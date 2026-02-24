@@ -63,3 +63,5 @@ Repo-wide audit across `*.py`, `*.yaml`, and `*.json` for:
 
 4. Syntax/import check:
 - `python -m compileall app`: pass
+- Note: Strings like `human_oversight` may appear in YAML criterion IDs.
+- These are identifier labels and are not treated as unified dimension keys.
