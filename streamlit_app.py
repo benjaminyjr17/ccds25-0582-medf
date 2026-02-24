@@ -40,12 +40,12 @@ PRESET_BASELINE = {
 }
 
 PRESET_FLIPPED = {
-    "transparency_explainability": 2,
+    "transparency_explainability": 4,
     "fairness_nondiscrimination": 5,
     "safety_robustness": 1,
     "privacy_data_governance": 5,
-    "human_agency_oversight": 2,
-    "accountability": 3,
+    "human_agency_oversight": 5,
+    "accountability": 4,
 }
 
 PRESET_SAFETY_HEAVY = {
@@ -532,7 +532,7 @@ def main() -> None:
                 preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
                 if preset_col_1.button("Preset: Baseline (2,1,4,1,2,3)"):
                     _apply_dimension_preset(PRESET_BASELINE)
-                if preset_col_2.button("Preset: Flipped (2,5,1,5,2,3)"):
+                if preset_col_2.button("Preset: Flipped (4,5,1,5,5,4)"):
                     _apply_dimension_preset(PRESET_FLIPPED)
                 if preset_col_3.button("Preset: Safety-heavy (3,3,5,3,3,3)"):
                     _apply_dimension_preset(PRESET_SAFETY_HEAVY)
