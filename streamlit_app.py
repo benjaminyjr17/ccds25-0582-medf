@@ -651,7 +651,7 @@ def main() -> None:
                 showlegend=False,
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
             )
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(fig, width="stretch", key="evaluate_radar")
 
             table_rows = []
             for row in framework_scores:
@@ -872,7 +872,7 @@ def main() -> None:
                     title=matrix_title,
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
-                st.plotly_chart(heatmap, width="stretch")
+                st.plotly_chart(heatmap, width="stretch", key="conflict_heatmap")
             else:
                 st.info("No correlation matrix returned in metadata.")
     elif page == "Pareto Resolution":
@@ -1078,7 +1078,11 @@ def main() -> None:
                 showlegend=False,
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
             )
-            st.plotly_chart(radar_figure, width="stretch")
+            st.plotly_chart(
+                radar_figure,
+                width="stretch",
+                key=f"pareto_weights_radar_{selected_solution_id}",
+            )
 
             st.subheader("Stakeholder Distance (Lower = Better Alignment)")
             distance_values = [float(selected_objectives.get(stakeholder_id, 0.0)) for stakeholder_id in stakeholder_ids]
@@ -1097,7 +1101,11 @@ def main() -> None:
                 yaxis_title="Distance",
                 margin={"l": 40, "r": 40, "t": 60, "b": 40},
             )
-            st.plotly_chart(bar_figure, width="stretch")
+            st.plotly_chart(
+                bar_figure,
+                width="stretch",
+                key=f"pareto_distance_bar_{selected_solution_id}",
+            )
 
             st.subheader("Tradeoff Visualization")
             if len(stakeholder_ids) == 2:
@@ -1142,7 +1150,11 @@ def main() -> None:
                     yaxis_title=f"{stakeholder_b} distance",
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
-                st.plotly_chart(scatter_figure, width="stretch")
+                st.plotly_chart(
+                    scatter_figure,
+                    width="stretch",
+                    key=f"pareto_tradeoff_scatter_{stakeholder_a}_{stakeholder_b}",
+                )
             elif len(stakeholder_ids) >= 3:
                 dimension_specs = [
                     {
@@ -1170,7 +1182,11 @@ def main() -> None:
                     title="Stakeholder Distance Tradeoffs",
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
-                st.plotly_chart(parallel_figure, width="stretch")
+                st.plotly_chart(
+                    parallel_figure,
+                    width="stretch",
+                    key=f"pareto_tradeoff_parallel_{len(stakeholder_ids)}",
+                )
                 st.caption(f"Selected solution: {selected_solution_id} (rank {selected_rank})")
             else:
                 st.info("Select at least 2 stakeholders to view tradeoffs.")
@@ -1203,163 +1219,166 @@ def main() -> None:
                 run_case_clicked = st.button("Run Case Study", key=f"run_case_{case_id}", type="primary")
 
                 if run_case_clicked:
-                    stakeholder_by_id = {
-                        str(item.get("id", "")): item
-                        for item in stakeholders
-                        if isinstance(item, dict) and item.get("id")
-                    }
-                    weights_payload: dict[str, dict[str, float]] = {}
-                    missing_stakeholder = False
-                    for stakeholder_id in case_stakeholder_ids:
-                        stakeholder_obj = stakeholder_by_id.get(stakeholder_id)
-                        if stakeholder_obj is None:
-                            st.error(
-                                f"Stakeholder '{stakeholder_id}' not found in /api/stakeholders; cannot run evaluation."
-                            )
-                            missing_stakeholder = True
-                            break
-
-                        raw_weights = stakeholder_obj.get("weights")
-                        if not isinstance(raw_weights, dict):
-                            st.error(
-                                f"Stakeholder '{stakeholder_id}' has no valid weights in /api/stakeholders; cannot run evaluation."
-                            )
-                            missing_stakeholder = True
-                            break
-
-                        missing_dimensions = [
-                            dimension for dimension in UNIFIED_DIMENSIONS if dimension not in raw_weights
-                        ]
-                        if missing_dimensions:
-                            st.error(
-                                f"Stakeholder '{stakeholder_id}' weights missing dimensions: {', '.join(missing_dimensions)}."
-                            )
-                            missing_stakeholder = True
-                            break
-
-                        weights_payload[stakeholder_id] = {
-                            dimension: float(raw_weights[dimension])
-                            for dimension in UNIFIED_DIMENSIONS
+                    try:
+                        stakeholder_by_id = {
+                            str(item.get("id", "")): item
+                            for item in stakeholders
+                            if isinstance(item, dict) and item.get("id")
                         }
+                        weights_payload: dict[str, dict[str, float]] = {}
+                        missing_stakeholder = False
+                        for stakeholder_id in case_stakeholder_ids:
+                            stakeholder_obj = stakeholder_by_id.get(stakeholder_id)
+                            if stakeholder_obj is None:
+                                st.error(
+                                    f"Stakeholder '{stakeholder_id}' not found in /api/stakeholders; cannot run evaluation."
+                                )
+                                missing_stakeholder = True
+                                break
 
-                    if missing_stakeholder:
-                        continue
+                            raw_weights = stakeholder_obj.get("weights")
+                            if not isinstance(raw_weights, dict):
+                                st.error(
+                                    f"Stakeholder '{stakeholder_id}' has no valid weights in /api/stakeholders; cannot run evaluation."
+                                )
+                                missing_stakeholder = True
+                                break
 
-                    evaluate_payload = {
-                        "ai_system": {
-                            "id": f"case_{case_id}",
-                            "name": case_name,
-                            "description": case_description,
-                            "context": {"dimension_scores": case_scores},
-                        },
-                        "framework_ids": case_framework_ids,
-                        "stakeholder_ids": case_stakeholder_ids,
-                        "weights": weights_payload,
-                        "scoring_method": "topsis",
-                    }
-                    conflicts_payload = {
-                        "ai_system": {
-                            "id": f"case_{case_id}",
-                            "name": case_name,
-                            "description": case_description,
-                            "context": {"dimension_scores": case_scores},
-                        },
-                        "framework_ids": case_framework_ids,
-                        "stakeholder_ids": case_stakeholder_ids,
-                    }
-                    pareto_payload = {
-                        "ai_system": {
-                            "id": f"case_{case_id}",
-                            "name": case_name,
-                            "description": case_description,
-                            "context": {"dimension_scores": case_scores},
-                        },
-                        "framework_ids": case_framework_ids,
-                        "stakeholder_ids": case_stakeholder_ids,
-                        "n_solutions": 8,
-                        "pop_size": 40,
-                        "n_gen": 80,
-                    }
+                            missing_dimensions = [
+                                dimension for dimension in UNIFIED_DIMENSIONS if dimension not in raw_weights
+                            ]
+                            if missing_dimensions:
+                                st.error(
+                                    f"Stakeholder '{stakeholder_id}' weights missing dimensions: {', '.join(missing_dimensions)}."
+                                )
+                                missing_stakeholder = True
+                                break
 
-                    with st.spinner("Running Evaluate → Conflicts → Pareto..."):
-                        try:
-                            evaluate_response = requests.post(
-                                f"{backend_url}/api/evaluate",
-                                json=evaluate_payload,
-                                timeout=60,
-                            )
-                            if evaluate_response.status_code != 200:
-                                st.error(evaluate_response.text)
-                                continue
+                            weights_payload[stakeholder_id] = {
+                                dimension: float(raw_weights[dimension])
+                                for dimension in UNIFIED_DIMENSIONS
+                            }
 
-                            conflicts_response = requests.post(
-                                f"{backend_url}/api/conflicts",
-                                json=conflicts_payload,
-                                timeout=60,
-                            )
-                            if conflicts_response.status_code != 200:
-                                st.error(conflicts_response.text)
-                                continue
-
-                            pareto_response = requests.post(
-                                f"{backend_url}/api/pareto",
-                                json=pareto_payload,
-                                timeout=90,
-                            )
-                            if pareto_response.status_code != 200:
-                                st.error(pareto_response.text)
-                                continue
-                        except Exception as exc:
-                            st.error(f"Case API call failed: {exc}")
+                        if missing_stakeholder:
                             continue
 
-                    st.session_state[case_result_key] = {
-                        "evaluate_payload": evaluate_payload,
-                        "conflicts_payload": conflicts_payload,
-                        "pareto_payload": pareto_payload,
-                        "evaluate_response": evaluate_response.json(),
-                        "conflicts_response": conflicts_response.json(),
-                        "pareto_response": pareto_response.json(),
-                    }
-                    bundle = _update_last_run_bundle(
-                        page_name="Case Studies",
-                        backend_url=backend_url,
-                        requests_payloads={
-                            "evaluate": evaluate_payload,
-                            "conflicts": conflicts_payload,
-                            "pareto": pareto_payload,
-                        },
-                        responses_payloads={
-                            "evaluate": evaluate_response.json(),
-                            "conflicts": conflicts_response.json(),
-                            "pareto": pareto_response.json(),
-                        },
-                        ui_context={
-                            "page": page,
-                            "framework_id": case_framework_ids[0],
+                        evaluate_payload = {
+                            "ai_system": {
+                                "id": f"case_{case_id}",
+                                "name": case_name,
+                                "description": case_description,
+                                "context": {"dimension_scores": case_scores},
+                            },
+                            "framework_ids": case_framework_ids,
                             "stakeholder_ids": case_stakeholder_ids,
-                            "case_id": case_id,
-                            "case_name": case_name,
-                        },
-                    )
-                    _write_ui_run_log(
-                        run_id=str(bundle.get("run_id", str(uuid4()))),
-                        page_name="case_studies",
-                        case_name=case_id,
-                        payload={
-                            "timestamp_utc": datetime.utcnow().isoformat() + "Z",
-                            "requests": {
+                            "weights": weights_payload,
+                            "scoring_method": "topsis",
+                        }
+                        conflicts_payload = {
+                            "ai_system": {
+                                "id": f"case_{case_id}",
+                                "name": case_name,
+                                "description": case_description,
+                                "context": {"dimension_scores": case_scores},
+                            },
+                            "framework_ids": case_framework_ids,
+                            "stakeholder_ids": case_stakeholder_ids,
+                        }
+                        pareto_payload = {
+                            "ai_system": {
+                                "id": f"case_{case_id}",
+                                "name": case_name,
+                                "description": case_description,
+                                "context": {"dimension_scores": case_scores},
+                            },
+                            "framework_ids": case_framework_ids,
+                            "stakeholder_ids": case_stakeholder_ids,
+                            "n_solutions": 8,
+                            "pop_size": 40,
+                            "n_gen": 80,
+                        }
+
+                        with st.spinner("Running Evaluate → Conflicts → Pareto..."):
+                            try:
+                                evaluate_response = requests.post(
+                                    f"{backend_url}/api/evaluate",
+                                    json=evaluate_payload,
+                                    timeout=60,
+                                )
+                                if evaluate_response.status_code != 200:
+                                    st.error(evaluate_response.text)
+                                    continue
+
+                                conflicts_response = requests.post(
+                                    f"{backend_url}/api/conflicts",
+                                    json=conflicts_payload,
+                                    timeout=60,
+                                )
+                                if conflicts_response.status_code != 200:
+                                    st.error(conflicts_response.text)
+                                    continue
+
+                                pareto_response = requests.post(
+                                    f"{backend_url}/api/pareto",
+                                    json=pareto_payload,
+                                    timeout=90,
+                                )
+                                if pareto_response.status_code != 200:
+                                    st.error(pareto_response.text)
+                                    continue
+                            except Exception as exc:
+                                st.error(f"Case API call failed: {exc}")
+                                continue
+
+                        st.session_state[case_result_key] = {
+                            "evaluate_payload": evaluate_payload,
+                            "conflicts_payload": conflicts_payload,
+                            "pareto_payload": pareto_payload,
+                            "evaluate_response": evaluate_response.json(),
+                            "conflicts_response": conflicts_response.json(),
+                            "pareto_response": pareto_response.json(),
+                        }
+                        bundle = _update_last_run_bundle(
+                            page_name="Case Studies",
+                            backend_url=backend_url,
+                            requests_payloads={
                                 "evaluate": evaluate_payload,
                                 "conflicts": conflicts_payload,
                                 "pareto": pareto_payload,
                             },
-                            "responses": {
+                            responses_payloads={
                                 "evaluate": evaluate_response.json(),
                                 "conflicts": conflicts_response.json(),
                                 "pareto": pareto_response.json(),
                             },
-                        },
-                    )
+                            ui_context={
+                                "page": page,
+                                "framework_id": case_framework_ids[0],
+                                "stakeholder_ids": case_stakeholder_ids,
+                                "case_id": case_id,
+                                "case_name": case_name,
+                            },
+                        )
+                        _write_ui_run_log(
+                            run_id=str(bundle.get("run_id", str(uuid4()))),
+                            page_name="case_studies",
+                            case_name=case_id,
+                            payload={
+                                "timestamp_utc": datetime.utcnow().isoformat() + "Z",
+                                "requests": {
+                                    "evaluate": evaluate_payload,
+                                    "conflicts": conflicts_payload,
+                                    "pareto": pareto_payload,
+                                },
+                                "responses": {
+                                    "evaluate": evaluate_response.json(),
+                                    "conflicts": conflicts_response.json(),
+                                    "pareto": pareto_response.json(),
+                                },
+                            },
+                        )
+                    except Exception as exc:
+                        st.error(f"Case '{case_name}' failed: {exc}")
 
                 case_result = st.session_state.get(case_result_key)
                 if not isinstance(case_result, dict):
@@ -1389,7 +1408,11 @@ def main() -> None:
                             title="Evaluation Dimension Scores",
                             radial_max=1.0,
                         )
-                        st.plotly_chart(eval_radar, width="stretch")
+                        st.plotly_chart(
+                            eval_radar,
+                            width="stretch",
+                            key=f"case_{case_id}_evaluation_radar",
+                        )
                     else:
                         st.warning("Evaluation dimension scores were not returned.")
                 else:
@@ -1423,7 +1446,11 @@ def main() -> None:
                             labels=matrix_labels,
                             title="Weights-only Correlation",
                         )
-                        st.plotly_chart(weights_heatmap, width="stretch")
+                        st.plotly_chart(
+                            weights_heatmap,
+                            width="stretch",
+                            key=f"case_{case_id}_weights_heatmap",
+                        )
                     else:
                         st.info("Weights-only matrix unavailable.")
                 with matrix_col_2:
@@ -1433,7 +1460,11 @@ def main() -> None:
                             labels=matrix_labels,
                             title="Contrib-based Correlation",
                         )
-                        st.plotly_chart(contrib_heatmap, width="stretch")
+                        st.plotly_chart(
+                            contrib_heatmap,
+                            width="stretch",
+                            key=f"case_{case_id}_contrib_heatmap",
+                        )
                     else:
                         st.info("Contrib-based matrix unavailable.")
 
@@ -1533,7 +1564,11 @@ def main() -> None:
                         title="Rank 1 Consensus Weights",
                         radial_max=1.0,
                     )
-                    st.plotly_chart(consensus_radar, width="stretch")
+                    st.plotly_chart(
+                        consensus_radar,
+                        width="stretch",
+                        key=f"case_{case_id}_consensus_radar_{rank_1_solution['solution_id']}",
+                    )
 
                     stakeholder_distance_bar = go.Figure(
                         data=[
@@ -1553,7 +1588,11 @@ def main() -> None:
                         yaxis_title="Distance",
                         margin={"l": 40, "r": 40, "t": 60, "b": 40},
                     )
-                    st.plotly_chart(stakeholder_distance_bar, width="stretch")
+                    st.plotly_chart(
+                        stakeholder_distance_bar,
+                        width="stretch",
+                        key=f"case_{case_id}_distance_bar_{rank_1_solution['solution_id']}",
+                    )
                 else:
                     st.warning("No Pareto solutions were returned.")
 
