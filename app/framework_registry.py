@@ -13,8 +13,6 @@ from app.models import (
     DIMENSION_DISPLAY_NAMES,
     EthicalDimension,
     EthicalFramework,
-    SCORE_MAX,
-    SCORE_MIN,
     StakeholderRole,
     UNIFIED_DIMENSIONS,
 )
@@ -93,29 +91,31 @@ def _parse_dimensions(raw_framework: dict[str, Any], file_name: str) -> list[Eth
         raw_weight = item.get("weight", 1.0)
         raw_questions = item.get("assessment_questions", [])
         if not isinstance(raw_questions, list):
-            raw_questions = []
-
-        criteria_value = str(raw_criteria_type).strip().lower()
-        if criteria_value == CriteriaType.BENEFIT.value:
-            criteria_type = CriteriaType.BENEFIT
-        elif criteria_value == CriteriaType.COST.value:
-            criteria_type = CriteriaType.COST
-        else:
             raise RuntimeError(
-                f"Invalid criteria_type '{raw_criteria_type}' for dimension '{dimension_id}' in framework file '{file_name}'."
+                f"Invalid assessment_questions for dimension '{dimension_id}' in framework file '{file_name}': expected a list."
             )
 
         try:
-            dimension = EthicalDimension(
-                name=dimension_id,
-                display_name=dimension_name,
-                description=description or "",
-                weight_default=float(raw_weight),
-                scale_min=SCORE_MIN,
-                scale_max=SCORE_MAX,
-                criteria_type=criteria_type,
-                assessment_questions=[str(question) for question in raw_questions[:5]],
-            )
+            criteria_type = CriteriaType(str(raw_criteria_type).strip().lower())
+        except ValueError as exc:
+            raise RuntimeError(
+                f"Invalid criteria_type '{raw_criteria_type}' for dimension '{dimension_id}' in framework file '{file_name}'."
+            ) from exc
+
+        try:
+            dimension_payload: dict[str, Any] = {
+                "name": dimension_id,
+                "display_name": dimension_name,
+                "description": description,
+                "weight_default": float(raw_weight),
+                "criteria_type": criteria_type,
+                "assessment_questions": [str(question) for question in raw_questions[:5]],
+            }
+            if "scale_min" in item:
+                dimension_payload["scale_min"] = float(item["scale_min"])
+            if "scale_max" in item:
+                dimension_payload["scale_max"] = float(item["scale_max"])
+            dimension = EthicalDimension(**dimension_payload)
         except Exception as exc:
             raise RuntimeError(
                 f"Invalid dimension '{dimension_id}' in framework file '{file_name}': {exc}"

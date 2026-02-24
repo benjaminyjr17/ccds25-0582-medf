@@ -156,7 +156,7 @@ class DBStakeholderProfile(Base):
 class EthicalDimension(BaseModel):
     name: str
     display_name: str
-    description: str = ""
+    description: Optional[str] = None
     weight_default: float = Field(1.0, ge=SCORE_MIN, le=SCORE_MAX)
     scale_min: float = SCORE_MIN
     scale_max: float = SCORE_MAX
@@ -195,6 +195,9 @@ class EthicalFramework(BaseModel):
             seen.add(dimension.name)
         if len(value) != len(UNIFIED_DIMENSIONS):
             raise ValueError(f"Framework must define {len(UNIFIED_DIMENSIONS)} dimensions.")
+        weight_sum = sum(dimension.weight_default for dimension in value)
+        if abs(weight_sum - 1.0) > 0.01:
+            raise ValueError("Framework dimension weights must sum to 1.0 (±0.01).")
         return value
 
 
@@ -403,5 +406,4 @@ class HealthResponse(BaseModel):
 class ErrorResponse(BaseModel):
     detail: Any
     error_code: Optional[str] = None
-    path: Optional[str] = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
