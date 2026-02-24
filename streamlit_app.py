@@ -112,6 +112,76 @@ CASE_STUDIES = [
 ]
 
 
+def _get_theme_base():
+    try:
+        return st.get_option("theme.base") or "light"
+    except Exception:
+        return "light"
+
+
+def _theme_tokens():
+    base = _get_theme_base()
+    if base == "dark":
+        return {
+            "plot_text": "#e5e7eb",
+            "plot_grid": "rgba(255,255,255,0.15)",
+            "plot_axis": "rgba(255,255,255,0.30)",
+            "panel_border": "rgba(255,255,255,0.08)",
+        }
+    return {
+        "plot_text": "#111827",
+        "plot_grid": "rgba(17,24,39,0.12)",
+        "plot_axis": "rgba(17,24,39,0.22)",
+        "panel_border": "rgba(17,24,39,0.08)",
+    }
+
+
+def _style_plotly(fig):
+    tokens = _theme_tokens()
+
+    fig.update_layout(
+        font=dict(color=tokens["plot_text"], size=14),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(l=40, r=40, t=60, b=40),
+    )
+
+    if hasattr(fig.layout, "polar"):
+        fig.update_layout(
+            polar=dict(
+                bgcolor="rgba(0,0,0,0)",
+                radialaxis=dict(
+                    gridcolor=tokens["plot_grid"],
+                    linecolor=tokens["plot_axis"],
+                    tickfont=dict(color=tokens["plot_text"]),
+                    tickcolor=tokens["plot_axis"],
+                ),
+                angularaxis=dict(
+                    gridcolor=tokens["plot_grid"],
+                    linecolor=tokens["plot_axis"],
+                    tickfont=dict(color=tokens["plot_text"]),
+                    tickcolor=tokens["plot_axis"],
+                ),
+            )
+        )
+
+    if hasattr(fig.layout, "xaxis"):
+        fig.update_layout(
+            xaxis=dict(
+                gridcolor=tokens["plot_grid"],
+                tickfont=dict(color=tokens["plot_text"]),
+                linecolor=tokens["plot_axis"],
+            ),
+            yaxis=dict(
+                gridcolor=tokens["plot_grid"],
+                tickfont=dict(color=tokens["plot_text"]),
+                linecolor=tokens["plot_axis"],
+            ),
+        )
+
+    return fig
+
+
 def _risk_label(score: float) -> tuple[str, str]:
     if score >= 0.8:
         return "LOW", "green"
@@ -327,6 +397,25 @@ def _build_correlation_heatmap(
 
 def main() -> None:
     st.set_page_config(page_title="MEDF Dashboard", layout="wide")
+    st.markdown(
+        """
+<style>
+.block-container {
+    padding-top: 2rem;
+}
+section[data-testid="stSidebar"] {
+    border-right: 1px solid rgba(128,128,128,0.15);
+}
+button[kind="primary"] {
+    border-radius: 8px !important;
+}
+button[kind="secondary"] {
+    border-radius: 8px !important;
+}
+</style>
+""",
+        unsafe_allow_html=True,
+    )
     st.title("MEDF Dashboard")
 
     page = st.radio(
@@ -651,7 +740,7 @@ def main() -> None:
                 showlegend=False,
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
             )
-            st.plotly_chart(fig, width="stretch", key="evaluate_radar")
+            st.plotly_chart(_style_plotly(fig), width="stretch", key="evaluate_radar")
 
             table_rows = []
             for row in framework_scores:
@@ -872,7 +961,7 @@ def main() -> None:
                     title=matrix_title,
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
-                st.plotly_chart(heatmap, width="stretch", key="conflict_heatmap")
+                st.plotly_chart(_style_plotly(heatmap), width="stretch", key="conflict_heatmap")
             else:
                 st.info("No correlation matrix returned in metadata.")
     elif page == "Pareto Resolution":
@@ -1079,7 +1168,7 @@ def main() -> None:
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
             )
             st.plotly_chart(
-                radar_figure,
+                _style_plotly(radar_figure),
                 width="stretch",
                 key=f"pareto_weights_radar_{selected_solution_id}",
             )
@@ -1102,7 +1191,7 @@ def main() -> None:
                 margin={"l": 40, "r": 40, "t": 60, "b": 40},
             )
             st.plotly_chart(
-                bar_figure,
+                _style_plotly(bar_figure),
                 width="stretch",
                 key=f"pareto_distance_bar_{selected_solution_id}",
             )
@@ -1151,7 +1240,7 @@ def main() -> None:
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
                 st.plotly_chart(
-                    scatter_figure,
+                    _style_plotly(scatter_figure),
                     width="stretch",
                     key=f"pareto_tradeoff_scatter_{stakeholder_a}_{stakeholder_b}",
                 )
@@ -1183,7 +1272,7 @@ def main() -> None:
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
                 st.plotly_chart(
-                    parallel_figure,
+                    _style_plotly(parallel_figure),
                     width="stretch",
                     key=f"pareto_tradeoff_parallel_{len(stakeholder_ids)}",
                 )
@@ -1409,7 +1498,7 @@ def main() -> None:
                             radial_max=1.0,
                         )
                         st.plotly_chart(
-                            eval_radar,
+                            _style_plotly(eval_radar),
                             width="stretch",
                             key=f"case_{case_id}_evaluation_radar",
                         )
@@ -1447,7 +1536,7 @@ def main() -> None:
                             title="Weights-only Correlation",
                         )
                         st.plotly_chart(
-                            weights_heatmap,
+                            _style_plotly(weights_heatmap),
                             width="stretch",
                             key=f"case_{case_id}_weights_heatmap",
                         )
@@ -1461,7 +1550,7 @@ def main() -> None:
                             title="Contrib-based Correlation",
                         )
                         st.plotly_chart(
-                            contrib_heatmap,
+                            _style_plotly(contrib_heatmap),
                             width="stretch",
                             key=f"case_{case_id}_contrib_heatmap",
                         )
@@ -1565,7 +1654,7 @@ def main() -> None:
                         radial_max=1.0,
                     )
                     st.plotly_chart(
-                        consensus_radar,
+                        _style_plotly(consensus_radar),
                         width="stretch",
                         key=f"case_{case_id}_consensus_radar_{rank_1_solution['solution_id']}",
                     )
@@ -1589,7 +1678,7 @@ def main() -> None:
                         margin={"l": 40, "r": 40, "t": 60, "b": 40},
                     )
                     st.plotly_chart(
-                        stakeholder_distance_bar,
+                        _style_plotly(stakeholder_distance_bar),
                         width="stretch",
                         key=f"case_{case_id}_distance_bar_{rank_1_solution['solution_id']}",
                     )
