@@ -118,6 +118,7 @@ def main() -> None:
         scoring_method = "topsis"
         conflict_metric = "Weights-only (priority conflict)"
         detect_clicked = False
+        screenshot_mode = False
         selected_stakeholder: dict[str, Any] | None = None
         conflict_stakeholder_ids: list[str] = []
 
@@ -226,6 +227,7 @@ def main() -> None:
                 ["Weights-only (priority conflict)", "Contrib-based (system-salience conflict)"],
                 index=0,
             )
+            screenshot_mode = st.checkbox("Screenshot mode", value=False)
             detect_clicked = st.button("Detect Conflicts", type="primary")
 
     col_left, col_right = st.columns([1, 1])
@@ -238,11 +240,11 @@ def main() -> None:
         st.subheader("Dimension Scores (Likert 1–5)")
         if page == "Conflict Detection":
             preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
-            if preset_col_1.button("Facial Recognition (baseline)"):
+            if preset_col_1.button("Preset: Baseline (2,1,4,1,2,3)"):
                 _apply_dimension_preset(PRESET_BASELINE)
-            if preset_col_2.button("Fairness/Privacy heavy (flipped)"):
+            if preset_col_2.button("Preset: Flipped (2,5,1,5,2,3)"):
                 _apply_dimension_preset(PRESET_FLIPPED)
-            if preset_col_3.button("Safety-heavy"):
+            if preset_col_3.button("Preset: Safety-heavy (3,3,5,3,3,3)"):
                 _apply_dimension_preset(PRESET_SAFETY_HEAVY)
 
         dimension_scores: dict[str, float] = {}
@@ -401,9 +403,91 @@ def main() -> None:
             st.subheader("Conflict Detection Results")
             if result.get("summary"):
                 st.info(str(result["summary"]))
+            if not screenshot_mode:
+                st.caption("Switch conflict metric in the sidebar to compare weights-only vs contrib-based views.")
 
             conflicts = result.get("conflicts", [])
             metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
+            correlation_matrix_weights = (
+                metadata.get("correlation_matrix_weights")
+                if isinstance(metadata, dict)
+                else None
+            )
+            correlation_matrix_contrib = (
+                metadata.get("correlation_matrix_contrib")
+                if isinstance(metadata, dict)
+                else None
+            )
+            rankings_weights = metadata.get("stakeholder_rankings_weights")
+            rankings_contrib = metadata.get("stakeholder_rankings_contrib")
+
+            rho_weights_dev_affected: str = "N/A"
+            rho_contrib_dev_affected: str = "N/A"
+            if isinstance(correlation_matrix_weights, dict):
+                rho_weights_raw = (
+                    correlation_matrix_weights.get("developer", {})
+                    .get("affected_community")
+                )
+                if isinstance(rho_weights_raw, (int, float)):
+                    rho_weights_dev_affected = f"{float(rho_weights_raw):.4f}"
+            if isinstance(correlation_matrix_contrib, dict):
+                rho_contrib_raw = (
+                    correlation_matrix_contrib.get("developer", {})
+                    .get("affected_community")
+                )
+                if isinstance(rho_contrib_raw, (int, float)):
+                    rho_contrib_dev_affected = f"{float(rho_contrib_raw):.4f}"
+
+            demo_box = st.container(border=True)
+            with demo_box:
+                st.markdown("**Demo Summary**")
+                metric_col_1, metric_col_2 = st.columns(2)
+                metric_col_1.metric("rho_weights(dev, affected)", rho_weights_dev_affected)
+                metric_col_2.metric("rho_contrib(dev, affected)", rho_contrib_dev_affected)
+
+                stakeholders_for_top1 = list(conflict_stakeholder_ids)
+                if not stakeholders_for_top1:
+                    stakeholders_for_top1 = list(
+                        {
+                            *(
+                                rankings_weights.keys()
+                                if isinstance(rankings_weights, dict)
+                                else []
+                            ),
+                            *(
+                                rankings_contrib.keys()
+                                if isinstance(rankings_contrib, dict)
+                                else []
+                            ),
+                        }
+                    )
+
+                top1_rows = []
+                for stakeholder_id in stakeholders_for_top1:
+                    weights_top_1 = "N/A"
+                    contrib_top_1 = "N/A"
+
+                    if isinstance(rankings_weights, dict):
+                        ranking_weights = rankings_weights.get(stakeholder_id)
+                        if isinstance(ranking_weights, list) and ranking_weights:
+                            weights_top_1 = str(ranking_weights[0])
+
+                    if isinstance(rankings_contrib, dict):
+                        ranking_contrib = rankings_contrib.get(stakeholder_id)
+                        if isinstance(ranking_contrib, list) and ranking_contrib:
+                            contrib_top_1 = str(ranking_contrib[0])
+
+                    top1_rows.append(
+                        {
+                            "stakeholder_id": stakeholder_id,
+                            "top1_weights": weights_top_1,
+                            "top1_contrib": contrib_top_1,
+                        }
+                    )
+
+                if top1_rows:
+                    st.table(top1_rows)
+
             pairwise_rho_weights = metadata.get("pairwise_rho_weights")
             include_rho_weights = isinstance(pairwise_rho_weights, dict)
             if isinstance(conflicts, list) and conflicts:
@@ -432,10 +516,10 @@ def main() -> None:
                 st.info("No stakeholder conflicts were returned.")
 
             if conflict_metric == "Weights-only (priority conflict)":
-                correlation_matrix = metadata.get("correlation_matrix_weights")
+                correlation_matrix = correlation_matrix_weights
                 matrix_title = "Stakeholder Spearman Correlation Matrix (Weights-only)"
             else:
-                correlation_matrix = metadata.get("correlation_matrix_contrib")
+                correlation_matrix = correlation_matrix_contrib
                 matrix_title = "Stakeholder Spearman Correlation Matrix (Contrib-based)"
 
             if isinstance(correlation_matrix, dict) and correlation_matrix:
@@ -475,45 +559,6 @@ def main() -> None:
                 st.plotly_chart(heatmap, width="stretch")
             else:
                 st.info("No correlation matrix returned in metadata.")
-
-            rankings_weights = metadata.get("stakeholder_rankings_weights")
-            rankings_contrib = metadata.get("stakeholder_rankings_contrib")
-            if isinstance(rankings_weights, dict) or isinstance(rankings_contrib, dict):
-                left_col, right_col = st.columns(2)
-
-                with left_col:
-                    st.markdown("**Top-1 Priority (Weights-only)**")
-                    if isinstance(rankings_weights, dict):
-                        rows_weights = []
-                        for stakeholder_id in conflict_stakeholder_ids:
-                            ranking = rankings_weights.get(stakeholder_id)
-                            top_1 = ranking[0] if isinstance(ranking, list) and ranking else None
-                            rows_weights.append(
-                                {
-                                    "stakeholder_id": stakeholder_id,
-                                    "top_1_dimension": top_1,
-                                }
-                            )
-                        st.table(rows_weights)
-                    else:
-                        st.info("No weights-only rankings returned in metadata.")
-
-                with right_col:
-                    st.markdown("**Top-1 Salience (Contrib-based)**")
-                    if isinstance(rankings_contrib, dict):
-                        rows_contrib = []
-                        for stakeholder_id in conflict_stakeholder_ids:
-                            ranking = rankings_contrib.get(stakeholder_id)
-                            top_1 = ranking[0] if isinstance(ranking, list) and ranking else None
-                            rows_contrib.append(
-                                {
-                                    "stakeholder_id": stakeholder_id,
-                                    "top_1_dimension": top_1,
-                                }
-                            )
-                        st.table(rows_contrib)
-                    else:
-                        st.info("No contrib-based rankings returned in metadata.")
 
 
 if __name__ == "__main__":
