@@ -16,3 +16,12 @@ Run tests (in a separate terminal with the same venv activated, or after stoppin
 source .venv/bin/activate
 pytest
 ```
+
+## Dev performance
+
+Streamlit recommends `watchdog` for faster file watching during local development.
+
+```bash
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m streamlit run streamlit_app.py
+```
