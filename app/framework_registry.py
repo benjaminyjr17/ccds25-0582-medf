@@ -70,12 +70,18 @@ def _parse_dimensions(raw_framework: dict[str, Any], file_name: str) -> list[Eth
 
         raw_dimension = item.get("dimension")
         if raw_dimension is None:
-            raw_dimension = item.get("id")
-
-        if raw_dimension is None:
-            raise RuntimeError(
-                f"Framework file '{file_name}' has a dimension without id at index {index}."
-            )
+            fallback_id = item.get("id")
+            if fallback_id is None:
+                raise RuntimeError(
+                    f"Framework file '{file_name}' has a criterion without dimension at index {index}."
+                )
+            candidate = str(fallback_id).strip().lower()
+            if candidate not in UNIFIED_DIMENSIONS:
+                raise RuntimeError(
+                    f"Framework file '{file_name}' has a criterion missing 'dimension' at index {index}. "
+                    f"Got id='{candidate}', which is not a canonical unified dimension key."
+                )
+            raw_dimension = candidate
 
         dimension_id = str(raw_dimension).strip().lower()
         dimension_name = str(
@@ -109,7 +115,14 @@ def _parse_dimensions(raw_framework: dict[str, Any], file_name: str) -> list[Eth
                 "description": description,
                 "weight_default": float(raw_weight),
                 "criteria_type": criteria_type,
-                "assessment_questions": [str(question) for question in raw_questions[:5]],
+                "assessment_questions": [
+                    cleaned
+                    for cleaned in (
+                        str(question).strip()
+                        for question in raw_questions
+                    )
+                    if cleaned
+                ][:5],
             }
             if "scale_min" in item:
                 dimension_payload["scale_min"] = float(item["scale_min"])
