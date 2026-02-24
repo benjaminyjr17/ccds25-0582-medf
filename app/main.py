@@ -11,6 +11,7 @@ from app.framework_registry import (
     seed_default_stakeholders,
 )
 from app.models import DBStakeholderProfile, HealthResponse
+from app.routers.conflicts import router as conflicts_router
 from app.routers.evaluate import router as evaluate_router
 from app.routers.frameworks import router as frameworks_router
 from app.routers.stakeholders import router as stakeholders_router
@@ -35,6 +36,7 @@ app = FastAPI(
 app.include_router(stakeholders_router)
 app.include_router(frameworks_router)
 app.include_router(evaluate_router)
+app.include_router(conflicts_router)
 
 
 @app.get("/api/health", response_model=HealthResponse, tags=["Health"])
