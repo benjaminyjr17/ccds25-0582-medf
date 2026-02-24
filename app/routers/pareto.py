@@ -11,12 +11,14 @@ try:
     from pymoo.algorithms.moo.nsga2 import NSGA2
     from pymoo.core.problem import Problem
     from pymoo.optimize import minimize
+    from pymoo.termination import get_termination
 
     _HAS_PYMOO = True
-except Exception:  # pragma: no cover - deterministic fallback when pymoo is unavailable
+except Exception:  # pragma: no cover - deterministic fallback if pymoo is unavailable
     NSGA2 = None
     Problem = object
     minimize = None
+    get_termination = None
     _HAS_PYMOO = False
 
 from app.database import get_db
@@ -32,7 +34,52 @@ from app.models import (
 router = APIRouter(prefix="/api", tags=["Pareto"])
 
 
-def _normalize_weights_or_422(raw_weights: dict[str, float], stakeholder_id: str) -> dict[str, float]:
+def _resolve_framework_id_or_422(payload: "ParetoRequest") -> str:
+    framework_id = payload.framework_id
+    if framework_id:
+        return framework_id
+    if payload.framework_ids and len(payload.framework_ids) > 0:
+        return payload.framework_ids[0]
+    raise HTTPException(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        detail="Either framework_id or framework_ids[0] must be provided.",
+    )
+
+
+def _extract_x_normalized_or_422(ai_system: AISystemInput) -> np.ndarray:
+    raw_scores = ai_system.context.get("dimension_scores")
+    if not isinstance(raw_scores, dict):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="ai_system.context.dimension_scores is required with all unified dimensions.",
+        )
+
+    ordered_scores: list[float] = []
+    for dimension in UNIFIED_DIMENSIONS:
+        if dimension not in raw_scores:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Missing ai_system.context.dimension_scores['{dimension}'].",
+            )
+        try:
+            score = float(raw_scores[dimension])
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid score for '{dimension}'.",
+            ) from exc
+        if score < 1.0 or score > 5.0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Score for '{dimension}' must be between 1 and 5.",
+            )
+        ordered_scores.append(score)
+
+    likert = np.asarray(ordered_scores, dtype=float)
+    return np.clip((likert - 1.0) / 4.0, 0.0, 1.0)
+
+
+def _validate_weight_vector_or_422(raw_weights: dict[str, float], stakeholder_id: str) -> dict[str, float]:
     if not isinstance(raw_weights, dict):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -75,7 +122,7 @@ def _normalize_weights_or_422(raw_weights: dict[str, float], stakeholder_id: str
             ),
         )
 
-    if total <= 0.0:
+    if total <= 1e-12:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"Weights for stakeholder '{stakeholder_id}' sum to zero.",
@@ -87,65 +134,33 @@ def _normalize_weights_or_422(raw_weights: dict[str, float], stakeholder_id: str
     }
 
 
-def _extract_likert_scores_or_422(ai_system: AISystemInput) -> np.ndarray:
-    raw_scores = ai_system.context.get("dimension_scores")
-    if not isinstance(raw_scores, dict):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="ai_system.context.dimension_scores is required with all unified dimensions.",
-        )
-
-    ordered_scores: list[float] = []
-    for dimension in UNIFIED_DIMENSIONS:
-        if dimension not in raw_scores:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Missing ai_system.context.dimension_scores['{dimension}'].",
-            )
-        try:
-            score = float(raw_scores[dimension])
-        except (TypeError, ValueError) as exc:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Invalid score for '{dimension}'.",
-            ) from exc
-        if score < 1.0 or score > 5.0:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Score for '{dimension}' must be between 1 and 5.",
-            )
-        ordered_scores.append(score)
-
-    return np.asarray(ordered_scores, dtype=float)
-
-
-def _normalize_to_simplex(values: np.ndarray) -> np.ndarray:
-    matrix = np.asarray(values, dtype=float)
-    if matrix.ndim == 1:
-        total = float(matrix.sum())
+def _normalize_simplex(values: np.ndarray) -> np.ndarray:
+    array = np.asarray(values, dtype=float)
+    if array.ndim == 1:
+        total = float(array.sum())
         if total <= 1e-12:
-            return np.full(matrix.shape[0], 1.0 / matrix.shape[0], dtype=float)
-        return matrix / total
+            return np.full(array.shape[0], 1.0 / array.shape[0], dtype=float)
+        return array / total
 
-    totals = np.sum(matrix, axis=1, keepdims=True)
-    fallback = np.full(matrix.shape, 1.0 / matrix.shape[1], dtype=float)
-    return np.divide(matrix, totals, out=fallback, where=totals > 1e-12)
+    totals = np.sum(array, axis=1, keepdims=True)
+    fallback = np.full(array.shape, 1.0 / array.shape[1], dtype=float)
+    return np.divide(array, totals, out=fallback, where=totals > 1e-12)
 
 
-def _evaluate_objectives(
-    candidate_matrix: np.ndarray,
+def _compute_objectives(
+    candidates: np.ndarray,
     stakeholder_matrix: np.ndarray,
     salience_vector: np.ndarray,
 ) -> np.ndarray:
-    normalized_candidates = _normalize_to_simplex(candidate_matrix)
-    n_candidates = normalized_candidates.shape[0]
+    normalized = _normalize_simplex(candidates)
+    n_candidates = normalized.shape[0]
     n_stakeholders = stakeholder_matrix.shape[0]
     objectives = np.zeros((n_candidates, n_stakeholders), dtype=float)
 
-    for index in range(n_stakeholders):
-        stakeholder_weights = stakeholder_matrix[index]
-        objectives[:, index] = np.sum(
-            salience_vector * np.abs(normalized_candidates - stakeholder_weights),
+    for idx in range(n_stakeholders):
+        stakeholder_weights = stakeholder_matrix[idx]
+        objectives[:, idx] = np.sum(
+            salience_vector * np.abs(normalized - stakeholder_weights),
             axis=1,
         )
 
@@ -185,13 +200,14 @@ class ParetoRequest(BaseModel):
         for stakeholder_id, vector in value.items():
             if not isinstance(vector, dict):
                 raise ValueError(f"weights['{stakeholder_id}'] must be a key/value object.")
+
             missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in vector]
             if missing:
                 raise ValueError(
                     f"weights['{stakeholder_id}'] is missing dimensions: {', '.join(missing)}"
                 )
 
-            casted: dict[str, float] = {}
+            parsed: dict[str, float] = {}
             for dimension in UNIFIED_DIMENSIONS:
                 try:
                     score = float(vector[dimension])
@@ -203,27 +219,27 @@ class ParetoRequest(BaseModel):
                     raise ValueError(
                         f"weights['{stakeholder_id}']['{dimension}'] must be in [0, 1]."
                     )
-                casted[dimension] = score
+                parsed[dimension] = score
 
-            total = float(sum(casted.values()))
+            total = float(sum(parsed.values()))
             if abs(total - 1.0) > 0.01:
                 raise ValueError(
                     f"weights['{stakeholder_id}'] must sum to 1.0 (±0.01); got {total:.4f}."
                 )
 
             normalized[stakeholder_id] = {
-                dimension: casted[dimension] / total
+                dimension: parsed[dimension] / total
                 for dimension in UNIFIED_DIMENSIONS
             }
 
         return normalized
 
     @model_validator(mode="after")
-    def validate_framework_and_ai_system(self) -> "ParetoRequest":
-        resolved_framework_id = self.framework_id
-        if resolved_framework_id is None and self.framework_ids:
-            resolved_framework_id = self.framework_ids[0]
-        if not resolved_framework_id:
+    def validate_framework_and_scores(self) -> "ParetoRequest":
+        framework_id = self.framework_id
+        if framework_id is None and self.framework_ids:
+            framework_id = self.framework_ids[0]
+        if not framework_id:
             raise ValueError("Either framework_id or framework_ids[0] must be provided.")
 
         raw_scores = self.ai_system.context.get("dimension_scores")
@@ -272,7 +288,7 @@ if _HAS_PYMOO:
             self.salience_vector = salience_vector
 
         def _evaluate(self, x: np.ndarray, out: dict, *args, **kwargs) -> None:  # type: ignore[override]
-            out["F"] = _evaluate_objectives(x, self.stakeholder_matrix, self.salience_vector)
+            out["F"] = _compute_objectives(x, self.stakeholder_matrix, self.salience_vector)
 
 
 @router.post(
@@ -284,31 +300,23 @@ def generate_pareto_solutions(
     payload: ParetoRequest,
     db: Session = Depends(get_db),
 ) -> ConflictReport:
-    resolved_framework_id = payload.framework_id or ((payload.framework_ids or [None])[0])
-    if not resolved_framework_id:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Either framework_id or framework_ids[0] must be provided.",
-        )
+    framework_id = _resolve_framework_id_or_422(payload)
 
-    framework = get_framework(resolved_framework_id)
+    framework = get_framework(framework_id)
     if framework is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Framework '{resolved_framework_id}' not found.",
+            detail=f"Framework '{framework_id}' not found.",
         )
 
-    likert_scores = _extract_likert_scores_or_422(payload.ai_system)
-    scaled_scores = np.clip((likert_scores - 1.0) / 4.0, 0.0, 1.0)
-    salience_total = float(np.sum(scaled_scores))
-    if salience_total <= 1e-12:
-        salience_vector = np.full(len(UNIFIED_DIMENSIONS), 1.0 / len(UNIFIED_DIMENSIONS), dtype=float)
+    x_normalized = _extract_x_normalized_or_422(payload.ai_system)
+    x_sum = float(np.sum(x_normalized))
+    if x_sum > 1e-12:
+        salience_vector = x_normalized / x_sum
     else:
-        salience_vector = scaled_scores / salience_total
+        salience_vector = np.full(len(UNIFIED_DIMENSIONS), 1.0 / len(UNIFIED_DIMENSIONS), dtype=float)
 
     stakeholder_vectors: list[np.ndarray] = []
-    stakeholder_weights_by_id: dict[str, dict[str, float]] = {}
-
     for stakeholder_id in payload.stakeholder_ids:
         stakeholder = get_stakeholder(stakeholder_id, db)
         if stakeholder is None:
@@ -317,13 +325,9 @@ def generate_pareto_solutions(
                 detail=f"Stakeholder '{stakeholder_id}' not found.",
             )
 
-        override = payload.weights.get(stakeholder_id) if payload.weights else None
-        normalized = _normalize_weights_or_422(
-            override if override is not None else stakeholder.weights,
-            stakeholder_id,
-        )
-
-        stakeholder_weights_by_id[stakeholder_id] = normalized
+        override_weights = payload.weights.get(stakeholder_id) if payload.weights else None
+        source_weights = override_weights if override_weights is not None else stakeholder.weights
+        normalized = _validate_weight_vector_or_422(source_weights, stakeholder_id)
         stakeholder_vectors.append(
             np.asarray([normalized[dimension] for dimension in UNIFIED_DIMENSIONS], dtype=float)
         )
@@ -336,10 +340,11 @@ def generate_pareto_solutions(
             salience_vector=salience_vector,
         )
         algorithm = NSGA2(pop_size=payload.pop_size)
+        termination = get_termination("n_gen", payload.n_gen)
         res = minimize(
             problem,
             algorithm,
-            termination=("n_gen", payload.n_gen),
+            termination=termination,
             seed=payload.seed,
             save_history=False,
             verbose=False,
@@ -354,51 +359,64 @@ def generate_pareto_solutions(
         rng = np.random.default_rng(payload.seed)
         n_candidates = max(payload.pop_size * payload.n_gen, payload.n_solutions * 4)
         raw_x = rng.random((n_candidates, len(UNIFIED_DIMENSIONS)), dtype=float)
-        raw_f = _evaluate_objectives(raw_x, stakeholder_matrix, salience_vector)
+        raw_f = _compute_objectives(raw_x, stakeholder_matrix, salience_vector)
 
-    normalized_weights = _normalize_to_simplex(raw_x)
+    normalized_candidates = _normalize_simplex(raw_x)
 
-    deduped_rows: list[tuple[np.ndarray, np.ndarray]] = []
+    deduped: list[tuple[np.ndarray, np.ndarray, float]] = []
     seen_keys: set[tuple[float, ...]] = set()
-    for idx in range(normalized_weights.shape[0]):
-        vector = normalized_weights[idx]
-        key = tuple(np.round(vector, 4).tolist())
-        if key in seen_keys:
-            continue
-        seen_keys.add(key)
-        deduped_rows.append((vector, raw_f[idx]))
 
-    deduped_rows.sort(key=lambda item: float(np.sum(item[1])))
-    selected_rows = deduped_rows[: payload.n_solutions]
+    for idx in range(normalized_candidates.shape[0]):
+        consensus_weights = normalized_candidates[idx]
+        dedupe_key = tuple(np.round(consensus_weights, 4).tolist())
+        if dedupe_key in seen_keys:
+            continue
+        seen_keys.add(dedupe_key)
+
+        objective_vector = raw_f[idx]
+        utility_wsm = float(np.dot(consensus_weights, x_normalized))
+        deduped.append((consensus_weights, objective_vector, utility_wsm))
+
+    deduped.sort(key=lambda item: (float(np.sum(item[1])), -float(item[2])))
+    selected = deduped[: payload.n_solutions]
 
     pareto_solutions: list[ParetoSolution] = []
-    for index, (consensus_vector, objective_vector) in enumerate(selected_rows, start=1):
-        consensus_weights = {
-            dimension: float(consensus_vector[dim_idx])
-            for dim_idx, dimension in enumerate(UNIFIED_DIMENSIONS)
+    ablation_utility_by_solution: dict[str, float] = {}
+
+    for rank, (consensus, objectives, utility_wsm) in enumerate(selected, start=1):
+        solution_id = f"ps_{uuid4().hex[:8]}"
+        consensus_map = {
+            dimension: float(consensus[index])
+            for index, dimension in enumerate(UNIFIED_DIMENSIONS)
         }
         objective_scores = {
-            stakeholder_id: float(objective_vector[obj_idx])
-            for obj_idx, stakeholder_id in enumerate(payload.stakeholder_ids)
+            stakeholder_id: float(objectives[index])
+            for index, stakeholder_id in enumerate(payload.stakeholder_ids)
         }
 
         pareto_solutions.append(
             ParetoSolution(
-                solution_id=f"ps_{uuid4().hex[:8]}",
-                weights={"consensus": consensus_weights},
+                solution_id=solution_id,
+                weights={"consensus": consensus_map},
                 objective_scores=objective_scores,
-                rank=index,
+                rank=rank,
             )
         )
+        ablation_utility_by_solution[solution_id] = utility_wsm
 
+    x_payload = {
+        dimension: float(x_normalized[index])
+        for index, dimension in enumerate(UNIFIED_DIMENSIONS)
+    }
     salience_payload = {
-        dimension: float(salience_vector[idx])
-        for idx, dimension in enumerate(UNIFIED_DIMENSIONS)
+        dimension: float(salience_vector[index])
+        for index, dimension in enumerate(UNIFIED_DIMENSIONS)
     }
 
     return ConflictReport(
         summary=(
-            f"Pareto solutions for consensus weights under framework '{framework.id}'."
+            "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance "
+            f"under framework {framework.id}."
         ),
         conflicts=[],
         pareto_solutions=pareto_solutions,
@@ -407,10 +425,14 @@ def generate_pareto_solutions(
             "ai_system_id": payload.ai_system.id,
             "ai_system_name": payload.ai_system.name,
             "stakeholder_ids": payload.stakeholder_ids,
+            "x_normalized": x_payload,
             "salience_vector": salience_payload,
-            "objective_definition": (
-                "For each stakeholder k, minimize sum_i salience_i * abs(w_i - w_k_i)."
-            ),
-            "n_solutions": len(pareto_solutions),
+            "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+            "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+            "ablation_utility_by_solution": ablation_utility_by_solution,
+            "pop_size": payload.pop_size,
+            "n_gen": payload.n_gen,
+            "seed": payload.seed,
+            "n_solutions_returned": len(pareto_solutions),
         },
     )
