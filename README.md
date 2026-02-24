@@ -1,7 +1,7 @@
 # MEDF — Multi-stakeholder Ethical Decision Framework for AI Systems  
 **NTU CCDS Final Year Project (CCDS25-0582)**  
 Author: Benjamin Oliver Yick  
-Supervisor: Dr Zhang Jiehuang  
+Supervisor: Dr. Zhang Jiehuang  
 
 ---
 
@@ -10,9 +10,9 @@ Supervisor: Dr Zhang Jiehuang
 AI governance tools evaluate ethical compliance through a single framework and a single evaluator perspective.  
 They do not:
 
-- Compare AI systems across multiple ethical frameworks simultaneously  
-- Model disagreement between stakeholder groups  
-- Quantify stakeholder-weighted ethical trade-offs  
+- Compare AI systems across multiple ethical frameworks simultaneously.  
+- Model disagreement between stakeholder groups.  
+- Quantify stakeholder-weighted ethical trade-offs.  
 
 This project addresses that gap.
 
@@ -22,22 +22,22 @@ This project addresses that gap.
 
 This work delivers a computational framework that:
 
-1. Harmonises three major AI governance frameworks:
-   - EU Assessment List for Trustworthy AI (ALTAI)
-   - NIST AI Risk Management Framework (AI RMF)
-   - Singapore Model AI Governance Framework (MGAF)
+1. Harmonizes three major AI governance frameworks:  
+   - EU Assessment List for Trustworthy AI (ALTAI).  
+   - NIST AI Risk Management Framework (AI RMF).  
+   - Singapore Model AI Governance Framework (MGAF).  
 
-2. Applies Multi-Criteria Decision Analysis (MCDA):
-   - AHP (weight derivation)
-   - TOPSIS (primary scoring)
-   - WSM (baseline comparator)
+2. Applies Multi-Criteria Decision Analysis (MCDA):  
+   - AHP (weight derivation).  
+   - TOPSIS (primary scoring).  
+   - WSM (baseline comparator).  
 
-3. Detects stakeholder disagreement using:
-   - Spearman rank correlation (ρ)
-   - Conflict classification (Low / Moderate / High)
+3. Detects stakeholder disagreement using:  
+   - Spearman rank correlation (ρ).  
+   - Conflict classification (Low / Moderate / High).  
 
-4. Computes Pareto-optimal compromise configurations via:
-   - NSGA-II (pymoo implementation)
+4. Computes Pareto-optimal compromise configurations via:  
+   - NSGA-II (pymoo implementation).  
 
 5. Produces reproducible, auditable intermediate computations for academic verification.
 
@@ -49,45 +49,45 @@ No existing open-source tool currently integrates all five capabilities.
 
 This project follows Design Science Research (Peffers et al., 2007):
 
-1. Problem Identification  
-2. Objective Definition  
-3. Design & Development  
-4. Demonstration (3 case studies)  
-5. Evaluation (expert validation + usability + ablation study)  
-6. Communication  
+1. Problem Identification.  
+2. Objective Definition.  
+3. Design & Development.  
+4. Demonstration (3 case studies).  
+5. Evaluation (expert validation + usability + ablation study).  
+6. Communication.  
 
 Validation includes:
 
-- Content Validity Index (I-CVI, S-CVI/Ave)  
-- Krippendorff’s Alpha (bootstrapped CI)  
-- System Usability Scale (SUS)  
-- Wilcoxon signed-rank test  
-- Friedman test  
-- Cliff’s Delta effect size  
+- Content Validity Index (I-CVI, S-CVI/Ave).  
+- Krippendorff’s Alpha (bootstrapped confidence interval).  
+- System Usability Scale (SUS).  
+- Wilcoxon signed-rank test.  
+- Friedman test.  
+- Cliff’s Delta effect size.  
 
 ---
 
 ## System Architecture
 
 ### Backend
-- FastAPI
-- Pydantic v2
-- SQLAlchemy 2.0
-- SQLite
+- FastAPI.  
+- Pydantic v2.  
+- SQLAlchemy 2.0.  
+- SQLite.  
 
 ### Scoring & Analysis
-- pyDecision (TOPSIS, AHP, WSM)
-- NumPy (reference verification)
-- SciPy (Spearman correlation)
-- pymoo (NSGA-II)
+- pyDecision (TOPSIS, AHP, WSM).  
+- NumPy (reference verification).  
+- SciPy (Spearman correlation).  
+- pymoo (NSGA-II).  
 
 ### Frontend
-- Streamlit
-- Plotly interactive visualisation
+- Streamlit.  
+- Plotly interactive visualization.  
 
 ### Configuration
-- Framework definitions stored as YAML
-- Version-controlled harmonisation mapping
+- Framework definitions stored as YAML.  
+- Version-controlled harmonization mapping.  
 
 ---
 
@@ -98,10 +98,10 @@ Evaluate a single AI system against EU ALTAI, NIST AI RMF, and Singapore MGAF si
 
 ### Stakeholder-Weighted Scoring
 Apply distinct weight vectors for:
-- Developer
-- Regulator
-- Affected Community
-- Custom stakeholder
+- Developer.  
+- Regulator.  
+- Affected Community.  
+- Custom stakeholder.  
 
 ### Conflict Detection
 Quantify disagreement between stakeholder ethical rankings using Spearman ρ.
@@ -110,10 +110,10 @@ Quantify disagreement between stakeholder ethical rankings using Spearman ρ.
 Generate non-dominated compromise weight configurations.
 
 ### Interactive Dashboard
-- Radar charts
-- Correlation heatmaps
-- Pareto scatter plots
-- Real-time weight adjustment
+- Radar charts.  
+- Correlation heatmaps.  
+- Pareto scatter plots.  
+- Real-time weight adjustment.  
 
 ---
 
@@ -162,7 +162,7 @@ ccds25-0582-medf/
 
 ## Quick Start
 
-### Step 1: Create Vitual Environment
+### Step 1: Create Virtual Environment
 
 ```bash
 python3 -m venv .venv
@@ -196,19 +196,19 @@ streamlit run dashboard/app.py
 
 ## Reproducibility
 
-- Hand-verified TOPSIS computation included
-- Unit tests cover scoring, AHP consistency, conflict detection
-- Statistical analysis script provided
-- Docker support available
-- YAML framework definitions version-controlled
+- Hand-verified TOPSIS computation included.  
+- Unit tests cover scoring, AHP consistency, and conflict detection.  
+- Statistical analysis script provided.  
+- Docker support available.  
+- YAML framework definitions version-controlled.  
 
 ---
 
 ## Case Studies
 
-1. Facial Recognition for Law Enforcement  
-2. Hiring Recommendation Algorithm  
-3. Healthcare Diagnostic AI  
+1. Facial Recognition for Law Enforcement.  
+2. Hiring Recommendation Algorithm.  
+3. Healthcare Diagnostic AI.  
 
 Each case study demonstrates different stakeholder conflict structures.
 
@@ -216,10 +216,10 @@ Each case study demonstrates different stakeholder conflict structures.
 
 ## Limitations
 
-- Limited to 3 frameworks (extensible via YAML)
-- Small expert sample (acknowledged in validation)
-- Single-machine prototype (not horizontally scalable)
-- Harmonisation mapping requires expert validation
+- Limited to 3 frameworks (extensible via YAML).  
+- Small expert sample (acknowledged in validation).  
+- Single-machine prototype (not horizontally scalable).  
+- Harmonization mapping requires expert validation.  
 
 These limitations do not undermine the core contribution: demonstrating the feasibility of multi-stakeholder cross-framework ethical AI assessment.
 
