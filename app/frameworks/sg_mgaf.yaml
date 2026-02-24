@@ -1,0 +1,17 @@
+id: sg_mgaf
+name: Singapore Model AI Governance Framework
+version: "2.0"
+description: Practical governance controls based on Singapore MGAF.
+criteria:
+  - id: internal_governance
+    name: Internal Governance
+    description: Define internal structures for AI oversight and risk ownership.
+    weight: 1.0
+  - id: operations_management
+    name: Operations Management
+    description: Maintain robust data, model, and deployment operations controls.
+    weight: 1.0
+  - id: stakeholder_communication
+    name: Stakeholder Communication
+    description: Communicate AI use, limitations, and recourse clearly to stakeholders.
+    weight: 1.0

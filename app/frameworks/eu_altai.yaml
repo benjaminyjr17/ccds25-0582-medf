@@ -1,0 +1,17 @@
+id: eu_altai
+name: EU Assessment List for Trustworthy AI (ALTAI)
+version: "2020"
+description: Baseline criteria distilled from EU ALTAI guidance.
+criteria:
+  - id: human_agency_oversight
+    name: Human Agency and Oversight
+    description: Ensure users retain meaningful control over AI-supported decisions.
+    weight: 1.0
+  - id: transparency
+    name: Transparency
+    description: Ensure traceability and user-facing explainability.
+    weight: 1.0
+  - id: accountability
+    name: Accountability
+    description: Define responsibility for outcomes and remediation.
+    weight: 1.0

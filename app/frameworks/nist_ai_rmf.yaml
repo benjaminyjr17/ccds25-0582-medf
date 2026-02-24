@@ -1,0 +1,17 @@
+id: nist_ai_rmf
+name: NIST AI Risk Management Framework
+version: "1.0"
+description: Core functions derived from NIST AI RMF.
+criteria:
+  - id: govern
+    name: Govern
+    description: Establish organizational governance and accountability structures.
+    weight: 1.0
+  - id: map
+    name: Map
+    description: Contextualize AI risks, impacts, and system boundaries.
+    weight: 1.0
+  - id: manage
+    name: Manage
+    description: Prioritize and mitigate identified risks over the system lifecycle.
+    weight: 1.0
