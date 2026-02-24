@@ -10,7 +10,7 @@ from app.models import ConflictCheckRequest, ConflictCheckResponse
 router = APIRouter(prefix="/conflicts", tags=["conflicts"])
 
 
-@router.post("/", response_model=ConflictCheckResponse)
+@router.post("", response_model=ConflictCheckResponse)
 def analyze_conflicts(payload: ConflictCheckRequest) -> ConflictCheckResponse:
     framework_conflicts = detect_framework_conflicts(payload.framework_ids)
     stakeholder_conflicts = detect_stakeholder_conflicts(payload.stakeholder_ids)

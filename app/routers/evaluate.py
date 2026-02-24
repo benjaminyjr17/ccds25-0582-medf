@@ -7,7 +7,7 @@ from app.scoring_engine import compute_scores
 router = APIRouter(prefix="/evaluate", tags=["evaluate"])
 
 
-@router.post("/", response_model=EvaluationResponse)
+@router.post("", response_model=EvaluationResponse)
 def evaluate(payload: EvaluationRequest) -> EvaluationResponse:
     available_frameworks = [framework.id for framework in list_frameworks()]
     scores = compute_scores(payload, framework_ids=available_frameworks)
