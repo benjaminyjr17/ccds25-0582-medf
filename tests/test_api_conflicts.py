@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.models import UNIFIED_DIMENSIONS
 from app.routers.conflicts import router as conflicts_router
 
 
@@ -47,3 +49,45 @@ def test_conflicts_endpoint_returns_pairwise_spearman_results() -> None:
     metadata = body.get("metadata", {})
     assert "correlation_matrix" in metadata
     assert "stakeholder_rankings" in metadata
+    assert "correlation_matrix_weights" in metadata
+    assert "stakeholder_rankings_weights" in metadata
+
+    stakeholder_ids = payload["stakeholder_ids"]
+    expected_dimensions = set(UNIFIED_DIMENSIONS)
+
+    for matrix_key in ("correlation_matrix", "correlation_matrix_weights"):
+        matrix = metadata.get(matrix_key)
+        assert isinstance(matrix, dict)
+        for stakeholder_a in stakeholder_ids:
+            assert stakeholder_a in matrix
+            row = matrix[stakeholder_a]
+            assert isinstance(row, dict)
+            assert stakeholder_a in row
+            assert abs(float(row[stakeholder_a]) - 1.0) <= 1e-6
+            for stakeholder_b in stakeholder_ids:
+                assert stakeholder_b in row
+                ab = float(matrix[stakeholder_a][stakeholder_b])
+                ba = float(matrix[stakeholder_b][stakeholder_a])
+                assert abs(ab - ba) <= 1e-6
+
+    rankings_weights = metadata.get("stakeholder_rankings_weights")
+    assert isinstance(rankings_weights, dict)
+    for stakeholder_id in stakeholder_ids:
+        assert stakeholder_id in rankings_weights
+        ranking = rankings_weights[stakeholder_id]
+        assert isinstance(ranking, list)
+        assert len(ranking) == len(UNIFIED_DIMENSIONS)
+        assert set(ranking) == expected_dimensions
+
+    weights_matrix = metadata.get("correlation_matrix_weights")
+    if not isinstance(weights_matrix, dict):
+        pytest.skip("Missing correlation_matrix_weights in metadata.")
+    try:
+        dev_reg = float(weights_matrix["developer"]["regulator"])
+        dev_aff = float(weights_matrix["developer"]["affected_community"])
+    except KeyError:
+        pytest.skip(
+            "Missing required stakeholder ids in correlation_matrix_weights "
+            "(developer, regulator, affected_community)."
+        )
+    assert dev_aff <= dev_reg

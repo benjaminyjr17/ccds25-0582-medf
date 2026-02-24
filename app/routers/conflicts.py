@@ -25,6 +25,19 @@ from app.scoring_engine import topsis_score
 
 router = APIRouter(prefix="/api", tags=["Conflict Detection"])
 
+_WEIGHTS_TIE_BREAK_ORDER: tuple[str, ...] = (
+    "accountability",
+    "privacy_data_governance",
+    "fairness_nondiscrimination",
+    "transparency_explainability",
+    "safety_robustness",
+    "human_agency_oversight",
+)
+_WEIGHTS_TIE_BREAK_INDEX = {
+    dimension: index
+    for index, dimension in enumerate(_WEIGHTS_TIE_BREAK_ORDER)
+}
+
 
 def _resolve_framework_id(payload: ConflictRequest) -> str:
     framework_id = payload.framework_id
@@ -197,15 +210,24 @@ def analyze_conflicts(
 
     criteria_types = _ordered_criteria_types(framework.id, framework.dimensions)
 
-    stakeholder_rankings: dict[str, list[str]] = {}
+    stakeholder_rankings_contrib: dict[str, list[str]] = {}
+    stakeholder_rankings_weights: dict[str, list[str]] = {}
     stakeholder_scores: dict[str, float] = {}
-    correlation_matrix: dict[str, dict[str, float]] = {
+    correlation_matrix_contrib: dict[str, dict[str, float]] = {
         stakeholder_id: {
             other_id: (1.0 if stakeholder_id == other_id else 0.0)
             for other_id in payload.stakeholder_ids
         }
         for stakeholder_id in payload.stakeholder_ids
     }
+    correlation_matrix_weights: dict[str, dict[str, float]] = {
+        stakeholder_id: {
+            other_id: (1.0 if stakeholder_id == other_id else 0.0)
+            for other_id in payload.stakeholder_ids
+        }
+        for stakeholder_id in payload.stakeholder_ids
+    }
+    pairwise_rho_weights: dict[str, float] = {}
 
     for stakeholder_id in payload.stakeholder_ids:
         stakeholder = get_stakeholder(stakeholder_id, db)
@@ -247,36 +269,61 @@ def analyze_conflicts(
             ) from exc
 
         contributions = np.clip(normalized_scores * weight_vector, 0.0, 1.0)
-        ranking_indices = np.argsort(-contributions, kind="stable")
-        stakeholder_rankings[stakeholder_id] = [
+        ranking_contrib_indices = np.argsort(-contributions, kind="stable")
+        stakeholder_rankings_contrib[stakeholder_id] = [
             UNIFIED_DIMENSIONS[index]
-            for index in ranking_indices
+            for index in ranking_contrib_indices
         ]
+        stakeholder_rankings_weights[stakeholder_id] = sorted(
+            UNIFIED_DIMENSIONS,
+            key=lambda dimension: (
+                -float(stakeholder_weights[dimension]),
+                _WEIGHTS_TIE_BREAK_INDEX[dimension],
+            ),
+        )
 
     conflicts: list[StakeholderConflict] = []
     for stakeholder_a, stakeholder_b in combinations(payload.stakeholder_ids, 2):
-        ranking_a = stakeholder_rankings[stakeholder_a]
-        ranking_b = stakeholder_rankings[stakeholder_b]
+        ranking_contrib_a = stakeholder_rankings_contrib[stakeholder_a]
+        ranking_contrib_b = stakeholder_rankings_contrib[stakeholder_b]
 
-        positions_a = _ranking_to_positions(ranking_a)
-        positions_b = _ranking_to_positions(ranking_b)
+        positions_contrib_a = _ranking_to_positions(ranking_contrib_a)
+        positions_contrib_b = _ranking_to_positions(ranking_contrib_b)
 
-        rank_vector_a = np.asarray(
-            [positions_a[dimension] for dimension in UNIFIED_DIMENSIONS],
+        rank_vector_contrib_a = np.asarray(
+            [positions_contrib_a[dimension] for dimension in UNIFIED_DIMENSIONS],
             dtype=float,
         )
-        rank_vector_b = np.asarray(
-            [positions_b[dimension] for dimension in UNIFIED_DIMENSIONS],
+        rank_vector_contrib_b = np.asarray(
+            [positions_contrib_b[dimension] for dimension in UNIFIED_DIMENSIONS],
             dtype=float,
         )
 
-        rho_value = _spearman_rho(rank_vector_a, rank_vector_b)
+        rho_value = _spearman_rho(rank_vector_contrib_a, rank_vector_contrib_b)
 
-        correlation_matrix[stakeholder_a][stakeholder_b] = rho_value
-        correlation_matrix[stakeholder_b][stakeholder_a] = rho_value
+        correlation_matrix_contrib[stakeholder_a][stakeholder_b] = rho_value
+        correlation_matrix_contrib[stakeholder_b][stakeholder_a] = rho_value
+
+        ranking_weights_a = stakeholder_rankings_weights[stakeholder_a]
+        ranking_weights_b = stakeholder_rankings_weights[stakeholder_b]
+        positions_weights_a = _ranking_to_positions(ranking_weights_a)
+        positions_weights_b = _ranking_to_positions(ranking_weights_b)
+        rank_vector_weights_a = np.asarray(
+            [positions_weights_a[dimension] for dimension in UNIFIED_DIMENSIONS],
+            dtype=float,
+        )
+        rank_vector_weights_b = np.asarray(
+            [positions_weights_b[dimension] for dimension in UNIFIED_DIMENSIONS],
+            dtype=float,
+        )
+        rho_weights = _spearman_rho(rank_vector_weights_a, rank_vector_weights_b)
+        correlation_matrix_weights[stakeholder_a][stakeholder_b] = rho_weights
+        correlation_matrix_weights[stakeholder_b][stakeholder_a] = rho_weights
+        pair_key = "|".join(sorted((stakeholder_a, stakeholder_b)))
+        pairwise_rho_weights[pair_key] = rho_weights
 
         rank_differences = {
-            dimension: abs(positions_a[dimension] - positions_b[dimension])
+            dimension: abs(positions_contrib_a[dimension] - positions_contrib_b[dimension])
             for dimension in UNIFIED_DIMENSIONS
         }
         conflicting_dimensions = sorted(
@@ -306,8 +353,13 @@ def analyze_conflicts(
         pareto_solutions=[],
         metadata={
             "framework_id": framework.id,
-            "stakeholder_rankings": stakeholder_rankings,
-            "correlation_matrix": correlation_matrix,
+            "stakeholder_rankings": stakeholder_rankings_contrib,
+            "stakeholder_rankings_contrib": stakeholder_rankings_contrib,
+            "stakeholder_rankings_weights": stakeholder_rankings_weights,
+            "correlation_matrix": correlation_matrix_contrib,
+            "correlation_matrix_contrib": correlation_matrix_contrib,
+            "correlation_matrix_weights": correlation_matrix_weights,
+            "pairwise_rho_weights": pairwise_rho_weights,
             "ai_system_id": payload.ai_system.id if payload.ai_system else None,
             "ai_system_name": payload.ai_system.name if payload.ai_system else None,
             "scoring_method": "topsis",
