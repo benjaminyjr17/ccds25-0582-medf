@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 from app.database import SessionLocal, init_db
 from app.framework_registry import (
@@ -49,3 +49,8 @@ def health() -> HealthResponse:
         frameworks_loaded=frameworks_loaded,
         stakeholder_profiles_loaded=stakeholder_profiles_loaded,
     )
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon() -> Response:
+    return Response(status_code=204)
