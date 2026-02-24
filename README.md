@@ -1,4 +1,4 @@
-# MEDF — Multi-stakeholder Ethical Decision Framework for AI Systems  
+# MEDF: Multi-stakeholder Ethical Decision Framework for AI Systems  
 **NTU CCDS Final Year Project (CCDS25-0582)**  
 Author: Benjamin Oliver Yick  
 Supervisor: Dr. Zhang Jiehuang  
