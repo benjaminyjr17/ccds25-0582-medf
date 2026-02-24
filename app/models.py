@@ -154,26 +154,35 @@ class DBStakeholderProfile(Base):
 
 
 class EthicalDimension(BaseModel):
-    id: str
     name: str
+    display_name: str
+    description: str = ""
+    weight_default: float = Field(1.0, ge=SCORE_MIN, le=SCORE_MAX)
+    scale_min: float = SCORE_MIN
+    scale_max: float = SCORE_MAX
     criteria_type: CriteriaType = CriteriaType.BENEFIT
-    description: Optional[str] = None
-    weight: float = Field(1.0, ge=SCORE_MIN, le=SCORE_MAX)
+    assessment_questions: List[str] = Field(default_factory=list)
 
-    @field_validator("id")
+    @field_validator("name")
     @classmethod
     def validate_dimension_id(cls, value: str) -> str:
         normalized = value.strip().lower()
         if normalized not in UNIFIED_DIMENSIONS:
-            raise ValueError(f"Dimension id must be one of: {', '.join(UNIFIED_DIMENSIONS)}")
+            raise ValueError(f"Dimension name must be one of: {', '.join(UNIFIED_DIMENSIONS)}")
         return normalized
+
+    @field_validator("assessment_questions")
+    @classmethod
+    def validate_assessment_questions(cls, value: List[str]) -> List[str]:
+        cleaned = [str(item).strip() for item in value if str(item).strip()]
+        return cleaned[:5]
 
 
 class EthicalFramework(BaseModel):
     id: str
     name: str
     version: Optional[str] = None
-    description: Optional[str] = None
+    source_url: Optional[str] = None
     dimensions: List[EthicalDimension] = Field(default_factory=list)
 
     @field_validator("dimensions")
@@ -181,9 +190,11 @@ class EthicalFramework(BaseModel):
     def validate_dimensions(cls, value: List[EthicalDimension]) -> List[EthicalDimension]:
         seen: set[str] = set()
         for dimension in value:
-            if dimension.id in seen:
-                raise ValueError(f"Duplicate dimension id '{dimension.id}' in framework.")
-            seen.add(dimension.id)
+            if dimension.name in seen:
+                raise ValueError(f"Duplicate dimension name '{dimension.name}' in framework.")
+            seen.add(dimension.name)
+        if len(value) != len(UNIFIED_DIMENSIONS):
+            raise ValueError(f"Framework must define {len(UNIFIED_DIMENSIONS)} dimensions.")
         return value
 
 
