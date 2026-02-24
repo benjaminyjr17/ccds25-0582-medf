@@ -35,6 +35,7 @@ def test_pareto_endpoint_returns_consensus_solutions() -> None:
         "pop_size": 32,
         "n_gen": 40,
         "seed": 7,
+        "deterministic_mode": True,
     }
 
     with TestClient(app) as client:
@@ -101,3 +102,53 @@ def test_pareto_endpoint_returns_consensus_solutions() -> None:
     if len(total_distances) >= 2:
         rounded_totals = {round(value, 10) for value in total_distances}
         assert len(rounded_totals) > 1
+
+
+def test_pareto_deterministic_mode_repeatability() -> None:
+    payload = {
+        "ai_system": {
+            "id": "facerec_1",
+            "name": "FaceDetect Pro v2.1",
+            "description": "Law enforcement system",
+            "context": {
+                "dimension_scores": {
+                    "transparency_explainability": 2,
+                    "fairness_nondiscrimination": 1,
+                    "safety_robustness": 4,
+                    "privacy_data_governance": 1,
+                    "human_agency_oversight": 2,
+                    "accountability": 3,
+                }
+            },
+        },
+        "framework_ids": ["eu_altai"],
+        "stakeholder_ids": ["developer", "regulator", "affected_community"],
+        "n_solutions": 8,
+        "pop_size": 32,
+        "n_gen": 40,
+        "seed": 7,
+        "deterministic_mode": True,
+    }
+
+    with TestClient(app) as client:
+        first = client.post("/api/pareto", json=payload)
+        second = client.post("/api/pareto", json=payload)
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+
+    first_body = first.json()
+    second_body = second.json()
+    first_solutions = first_body.get("pareto_solutions", [])
+    second_solutions = second_body.get("pareto_solutions", [])
+
+    assert isinstance(first_solutions, list) and first_solutions
+    assert isinstance(second_solutions, list) and second_solutions
+
+    first_consensus = first_solutions[0]["weights"]["consensus"]
+    second_consensus = second_solutions[0]["weights"]["consensus"]
+
+    first_vector = tuple(round(float(first_consensus[dimension]), 4) for dimension in UNIFIED_DIMENSIONS)
+    second_vector = tuple(round(float(second_consensus[dimension]), 4) for dimension in UNIFIED_DIMENSIONS)
+
+    assert first_vector == second_vector

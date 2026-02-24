@@ -11,10 +11,13 @@ Major changes require version bump and schema hash update.
 
 from __future__ import annotations
 
+from uuid import uuid4
+
 import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.audit_log import write_audit_record
 from app.database import get_db
 from app.framework_registry import get_framework, get_stakeholder
 from app.models import (
@@ -165,6 +168,8 @@ def evaluate(
     payload: EvaluateRequest,
     db: Session = Depends(get_db),
 ) -> EvaluationResult:
+    run_id = str(uuid4())
+
     if payload.scoring_method == ScoringMethod.AHP:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -281,10 +286,24 @@ def evaluate(
         else 0.0
     )
 
-    return EvaluationResult(
+    result = EvaluationResult(
         ai_system_id=payload.ai_system.id,
         scoring_method=ScoringMethod(payload.scoring_method.value),
         framework_scores=framework_scores,
         overall_score=overall_score,
-        notes="Evaluation computed from supplied ai_system.context.dimension_scores.",
+        notes=(
+            "Evaluation computed from supplied ai_system.context.dimension_scores. "
+            f"run_id={run_id}"
+        ),
     )
+
+    write_audit_record(
+        run_id=run_id,
+        endpoint_path="/api/evaluate",
+        method="POST",
+        request_body=payload.model_dump(mode="json"),
+        response_body=result.model_dump(mode="json"),
+        status_code=200,
+    )
+
+    return result

@@ -12,6 +12,7 @@ Major changes require version bump and schema hash update.
 from __future__ import annotations
 
 from itertools import combinations
+from uuid import uuid4
 
 import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -33,6 +34,7 @@ from app.models import (
     UNIFIED_DIMENSIONS,
 )
 from app.scoring_engine import topsis_score
+from app.audit_log import write_audit_record
 
 router = APIRouter(prefix="/api", tags=["Conflict Detection"])
 
@@ -207,6 +209,8 @@ def analyze_conflicts(
     payload: ConflictRequest,
     db: Session = Depends(get_db),
 ) -> ConflictReport:
+    run_id = str(uuid4())
+
     framework_id = _resolve_framework_id(payload)
     framework = get_framework(framework_id)
     if framework is None:
@@ -355,7 +359,7 @@ def analyze_conflicts(
     mean_rho = float(np.mean([conflict.spearman_rho for conflict in conflicts])) if conflicts else 1.0
     overall_conflict = _conflict_level_from_rho(mean_rho).value
 
-    return ConflictReport(
+    result = ConflictReport(
         summary=(
             f"Conflict analysis for framework '{framework.id}' indicates "
             f"{overall_conflict} overall stakeholder disagreement."
@@ -375,5 +379,17 @@ def analyze_conflicts(
             "ai_system_name": payload.ai_system.name if payload.ai_system else None,
             "scoring_method": "topsis",
             "stakeholder_scores": stakeholder_scores,
+            "run_id": run_id,
         },
     )
+
+    write_audit_record(
+        run_id=run_id,
+        endpoint_path="/api/conflicts",
+        method="POST",
+        request_body=payload.model_dump(mode="json"),
+        response_body=result.model_dump(mode="json"),
+        status_code=200,
+    )
+
+    return result

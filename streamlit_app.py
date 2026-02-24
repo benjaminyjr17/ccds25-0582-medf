@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import io
 import json
 from datetime import datetime
+from pathlib import Path
 from typing import Any
+from uuid import uuid4
+import zipfile
 
 import plotly.graph_objects as go
 import requests
@@ -149,6 +153,117 @@ def load_stakeholders(backend_url: str) -> list[dict[str, Any]]:
     return payload
 
 
+def _safe_json(value: Any) -> Any:
+    try:
+        return json.loads(json.dumps(value, default=str))
+    except Exception:
+        return str(value)
+
+
+def _extract_run_id_from_responses(responses: dict[str, Any]) -> str:
+    for response in responses.values():
+        if not isinstance(response, dict):
+            continue
+        metadata = response.get("metadata")
+        if isinstance(metadata, dict) and isinstance(metadata.get("run_id"), str):
+            return metadata["run_id"]
+        notes = response.get("notes")
+        if isinstance(notes, str) and "run_id=" in notes:
+            return notes.split("run_id=", 1)[1].strip().split()[0]
+    return str(uuid4())
+
+
+def _update_last_run_bundle(
+    *,
+    page_name: str,
+    backend_url: str,
+    requests_payloads: dict[str, Any],
+    responses_payloads: dict[str, Any],
+    ui_context: dict[str, Any],
+) -> dict[str, Any]:
+    run_id = _extract_run_id_from_responses(responses_payloads)
+    bundle = {
+        "run_id": run_id,
+        "timestamp_utc": datetime.utcnow().isoformat() + "Z",
+        "backend_url": backend_url,
+        "page_name": page_name,
+        "requests": _safe_json(requests_payloads),
+        "responses": _safe_json(responses_payloads),
+        "ui_context": _safe_json(ui_context),
+    }
+    st.session_state["last_run_bundle"] = bundle
+    return bundle
+
+
+def _write_ui_run_log(
+    *,
+    run_id: str,
+    page_name: str,
+    case_name: str,
+    payload: dict[str, Any],
+) -> None:
+    try:
+        ui_dir = Path("data") / "ui_runs"
+        ui_dir.mkdir(parents=True, exist_ok=True)
+        safe_page = page_name.lower().replace(" ", "_")
+        safe_case = case_name.lower().replace(" ", "_")
+        file_path = ui_dir / f"{run_id}_{safe_page}_{safe_case}.json"
+        file_path.write_text(json.dumps(_safe_json(payload), indent=2, sort_keys=True), encoding="utf-8")
+    except Exception:
+        return
+
+
+def _build_bundle_zip(bundle: dict[str, Any]) -> bytes:
+    in_memory = io.BytesIO()
+    requests_payloads = bundle.get("requests", {}) if isinstance(bundle.get("requests"), dict) else {}
+    responses_payloads = bundle.get("responses", {}) if isinstance(bundle.get("responses"), dict) else {}
+
+    with zipfile.ZipFile(in_memory, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
+        manifest = {
+            "run_id": bundle.get("run_id"),
+            "timestamp_utc": bundle.get("timestamp_utc"),
+            "backend_url": bundle.get("backend_url"),
+            "page_name": bundle.get("page_name"),
+            "app_version": "unknown",
+        }
+        archive.writestr("manifest.json", json.dumps(_safe_json(manifest), indent=2, sort_keys=True))
+
+        file_map = (
+            ("evaluate_request.json", requests_payloads.get("evaluate")),
+            ("evaluate_response.json", responses_payloads.get("evaluate")),
+            ("conflicts_request.json", requests_payloads.get("conflicts")),
+            ("conflicts_response.json", responses_payloads.get("conflicts")),
+            ("pareto_request.json", requests_payloads.get("pareto")),
+            ("pareto_response.json", responses_payloads.get("pareto")),
+        )
+        for filename, data in file_map:
+            if data is not None:
+                archive.writestr(filename, json.dumps(_safe_json(data), indent=2, sort_keys=True))
+
+        archive.writestr(
+            "ui_context.json",
+            json.dumps(_safe_json(bundle.get("ui_context", {})), indent=2, sort_keys=True),
+        )
+
+    return in_memory.getvalue()
+
+
+def _render_bundle_export() -> None:
+    bundle = st.session_state.get("last_run_bundle")
+    if not isinstance(bundle, dict):
+        return
+
+    run_id = str(bundle.get("run_id", "unknown"))
+    zip_bytes = _build_bundle_zip(bundle)
+    st.download_button(
+        "Export Full Analysis Bundle (ZIP)",
+        data=zip_bytes,
+        file_name=f"medf_bundle_{run_id}.zip",
+        mime="application/zip",
+        key=f"bundle_export_{run_id}",
+    )
+
+
 def _build_radar_chart(
     values_by_dimension: dict[str, float],
     *,
@@ -211,9 +326,8 @@ def _build_correlation_heatmap(
 
 
 def main() -> None:
-    st.set_page_config(page_title="MEDF Demo", layout="wide")
-    st.title("MEDF Demo")
-    st.caption("Stage 2D MVP frontend for evaluating one framework and one stakeholder.")
+    st.set_page_config(page_title="MEDF Dashboard", layout="wide")
+    st.title("MEDF Dashboard")
 
     page = st.radio(
         "Page",
@@ -221,6 +335,8 @@ def main() -> None:
         index=0,
         horizontal=True,
     )
+    st.subheader(page)
+    _render_bundle_export()
 
     with st.sidebar:
         st.header("Configuration")
@@ -438,7 +554,6 @@ def main() -> None:
                     )
                 )
     else:
-        st.subheader("Case Studies")
         if not case_screenshot_mode:
             st.caption("Fixed framework: eu_altai | Fixed stakeholders: developer, regulator, affected_community")
 
@@ -485,6 +600,18 @@ def main() -> None:
                 return
 
             result = response.json()
+            _update_last_run_bundle(
+                page_name="Evaluate",
+                backend_url=backend_url,
+                requests_payloads={"evaluate": payload},
+                responses_payloads={"evaluate": result},
+                ui_context={
+                    "page": page,
+                    "framework_id": framework_id,
+                    "stakeholder_ids": [stakeholder_id],
+                    "scoring_method": scoring_method,
+                },
+            )
             overall_score = float(result.get("overall_score", 0.0))
             label, color = _risk_label(overall_score)
 
@@ -577,6 +704,18 @@ def main() -> None:
                 return
 
             result = response.json()
+            _update_last_run_bundle(
+                page_name="Conflict Detection",
+                backend_url=backend_url,
+                requests_payloads={"conflicts": payload},
+                responses_payloads={"conflicts": result},
+                ui_context={
+                    "page": page,
+                    "framework_id": framework_id,
+                    "stakeholder_ids": conflict_stakeholder_ids,
+                    "conflict_metric": conflict_metric,
+                },
+            )
             st.subheader("Conflict Detection Results")
             if result.get("summary"):
                 st.info(str(result["summary"]))
@@ -775,6 +914,30 @@ def main() -> None:
                 return
 
             result = response.json()
+            bundle = _update_last_run_bundle(
+                page_name="Pareto Resolution",
+                backend_url=backend_url,
+                requests_payloads={"pareto": payload},
+                responses_payloads={"pareto": result},
+                ui_context={
+                    "page": page,
+                    "framework_id": framework_id,
+                    "stakeholder_ids": pareto_stakeholder_ids,
+                    "n_solutions": pareto_n_solutions,
+                    "pop_size": pareto_pop_size,
+                    "n_gen": pareto_n_gen,
+                },
+            )
+            _write_ui_run_log(
+                run_id=str(bundle.get("run_id", str(uuid4()))),
+                page_name="pareto_resolution",
+                case_name="manual",
+                payload={
+                    "timestamp_utc": datetime.utcnow().isoformat() + "Z",
+                    "request": payload,
+                    "response": result,
+                },
+            )
             st.subheader("Pareto Resolution Results")
             summary = result.get("summary")
             if summary:
@@ -834,11 +997,11 @@ def main() -> None:
                 row: dict[str, Any] = {
                     "rank": rank,
                     "solution_id": solution_id,
-                    "total_distance": round(total_distance, 6),
-                    "utility_wsm": round(utility_wsm, 6) if utility_wsm is not None else None,
+                    "total_distance": round(total_distance, 4),
+                    "utility_wsm": round(utility_wsm, 4) if utility_wsm is not None else None,
                 }
                 for stakeholder_id in stakeholder_ids:
-                    row[stakeholder_id] = round(float(objective_scores.get(stakeholder_id, 0.0)), 6)
+                    row[stakeholder_id] = round(float(objective_scores.get(stakeholder_id, 0.0)), 4)
                 table_rows.append(row)
                 parsed_solutions.append(
                     {
@@ -1115,6 +1278,45 @@ def main() -> None:
                         "conflicts_response": conflicts_response.json(),
                         "pareto_response": pareto_response.json(),
                     }
+                    bundle = _update_last_run_bundle(
+                        page_name="Case Studies",
+                        backend_url=backend_url,
+                        requests_payloads={
+                            "evaluate": evaluate_payload,
+                            "conflicts": conflicts_payload,
+                            "pareto": pareto_payload,
+                        },
+                        responses_payloads={
+                            "evaluate": evaluate_response.json(),
+                            "conflicts": conflicts_response.json(),
+                            "pareto": pareto_response.json(),
+                        },
+                        ui_context={
+                            "page": page,
+                            "framework_id": case_framework_ids[0],
+                            "stakeholder_ids": case_stakeholder_ids,
+                            "case_id": case_id,
+                            "case_name": case_name,
+                        },
+                    )
+                    _write_ui_run_log(
+                        run_id=str(bundle.get("run_id", str(uuid4()))),
+                        page_name="case_studies",
+                        case_name=case_id,
+                        payload={
+                            "timestamp_utc": datetime.utcnow().isoformat() + "Z",
+                            "requests": {
+                                "evaluate": evaluate_payload,
+                                "conflicts": conflicts_payload,
+                                "pareto": pareto_payload,
+                            },
+                            "responses": {
+                                "evaluate": evaluate_response.json(),
+                                "conflicts": conflicts_response.json(),
+                                "pareto": pareto_response.json(),
+                            },
+                        },
+                    )
 
                 case_result = st.session_state.get(case_result_key)
                 if not isinstance(case_result, dict):
@@ -1248,11 +1450,11 @@ def main() -> None:
                     row: dict[str, Any] = {
                         "rank": rank,
                         "solution_id": solution_id,
-                        "total_distance": round(total_distance, 6),
-                        "utility_wsm": round(utility_value, 6) if utility_value is not None else None,
+                        "total_distance": round(total_distance, 4),
+                        "utility_wsm": round(utility_value, 4) if utility_value is not None else None,
                     }
                     for stakeholder_id in case_stakeholder_ids:
-                        row[stakeholder_id] = round(float(objective_scores.get(stakeholder_id, 0.0)), 6)
+                        row[stakeholder_id] = round(float(objective_scores.get(stakeholder_id, 0.0)), 4)
 
                     consensus_raw = solution.get("weights", {}).get("consensus", {})
                     consensus_weights = (
@@ -1346,7 +1548,7 @@ def main() -> None:
                             }
                         )
 
-    st.caption("MEDF v1.0 — Feature Frozen Build")
+    st.caption("MEDF v1.0 — Feature Frozen Build • Reproducible Artifact")
 
 
 if __name__ == "__main__":

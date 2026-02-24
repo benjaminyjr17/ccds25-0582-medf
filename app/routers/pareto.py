@@ -41,6 +41,7 @@ from app.models import (
     ParetoSolution,
     UNIFIED_DIMENSIONS,
 )
+from app.audit_log import write_audit_record
 
 router = APIRouter(prefix="/api", tags=["Pareto"])
 
@@ -188,6 +189,7 @@ class ParetoRequest(BaseModel):
     pop_size: int = Field(default=64, ge=16, le=256)
     n_gen: int = Field(default=80, ge=10, le=300)
     seed: int = 42
+    deterministic_mode: bool = True
 
     @field_validator("stakeholder_ids")
     @classmethod
@@ -311,6 +313,10 @@ def generate_pareto_solutions(
     payload: ParetoRequest,
     db: Session = Depends(get_db),
 ) -> ConflictReport:
+    run_id = str(uuid4())
+    if payload.deterministic_mode:
+        np.random.seed(payload.seed)
+
     framework_id = _resolve_framework_id_or_422(payload)
 
     framework = get_framework(framework_id)
@@ -374,7 +380,7 @@ def generate_pareto_solutions(
 
     normalized_candidates = _normalize_simplex(raw_x)
 
-    deduped: list[tuple[np.ndarray, np.ndarray, float]] = []
+    deduped: list[tuple[np.ndarray, np.ndarray, float, tuple[float, ...]]] = []
     seen_keys: set[tuple[float, ...]] = set()
 
     for idx in range(normalized_candidates.shape[0]):
@@ -386,15 +392,21 @@ def generate_pareto_solutions(
 
         objective_vector = raw_f[idx]
         utility_wsm = float(np.dot(consensus_weights, x_normalized))
-        deduped.append((consensus_weights, objective_vector, utility_wsm))
+        deduped.append((consensus_weights, objective_vector, utility_wsm, dedupe_key))
 
-    deduped.sort(key=lambda item: (float(np.sum(item[1])), -float(item[2])))
+    deduped.sort(
+        key=lambda item: (
+            float(np.sum(item[1])),
+            -float(item[2]),
+            item[3],
+        )
+    )
     selected = deduped[: payload.n_solutions]
 
     pareto_solutions: list[ParetoSolution] = []
     ablation_utility_by_solution: dict[str, float] = {}
 
-    for rank, (consensus, objectives, utility_wsm) in enumerate(selected, start=1):
+    for rank, (consensus, objectives, utility_wsm, _) in enumerate(selected, start=1):
         solution_id = f"ps_{uuid4().hex[:8]}"
         consensus_map = {
             dimension: float(consensus[index])
@@ -424,7 +436,7 @@ def generate_pareto_solutions(
         for index, dimension in enumerate(UNIFIED_DIMENSIONS)
     }
 
-    return ConflictReport(
+    result = ConflictReport(
         summary=(
             "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance "
             f"under framework {framework.id}."
@@ -444,6 +456,19 @@ def generate_pareto_solutions(
             "pop_size": payload.pop_size,
             "n_gen": payload.n_gen,
             "seed": payload.seed,
+            "deterministic_mode": payload.deterministic_mode,
             "n_solutions_returned": len(pareto_solutions),
+            "run_id": run_id,
         },
     )
+
+    write_audit_record(
+        run_id=run_id,
+        endpoint_path="/api/pareto",
+        method="POST",
+        request_body=payload.model_dump(mode="json"),
+        response_body=result.model_dump(mode="json"),
+        status_code=200,
+    )
+
+    return result
