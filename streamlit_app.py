@@ -114,36 +114,117 @@ CASE_STUDIES = [
 
 def _get_theme_base():
     try:
-        return st.get_option("theme.base") or "light"
+        base = str(st.get_option("theme.base") or "light").lower()
+        if base not in {"dark", "light"}:
+            return "light"
+        return base
     except Exception:
         return "light"
 
 
-def _theme_tokens():
-    base = _get_theme_base()
-    if base == "dark":
+def _ui_tokens(theme_base: str) -> dict[str, str]:
+    if theme_base == "dark":
         return {
+            "bg": "#0b0f19",
+            "panel_bg": "#0f172a",
+            "sidebar_bg": "#0b1220",
+            "text": "#e5e7eb",
+            "muted_text": "#9ca3af",
+            "border": "rgba(255,255,255,0.10)",
+            "primary": "#ef4444",
+            "primary_hover": "#dc2626",
             "plot_text": "#e5e7eb",
-            "plot_grid": "rgba(255,255,255,0.15)",
+            "plot_grid": "rgba(255,255,255,0.18)",
             "plot_axis": "rgba(255,255,255,0.30)",
-            "panel_border": "rgba(255,255,255,0.08)",
         }
     return {
+        "bg": "#ffffff",
+        "panel_bg": "#ffffff",
+        "sidebar_bg": "#f8fafc",
+        "text": "#111827",
+        "muted_text": "#6b7280",
+        "border": "rgba(17,24,39,0.10)",
+        "primary": "#ef4444",
+        "primary_hover": "#dc2626",
         "plot_text": "#111827",
         "plot_grid": "rgba(17,24,39,0.12)",
         "plot_axis": "rgba(17,24,39,0.22)",
-        "panel_border": "rgba(17,24,39,0.08)",
     }
 
 
-def _style_plotly(fig):
-    tokens = _theme_tokens()
+def inject_css(tokens: dict[str, str]) -> None:
+    st.markdown(
+        f"""
+<style>
+html, body, [data-testid="stAppViewContainer"] {{
+    background: {tokens["bg"]};
+    color: {tokens["text"]};
+}}
+[data-testid="stAppViewContainer"] .main .block-container {{
+    padding-top: 1.6rem;
+    padding-bottom: 1.25rem;
+}}
+section[data-testid="stSidebar"] {{
+    background: {tokens["sidebar_bg"]};
+    border-right: 1px solid {tokens["border"]};
+    padding-top: 0.5rem;
+}}
+h1, h2, h3 {{
+    color: {tokens["text"]};
+    letter-spacing: 0.01em;
+}}
+p, label, [data-testid="stMarkdownContainer"], [data-testid="stCaptionContainer"] {{
+    color: {tokens["text"]};
+}}
+[data-testid="stCaptionContainer"] {{
+    color: {tokens["muted_text"]};
+}}
+button[kind="primary"] {{
+    background: {tokens["primary"]} !important;
+    border: 1px solid {tokens["primary"]} !important;
+    border-radius: 8px !important;
+}}
+button[kind="primary"]:hover {{
+    background: {tokens["primary_hover"]} !important;
+    border-color: {tokens["primary_hover"]} !important;
+}}
+button[kind="secondary"] {{
+    border-radius: 8px !important;
+    border: 1px solid {tokens["border"]} !important;
+}}
+[data-testid="stExpander"] {{
+    border: 1px solid {tokens["border"]} !important;
+    border-radius: 10px !important;
+    background: {tokens["panel_bg"]};
+}}
+[data-testid="stDataFrame"], .stTable {{
+    border: 1px solid {tokens["border"]};
+    border-radius: 8px;
+}}
+[data-testid="stHorizontalBlock"] hr, hr {{
+    border-color: {tokens["border"]};
+}}
+</style>
+""",
+        unsafe_allow_html=True,
+    )
+
+
+def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
+    axis_style = dict(
+        gridcolor=tokens["plot_grid"],
+        tickfont=dict(color=tokens["plot_text"]),
+        titlefont=dict(color=tokens["plot_text"]),
+        linecolor=tokens["plot_axis"],
+        zerolinecolor=tokens["plot_axis"],
+    )
 
     fig.update_layout(
         font=dict(color=tokens["plot_text"], size=14),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         margin=dict(l=40, r=40, t=60, b=40),
+        title=dict(font=dict(color=tokens["plot_text"])),
     )
 
     if hasattr(fig.layout, "polar"):
@@ -155,29 +236,39 @@ def _style_plotly(fig):
                     linecolor=tokens["plot_axis"],
                     tickfont=dict(color=tokens["plot_text"]),
                     tickcolor=tokens["plot_axis"],
+                    range=[0, 1],
+                    showline=True,
                 ),
                 angularaxis=dict(
                     gridcolor=tokens["plot_grid"],
                     linecolor=tokens["plot_axis"],
                     tickfont=dict(color=tokens["plot_text"]),
                     tickcolor=tokens["plot_axis"],
+                    showline=True,
                 ),
             )
         )
 
     if hasattr(fig.layout, "xaxis"):
         fig.update_layout(
-            xaxis=dict(
-                gridcolor=tokens["plot_grid"],
-                tickfont=dict(color=tokens["plot_text"]),
-                linecolor=tokens["plot_axis"],
-            ),
-            yaxis=dict(
-                gridcolor=tokens["plot_grid"],
-                tickfont=dict(color=tokens["plot_text"]),
-                linecolor=tokens["plot_axis"],
-            ),
+            xaxis=axis_style,
+            yaxis=axis_style,
         )
+
+    for trace in fig.data:
+        if isinstance(trace, go.Heatmap):
+            if trace.colorbar is None:
+                trace.colorbar = {}
+            trace.colorbar.tickfont = dict(color=tokens["plot_text"])
+            if trace.colorbar.title is None:
+                trace.colorbar.title = {}
+            trace.colorbar.title.font = dict(color=tokens["plot_text"])
+        if isinstance(trace, go.Parcoords) and getattr(trace, "line", None) is not None:
+            colorbar = getattr(trace.line, "colorbar", None)
+            if colorbar is not None:
+                colorbar.tickfont = dict(color=tokens["plot_text"])
+                if colorbar.title is not None:
+                    colorbar.title.font = dict(color=tokens["plot_text"])
 
     return fig
 
@@ -397,25 +488,8 @@ def _build_correlation_heatmap(
 
 def main() -> None:
     st.set_page_config(page_title="MEDF Dashboard", layout="wide")
-    st.markdown(
-        """
-<style>
-.block-container {
-    padding-top: 2rem;
-}
-section[data-testid="stSidebar"] {
-    border-right: 1px solid rgba(128,128,128,0.15);
-}
-button[kind="primary"] {
-    border-radius: 8px !important;
-}
-button[kind="secondary"] {
-    border-radius: 8px !important;
-}
-</style>
-""",
-        unsafe_allow_html=True,
-    )
+    tokens = _ui_tokens(_get_theme_base())
+    inject_css(tokens)
     st.title("MEDF Dashboard")
 
     page = st.radio(
@@ -482,8 +556,10 @@ button[kind="secondary"] {
         }
 
         if page == "Evaluate":
+            st.markdown("**Method**")
             scoring_method = st.radio("Scoring method", ["topsis", "wsm"], horizontal=True)
 
+            st.markdown("**Stakeholder**")
             if stakeholder_options:
                 stakeholder_label = st.selectbox("Stakeholder", list(stakeholder_options.keys()))
                 selected_stakeholder = stakeholder_options[stakeholder_label]
@@ -533,6 +609,7 @@ button[kind="secondary"] {
             else:
                 st.caption(f"Using stakeholder default weights (sum: {sum(base_weights.values()):.4f})")
         elif page == "Conflict Detection":
+            st.markdown("**Stakeholders**")
             if stakeholder_options:
                 labels = list(stakeholder_options.keys())
                 default_ids = ["developer", "regulator", "affected_community"]
@@ -555,14 +632,17 @@ button[kind="secondary"] {
                 ]
             else:
                 st.warning("No stakeholders available from backend.")
+            st.markdown("**Method**")
             conflict_metric = st.radio(
                 "Conflict metric",
                 ["Weights-only (priority conflict)", "Contrib-based (system-salience conflict)"],
                 index=0,
             )
+            st.markdown("**Display**")
             screenshot_mode = st.checkbox("Screenshot mode", value=False)
             detect_clicked = st.button("Detect Conflicts", type="primary")
         elif page == "Pareto Resolution":
+            st.markdown("**Stakeholders**")
             if stakeholder_options:
                 labels = list(stakeholder_options.keys())
                 default_ids = ["developer", "regulator", "affected_community"]
@@ -585,6 +665,7 @@ button[kind="secondary"] {
             else:
                 st.warning("No stakeholders available from backend.")
 
+            st.markdown("**Search Parameters**")
             pareto_n_solutions = st.slider("n_solutions", min_value=1, max_value=20, value=8, step=1)
             pareto_pop_size = st.slider("pop_size", min_value=16, max_value=128, value=40, step=8)
             pareto_n_gen = st.slider("n_gen", min_value=20, max_value=200, value=80, step=10)
@@ -597,6 +678,7 @@ button[kind="secondary"] {
                 disabled=len(pareto_stakeholder_ids) < 2,
             )
         else:
+            st.markdown("**Display**")
             case_screenshot_mode = st.checkbox("Screenshot Mode", value=False)
             st.caption("Case Studies runs fixed scenarios through Evaluate → Conflicts → Pareto.")
 
@@ -740,7 +822,7 @@ button[kind="secondary"] {
                 showlegend=False,
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
             )
-            st.plotly_chart(_style_plotly(fig), width="stretch", key="evaluate_radar")
+            st.plotly_chart(style_plotly(fig, tokens), width="stretch", key="evaluate_radar")
 
             table_rows = []
             for row in framework_scores:
@@ -961,7 +1043,7 @@ button[kind="secondary"] {
                     title=matrix_title,
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
-                st.plotly_chart(_style_plotly(heatmap), width="stretch", key="conflict_heatmap")
+                st.plotly_chart(style_plotly(heatmap, tokens), width="stretch", key="conflict_heatmap")
             else:
                 st.info("No correlation matrix returned in metadata.")
     elif page == "Pareto Resolution":
@@ -1168,7 +1250,7 @@ button[kind="secondary"] {
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
             )
             st.plotly_chart(
-                _style_plotly(radar_figure),
+                style_plotly(radar_figure, tokens),
                 width="stretch",
                 key=f"pareto_weights_radar_{selected_solution_id}",
             )
@@ -1191,7 +1273,7 @@ button[kind="secondary"] {
                 margin={"l": 40, "r": 40, "t": 60, "b": 40},
             )
             st.plotly_chart(
-                _style_plotly(bar_figure),
+                style_plotly(bar_figure, tokens),
                 width="stretch",
                 key=f"pareto_distance_bar_{selected_solution_id}",
             )
@@ -1240,7 +1322,7 @@ button[kind="secondary"] {
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
                 st.plotly_chart(
-                    _style_plotly(scatter_figure),
+                    style_plotly(scatter_figure, tokens),
                     width="stretch",
                     key=f"pareto_tradeoff_scatter_{stakeholder_a}_{stakeholder_b}",
                 )
@@ -1272,7 +1354,7 @@ button[kind="secondary"] {
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
                 st.plotly_chart(
-                    _style_plotly(parallel_figure),
+                    style_plotly(parallel_figure, tokens),
                     width="stretch",
                     key=f"pareto_tradeoff_parallel_{len(stakeholder_ids)}",
                 )
@@ -1478,8 +1560,8 @@ button[kind="secondary"] {
                 conflicts_result = case_result.get("conflicts_response", {})
                 pareto_result = case_result.get("pareto_response", {})
 
-                st.markdown("---")
-                st.markdown("### SECTION A — Evaluation Result")
+                st.divider()
+                st.markdown("### Section A — Evaluation Result")
                 overall_score = float(evaluate_result.get("overall_score", 0.0))
                 st.metric("Overall Score", f"{overall_score:.4f}")
 
@@ -1498,7 +1580,7 @@ button[kind="secondary"] {
                             radial_max=1.0,
                         )
                         st.plotly_chart(
-                            _style_plotly(eval_radar),
+                            style_plotly(eval_radar, tokens),
                             width="stretch",
                             key=f"case_{case_id}_evaluation_radar",
                         )
@@ -1507,8 +1589,8 @@ button[kind="secondary"] {
                 else:
                     st.warning("No evaluation framework scores returned.")
 
-                st.markdown("---")
-                st.markdown("### SECTION B — Conflict Analysis")
+                st.divider()
+                st.markdown("### Section B — Conflict Analysis")
                 conflict_metadata = conflicts_result.get("metadata", {}) if isinstance(conflicts_result, dict) else {}
                 matrix_weights = (
                     conflict_metadata.get("correlation_matrix_weights")
@@ -1536,7 +1618,7 @@ button[kind="secondary"] {
                             title="Weights-only Correlation",
                         )
                         st.plotly_chart(
-                            _style_plotly(weights_heatmap),
+                            style_plotly(weights_heatmap, tokens),
                             width="stretch",
                             key=f"case_{case_id}_weights_heatmap",
                         )
@@ -1550,7 +1632,7 @@ button[kind="secondary"] {
                             title="Contrib-based Correlation",
                         )
                         st.plotly_chart(
-                            _style_plotly(contrib_heatmap),
+                            style_plotly(contrib_heatmap, tokens),
                             width="stretch",
                             key=f"case_{case_id}_contrib_heatmap",
                         )
@@ -1572,8 +1654,8 @@ button[kind="secondary"] {
                 rho_col_1.metric("dev↔affected weights rho", rho_weights)
                 rho_col_2.metric("dev↔affected contrib rho", rho_contrib)
 
-                st.markdown("---")
-                st.markdown("### SECTION C — Pareto Resolution")
+                st.divider()
+                st.markdown("### Section C — Pareto Resolution")
                 pareto_solutions = pareto_result.get("pareto_solutions", []) if isinstance(pareto_result, dict) else []
                 pareto_metadata = pareto_result.get("metadata", {}) if isinstance(pareto_result, dict) else {}
                 ablation_utilities = (
@@ -1654,7 +1736,7 @@ button[kind="secondary"] {
                         radial_max=1.0,
                     )
                     st.plotly_chart(
-                        _style_plotly(consensus_radar),
+                        style_plotly(consensus_radar, tokens),
                         width="stretch",
                         key=f"case_{case_id}_consensus_radar_{rank_1_solution['solution_id']}",
                     )
@@ -1678,15 +1760,15 @@ button[kind="secondary"] {
                         margin={"l": 40, "r": 40, "t": 60, "b": 40},
                     )
                     st.plotly_chart(
-                        _style_plotly(stakeholder_distance_bar),
+                        style_plotly(stakeholder_distance_bar, tokens),
                         width="stretch",
                         key=f"case_{case_id}_distance_bar_{rank_1_solution['solution_id']}",
                     )
                 else:
                     st.warning("No Pareto solutions were returned.")
 
-                st.markdown("---")
-                st.markdown("### SECTION D — Export JSON")
+                st.divider()
+                st.markdown("### Section D — Export JSON")
                 export_clicked = st.button("Export Case JSON", key=f"export_case_{case_id}")
                 if export_clicked:
                     st.session_state[case_export_key] = True
