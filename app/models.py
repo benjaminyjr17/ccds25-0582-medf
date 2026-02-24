@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator
 from sqlalchemy import Boolean, DateTime, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -276,6 +276,69 @@ class EvaluateRequest(BaseModel):
 class ConflictRequest(BaseModel):
     framework_ids: List[str]
     stakeholder_ids: List[str]
+    ai_system: Optional[AISystemInput] = None
+    framework_id: Optional[str] = None
+    weights: Optional[Dict[str, Dict[str, float]]] = None
+
+    @field_validator("weights")
+    @classmethod
+    def validate_conflict_weights(
+        cls,
+        value: Optional[Dict[str, Dict[str, float]]],
+    ) -> Optional[Dict[str, Dict[str, float]]]:
+        if value is None:
+            return None
+
+        normalized: Dict[str, Dict[str, float]] = {}
+        for stakeholder_id, weight_vector in value.items():
+            normalized[stakeholder_id] = _normalize_dimension_scores(
+                weight_vector,
+                require_all_dimensions=True,
+            )
+        return normalized
+
+    @model_validator(mode="after")
+    def validate_conflict_request(self) -> "ConflictRequest":
+        resolved_framework_id = self.framework_id
+        if resolved_framework_id is None and self.framework_ids:
+            resolved_framework_id = self.framework_ids[0]
+        if not resolved_framework_id:
+            raise ValueError("Either framework_id or framework_ids[0] must be provided.")
+
+        if self.ai_system is None:
+            raise ValueError("ai_system is required for conflict analysis.")
+
+        dimension_scores = self.ai_system.context.get("dimension_scores")
+        if not isinstance(dimension_scores, dict):
+            raise ValueError(
+                "ai_system.context.dimension_scores is required with all unified dimensions."
+            )
+
+        missing = [
+            dimension
+            for dimension in UNIFIED_DIMENSIONS
+            if dimension not in dimension_scores
+        ]
+        if missing:
+            raise ValueError(
+                "ai_system.context.dimension_scores is missing dimensions: "
+                + ", ".join(missing)
+            )
+
+        for dimension in UNIFIED_DIMENSIONS:
+            raw_score = dimension_scores.get(dimension)
+            try:
+                score = float(raw_score)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(
+                    f"Invalid ai_system.context.dimension_scores value for '{dimension}'."
+                ) from exc
+            if score < LIKERT_MIN or score > LIKERT_MAX:
+                raise ValueError(
+                    f"ai_system.context.dimension_scores['{dimension}'] must be between {LIKERT_MIN} and {LIKERT_MAX}."
+                )
+
+        return self
 
 
 class CompareRequest(BaseModel):

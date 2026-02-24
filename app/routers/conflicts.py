@@ -2,14 +2,15 @@ from __future__ import annotations
 
 from itertools import combinations
 
+import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.conflict_detection import (
-    compute_pairwise_spearman,
-    find_divergent_dimensions,
-    find_pareto_solutions,
-)
+try:
+    from scipy.stats import spearmanr as _scipy_spearmanr
+except Exception:  # pragma: no cover - fallback for environments without scipy
+    _scipy_spearmanr = None
+
 from app.database import get_db
 from app.framework_registry import get_framework, get_stakeholder
 from app.models import (
@@ -20,26 +21,157 @@ from app.models import (
     StakeholderConflict,
     UNIFIED_DIMENSIONS,
 )
-from app.scoring_engine import compute_scores
+from app.scoring_engine import topsis_score
 
 router = APIRouter(prefix="/api", tags=["Conflict Detection"])
 
 
-def _placeholder_dimension_scores(framework_id: str, stakeholder_id: str) -> dict[str, float]:
-    scores: dict[str, float] = {}
-    for index, dimension in enumerate(UNIFIED_DIMENSIONS, start=1):
-        seed = sum(ord(char) for char in f"{framework_id}:{stakeholder_id}:{dimension}") + (index * 11)
-        scores[dimension] = float((seed % 5) + 1)
-    return scores
+def _resolve_framework_id(payload: ConflictRequest) -> str:
+    framework_id = payload.framework_id
+    if framework_id:
+        return framework_id
+    if payload.framework_ids:
+        return payload.framework_ids[0]
+    raise HTTPException(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        detail="Either framework_id or framework_ids[0] must be provided.",
+    )
+
+
+def _extract_dimension_scores(payload: ConflictRequest) -> np.ndarray:
+    if payload.ai_system is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="ai_system is required for conflict analysis.",
+        )
+
+    raw_scores = payload.ai_system.context.get("dimension_scores")
+    if not isinstance(raw_scores, dict):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="ai_system.context.dimension_scores is required with all unified dimensions.",
+        )
+
+    ordered_scores: list[float] = []
+    for dimension in UNIFIED_DIMENSIONS:
+        if dimension not in raw_scores:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Missing ai_system.context.dimension_scores['{dimension}'].",
+            )
+        try:
+            score = float(raw_scores[dimension])
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid score for '{dimension}'.",
+            ) from exc
+        if score < 1.0 or score > 5.0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Score for '{dimension}' must be between 1 and 5.",
+            )
+        ordered_scores.append(score)
+
+    return np.asarray(ordered_scores, dtype=float)
+
+
+def _ordered_criteria_types(framework_id: str, framework_dimensions: list) -> list[str]:
+    dimension_map = {dimension.name: dimension for dimension in framework_dimensions}
+    missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in dimension_map]
+    if missing:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=(
+                f"Framework '{framework_id}' is missing criteria types for dimensions: "
+                + ", ".join(missing)
+            ),
+        )
+
+    criteria_types: list[str] = []
+    for dimension in UNIFIED_DIMENSIONS:
+        raw_type = getattr(dimension_map[dimension].criteria_type, "value", dimension_map[dimension].criteria_type)
+        criteria_type = str(raw_type).strip().lower()
+        if criteria_type not in {"benefit", "cost"}:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Framework '{framework_id}' has invalid criteria type '{criteria_type}'.",
+            )
+        criteria_types.append(criteria_type)
+
+    return criteria_types
+
+
+def _validate_weights(weights: dict[str, float], stakeholder_id: str) -> dict[str, float]:
+    if not isinstance(weights, dict):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Weights for stakeholder '{stakeholder_id}' must be an object.",
+        )
+
+    missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in weights]
+    if missing:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"Weights for stakeholder '{stakeholder_id}' are missing dimensions: "
+                + ", ".join(missing)
+            ),
+        )
+
+    normalized: dict[str, float] = {}
+    for dimension in UNIFIED_DIMENSIONS:
+        raw_value = weights.get(dimension)
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid weight for '{dimension}' in stakeholder '{stakeholder_id}'.",
+            ) from exc
+        if value < 0.0 or value > 1.0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Weight for '{dimension}' in stakeholder '{stakeholder_id}' must be in [0, 1].",
+            )
+        normalized[dimension] = value
+
+    total = sum(normalized.values())
+    if abs(total - 1.0) > 0.01:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"Weights for stakeholder '{stakeholder_id}' must sum to 1.0 (±0.01); got {total:.4f}."
+            ),
+        )
+
+    return normalized
 
 
 def _conflict_level_from_rho(rho: float) -> ConflictLevel:
-    absolute_rho = abs(rho)
-    if absolute_rho >= 0.8:
+    if rho > 0.7:
         return ConflictLevel.LOW
-    if absolute_rho >= 0.5:
+    if rho > 0.3:
         return ConflictLevel.MODERATE
     return ConflictLevel.HIGH
+
+
+def _ranking_to_positions(ranking: list[str]) -> dict[str, int]:
+    return {dimension: index for index, dimension in enumerate(ranking)}
+
+
+def _spearman_rho(rank_vector_a: np.ndarray, rank_vector_b: np.ndarray) -> float:
+    if _scipy_spearmanr is not None:
+        rho, _ = _scipy_spearmanr(rank_vector_a, rank_vector_b)
+        return float(rho) if np.isfinite(rho) else 0.0
+
+    centered_a = rank_vector_a - float(np.mean(rank_vector_a))
+    centered_b = rank_vector_b - float(np.mean(rank_vector_b))
+    denominator = float(np.linalg.norm(centered_a) * np.linalg.norm(centered_b))
+    if denominator == 0.0:
+        return 0.0
+    rho = float(np.dot(centered_a, centered_b) / denominator)
+    return float(np.clip(rho, -1.0, 1.0))
 
 
 @router.post(
@@ -51,82 +183,134 @@ def analyze_conflicts(
     payload: ConflictRequest,
     db: Session = Depends(get_db),
 ) -> ConflictReport:
-    for framework_id in payload.framework_ids:
-        if get_framework(framework_id) is None:
-            error = ErrorResponse(
-                detail=f"Framework '{framework_id}' not found.",
-                error_code="framework_not_found",
-                path=f"/api/conflicts/{framework_id}",
-            )
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error.model_dump())
+    framework_id = _resolve_framework_id(payload)
+    framework = get_framework(framework_id)
+    if framework is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Framework '{framework_id}' not found.",
+        )
 
-    stakeholder_weights: dict[str, dict[str, float]] = {}
+    decision_vector = _extract_dimension_scores(payload)
+    decision_matrix = decision_vector.reshape(1, len(UNIFIED_DIMENSIONS))
+    normalized_scores = np.clip((decision_vector - 1.0) / 4.0, 0.0, 1.0)
+
+    criteria_types = _ordered_criteria_types(framework.id, framework.dimensions)
+
+    stakeholder_rankings: dict[str, list[str]] = {}
+    stakeholder_scores: dict[str, float] = {}
+    correlation_matrix: dict[str, dict[str, float]] = {
+        stakeholder_id: {
+            other_id: (1.0 if stakeholder_id == other_id else 0.0)
+            for other_id in payload.stakeholder_ids
+        }
+        for stakeholder_id in payload.stakeholder_ids
+    }
+
     for stakeholder_id in payload.stakeholder_ids:
         stakeholder = get_stakeholder(stakeholder_id, db)
         if stakeholder is None:
-            error = ErrorResponse(
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Stakeholder '{stakeholder_id}' not found.",
-                error_code="stakeholder_not_found",
-                path=f"/api/conflicts/{stakeholder_id}",
             )
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error.model_dump())
-        stakeholder_weights[stakeholder_id] = stakeholder.weights
 
-    rankings: dict[str, list[str]] = {}
-    dimension_profiles: dict[str, dict[str, float]] = {}
+        requested_weights = payload.weights.get(stakeholder_id) if payload.weights else None
+        stakeholder_weights = _validate_weights(
+            requested_weights if requested_weights is not None else stakeholder.weights,
+            stakeholder_id,
+        )
+        weight_vector = np.asarray(
+            [stakeholder_weights[dimension] for dimension in UNIFIED_DIMENSIONS],
+            dtype=float,
+        )
 
-    for stakeholder_id, weights in stakeholder_weights.items():
-        framework_scores: list[tuple[str, float]] = []
-        profile = {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
-
-        for framework_id in payload.framework_ids:
-            scored = compute_scores(
-                _placeholder_dimension_scores(framework_id, stakeholder_id),
-                weights,
-                method="topsis",
+        topsis_matrix = np.vstack(
+            [
+                decision_matrix,
+                np.full((1, len(UNIFIED_DIMENSIONS)), 5.0, dtype=float),
+                np.full((1, len(UNIFIED_DIMENSIONS)), 1.0, dtype=float),
+            ]
+        )
+        try:
+            stakeholder_scores[stakeholder_id] = float(
+                topsis_score(
+                    decision_matrix=topsis_matrix,
+                    weights=weight_vector,
+                    criteria_types=criteria_types,
+                )[0]
             )
-            framework_scores.append((framework_id, float(scored["overall_score"])))
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid scoring inputs for stakeholder '{stakeholder_id}': {exc}",
+            ) from exc
 
-            per_dimension = scored["dimension_scores"]
-            for dimension in UNIFIED_DIMENSIONS:
-                profile[dimension] += float(per_dimension.get(dimension, 0.0))
-
-        count = len(payload.framework_ids) if payload.framework_ids else 1
-        dimension_profiles[stakeholder_id] = {
-            dimension: profile[dimension] / count
-            for dimension in UNIFIED_DIMENSIONS
-        }
-        rankings[stakeholder_id] = [
-            framework_id
-            for framework_id, _ in sorted(framework_scores, key=lambda item: item[1], reverse=True)
+        contributions = np.clip(normalized_scores * weight_vector, 0.0, 1.0)
+        ranking_indices = np.argsort(-contributions, kind="stable")
+        stakeholder_rankings[stakeholder_id] = [
+            UNIFIED_DIMENSIONS[index]
+            for index in ranking_indices
         ]
 
     conflicts: list[StakeholderConflict] = []
     for stakeholder_a, stakeholder_b in combinations(payload.stakeholder_ids, 2):
-        rho, _ = compute_pairwise_spearman(rankings[stakeholder_a], rankings[stakeholder_b])
-        divergent = find_divergent_dimensions(
-            dimension_profiles[stakeholder_a],
-            dimension_profiles[stakeholder_b],
+        ranking_a = stakeholder_rankings[stakeholder_a]
+        ranking_b = stakeholder_rankings[stakeholder_b]
+
+        positions_a = _ranking_to_positions(ranking_a)
+        positions_b = _ranking_to_positions(ranking_b)
+
+        rank_vector_a = np.asarray(
+            [positions_a[dimension] for dimension in UNIFIED_DIMENSIONS],
+            dtype=float,
         )
+        rank_vector_b = np.asarray(
+            [positions_b[dimension] for dimension in UNIFIED_DIMENSIONS],
+            dtype=float,
+        )
+
+        rho_value = _spearman_rho(rank_vector_a, rank_vector_b)
+
+        correlation_matrix[stakeholder_a][stakeholder_b] = rho_value
+        correlation_matrix[stakeholder_b][stakeholder_a] = rho_value
+
+        rank_differences = {
+            dimension: abs(positions_a[dimension] - positions_b[dimension])
+            for dimension in UNIFIED_DIMENSIONS
+        }
+        conflicting_dimensions = sorted(
+            UNIFIED_DIMENSIONS,
+            key=lambda dimension: (-rank_differences[dimension], dimension),
+        )[:2]
+
         conflicts.append(
             StakeholderConflict(
                 stakeholder_a_id=stakeholder_a,
                 stakeholder_b_id=stakeholder_b,
-                conflict_level=_conflict_level_from_rho(rho),
-                spearman_rho=rho,
-                conflicting_dimensions=divergent,
+                conflict_level=_conflict_level_from_rho(rho_value),
+                spearman_rho=rho_value,
+                conflicting_dimensions=conflicting_dimensions,
             )
         )
 
-    pareto_solutions = find_pareto_solutions()
+    mean_rho = float(np.mean([conflict.spearman_rho for conflict in conflicts])) if conflicts else 1.0
+    overall_conflict = _conflict_level_from_rho(mean_rho).value
 
     return ConflictReport(
-        summary="Deterministic Stage 1C placeholder conflict report.",
+        summary=(
+            f"Conflict analysis for framework '{framework.id}' indicates "
+            f"{overall_conflict} overall stakeholder disagreement."
+        ),
         conflicts=conflicts,
-        pareto_solutions=pareto_solutions,
+        pareto_solutions=[],
         metadata={
-            "framework_ids": payload.framework_ids,
-            "stakeholder_ids": payload.stakeholder_ids,
-            "pairwise_conflicts": len(conflicts),
+            "framework_id": framework.id,
+            "stakeholder_rankings": stakeholder_rankings,
+            "correlation_matrix": correlation_matrix,
+            "ai_system_id": payload.ai_system.id if payload.ai_system else None,
+            "ai_system_name": payload.ai_system.name if payload.ai_system else None,
+            "scoring_method": "topsis",
+            "stakeholder_scores": stakeholder_scores,
         },
     )
