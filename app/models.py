@@ -35,10 +35,6 @@ WEIGHT_MAX: float = 1.0
 LIKERT_MIN: float = 1.0
 LIKERT_MAX: float = 5.0
 
-# Backward-compatible aliases for unchanged validators/fields in this file.
-SCORE_MIN: float = WEIGHT_MIN
-SCORE_MAX: float = WEIGHT_MAX
-
 
 class CriteriaType(str, Enum):
     BENEFIT = "benefit"
@@ -89,9 +85,9 @@ def _normalize_dimension_scores(
         except (TypeError, ValueError) as exc:
             raise ValueError(f"Invalid score for dimension '{dimension}'.") from exc
 
-        if score < SCORE_MIN or score > SCORE_MAX:
+        if score < WEIGHT_MIN or score > WEIGHT_MAX:
             raise ValueError(
-                f"Dimension '{dimension}' score must be between {SCORE_MIN} and {SCORE_MAX}."
+                f"Dimension '{dimension}' score must be between {WEIGHT_MIN} and {WEIGHT_MAX}."
             )
 
         normalized[dimension] = score
@@ -335,7 +331,7 @@ class StakeholderCreateRequest(BaseModel):
 
 class FrameworkScore(BaseModel):
     framework_id: str
-    score: float = Field(..., ge=SCORE_MIN, le=SCORE_MAX)
+    score: float = Field(..., ge=WEIGHT_MIN, le=WEIGHT_MAX)
     dimension_scores: Dict[str, float] = Field(default_factory=dict)
     risk_level: Optional[RiskLevel] = None
 
@@ -349,7 +345,7 @@ class EvaluationResult(BaseModel):
     ai_system_id: str
     scoring_method: ScoringMethod
     framework_scores: List[FrameworkScore] = Field(default_factory=list)
-    overall_score: Optional[float] = Field(default=None, ge=SCORE_MIN, le=SCORE_MAX)
+    overall_score: Optional[float] = Field(default=None, ge=WEIGHT_MIN, le=WEIGHT_MAX)
     generated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     notes: Optional[str] = None
 
