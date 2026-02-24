@@ -879,6 +879,8 @@ def main() -> None:
             else:
                 st.info("Select at least 2 stakeholders to view tradeoffs.")
 
+    st.caption("MEDF v1.0 — Feature Frozen Build")
+
 
 if __name__ == "__main__":
     main()

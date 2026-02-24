@@ -1,3 +1,14 @@
+"""
+==============================
+FEATURE FREEZE NOTICE
+==============================
+This file is part of the frozen API surface for FYP evaluation.
+Do NOT modify request/response schemas or endpoint paths.
+Minor bug fixes allowed.
+Major changes require version bump and schema hash update.
+==============================
+"""
+
 from __future__ import annotations
 
 import json
