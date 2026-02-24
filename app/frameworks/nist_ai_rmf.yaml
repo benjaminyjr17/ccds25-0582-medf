@@ -3,15 +3,33 @@ name: NIST AI Risk Management Framework
 version: "1.0"
 description: Core functions derived from NIST AI RMF.
 criteria:
-  - id: govern
+  - id: rmf_fairness
+    name: Fairness Risk Management
+    dimension: fairness
+    description: Identify and mitigate inequitable model outcomes.
+    weight: 1.0
+  - id: rmf_accountability
     name: Govern
-    description: Establish organizational governance and accountability structures.
+    dimension: accountability
+    description: Establish governance and accountability controls.
     weight: 1.0
-  - id: map
-    name: Map
-    description: Contextualize AI risks, impacts, and system boundaries.
+  - id: rmf_transparency
+    name: Explainability and Traceability
+    dimension: transparency
+    description: Support transparency and decision traceability.
     weight: 1.0
-  - id: manage
-    name: Manage
-    description: Prioritize and mitigate identified risks over the system lifecycle.
+  - id: rmf_privacy
+    name: Data and Privacy Risk
+    dimension: privacy
+    description: Manage privacy and data governance risks.
+    weight: 1.0
+  - id: rmf_safety
+    name: Robustness and Reliability
+    dimension: safety
+    description: Manage robustness, resilience, and safety risk.
+    weight: 1.0
+  - id: rmf_human_oversight
+    name: Human Oversight
+    dimension: human_oversight
+    description: Include meaningful human review and oversight practices.
     weight: 1.0

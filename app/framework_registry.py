@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from pydantic import ValidationError
 
 from app.models import FrameworkCriterion, FrameworkDefinition, FrameworkSummary
 
@@ -27,19 +28,25 @@ def _parse_criteria(raw_criteria: Any) -> list[FrameworkCriterion]:
         raw_description = criterion.get("description")
         description = str(raw_description) if raw_description is not None else None
 
-        try:
-            weight = float(criterion.get("weight", 1.0))
-        except (TypeError, ValueError):
-            weight = 1.0
+        raw_dimension = criterion.get("dimension")
+        raw_weight = criterion.get("weight")
+        if raw_dimension is None or raw_weight is None:
+            continue
 
-        criteria.append(
-            FrameworkCriterion(
-                id=criterion_id,
-                name=criterion_name,
-                description=description,
-                weight=weight,
+        try:
+            parsed = FrameworkCriterion.model_validate(
+                {
+                    "id": criterion_id,
+                    "name": criterion_name,
+                    "dimension": str(raw_dimension),
+                    "description": description,
+                    "weight": float(raw_weight),
+                }
             )
-        )
+        except (TypeError, ValueError, ValidationError):
+            continue
+
+        criteria.append(parsed)
 
     return criteria
 

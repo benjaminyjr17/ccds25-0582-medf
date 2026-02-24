@@ -19,13 +19,14 @@ This repository implements a minimal backend skeleton for the Multi-stakeholder 
 ### FrameworkCriterion
 - `id: str`
 - `name: str`
+- `dimension: "fairness" | "accountability" | "transparency" | "privacy" | "safety" | "human_oversight"`
 - `description: str | None`
-- `weight: float`
+- `weight: float` (required)
 
 ### Stakeholder (SQLite + API)
-- `id: int` (primary key)
+- `id: str` (API response; sourced from internal DB key)
 - `name: str` (unique)
-- `role: str`
+- `role: "developer" | "regulator" | "affected_community" | "custom"`
 - `description: str`
 
 Default seeded stakeholders:
@@ -34,7 +35,7 @@ Default seeded stakeholders:
 - Affected Community
 
 ### EvaluationRequest / EvaluationResponse (API)
-- Input: `case_id`, selected `framework_ids`, selected `stakeholder_ids`, optional `inputs`.
+- Input: `case_id`, selected `framework_ids: list[str]`, selected `stakeholder_ids: list[str]`, required `weights` (full six-dimension vector per stakeholder), optional `inputs`.
 - Output: deterministic placeholder `scores` by framework ID.
 
 ### ConflictCheckRequest / ConflictCheckResponse (API)

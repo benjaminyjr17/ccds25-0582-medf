@@ -12,7 +12,7 @@ def detect_framework_conflicts(framework_ids: Iterable[str]) -> dict[str, Any]:
     }
 
 
-def detect_stakeholder_conflicts(stakeholder_ids: Iterable[int]) -> dict[str, Any]:
+def detect_stakeholder_conflicts(stakeholder_ids: Iterable[str]) -> dict[str, Any]:
     return {
         "stakeholder_ids": sorted(set(stakeholder_ids)),
         "conflicts": [],
@@ -21,7 +21,7 @@ def detect_stakeholder_conflicts(stakeholder_ids: Iterable[int]) -> dict[str, An
 
 
 def build_conflict_matrix(
-    stakeholder_ids: Iterable[int],
+    stakeholder_ids: Iterable[str],
     framework_ids: Iterable[str],
 ) -> dict[str, Any]:
     return {

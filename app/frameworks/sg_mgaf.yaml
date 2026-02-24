@@ -3,15 +3,33 @@ name: Singapore Model AI Governance Framework
 version: "2.0"
 description: Practical governance controls based on Singapore MGAF.
 criteria:
-  - id: internal_governance
+  - id: mgaf_fairness
+    name: Fairness and Inclusion
+    dimension: fairness
+    description: Promote fairness outcomes and avoid discriminatory harm.
+    weight: 1.0
+  - id: mgaf_accountability
     name: Internal Governance
-    description: Define internal structures for AI oversight and risk ownership.
+    dimension: accountability
+    description: Set governance structures and clear accountability ownership.
     weight: 1.0
-  - id: operations_management
+  - id: mgaf_transparency
+    name: Communication and Explainability
+    dimension: transparency
+    description: Communicate AI behavior, limitations, and recourse.
+    weight: 1.0
+  - id: mgaf_privacy
+    name: Data Governance
+    dimension: privacy
+    description: Ensure strong personal data governance and protection controls.
+    weight: 1.0
+  - id: mgaf_safety
     name: Operations Management
-    description: Maintain robust data, model, and deployment operations controls.
+    dimension: safety
+    description: Maintain model quality, robustness, and operational safeguards.
     weight: 1.0
-  - id: stakeholder_communication
-    name: Stakeholder Communication
-    description: Communicate AI use, limitations, and recourse clearly to stakeholders.
+  - id: mgaf_human_oversight
+    name: Human-in-the-loop Oversight
+    dimension: human_oversight
+    description: Provide human override and escalation pathways where needed.
     weight: 1.0
