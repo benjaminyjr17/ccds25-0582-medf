@@ -30,8 +30,14 @@ DIMENSION_DISPLAY_NAMES: Dict[str, str] = {
     "accountability": "Accountability",
 }
 
-SCORE_MIN: float = 0.0
-SCORE_MAX: float = 1.0
+WEIGHT_MIN: float = 0.0
+WEIGHT_MAX: float = 1.0
+LIKERT_MIN: float = 1.0
+LIKERT_MAX: float = 5.0
+
+# Backward-compatible aliases for unchanged validators/fields in this file.
+SCORE_MIN: float = WEIGHT_MIN
+SCORE_MAX: float = WEIGHT_MAX
 
 
 class CriteriaType(str, Enum):
@@ -157,9 +163,9 @@ class EthicalDimension(BaseModel):
     name: str
     display_name: str
     description: Optional[str] = None
-    weight_default: float = Field(1.0, ge=SCORE_MIN, le=SCORE_MAX)
-    scale_min: float = SCORE_MIN
-    scale_max: float = SCORE_MAX
+    weight_default: float = Field(1.0, ge=WEIGHT_MIN, le=WEIGHT_MAX)
+    scale_min: float = LIKERT_MIN
+    scale_max: float = LIKERT_MAX
     criteria_type: CriteriaType = CriteriaType.BENEFIT
     assessment_questions: List[str] = Field(default_factory=list)
 
