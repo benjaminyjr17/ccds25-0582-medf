@@ -23,28 +23,28 @@ _FRAMEWORKS: dict[str, EthicalFramework] = {}
 
 _DEFAULT_STAKEHOLDER_WEIGHTS: dict[str, dict[str, float]] = {
     "developer": {
-        "fairness": 0.15,
+        "transparency_explainability": 0.10,
+        "fairness_nondiscrimination": 0.15,
+        "safety_robustness": 0.30,
+        "privacy_data_governance": 0.15,
+        "human_agency_oversight": 0.15,
         "accountability": 0.15,
-        "transparency": 0.10,
-        "privacy": 0.15,
-        "safety": 0.30,
-        "human_oversight": 0.15,
     },
     "regulator": {
-        "fairness": 0.20,
+        "transparency_explainability": 0.20,
+        "fairness_nondiscrimination": 0.20,
+        "safety_robustness": 0.10,
+        "privacy_data_governance": 0.15,
+        "human_agency_oversight": 0.10,
         "accountability": 0.25,
-        "transparency": 0.20,
-        "privacy": 0.15,
-        "safety": 0.10,
-        "human_oversight": 0.10,
     },
     "affected_community": {
-        "fairness": 0.30,
+        "transparency_explainability": 0.10,
+        "fairness_nondiscrimination": 0.30,
+        "safety_robustness": 0.10,
+        "privacy_data_governance": 0.15,
+        "human_agency_oversight": 0.20,
         "accountability": 0.15,
-        "transparency": 0.10,
-        "privacy": 0.15,
-        "safety": 0.10,
-        "human_oversight": 0.20,
     },
 }
 
@@ -107,11 +107,27 @@ def _parse_dimensions(raw_framework: dict[str, Any], file_name: str) -> list[Eth
     if not dimension_map:
         raise RuntimeError(f"Framework file '{file_name}' contains no valid dimensions.")
 
-    return [
+    ordered_dimensions = [
         dimension_map[dimension]
         for dimension in UNIFIED_DIMENSIONS
         if dimension in dimension_map
     ]
+
+    if len(ordered_dimensions) != len(UNIFIED_DIMENSIONS):
+        missing = [
+            dimension for dimension in UNIFIED_DIMENSIONS if dimension not in dimension_map
+        ]
+        raise RuntimeError(
+            f"Framework file '{file_name}' is missing canonical dimensions: {', '.join(missing)}"
+        )
+
+    weight_sum = sum(dimension.weight for dimension in ordered_dimensions)
+    if abs(weight_sum - 1.0) > 0.01:
+        raise RuntimeError(
+            f"Framework file '{file_name}' dimension weights must sum to 1.0 (±0.01); got {weight_sum:.4f}."
+        )
+
+    return ordered_dimensions
 
 
 def load_frameworks() -> list[EthicalFramework]:
@@ -212,15 +228,21 @@ def seed_default_stakeholders(db: Session | None = None) -> None:
         )
 
         default_ids = [entry["id"] for entry in defaults]
-        existing_ids = {
-            stakeholder_id
-            for (stakeholder_id,) in session.query(DBStakeholderProfile.id)
+        existing_rows = {
+            row.id: row
+            for row in session.query(DBStakeholderProfile)
             .filter(DBStakeholderProfile.id.in_(default_ids))
             .all()
         }
 
         for entry in defaults:
-            if entry["id"] in existing_ids:
+            existing = existing_rows.get(entry["id"])
+            if existing is not None:
+                existing.name = entry["name"]
+                existing.role = entry["role"]
+                existing.description = entry["description"]
+                existing.is_default = True
+                existing.weights = entry["weights"]
                 continue
 
             row = DBStakeholderProfile(

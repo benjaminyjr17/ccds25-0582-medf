@@ -13,21 +13,21 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
 UNIFIED_DIMENSIONS: tuple[str, ...] = (
-    "fairness",
+    "transparency_explainability",
+    "fairness_nondiscrimination",
+    "safety_robustness",
+    "privacy_data_governance",
+    "human_agency_oversight",
     "accountability",
-    "transparency",
-    "privacy",
-    "safety",
-    "human_oversight",
 )
 
 DIMENSION_DISPLAY_NAMES: Dict[str, str] = {
-    "fairness": "Fairness",
+    "transparency_explainability": "Transparency and Explainability",
+    "fairness_nondiscrimination": "Fairness and Non-discrimination",
+    "safety_robustness": "Safety and Robustness",
+    "privacy_data_governance": "Privacy and Data Governance",
+    "human_agency_oversight": "Human Agency and Oversight",
     "accountability": "Accountability",
-    "transparency": "Transparency",
-    "privacy": "Privacy",
-    "safety": "Safety",
-    "human_oversight": "Human Oversight",
 }
 
 SCORE_MIN: float = 0.0
@@ -95,7 +95,11 @@ def _normalize_dimension_scores(
         if missing:
             missing_str = ", ".join(missing)
             raise ValueError(f"Missing scores for dimensions: {missing_str}.")
-        return {dimension: normalized[dimension] for dimension in UNIFIED_DIMENSIONS}
+        ordered = {dimension: normalized[dimension] for dimension in UNIFIED_DIMENSIONS}
+        total = sum(ordered.values())
+        if abs(total - 1.0) > 0.01:
+            raise ValueError("Weights must sum to 1.0 (±0.01).")
+        return ordered
 
     return normalized
 

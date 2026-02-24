@@ -5,31 +5,31 @@ description: Practical governance controls based on Singapore MGAF.
 criteria:
   - id: mgaf_fairness
     name: Fairness and Inclusion
-    dimension: fairness
+    dimension: fairness_nondiscrimination
     description: Promote fairness outcomes and avoid discriminatory harm.
-    weight: 1.0
+    weight: 0.17
   - id: mgaf_accountability
     name: Internal Governance
     dimension: accountability
     description: Set governance structures and clear accountability ownership.
-    weight: 1.0
+    weight: 0.17
   - id: mgaf_transparency
     name: Communication and Explainability
-    dimension: transparency
+    dimension: transparency_explainability
     description: Communicate AI behavior, limitations, and recourse.
-    weight: 1.0
+    weight: 0.17
   - id: mgaf_privacy
     name: Data Governance
-    dimension: privacy
+    dimension: privacy_data_governance
     description: Ensure strong personal data governance and protection controls.
-    weight: 1.0
+    weight: 0.16
   - id: mgaf_safety
     name: Operations Management
-    dimension: safety
+    dimension: safety_robustness
     description: Maintain model quality, robustness, and operational safeguards.
-    weight: 1.0
+    weight: 0.17
   - id: mgaf_human_oversight
     name: Human-in-the-loop Oversight
-    dimension: human_oversight
+    dimension: human_agency_oversight
     description: Provide human override and escalation pathways where needed.
-    weight: 1.0
+    weight: 0.16

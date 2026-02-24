@@ -5,31 +5,31 @@ description: Baseline criteria distilled from EU ALTAI guidance.
 criteria:
   - id: altai_fairness
     name: Fairness and Non-discrimination
-    dimension: fairness
+    dimension: fairness_nondiscrimination
     description: Assess fairness and discrimination risk across impacted groups.
-    weight: 1.0
+    weight: 0.17
   - id: altai_accountability
     name: Accountability
     dimension: accountability
     description: Define responsibility, governance, and remediation ownership.
-    weight: 1.0
+    weight: 0.17
   - id: altai_transparency
     name: Transparency and Explainability
-    dimension: transparency
+    dimension: transparency_explainability
     description: Ensure traceability and explainability for relevant decisions.
-    weight: 1.0
+    weight: 0.17
   - id: altai_privacy
     name: Privacy and Data Governance
-    dimension: privacy
+    dimension: privacy_data_governance
     description: Enforce privacy controls and lawful data lifecycle management.
-    weight: 1.0
+    weight: 0.16
   - id: altai_safety
     name: Technical Robustness and Safety
-    dimension: safety
+    dimension: safety_robustness
     description: Address reliability, resilience, and misuse prevention.
-    weight: 1.0
+    weight: 0.17
   - id: altai_human_oversight
     name: Human Agency and Oversight
-    dimension: human_oversight
+    dimension: human_agency_oversight
     description: Preserve meaningful human control and intervention capability.
-    weight: 1.0
+    weight: 0.16

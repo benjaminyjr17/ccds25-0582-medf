@@ -5,31 +5,31 @@ description: Core functions derived from NIST AI RMF.
 criteria:
   - id: rmf_fairness
     name: Fairness Risk Management
-    dimension: fairness
+    dimension: fairness_nondiscrimination
     description: Identify and mitigate inequitable model outcomes.
-    weight: 1.0
+    weight: 0.17
   - id: rmf_accountability
     name: Govern
     dimension: accountability
     description: Establish governance and accountability controls.
-    weight: 1.0
+    weight: 0.17
   - id: rmf_transparency
     name: Explainability and Traceability
-    dimension: transparency
+    dimension: transparency_explainability
     description: Support transparency and decision traceability.
-    weight: 1.0
+    weight: 0.17
   - id: rmf_privacy
     name: Data and Privacy Risk
-    dimension: privacy
+    dimension: privacy_data_governance
     description: Manage privacy and data governance risks.
-    weight: 1.0
+    weight: 0.16
   - id: rmf_safety
     name: Robustness and Reliability
-    dimension: safety
+    dimension: safety_robustness
     description: Manage robustness, resilience, and safety risk.
-    weight: 1.0
+    weight: 0.17
   - id: rmf_human_oversight
     name: Human Oversight
-    dimension: human_oversight
+    dimension: human_agency_oversight
     description: Include meaningful human review and oversight practices.
-    weight: 1.0
+    weight: 0.16
