@@ -201,9 +201,9 @@ class EthicalFramework(BaseModel):
             seen.add(dimension.name)
         if len(value) != len(UNIFIED_DIMENSIONS):
             raise ValueError(f"Framework must define {len(UNIFIED_DIMENSIONS)} dimensions.")
-        weight_sum = sum(dimension.weight_default for dimension in value)
-        if abs(weight_sum - 1.0) > 0.01:
-            raise ValueError("Framework dimension weights must sum to 1.0 (±0.01).")
+        total = sum(d.weight_default for d in value)
+        if abs(total - 1.0) > 0.01:
+            raise ValueError("Framework dimension default weights must sum to 1.0 (±0.01).")
         return value
 
 
