@@ -28,6 +28,6 @@ def get_framework_by_id(framework_id: str) -> EthicalFramework:
         )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=error.model_dump(),
+            detail=error.model_dump(mode="json"),
         )
     return framework

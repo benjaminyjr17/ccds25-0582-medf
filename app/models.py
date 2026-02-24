@@ -384,9 +384,9 @@ class CompareResult(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str
-    service: str
-    version: Optional[str] = None
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    version: str
+    frameworks_loaded: int
+    stakeholder_profiles_loaded: int
 
 
 class ErrorResponse(BaseModel):
