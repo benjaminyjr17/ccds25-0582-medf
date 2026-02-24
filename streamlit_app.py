@@ -1203,6 +1203,48 @@ def main() -> None:
                 run_case_clicked = st.button("Run Case Study", key=f"run_case_{case_id}", type="primary")
 
                 if run_case_clicked:
+                    stakeholder_by_id = {
+                        str(item.get("id", "")): item
+                        for item in stakeholders
+                        if isinstance(item, dict) and item.get("id")
+                    }
+                    weights_payload: dict[str, dict[str, float]] = {}
+                    missing_stakeholder = False
+                    for stakeholder_id in case_stakeholder_ids:
+                        stakeholder_obj = stakeholder_by_id.get(stakeholder_id)
+                        if stakeholder_obj is None:
+                            st.error(
+                                f"Stakeholder '{stakeholder_id}' not found in /api/stakeholders; cannot run evaluation."
+                            )
+                            missing_stakeholder = True
+                            break
+
+                        raw_weights = stakeholder_obj.get("weights")
+                        if not isinstance(raw_weights, dict):
+                            st.error(
+                                f"Stakeholder '{stakeholder_id}' has no valid weights in /api/stakeholders; cannot run evaluation."
+                            )
+                            missing_stakeholder = True
+                            break
+
+                        missing_dimensions = [
+                            dimension for dimension in UNIFIED_DIMENSIONS if dimension not in raw_weights
+                        ]
+                        if missing_dimensions:
+                            st.error(
+                                f"Stakeholder '{stakeholder_id}' weights missing dimensions: {', '.join(missing_dimensions)}."
+                            )
+                            missing_stakeholder = True
+                            break
+
+                        weights_payload[stakeholder_id] = {
+                            dimension: float(raw_weights[dimension])
+                            for dimension in UNIFIED_DIMENSIONS
+                        }
+
+                    if missing_stakeholder:
+                        continue
+
                     evaluate_payload = {
                         "ai_system": {
                             "id": f"case_{case_id}",
@@ -1212,6 +1254,7 @@ def main() -> None:
                         },
                         "framework_ids": case_framework_ids,
                         "stakeholder_ids": case_stakeholder_ids,
+                        "weights": weights_payload,
                         "scoring_method": "topsis",
                     }
                     conflicts_payload = {
