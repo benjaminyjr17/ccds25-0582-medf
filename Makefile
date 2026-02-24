@@ -42,3 +42,21 @@ dev:
 
 doctor:
 	bash scripts/doctor_env.sh
+
+run:
+	.venv/bin/python -m uvicorn app.main:app --reload --port 8000
+
+streamlit:
+	.venv/bin/python -m streamlit run streamlit_app.py
+
+test:
+	.venv/bin/pytest -q
+
+docker-build:
+	docker build -t medf-backend .
+
+docker-up:
+	docker-compose up --build
+
+docker-down:
+	docker-compose down
