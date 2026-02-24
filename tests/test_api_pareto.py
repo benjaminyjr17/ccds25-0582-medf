@@ -1,0 +1,83 @@
+from __future__ import annotations
+
+import math
+
+from fastapi.testclient import TestClient
+
+from app.main import app
+from app.models import UNIFIED_DIMENSIONS
+from app.routers.pareto import router as pareto_router
+
+
+def test_pareto_endpoint_returns_consensus_solutions() -> None:
+    if not any(route.path == "/api/pareto" for route in app.routes):
+        app.include_router(pareto_router)
+
+    payload = {
+        "ai_system": {
+            "id": "facerec_1",
+            "name": "FaceDetect Pro v2.1",
+            "description": "Law enforcement system",
+            "context": {
+                "dimension_scores": {
+                    "transparency_explainability": 2,
+                    "fairness_nondiscrimination": 1,
+                    "safety_robustness": 4,
+                    "privacy_data_governance": 1,
+                    "human_agency_oversight": 2,
+                    "accountability": 3,
+                }
+            },
+        },
+        "framework_ids": ["eu_altai"],
+        "stakeholder_ids": ["developer", "regulator", "affected_community"],
+        "n_solutions": 8,
+        "pop_size": 32,
+        "n_gen": 40,
+        "seed": 7,
+    }
+
+    with TestClient(app) as client:
+        response = client.post("/api/pareto", json=payload)
+
+    assert response.status_code == 200
+    body = response.json()
+
+    assert isinstance(body.get("pareto_solutions"), list)
+    solutions = body["pareto_solutions"]
+    assert 1 <= len(solutions) <= 8
+
+    expected_dims = set(UNIFIED_DIMENSIONS)
+    expected_stakeholders = set(payload["stakeholder_ids"])
+
+    for solution in solutions:
+        assert isinstance(solution.get("solution_id"), str)
+        assert solution["solution_id"].strip() != ""
+
+        weights = solution.get("weights", {})
+        assert isinstance(weights, dict)
+        assert "consensus" in weights
+        consensus = weights["consensus"]
+        assert isinstance(consensus, dict)
+        assert set(consensus.keys()) == expected_dims
+
+        consensus_sum = sum(float(value) for value in consensus.values())
+        assert math.isclose(consensus_sum, 1.0, abs_tol=0.01)
+
+        objective_scores = solution.get("objective_scores", {})
+        assert isinstance(objective_scores, dict)
+        assert set(objective_scores.keys()) == expected_stakeholders
+        for value in objective_scores.values():
+            score = float(value)
+            assert score >= 0.0
+
+        assert int(solution.get("rank", 0)) >= 1
+
+    metadata = body.get("metadata", {})
+    assert isinstance(metadata, dict)
+    salience_vector = metadata.get("salience_vector")
+    assert isinstance(salience_vector, dict)
+    assert set(salience_vector.keys()) == expected_dims
+
+    salience_sum = sum(float(value) for value in salience_vector.values())
+    assert math.isclose(salience_sum, 1.0, abs_tol=1e-6)
