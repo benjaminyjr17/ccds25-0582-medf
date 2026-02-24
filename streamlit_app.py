@@ -24,6 +24,33 @@ DIMENSION_DISPLAY_NAMES = {
     "accountability": "Accountability",
 }
 
+PRESET_BASELINE = {
+    "transparency_explainability": 2,
+    "fairness_nondiscrimination": 1,
+    "safety_robustness": 4,
+    "privacy_data_governance": 1,
+    "human_agency_oversight": 2,
+    "accountability": 3,
+}
+
+PRESET_FLIPPED = {
+    "transparency_explainability": 2,
+    "fairness_nondiscrimination": 5,
+    "safety_robustness": 1,
+    "privacy_data_governance": 5,
+    "human_agency_oversight": 2,
+    "accountability": 3,
+}
+
+PRESET_SAFETY_HEAVY = {
+    "transparency_explainability": 3,
+    "fairness_nondiscrimination": 3,
+    "safety_robustness": 5,
+    "privacy_data_governance": 3,
+    "human_agency_oversight": 3,
+    "accountability": 3,
+}
+
 
 def _risk_label(score: float) -> tuple[str, str]:
     if score >= 0.8:
@@ -35,21 +62,32 @@ def _risk_label(score: float) -> tuple[str, str]:
     return "CRITICAL", "red"
 
 
-@st.cache_data(show_spinner=False)
+def _apply_dimension_preset(preset: dict[str, int]) -> None:
+    for dimension, score in preset.items():
+        st.session_state[f"score_{dimension}"] = int(score)
+
+
+@st.cache_data(show_spinner=False, ttl=60)
 def load_frameworks(backend_url: str) -> list[dict[str, Any]]:
     response = requests.get(f"{backend_url}/api/frameworks", timeout=15)
     response.raise_for_status()
-    payload = response.json()
+    try:
+        payload = response.json()
+    except ValueError as exc:
+        raise ValueError("Invalid JSON received from /api/frameworks.") from exc
     if not isinstance(payload, list):
         raise ValueError("Unexpected /api/frameworks response shape.")
     return payload
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, ttl=60)
 def load_stakeholders(backend_url: str) -> list[dict[str, Any]]:
     response = requests.get(f"{backend_url}/api/stakeholders", timeout=15)
     response.raise_for_status()
-    payload = response.json()
+    try:
+        payload = response.json()
+    except ValueError as exc:
+        raise ValueError("Invalid JSON received from /api/stakeholders.") from exc
     if not isinstance(payload, list):
         raise ValueError("Unexpected /api/stakeholders response shape.")
     return payload
@@ -78,6 +116,8 @@ def main() -> None:
         framework_id = ""
         stakeholder_id = ""
         scoring_method = "topsis"
+        conflict_metric = "Weights-only (priority conflict)"
+        detect_clicked = False
         selected_stakeholder: dict[str, Any] | None = None
         conflict_stakeholder_ids: list[str] = []
 
@@ -96,6 +136,10 @@ def main() -> None:
             f"{item.get('name', item.get('id', 'unknown'))} ({item.get('id', 'unknown')})": item
             for item in stakeholders
             if isinstance(item, dict)
+        }
+        stakeholder_labels_by_id = {
+            str(item.get("id", "")): label
+            for label, item in stakeholder_options.items()
         }
 
         weights_for_request: dict[str, float] = {
@@ -157,10 +201,18 @@ def main() -> None:
         else:
             if stakeholder_options:
                 labels = list(stakeholder_options.keys())
+                default_ids = ["developer", "regulator", "affected_community"]
+                default_labels = [
+                    stakeholder_labels_by_id[stakeholder_id]
+                    for stakeholder_id in default_ids
+                    if stakeholder_id in stakeholder_labels_by_id
+                ]
+                if not default_labels:
+                    default_labels = labels[:2]
                 selected_labels = st.multiselect(
                     "Stakeholders (2–3)",
                     labels,
-                    default=labels[:2],
+                    default=default_labels,
                     max_selections=3,
                 )
                 conflict_stakeholder_ids = [
@@ -169,6 +221,12 @@ def main() -> None:
                 ]
             else:
                 st.warning("No stakeholders available from backend.")
+            conflict_metric = st.radio(
+                "Conflict metric",
+                ["Weights-only (priority conflict)", "Contrib-based (system-salience conflict)"],
+                index=0,
+            )
+            detect_clicked = st.button("Detect Conflicts", type="primary")
 
     col_left, col_right = st.columns([1, 1])
     with col_left:
@@ -178,22 +236,28 @@ def main() -> None:
 
     with col_right:
         st.subheader("Dimension Scores (Likert 1–5)")
+        if page == "Conflict Detection":
+            preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
+            if preset_col_1.button("Facial Recognition (baseline)"):
+                _apply_dimension_preset(PRESET_BASELINE)
+            if preset_col_2.button("Fairness/Privacy heavy (flipped)"):
+                _apply_dimension_preset(PRESET_FLIPPED)
+            if preset_col_3.button("Safety-heavy"):
+                _apply_dimension_preset(PRESET_SAFETY_HEAVY)
+
         dimension_scores: dict[str, float] = {}
-        default_scores = {
-            "transparency_explainability": 2,
-            "fairness_nondiscrimination": 1,
-            "safety_robustness": 4,
-            "privacy_data_governance": 1,
-            "human_agency_oversight": 2,
-            "accountability": 3,
-        }
+        default_scores = PRESET_BASELINE
+        for dimension in UNIFIED_DIMENSIONS:
+            session_key = f"score_{dimension}"
+            if session_key not in st.session_state:
+                st.session_state[session_key] = int(default_scores[dimension])
         for dimension in UNIFIED_DIMENSIONS:
             dimension_scores[dimension] = float(
                 st.slider(
                     DIMENSION_DISPLAY_NAMES[dimension],
                     min_value=1,
                     max_value=5,
-                    value=int(default_scores[dimension]),
+                    value=int(st.session_state[f"score_{dimension}"]),
                     step=1,
                     key=f"score_{dimension}",
                 )
@@ -299,8 +363,6 @@ def main() -> None:
             st.subheader("Per-Framework Scores")
             st.dataframe(table_rows, width="stretch", hide_index=True)
     else:
-        detect_clicked = st.button("Detect Conflicts", type="primary")
-
         if detect_clicked:
             if not framework_id:
                 st.error("Please select a framework.")
@@ -338,37 +400,66 @@ def main() -> None:
             result = response.json()
             st.subheader("Conflict Detection Results")
             if result.get("summary"):
-                st.write(str(result["summary"]))
+                st.info(str(result["summary"]))
 
             conflicts = result.get("conflicts", [])
+            metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
+            pairwise_rho_weights = metadata.get("pairwise_rho_weights")
+            include_rho_weights = isinstance(pairwise_rho_weights, dict)
             if isinstance(conflicts, list) and conflicts:
                 rows = []
                 for conflict in conflicts:
-                    rows.append(
-                        {
-                            "stakeholder_a_id": conflict.get("stakeholder_a_id"),
-                            "stakeholder_b_id": conflict.get("stakeholder_b_id"),
-                            "spearman_rho": round(float(conflict.get("spearman_rho", 0.0)), 4),
-                            "conflict_level": conflict.get("conflict_level"),
-                            "conflicting_dimensions": conflict.get("conflicting_dimensions", []),
-                        }
-                    )
+                    row = {
+                        "stakeholder_a_id": conflict.get("stakeholder_a_id"),
+                        "stakeholder_b_id": conflict.get("stakeholder_b_id"),
+                        "spearman_rho": round(float(conflict.get("spearman_rho", 0.0)), 4),
+                        "conflict_level": conflict.get("conflict_level"),
+                        "conflicting_dimensions": conflict.get("conflicting_dimensions", []),
+                    }
+                    if include_rho_weights:
+                        stakeholder_a = str(conflict.get("stakeholder_a_id", ""))
+                        stakeholder_b = str(conflict.get("stakeholder_b_id", ""))
+                        pair_key = "|".join(sorted((stakeholder_a, stakeholder_b)))
+                        rho_weights = pairwise_rho_weights.get(pair_key)
+                        row["rho_weights"] = (
+                            round(float(rho_weights), 4)
+                            if rho_weights is not None
+                            else None
+                        )
+                    rows.append(row)
                 st.dataframe(rows, width="stretch", hide_index=True)
             else:
                 st.info("No stakeholder conflicts were returned.")
 
-            metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
-            correlation_matrix = metadata.get("correlation_matrix") if isinstance(metadata, dict) else None
+            if conflict_metric == "Weights-only (priority conflict)":
+                correlation_matrix = metadata.get("correlation_matrix_weights")
+                matrix_title = "Stakeholder Spearman Correlation Matrix (Weights-only)"
+            else:
+                correlation_matrix = metadata.get("correlation_matrix_contrib")
+                matrix_title = "Stakeholder Spearman Correlation Matrix (Contrib-based)"
+
             if isinstance(correlation_matrix, dict) and correlation_matrix:
-                labels = list(correlation_matrix.keys())
+                labels = [
+                    stakeholder_id
+                    for stakeholder_id in conflict_stakeholder_ids
+                    if stakeholder_id in correlation_matrix
+                ]
+                if not labels:
+                    labels = list(correlation_matrix.keys())
                 z_values = [
                     [float(correlation_matrix.get(row, {}).get(col, 0.0)) for col in labels]
                     for row in labels
+                ]
+                z_text = [
+                    [f"{value:.2f}" for value in row]
+                    for row in z_values
                 ]
 
                 heatmap = go.Figure(
                     data=go.Heatmap(
                         z=z_values,
+                        text=z_text,
+                        texttemplate="%{text}",
                         x=labels,
                         y=labels,
                         zmin=-1,
@@ -378,12 +469,51 @@ def main() -> None:
                     )
                 )
                 heatmap.update_layout(
-                    title="Stakeholder Spearman Correlation Matrix",
+                    title=matrix_title,
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
                 st.plotly_chart(heatmap, width="stretch")
             else:
                 st.info("No correlation matrix returned in metadata.")
+
+            rankings_weights = metadata.get("stakeholder_rankings_weights")
+            rankings_contrib = metadata.get("stakeholder_rankings_contrib")
+            if isinstance(rankings_weights, dict) or isinstance(rankings_contrib, dict):
+                left_col, right_col = st.columns(2)
+
+                with left_col:
+                    st.markdown("**Top-1 Priority (Weights-only)**")
+                    if isinstance(rankings_weights, dict):
+                        rows_weights = []
+                        for stakeholder_id in conflict_stakeholder_ids:
+                            ranking = rankings_weights.get(stakeholder_id)
+                            top_1 = ranking[0] if isinstance(ranking, list) and ranking else None
+                            rows_weights.append(
+                                {
+                                    "stakeholder_id": stakeholder_id,
+                                    "top_1_dimension": top_1,
+                                }
+                            )
+                        st.table(rows_weights)
+                    else:
+                        st.info("No weights-only rankings returned in metadata.")
+
+                with right_col:
+                    st.markdown("**Top-1 Salience (Contrib-based)**")
+                    if isinstance(rankings_contrib, dict):
+                        rows_contrib = []
+                        for stakeholder_id in conflict_stakeholder_ids:
+                            ranking = rankings_contrib.get(stakeholder_id)
+                            top_1 = ranking[0] if isinstance(ranking, list) and ranking else None
+                            rows_contrib.append(
+                                {
+                                    "stakeholder_id": stakeholder_id,
+                                    "top_1_dimension": top_1,
+                                }
+                            )
+                        st.table(rows_contrib)
+                    else:
+                        st.info("No contrib-based rankings returned in metadata.")
 
 
 if __name__ == "__main__":
