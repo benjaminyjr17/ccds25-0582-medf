@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+from datetime import datetime
 from typing import Any
 
 import plotly.graph_objects as go
@@ -51,6 +53,60 @@ PRESET_SAFETY_HEAVY = {
     "accountability": 3,
 }
 
+CASE_STUDIES = [
+    {
+        "id": "facial_recognition",
+        "name": "Facial Recognition (High Stakeholder Disagreement)",
+        "description": (
+            "This scenario models law-enforcement facial recognition with low fairness and privacy ratings. "
+            "It is designed to expose structural disagreement between technical and affected-community priorities. "
+            "Expected behavior: weights-only developer↔affected correlation is negative and Pareto tradeoffs are visible."
+        ),
+        "dimension_scores": {
+            "transparency_explainability": 2,
+            "fairness_nondiscrimination": 1,
+            "safety_robustness": 4,
+            "privacy_data_governance": 1,
+            "human_agency_oversight": 2,
+            "accountability": 3,
+        },
+    },
+    {
+        "id": "hiring_recommendation",
+        "name": "Hiring Recommendation (Fairness Dominant)",
+        "description": (
+            "This scenario represents algorithmic hiring support where fairness and oversight drive policy concerns. "
+            "Scores are balanced overall but emphasize human-agency controls and accountability. "
+            "It is useful for examining whether stakeholder conflict remains moderate under less extreme inputs."
+        ),
+        "dimension_scores": {
+            "transparency_explainability": 3,
+            "fairness_nondiscrimination": 2,
+            "safety_robustness": 3,
+            "privacy_data_governance": 3,
+            "human_agency_oversight": 4,
+            "accountability": 3,
+        },
+    },
+    {
+        "id": "healthcare_diagnostic",
+        "name": "Healthcare Diagnostic AI (Safety Dominant)",
+        "description": (
+            "This scenario captures a clinical decision-support context where safety and robustness are primary. "
+            "Privacy and accountability remain high, reflecting regulated healthcare deployment constraints. "
+            "It helps illustrate consensus behavior when risk tolerance is low and reliability is prioritized."
+        ),
+        "dimension_scores": {
+            "transparency_explainability": 3,
+            "fairness_nondiscrimination": 3,
+            "safety_robustness": 5,
+            "privacy_data_governance": 4,
+            "human_agency_oversight": 3,
+            "accountability": 4,
+        },
+    },
+]
+
 
 def _risk_label(score: float) -> tuple[str, str]:
     if score >= 0.8:
@@ -93,6 +149,67 @@ def load_stakeholders(backend_url: str) -> list[dict[str, Any]]:
     return payload
 
 
+def _build_radar_chart(
+    values_by_dimension: dict[str, float],
+    *,
+    title: str,
+    radial_max: float = 1.0,
+) -> go.Figure:
+    radar_labels = [DIMENSION_DISPLAY_NAMES[dimension] for dimension in UNIFIED_DIMENSIONS]
+    radar_values = [float(values_by_dimension.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
+    radar_labels_closed = radar_labels + [radar_labels[0]]
+    radar_values_closed = radar_values + [radar_values[0]]
+
+    figure = go.Figure()
+    figure.add_trace(
+        go.Scatterpolar(
+            r=radar_values_closed,
+            theta=radar_labels_closed,
+            fill="toself",
+            name=title,
+        )
+    )
+    figure.update_layout(
+        title=title,
+        polar={"radialaxis": {"visible": True, "range": [0, radial_max]}},
+        showlegend=False,
+        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+    )
+    return figure
+
+
+def _build_correlation_heatmap(
+    matrix: dict[str, dict[str, float]],
+    *,
+    labels: list[str],
+    title: str,
+) -> go.Figure:
+    z_values = [
+        [float(matrix.get(row, {}).get(col, 0.0)) for col in labels]
+        for row in labels
+    ]
+    z_text = [[f"{value:.2f}" for value in row] for row in z_values]
+
+    figure = go.Figure(
+        data=go.Heatmap(
+            z=z_values,
+            text=z_text,
+            texttemplate="%{text}",
+            x=labels,
+            y=labels,
+            zmin=-1,
+            zmax=1,
+            colorscale="RdBu",
+            colorbar={"title": "rho"},
+        )
+    )
+    figure.update_layout(
+        title=title,
+        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+    )
+    return figure
+
+
 def main() -> None:
     st.set_page_config(page_title="MEDF Demo", layout="wide")
     st.title("MEDF Demo")
@@ -100,7 +217,7 @@ def main() -> None:
 
     page = st.radio(
         "Page",
-        ["Evaluate", "Conflict Detection", "Pareto Resolution"],
+        ["Evaluate", "Conflict Detection", "Pareto Resolution", "Case Studies"],
         index=0,
         horizontal=True,
     )
@@ -131,6 +248,7 @@ def main() -> None:
         pareto_pop_size = 40
         pareto_n_gen = 80
         generate_pareto_clicked = False
+        case_screenshot_mode = False
 
         framework_options = {
             f"{item.get('name', item.get('id', 'unknown'))} ({item.get('id', 'unknown')})": item
@@ -239,7 +357,7 @@ def main() -> None:
             )
             screenshot_mode = st.checkbox("Screenshot mode", value=False)
             detect_clicked = st.button("Detect Conflicts", type="primary")
-        else:
+        elif page == "Pareto Resolution":
             if stakeholder_options:
                 labels = list(stakeholder_options.keys())
                 default_ids = ["developer", "regulator", "affected_community"]
@@ -273,41 +391,56 @@ def main() -> None:
                 type="primary",
                 disabled=len(pareto_stakeholder_ids) < 2,
             )
+        else:
+            case_screenshot_mode = st.checkbox("Screenshot Mode", value=False)
+            st.caption("Case Studies runs fixed scenarios through Evaluate → Conflicts → Pareto.")
 
-    col_left, col_right = st.columns([1, 1])
-    with col_left:
-        ai_system_id = st.text_input("AI system id", value="demo_facerec")
-        ai_system_name = st.text_input("AI system name", value="Demo Facial Recognition System")
-        ai_system_description = st.text_area("AI system description", value="MVP evaluation input")
+    ai_system_id = "demo_facerec"
+    ai_system_name = "Demo Facial Recognition System"
+    ai_system_description = "MVP evaluation input"
+    dimension_scores: dict[str, float] = {
+        dimension: float(value)
+        for dimension, value in PRESET_BASELINE.items()
+    }
 
-    with col_right:
-        st.subheader("Dimension Scores (Likert 1–5)")
-        if page in {"Conflict Detection", "Pareto Resolution"}:
-            preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
-            if preset_col_1.button("Preset: Baseline (2,1,4,1,2,3)"):
-                _apply_dimension_preset(PRESET_BASELINE)
-            if preset_col_2.button("Preset: Flipped (2,5,1,5,2,3)"):
-                _apply_dimension_preset(PRESET_FLIPPED)
-            if preset_col_3.button("Preset: Safety-heavy (3,3,5,3,3,3)"):
-                _apply_dimension_preset(PRESET_SAFETY_HEAVY)
+    if page != "Case Studies":
+        col_left, col_right = st.columns([1, 1])
+        with col_left:
+            ai_system_id = st.text_input("AI system id", value="demo_facerec")
+            ai_system_name = st.text_input("AI system name", value="Demo Facial Recognition System")
+            ai_system_description = st.text_area("AI system description", value="MVP evaluation input")
 
-        dimension_scores: dict[str, float] = {}
-        default_scores = PRESET_BASELINE
-        for dimension in UNIFIED_DIMENSIONS:
-            session_key = f"score_{dimension}"
-            if session_key not in st.session_state:
-                st.session_state[session_key] = int(default_scores[dimension])
-        for dimension in UNIFIED_DIMENSIONS:
-            dimension_scores[dimension] = float(
-                st.slider(
-                    DIMENSION_DISPLAY_NAMES[dimension],
-                    min_value=1,
-                    max_value=5,
-                    value=int(st.session_state[f"score_{dimension}"]),
-                    step=1,
-                    key=f"score_{dimension}",
+        with col_right:
+            st.subheader("Dimension Scores (Likert 1–5)")
+            if page in {"Conflict Detection", "Pareto Resolution"}:
+                preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
+                if preset_col_1.button("Preset: Baseline (2,1,4,1,2,3)"):
+                    _apply_dimension_preset(PRESET_BASELINE)
+                if preset_col_2.button("Preset: Flipped (2,5,1,5,2,3)"):
+                    _apply_dimension_preset(PRESET_FLIPPED)
+                if preset_col_3.button("Preset: Safety-heavy (3,3,5,3,3,3)"):
+                    _apply_dimension_preset(PRESET_SAFETY_HEAVY)
+
+            default_scores = PRESET_BASELINE
+            for dimension in UNIFIED_DIMENSIONS:
+                session_key = f"score_{dimension}"
+                if session_key not in st.session_state:
+                    st.session_state[session_key] = int(default_scores[dimension])
+            for dimension in UNIFIED_DIMENSIONS:
+                dimension_scores[dimension] = float(
+                    st.slider(
+                        DIMENSION_DISPLAY_NAMES[dimension],
+                        min_value=1,
+                        max_value=5,
+                        value=int(st.session_state[f"score_{dimension}"]),
+                        step=1,
+                        key=f"score_{dimension}",
+                    )
                 )
-            )
+    else:
+        st.subheader("Case Studies")
+        if not case_screenshot_mode:
+            st.caption("Fixed framework: eu_altai | Fixed stakeholders: developer, regulator, affected_community")
 
     if page == "Evaluate":
         evaluate_clicked = st.button("Evaluate", type="primary")
@@ -603,7 +736,7 @@ def main() -> None:
                 st.plotly_chart(heatmap, width="stretch")
             else:
                 st.info("No correlation matrix returned in metadata.")
-    else:
+    elif page == "Pareto Resolution":
         if generate_pareto_clicked:
             if not framework_id:
                 st.error("Please select a framework.")
@@ -878,6 +1011,340 @@ def main() -> None:
                 st.caption(f"Selected solution: {selected_solution_id} (rank {selected_rank})")
             else:
                 st.info("Select at least 2 stakeholders to view tradeoffs.")
+    else:
+        case_framework_ids = ["eu_altai"]
+        case_stakeholder_ids = ["developer", "regulator", "affected_community"]
+
+        for case in CASE_STUDIES:
+            case_id = str(case["id"])
+            case_name = str(case["name"])
+            case_description = str(case["description"])
+            case_scores = {
+                dimension: float(case["dimension_scores"][dimension])
+                for dimension in UNIFIED_DIMENSIONS
+            }
+            case_result_key = f"case_result_{case_id}"
+            case_export_key = f"case_export_{case_id}"
+
+            with st.expander(f"Case: {case_name}", expanded=not case_screenshot_mode):
+                st.write(case_description)
+                if not case_screenshot_mode:
+                    st.caption(
+                        "Input dimension scores: "
+                        + ", ".join(
+                            f"{DIMENSION_DISPLAY_NAMES[dimension]}={int(case_scores[dimension])}"
+                            for dimension in UNIFIED_DIMENSIONS
+                        )
+                    )
+
+                run_case_clicked = st.button("Run Case Study", key=f"run_case_{case_id}", type="primary")
+
+                if run_case_clicked:
+                    evaluate_payload = {
+                        "ai_system": {
+                            "id": f"case_{case_id}",
+                            "name": case_name,
+                            "description": case_description,
+                            "context": {"dimension_scores": case_scores},
+                        },
+                        "framework_ids": case_framework_ids,
+                        "stakeholder_ids": case_stakeholder_ids,
+                        "scoring_method": "topsis",
+                    }
+                    conflicts_payload = {
+                        "ai_system": {
+                            "id": f"case_{case_id}",
+                            "name": case_name,
+                            "description": case_description,
+                            "context": {"dimension_scores": case_scores},
+                        },
+                        "framework_ids": case_framework_ids,
+                        "stakeholder_ids": case_stakeholder_ids,
+                    }
+                    pareto_payload = {
+                        "ai_system": {
+                            "id": f"case_{case_id}",
+                            "name": case_name,
+                            "description": case_description,
+                            "context": {"dimension_scores": case_scores},
+                        },
+                        "framework_ids": case_framework_ids,
+                        "stakeholder_ids": case_stakeholder_ids,
+                        "n_solutions": 8,
+                        "pop_size": 40,
+                        "n_gen": 80,
+                    }
+
+                    with st.spinner("Running Evaluate → Conflicts → Pareto..."):
+                        try:
+                            evaluate_response = requests.post(
+                                f"{backend_url}/api/evaluate",
+                                json=evaluate_payload,
+                                timeout=60,
+                            )
+                            if evaluate_response.status_code != 200:
+                                st.error(evaluate_response.text)
+                                continue
+
+                            conflicts_response = requests.post(
+                                f"{backend_url}/api/conflicts",
+                                json=conflicts_payload,
+                                timeout=60,
+                            )
+                            if conflicts_response.status_code != 200:
+                                st.error(conflicts_response.text)
+                                continue
+
+                            pareto_response = requests.post(
+                                f"{backend_url}/api/pareto",
+                                json=pareto_payload,
+                                timeout=90,
+                            )
+                            if pareto_response.status_code != 200:
+                                st.error(pareto_response.text)
+                                continue
+                        except Exception as exc:
+                            st.error(f"Case API call failed: {exc}")
+                            continue
+
+                    st.session_state[case_result_key] = {
+                        "evaluate_payload": evaluate_payload,
+                        "conflicts_payload": conflicts_payload,
+                        "pareto_payload": pareto_payload,
+                        "evaluate_response": evaluate_response.json(),
+                        "conflicts_response": conflicts_response.json(),
+                        "pareto_response": pareto_response.json(),
+                    }
+
+                case_result = st.session_state.get(case_result_key)
+                if not isinstance(case_result, dict):
+                    st.info("Run Case Study to generate report outputs.")
+                    continue
+
+                evaluate_result = case_result.get("evaluate_response", {})
+                conflicts_result = case_result.get("conflicts_response", {})
+                pareto_result = case_result.get("pareto_response", {})
+
+                st.markdown("---")
+                st.markdown("### SECTION A — Evaluation Result")
+                overall_score = float(evaluate_result.get("overall_score", 0.0))
+                st.metric("Overall Score", f"{overall_score:.4f}")
+
+                framework_scores = evaluate_result.get("framework_scores", [])
+                if isinstance(framework_scores, list) and framework_scores:
+                    first_framework = framework_scores[0]
+                    dim_scores = (
+                        first_framework.get("dimension_scores", {})
+                        if isinstance(first_framework, dict)
+                        else {}
+                    )
+                    if isinstance(dim_scores, dict):
+                        eval_radar = _build_radar_chart(
+                            {dimension: float(dim_scores.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS},
+                            title="Evaluation Dimension Scores",
+                            radial_max=1.0,
+                        )
+                        st.plotly_chart(eval_radar, width="stretch")
+                    else:
+                        st.warning("Evaluation dimension scores were not returned.")
+                else:
+                    st.warning("No evaluation framework scores returned.")
+
+                st.markdown("---")
+                st.markdown("### SECTION B — Conflict Analysis")
+                conflict_metadata = conflicts_result.get("metadata", {}) if isinstance(conflicts_result, dict) else {}
+                matrix_weights = (
+                    conflict_metadata.get("correlation_matrix_weights")
+                    if isinstance(conflict_metadata, dict)
+                    else None
+                )
+                matrix_contrib = (
+                    conflict_metadata.get("correlation_matrix_contrib")
+                    if isinstance(conflict_metadata, dict)
+                    else None
+                )
+
+                matrix_labels = list(case_stakeholder_ids)
+                if isinstance(matrix_weights, dict):
+                    matrix_labels = [stakeholder_id for stakeholder_id in case_stakeholder_ids if stakeholder_id in matrix_weights]
+                    if not matrix_labels:
+                        matrix_labels = list(matrix_weights.keys())
+
+                matrix_col_1, matrix_col_2 = st.columns(2)
+                with matrix_col_1:
+                    if isinstance(matrix_weights, dict):
+                        weights_heatmap = _build_correlation_heatmap(
+                            matrix_weights,
+                            labels=matrix_labels,
+                            title="Weights-only Correlation",
+                        )
+                        st.plotly_chart(weights_heatmap, width="stretch")
+                    else:
+                        st.info("Weights-only matrix unavailable.")
+                with matrix_col_2:
+                    if isinstance(matrix_contrib, dict):
+                        contrib_heatmap = _build_correlation_heatmap(
+                            matrix_contrib,
+                            labels=matrix_labels,
+                            title="Contrib-based Correlation",
+                        )
+                        st.plotly_chart(contrib_heatmap, width="stretch")
+                    else:
+                        st.info("Contrib-based matrix unavailable.")
+
+                rho_weights = "N/A"
+                rho_contrib = "N/A"
+                if isinstance(matrix_weights, dict):
+                    rho_value = matrix_weights.get("developer", {}).get("affected_community")
+                    if isinstance(rho_value, (int, float)):
+                        rho_weights = f"{float(rho_value):.4f}"
+                if isinstance(matrix_contrib, dict):
+                    rho_value = matrix_contrib.get("developer", {}).get("affected_community")
+                    if isinstance(rho_value, (int, float)):
+                        rho_contrib = f"{float(rho_value):.4f}"
+
+                rho_col_1, rho_col_2 = st.columns(2)
+                rho_col_1.metric("dev↔affected weights rho", rho_weights)
+                rho_col_2.metric("dev↔affected contrib rho", rho_contrib)
+
+                st.markdown("---")
+                st.markdown("### SECTION C — Pareto Resolution")
+                pareto_solutions = pareto_result.get("pareto_solutions", []) if isinstance(pareto_result, dict) else []
+                pareto_metadata = pareto_result.get("metadata", {}) if isinstance(pareto_result, dict) else {}
+                ablation_utilities = (
+                    pareto_metadata.get("ablation_utility_by_solution")
+                    if isinstance(pareto_metadata, dict)
+                    else None
+                )
+                if not isinstance(ablation_utilities, dict):
+                    ablation_utilities = {}
+
+                parsed_solutions: list[dict[str, Any]] = []
+                solution_rows: list[dict[str, Any]] = []
+                for solution in pareto_solutions if isinstance(pareto_solutions, list) else []:
+                    if not isinstance(solution, dict):
+                        continue
+                    solution_id = str(solution.get("solution_id", "")).strip()
+                    if not solution_id:
+                        continue
+                    try:
+                        rank = int(solution.get("rank", 0))
+                    except (TypeError, ValueError):
+                        rank = 0
+
+                    raw_objectives = solution.get("objective_scores", {})
+                    objective_scores = (
+                        {str(key): float(value) for key, value in raw_objectives.items()}
+                        if isinstance(raw_objectives, dict)
+                        else {}
+                    )
+
+                    total_distance = float(sum(objective_scores.values()))
+                    utility_wsm = ablation_utilities.get(solution_id)
+                    utility_value: float | None = None
+                    if isinstance(utility_wsm, (int, float)):
+                        utility_value = float(utility_wsm)
+
+                    row: dict[str, Any] = {
+                        "rank": rank,
+                        "solution_id": solution_id,
+                        "total_distance": round(total_distance, 6),
+                        "utility_wsm": round(utility_value, 6) if utility_value is not None else None,
+                    }
+                    for stakeholder_id in case_stakeholder_ids:
+                        row[stakeholder_id] = round(float(objective_scores.get(stakeholder_id, 0.0)), 6)
+
+                    consensus_raw = solution.get("weights", {}).get("consensus", {})
+                    consensus_weights = (
+                        {dimension: float(consensus_raw.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS}
+                        if isinstance(consensus_raw, dict)
+                        else {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
+                    )
+
+                    solution_rows.append(row)
+                    parsed_solutions.append(
+                        {
+                            "rank": rank,
+                            "solution_id": solution_id,
+                            "objective_scores": objective_scores,
+                            "consensus_weights": consensus_weights,
+                            "utility_wsm": utility_value,
+                            "total_distance": total_distance,
+                        }
+                    )
+
+                parsed_solutions.sort(key=lambda item: (item["rank"] if item["rank"] > 0 else 10**9, item["solution_id"]))
+                solution_rows.sort(key=lambda item: (item["rank"] if item["rank"] > 0 else 10**9, item["solution_id"]))
+                top_rows = solution_rows[:5]
+
+                if top_rows:
+                    st.dataframe(top_rows, width="stretch", hide_index=True)
+                    rank_1_solution = parsed_solutions[0]
+                    rank_1_consensus = rank_1_solution["consensus_weights"]
+                    rank_1_objectives = rank_1_solution["objective_scores"]
+
+                    consensus_radar = _build_radar_chart(
+                        rank_1_consensus,
+                        title="Rank 1 Consensus Weights",
+                        radial_max=1.0,
+                    )
+                    st.plotly_chart(consensus_radar, width="stretch")
+
+                    stakeholder_distance_bar = go.Figure(
+                        data=[
+                            go.Bar(
+                                x=case_stakeholder_ids,
+                                y=[
+                                    float(rank_1_objectives.get(stakeholder_id, 0.0))
+                                    for stakeholder_id in case_stakeholder_ids
+                                ],
+                                name="Distance",
+                            )
+                        ]
+                    )
+                    stakeholder_distance_bar.update_layout(
+                        title="Stakeholder Distance (Lower = Better Alignment)",
+                        xaxis_title="Stakeholder",
+                        yaxis_title="Distance",
+                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                    )
+                    st.plotly_chart(stakeholder_distance_bar, width="stretch")
+                else:
+                    st.warning("No Pareto solutions were returned.")
+
+                st.markdown("---")
+                st.markdown("### SECTION D — Export JSON")
+                export_clicked = st.button("Export Case JSON", key=f"export_case_{case_id}")
+                if export_clicked:
+                    st.session_state[case_export_key] = True
+                if st.session_state.get(case_export_key, False):
+                    export_payload = {
+                        "case_id": case_id,
+                        "case_name": case_name,
+                        "dimension_scores": case_scores,
+                        "evaluate": evaluate_result,
+                        "conflicts": conflicts_result,
+                        "pareto": pareto_result,
+                    }
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    filename = f"case_{case_id}_{timestamp}.json"
+                    st.download_button(
+                        "Download Case JSON",
+                        data=json.dumps(export_payload, indent=2, sort_keys=True),
+                        file_name=filename,
+                        mime="application/json",
+                        key=f"download_case_{case_id}",
+                    )
+
+                if not case_screenshot_mode:
+                    with st.expander("Raw API Results"):
+                        st.json(
+                            {
+                                "evaluate": evaluate_result,
+                                "conflicts": conflicts_result,
+                                "pareto": pareto_result,
+                            }
+                        )
 
     st.caption("MEDF v1.0 — Feature Frozen Build")
 
