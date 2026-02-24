@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -14,17 +15,124 @@ from app.models import (
     ScoringMethod,
     UNIFIED_DIMENSIONS,
 )
-from app.scoring_engine import compute_scores
+from app.scoring_engine import topsis_score, wsm_scores
 
 router = APIRouter(prefix="/api", tags=["Evaluation"])
 
 
-def _placeholder_dimension_scores(framework_id: str, ai_system_id: str) -> dict[str, float]:
-    scores: dict[str, float] = {}
-    for index, dimension in enumerate(UNIFIED_DIMENSIONS, start=1):
-        seed = sum(ord(char) for char in f"{framework_id}:{ai_system_id}:{dimension}") + (index * 17)
-        scores[dimension] = float((seed % 5) + 1)
-    return scores
+def _get_dimension_scores(payload: EvaluateRequest) -> dict[str, float]:
+    context = payload.ai_system.context or {}
+    raw_scores = context.get("dimension_scores")
+    if not isinstance(raw_scores, dict):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                "ai_system.context.dimension_scores is required and must contain all 6 "
+                "unified dimensions with Likert scores in [1, 5]."
+            ),
+        )
+
+    missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in raw_scores]
+    if missing:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                "ai_system.context.dimension_scores is missing dimensions: "
+                + ", ".join(missing)
+            ),
+        )
+
+    normalized: dict[str, float] = {}
+    for dimension in UNIFIED_DIMENSIONS:
+        raw_value = raw_scores.get(dimension)
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid dimension score for '{dimension}'. Must be a number in [1, 5].",
+            ) from exc
+
+        if value < 1.0 or value > 5.0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Dimension '{dimension}' score must be in [1, 5].",
+            )
+        normalized[dimension] = value
+
+    return normalized
+
+
+def _validate_weights(weights: dict[str, float], stakeholder_id: str) -> dict[str, float]:
+    if not isinstance(weights, dict):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Weights for stakeholder '{stakeholder_id}' must be a key/value object.",
+        )
+
+    missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in weights]
+    if missing:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"Weights for stakeholder '{stakeholder_id}' are missing dimensions: "
+                + ", ".join(missing)
+            ),
+        )
+
+    normalized: dict[str, float] = {}
+    for dimension in UNIFIED_DIMENSIONS:
+        raw_value = weights.get(dimension)
+        try:
+            value = float(raw_value)
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid weight for '{dimension}' in stakeholder '{stakeholder_id}'.",
+            ) from exc
+        if value < 0.0 or value > 1.0:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Weight for '{dimension}' in stakeholder '{stakeholder_id}' must be in [0, 1].",
+            )
+        normalized[dimension] = value
+
+    total = sum(normalized.values())
+    if abs(total - 1.0) > 0.01:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"Weights for stakeholder '{stakeholder_id}' must sum to 1.0 (±0.01); got {total:.4f}."
+            ),
+        )
+
+    return normalized
+
+
+def _ordered_criteria_types(framework_id: str, framework_dimensions: list) -> list[str]:
+    dimension_map = {dimension.name: dimension for dimension in framework_dimensions}
+    missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in dimension_map]
+    if missing:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=(
+                f"Framework '{framework_id}' is missing criteria types for dimensions: "
+                + ", ".join(missing)
+            ),
+        )
+
+    criteria_types: list[str] = []
+    for dimension in UNIFIED_DIMENSIONS:
+        criteria_raw = getattr(dimension_map[dimension].criteria_type, "value", dimension_map[dimension].criteria_type)
+        criteria_type = str(criteria_raw).strip().lower()
+        if criteria_type not in {"benefit", "cost"}:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Framework '{framework_id}' has invalid criteria type '{criteria_type}'.",
+            )
+        criteria_types.append(criteria_type)
+
+    return criteria_types
 
 
 def _risk_level(overall_score: float) -> RiskLevel:
@@ -46,18 +154,32 @@ def evaluate(
     payload: EvaluateRequest,
     db: Session = Depends(get_db),
 ) -> EvaluationResult:
+    if payload.scoring_method == ScoringMethod.AHP:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="AHP scoring not supported in /api/evaluate yet",
+        )
+
+    dimension_scores = _get_dimension_scores(payload)
+    decision_vector = np.array(
+        [dimension_scores[dimension] for dimension in UNIFIED_DIMENSIONS],
+        dtype=float,
+    )
+    decision_matrix = decision_vector.reshape(1, len(UNIFIED_DIMENSIONS))
+    normalized_vector = np.clip((decision_vector - 1.0) / 4.0, 0.0, 1.0)
+
     framework_scores: list[FrameworkScore] = []
     framework_overall_scores: list[float] = []
 
     for framework_id in payload.framework_ids:
         framework = get_framework(framework_id)
         if framework is None:
-            error = ErrorResponse(
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Framework '{framework_id}' not found.",
-                error_code="framework_not_found",
-                path=f"/api/evaluate/{framework_id}",
             )
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error.model_dump())
+
+        criteria_types = _ordered_criteria_types(framework.id, framework.dimensions)
 
         stakeholder_results: list[float] = []
         aggregated_dimension_scores: dict[str, float] = {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
@@ -65,21 +187,65 @@ def evaluate(
         for stakeholder_id in payload.stakeholder_ids:
             stakeholder = get_stakeholder(stakeholder_id, db)
             if stakeholder is None:
-                error = ErrorResponse(
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Stakeholder '{stakeholder_id}' not found.",
-                    error_code="stakeholder_not_found",
-                    path=f"/api/evaluate/{stakeholder_id}",
                 )
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error.model_dump())
 
-            weights = payload.weights.get(stakeholder_id) or stakeholder.weights
-            raw_dimension_scores = _placeholder_dimension_scores(framework.id, payload.ai_system.id)
-            scored = compute_scores(raw_dimension_scores, weights, payload.scoring_method.value)
+            stakeholder_weights = _validate_weights(
+                payload.weights.get(stakeholder_id) or stakeholder.weights,
+                stakeholder_id,
+            )
+            weight_vector = np.array(
+                [stakeholder_weights[dimension] for dimension in UNIFIED_DIMENSIONS],
+                dtype=float,
+            )
 
-            stakeholder_results.append(float(scored["overall_score"]))
-            per_dimension = scored["dimension_scores"]
+            if payload.scoring_method == ScoringMethod.TOPSIS:
+                topsis_matrix = np.vstack(
+                    [
+                        decision_matrix,
+                        np.full((1, len(UNIFIED_DIMENSIONS)), 5.0, dtype=float),
+                        np.full((1, len(UNIFIED_DIMENSIONS)), 1.0, dtype=float),
+                    ]
+                )
+                try:
+                    score_value = float(
+                        topsis_score(
+                            decision_matrix=topsis_matrix,
+                            weights=weight_vector,
+                            criteria_types=criteria_types,
+                        )[0]
+                    )
+                except ValueError as exc:
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail=f"Invalid TOPSIS input for stakeholder '{stakeholder_id}': {exc}",
+                    ) from exc
+            elif payload.scoring_method == ScoringMethod.WSM:
+                try:
+                    score_value = float(
+                        wsm_scores(
+                            decision_matrix=decision_matrix,
+                            weights=weight_vector,
+                        )[0]
+                    )
+                except ValueError as exc:
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail=f"Invalid WSM input for stakeholder '{stakeholder_id}': {exc}",
+                    ) from exc
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Unsupported scoring method '{payload.scoring_method.value}'.",
+                )
+
+            stakeholder_results.append(score_value)
+            per_dimension_contrib = np.clip(normalized_vector * weight_vector, 0.0, 1.0)
             for dimension in UNIFIED_DIMENSIONS:
-                aggregated_dimension_scores[dimension] += float(per_dimension.get(dimension, 0.0))
+                index = UNIFIED_DIMENSIONS.index(dimension)
+                aggregated_dimension_scores[dimension] += float(per_dimension_contrib[index])
 
         divisor = len(stakeholder_results) if stakeholder_results else 1
         average_framework_score = sum(stakeholder_results) / divisor if stakeholder_results else 0.0
@@ -109,5 +275,5 @@ def evaluate(
         scoring_method=ScoringMethod(payload.scoring_method.value),
         framework_scores=framework_scores,
         overall_score=overall_score,
-        notes="Deterministic Stage 1C placeholder evaluation.",
+        notes="Evaluation computed from supplied ai_system.context.dimension_scores.",
     )

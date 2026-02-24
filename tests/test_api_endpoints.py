@@ -39,8 +39,11 @@ def test_frameworks_list_and_item_endpoints() -> None:
             assert isinstance(dimensions, list)
             assert len(dimensions) == 6
 
-            dimension_ids = {item["id"] for item in dimensions}
-            assert dimension_ids == set(UNIFIED_DIMENSIONS)
+            dimension_names = {
+                item.get("name") or item.get("id")
+                for item in dimensions
+            }
+            assert dimension_names == set(UNIFIED_DIMENSIONS)
 
         framework_id = frameworks[0]["id"]
         item_response = client.get(f"/api/frameworks/{framework_id}")
