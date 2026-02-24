@@ -250,7 +250,7 @@ def main() -> None:
             showlegend=False,
             margin={"l": 40, "r": 40, "t": 40, "b": 40},
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
         table_rows = []
         for row in framework_scores:
@@ -266,7 +266,7 @@ def main() -> None:
                 }
             )
         st.subheader("Per-Framework Scores")
-        st.dataframe(table_rows, use_container_width=True, hide_index=True)
+        st.dataframe(table_rows, width="stretch", hide_index=True)
 
 
 if __name__ == "__main__":
