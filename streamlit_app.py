@@ -705,12 +705,16 @@ def _assert_ui_contract(
 
 def _sync_pareto_controls_from_preset(selected_preset: str) -> None:
     preset = PARETO_PRESETS.get(selected_preset, PARETO_PRESETS["Standard"])
-    if st.session_state.get("pareto_preset_applied") == selected_preset:
+    last_preset = st.session_state.get(
+        "last_pareto_preset",
+        st.session_state.get("pareto_preset_applied"),
+    )
+    if last_preset == selected_preset:
         return
     st.session_state["pareto_options_to_show"] = int(preset["n_solutions"])
     st.session_state["pareto_search_breadth"] = int(preset["pop_size"])
     st.session_state["pareto_search_depth"] = int(preset["n_gen"])
-    st.session_state["pareto_preset_applied"] = selected_preset
+    st.session_state["last_pareto_preset"] = selected_preset
 
 
 def _risk_label(score: float) -> tuple[str, str]:
@@ -1032,6 +1036,9 @@ def main() -> None:
     st.set_page_config(page_title="MEDF Governance Platform", layout="wide")
     tokens = _ui_tokens(_get_theme_base())
     inject_css(tokens)
+    # Root cause: the toggle was not key-bound and was mirrored manually, which created two
+    # competing state paths and occasional one-rerun-late visibility updates.
+    st.session_state.setdefault("conference_mode", False)
     _render_institutional_header()
 
     if "demo_mode" not in st.session_state:
@@ -1118,16 +1125,15 @@ def main() -> None:
         st.markdown("Multi-stakeholder trade-offs are summarized using Pareto dominance.")
         st.markdown("- Only non-dominated solutions are retained on the Pareto frontier.")
 
-    conference_mode = bool(st.session_state.get("conference_mode", True))
+    conference_mode = st.session_state["conference_mode"]
 
     with st.sidebar:
         st.header("Configuration")
         conference_mode = st.toggle(
             "Conference Mode",
-            value=conference_mode,
+            key="conference_mode",
             help="Prioritize executive visuals and preset controls.",
         )
-        st.session_state["conference_mode"] = conference_mode
         st.caption("Conference Mode prioritizes primary outputs.")
 
         st.markdown("**Backend URL**")
