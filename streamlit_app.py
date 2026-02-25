@@ -4,6 +4,7 @@ import io
 import json
 import math
 from datetime import datetime
+from html import escape
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -13,7 +14,7 @@ import plotly.graph_objects as go
 import requests
 import streamlit as st
 
-from plot_theme import ACCENT, BG, CARD_BG, MUTED, TEXT, apply_plot_theme as _shared_apply_plot_theme
+from plot_theme import BG, TEXT, apply_plot_theme as _shared_apply_plot_theme
 
 UNIFIED_DIMENSIONS = [
     "transparency_explainability",
@@ -24,8 +25,17 @@ UNIFIED_DIMENSIONS = [
     "accountability",
 ]
 
-BRAND_BLUE_HEX = ACCENT
-BRAND_BLUE_FILL_RGBA = "rgba(34, 197, 94, 0.24)"
+SEM_SUCCESS_HEX = "#22C55E"
+SEM_WARNING_HEX = "#F59E0B"
+SEM_DANGER_HEX = "#EF4444"
+SEM_INFO_HEX = "#38BDF8"
+SEM_MUTED_HEX = "#9CA3AF"
+SEM_CARD_BG_HEX = "#0F172A"
+SEM_BORDER_HEX = "#1F2937"
+PARCOORDS_TICKFONT_HEX = "#E6E6E6"
+
+BRAND_BLUE_HEX = SEM_INFO_HEX
+BRAND_BLUE_FILL_RGBA = "rgba(56, 189, 248, 0.22)"
 
 DIMENSION_DISPLAY_NAMES = {
     "transparency_explainability": "Transparency and Explainability",
@@ -111,6 +121,10 @@ DEMO_WEIGHTS = {
 }
 
 HARD_CAP_EVALS = 50_000
+PARETO_PRESETS = {
+    "Standard": {"n_solutions": 8, "pop_size": 40, "n_gen": 80},
+    "Thorough": {"n_solutions": 12, "pop_size": 80, "n_gen": 160},
+}
 
 CASE_STUDIES = [
     {
@@ -182,62 +196,143 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
     _ = theme_base
     return {
         "BG": BG,
-        "CARD_BG": CARD_BG,
+        "CARD_BG": SEM_CARD_BG_HEX,
         "TEXT": TEXT,
-        "MUTED": MUTED,
-        "ACCENT": ACCENT,
+        "MUTED": SEM_MUTED_HEX,
+        "ACCENT": SEM_INFO_HEX,
+        "SUCCESS": SEM_SUCCESS_HEX,
+        "WARNING": SEM_WARNING_HEX,
+        "DANGER": SEM_DANGER_HEX,
+        "INFO": SEM_INFO_HEX,
+        "BORDER": SEM_BORDER_HEX,
     }
 
 def inject_css(tokens: dict[str, str]) -> None:
     st.markdown(
         f"""
 <style>
+:root {{
+    --medf-bg: {tokens["BG"]};
+    --medf-card-bg: {tokens["CARD_BG"]};
+    --medf-text: {tokens["TEXT"]};
+    --medf-muted: {tokens["MUTED"]};
+    --medf-border: {tokens["BORDER"]};
+    --medf-info: {tokens["INFO"]};
+}}
+
 html, body, [data-testid="stAppViewContainer"] {{
-    background: {tokens["BG"]};
-    color: {tokens["TEXT"]};
+    background: var(--medf-bg);
+    color: var(--medf-text);
 }}
+
 [data-testid="stAppViewContainer"] .main .block-container {{
-    max-width: 1240px;
-    padding-top: 1.10rem;
-    padding-bottom: 1.00rem;
-    padding-left: 1.10rem;
-    padding-right: 1.10rem;
+    max-width: 1280px;
+    padding-top: 0.95rem;
+    padding-bottom: 1.1rem;
+    padding-left: 1.05rem;
+    padding-right: 1.05rem;
 }}
+
 section[data-testid="stSidebar"] {{
-    background: {tokens["CARD_BG"]};
-    border-right: 1px solid rgba(167,176,192,0.24);
-    padding-top: 0.6rem;
+    background: var(--medf-card-bg);
+    border-right: 1px solid var(--medf-border);
 }}
+
+section[data-testid="stSidebar"] > div {{
+    padding-top: 0.45rem;
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+}}
+
 h1, h2, h3, h4 {{
-    color: {tokens["TEXT"]};
+    color: var(--medf-text);
     letter-spacing: 0.01em;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
 }}
-[data-testid="stMarkdownContainer"], p, label {{
-    color: {tokens["TEXT"]};
+
+[data-testid="stCaptionContainer"], .medf-muted {{
+    color: var(--medf-muted);
 }}
-[data-testid="stCaptionContainer"] {{
-    color: {tokens["MUTED"]};
+
+.medf-header {{
+    margin-bottom: 0.55rem;
 }}
-.medf-card {{
-    background: {tokens["CARD_BG"]};
-    border: 1px solid rgba(167,176,192,0.24) !important;
-    border-radius: 12px;
-    padding: 0.95rem 1rem;
-    margin-bottom: 0.9rem;
+
+.medf-title {{
+    color: var(--medf-text);
+    font-size: 1.62rem;
+    font-weight: 650;
+    letter-spacing: 0.008em;
+    line-height: 1.3;
 }}
+
+.medf-subtitle {{
+    color: var(--medf-muted);
+    font-size: 0.94rem;
+    line-height: 1.45;
+    margin-top: 0.18rem;
+}}
+
+.medf-separator {{
+    margin-top: 0.48rem;
+    border-top: 1px solid var(--medf-border);
+}}
+
+.medf-kpi-strip {{
+    margin-top: 0.38rem;
+    margin-bottom: 0.95rem;
+}}
+
+.medf-kpi-card {{
+    background: var(--medf-card-bg);
+    border: 1px solid var(--medf-border);
+    border-left: 4px solid var(--kpi-accent, var(--medf-info));
+    border-radius: 10px;
+    padding: 0.72rem 0.8rem;
+    min-height: 106px;
+}}
+
+.medf-kpi-value {{
+    color: var(--medf-text);
+    font-size: 1.16rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 0.08rem;
+}}
+
+.medf-kpi-label {{
+    color: var(--medf-muted);
+    font-size: 0.67rem;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin-top: 0.33rem;
+}}
+
+.medf-kpi-note {{
+    color: var(--medf-muted);
+    font-size: 0.76rem;
+    line-height: 1.24;
+    margin-top: 0.18rem;
+}}
+
 [data-testid="stVerticalBlockBorderWrapper"] {{
-    background: {tokens["CARD_BG"]};
-    border: 1px solid rgba(167,176,192,0.24) !important;
-    border-radius: 12px;
-    padding: 0.65rem 0.75rem 0.75rem 0.75rem;
+    border-color: var(--medf-border) !important;
+    border-radius: 10px;
+    background: var(--medf-card-bg);
 }}
-[data-testid="stExpander"], [data-testid="stDataFrame"], .stTable {{
-    background: {tokens["CARD_BG"]};
-    border: 1px solid rgba(167,176,192,0.24);
-    border-radius: 12px;
+
+div.stButton > button {{
+    border: 1px solid var(--medf-border);
+    border-radius: 8px;
+    background: #111827;
+    color: var(--medf-text);
+    font-weight: 600;
 }}
-[data-testid="stHorizontalBlock"] hr, hr {{
-    border-color: rgba(167,176,192,0.24);
+
+div.stButton > button:hover {{
+    border-color: #334155;
+    background: #0b1220;
 }}
 </style>
 """,
@@ -252,7 +347,12 @@ def apply_plot_theme(fig: go.Figure, title: str | None = None) -> go.Figure:
         title_text = ""
     if title_text:
         fig.update_layout(title={"text": title_text})
-    return _shared_apply_plot_theme(fig)
+    themed = _shared_apply_plot_theme(fig)
+    raw_meta = getattr(themed.layout, "meta", None)
+    meta = dict(raw_meta) if isinstance(raw_meta, dict) else {}
+    meta["medf_plot_theme_applied"] = True
+    themed.update_layout(meta=meta)
+    return themed
 
 
 def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
@@ -292,14 +392,316 @@ def _assert_tradeoff_parcoords_theme(fig: go.Figure) -> None:
         raise AssertionError(f"Parcoords colorbar title font color must be {TEXT}.")
 
 
+def _render_institutional_header() -> None:
+    st.markdown(
+        """
+<div class="medf-header">
+    <div class="medf-title">MEDF — Multi-Stakeholder Ethical Decision Framework.</div>
+    <div class="medf-subtitle">Governance-grade evaluation. Stakeholder conflict detection. Pareto-based resolution.</div>
+    <div class="medf-separator"></div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+
+def _distance_semantic(distance: float) -> tuple[str, str]:
+    if distance <= 0.20:
+        return "Aligned", SEM_SUCCESS_HEX
+    if distance <= 0.40:
+        return "Moderate", SEM_WARNING_HEX
+    return "High", SEM_DANGER_HEX
+
+
+def _conflict_severity_rank(level: str) -> int:
+    normalized = safe_str(level).strip().lower()
+    if "critical" in normalized or "high" in normalized:
+        return 3
+    if "moderate" in normalized or "medium" in normalized:
+        return 2
+    if "low" in normalized:
+        return 1
+    return 0
+
+
+def _conflict_semantic(level: str, rho: float | None) -> tuple[str, str]:
+    normalized = safe_str(level).strip().lower()
+    if normalized:
+        if "critical" in normalized or "high" in normalized:
+            return "High", SEM_DANGER_HEX
+        if "moderate" in normalized or "medium" in normalized:
+            return "Moderate", SEM_WARNING_HEX
+        if "low" in normalized:
+            return "Low", SEM_SUCCESS_HEX
+    if rho is None:
+        return "Unavailable", SEM_INFO_HEX
+    if rho <= -0.35:
+        return "High", SEM_DANGER_HEX
+    if rho < 0.15:
+        return "Moderate", SEM_WARNING_HEX
+    return "Low", SEM_SUCCESS_HEX
+
+
+def _conflict_overview(conflict_result: Any) -> dict[str, str]:
+    default_value = "NO DATA."
+    default_note = "No conflict output is available for this run."
+    if not isinstance(conflict_result, dict):
+        return {
+            "value": default_value,
+            "color": SEM_INFO_HEX,
+            "note": default_note,
+            "pair": "N/A",
+        }
+
+    conflicts = conflict_result.get("conflicts", [])
+    if not isinstance(conflicts, list) or not conflicts:
+        return {
+            "value": "NO MATERIAL CONFLICT.",
+            "color": SEM_SUCCESS_HEX,
+            "note": "No stakeholder conflict pair is currently flagged.",
+            "pair": "N/A",
+        }
+
+    worst: dict[str, Any] | None = None
+    worst_key: tuple[float, float] = (-1.0, -1.0)
+    for conflict in conflicts:
+        if not isinstance(conflict, dict):
+            continue
+        level = safe_str(conflict.get("conflict_level")).strip()
+        rho_raw = conflict.get("spearman_rho")
+        rho_value = float(rho_raw) if isinstance(rho_raw, (int, float)) else None
+        severity = float(_conflict_severity_rank(level))
+        rho_rank = float(-rho_value) if rho_value is not None else -2.0
+        if (severity, rho_rank) > worst_key:
+            worst = conflict
+            worst_key = (severity, rho_rank)
+
+    if worst is None:
+        return {
+            "value": default_value,
+            "color": SEM_INFO_HEX,
+            "note": default_note,
+            "pair": "N/A",
+        }
+
+    level = safe_str(worst.get("conflict_level")).strip()
+    rho_raw = worst.get("spearman_rho")
+    rho_value = float(rho_raw) if isinstance(rho_raw, (int, float)) else None
+    semantic_label, semantic_color = _conflict_semantic(level, rho_value)
+    pair = (
+        f"{safe_str(worst.get('stakeholder_a_id')).strip()} vs "
+        f"{safe_str(worst.get('stakeholder_b_id')).strip()}"
+    ).strip()
+    pair_value = pair if pair and pair != "vs" else "N/A"
+    value = semantic_label.upper()
+    if rho_value is not None:
+        value = f"{value} ({fmt_small(rho_value)})."
+    else:
+        value = f"{value}."
+    return {
+        "value": value,
+        "color": semantic_color,
+        "note": f"Worst pairwise alignment: {pair_value}.",
+        "pair": pair_value,
+    }
+
+
+def _consensus_overview(pareto_result: Any) -> dict[str, str]:
+    default_overview = {
+        "primary_dimension": "N/A.",
+        "primary_dimension_color": SEM_INFO_HEX,
+        "primary_dimension_note": "No Pareto solution is currently selected.",
+        "divergence": "N/A.",
+        "divergence_color": SEM_INFO_HEX,
+        "divergence_note": "No stakeholder distance is currently available.",
+    }
+    if not isinstance(pareto_result, dict):
+        return default_overview
+
+    raw_solutions = pareto_result.get("pareto_solutions", [])
+    if not isinstance(raw_solutions, list) or not raw_solutions:
+        return default_overview
+
+    valid_solutions = [item for item in raw_solutions if isinstance(item, dict)]
+    if not valid_solutions:
+        return default_overview
+
+    selected_solution_id = safe_str(st.session_state.get("pareto_selected_id")).strip()
+    selected_solution = next(
+        (
+            item
+            for item in valid_solutions
+            if safe_str(item.get("solution_id")).strip() == selected_solution_id
+        ),
+        valid_solutions[0],
+    )
+
+    consensus_raw = selected_solution.get("weights", {})
+    consensus = {}
+    if isinstance(consensus_raw, dict) and isinstance(consensus_raw.get("consensus"), dict):
+        consensus = {
+            dimension: float(consensus_raw["consensus"].get(dimension, 0.0))
+            for dimension in UNIFIED_DIMENSIONS
+        }
+    if consensus:
+        top_dimension = max(consensus.items(), key=lambda item: float(item[1]))[0]
+        primary_dimension = f"{DIMENSION_DISPLAY_NAMES.get(top_dimension, top_dimension)}."
+    else:
+        primary_dimension = "N/A."
+
+    objective_raw = selected_solution.get("objective_scores", {})
+    objective_scores = (
+        {safe_str(key): float(value) for key, value in objective_raw.items()}
+        if isinstance(objective_raw, dict)
+        else {}
+    )
+    divergence = "N/A."
+    divergence_color = SEM_INFO_HEX
+    divergence_note = "No stakeholder distance is currently available."
+    if objective_scores:
+        stakeholder_id, max_distance = max(objective_scores.items(), key=lambda item: float(item[1]))
+        distance_label, distance_color = _distance_semantic(float(max_distance))
+        divergence = f"{stakeholder_id}: {fmt_small(max_distance)}."
+        divergence_color = distance_color
+        divergence_note = f"Highest distance classification: {distance_label.lower()}."
+
+    return {
+        "primary_dimension": primary_dimension,
+        "primary_dimension_color": SEM_INFO_HEX,
+        "primary_dimension_note": "Top consensus weight in the selected solution.",
+        "divergence": divergence,
+        "divergence_color": divergence_color,
+        "divergence_note": divergence_note,
+    }
+
+
+def _build_executive_kpis() -> list[dict[str, str]]:
+    evaluate_result = st.session_state.get("last_evaluate_result")
+    conflict_result = st.session_state.get("last_conflict_result")
+    pareto_result = st.session_state.get("pareto_result")
+
+    score_value = "N/A."
+    score_color = SEM_INFO_HEX
+    score_note = "No evaluation score is currently available."
+    if isinstance(evaluate_result, dict) and isinstance(evaluate_result.get("overall_score"), (int, float)):
+        overall_score = float(evaluate_result["overall_score"])
+        risk_label, risk_color = _risk_label(overall_score)
+        score_value = f"{fmt_score(overall_score)} ({risk_label})."
+        score_color = risk_color
+        score_note = "Normalized aggregate score from the latest evaluation run."
+
+    conflict_overview = _conflict_overview(conflict_result)
+    consensus_overview = _consensus_overview(pareto_result)
+
+    return [
+        {
+            "icon": "■",
+            "label": "Overall Ethical Score",
+            "value": score_value,
+            "note": score_note,
+            "color": score_color,
+        },
+        {
+            "icon": "⚖",
+            "label": "Conflict Level",
+            "value": conflict_overview["value"],
+            "note": conflict_overview["note"],
+            "color": conflict_overview["color"],
+        },
+        {
+            "icon": "◇",
+            "label": "Primary Consensus Dimension",
+            "value": consensus_overview["primary_dimension"],
+            "note": consensus_overview["primary_dimension_note"],
+            "color": consensus_overview["primary_dimension_color"],
+        },
+        {
+            "icon": "↔",
+            "label": "Highest Stakeholder Divergence",
+            "value": consensus_overview["divergence"],
+            "note": consensus_overview["divergence_note"],
+            "color": consensus_overview["divergence_color"],
+        },
+    ]
+
+
+def _render_kpi_strip(cards: list[dict[str, str]]) -> None:
+    if not cards:
+        return
+    st.markdown('<div class="medf-kpi-strip">', unsafe_allow_html=True)
+    columns = st.columns(len(cards))
+    for index, card in enumerate(cards):
+        icon = escape(safe_str(card.get("icon", "•")))
+        label = escape(safe_str(card.get("label", "")).upper())
+        value = escape(safe_str(card.get("value", "N/A.")))
+        note = escape(safe_str(card.get("note", "")))
+        color = escape(safe_str(card.get("color", SEM_INFO_HEX)))
+        columns[index].markdown(
+            f"""
+<div class="medf-kpi-card" style="--kpi-accent:{color};">
+    <div>{icon}</div>
+    <div class="medf-kpi-value">{value}</div>
+    <div class="medf-kpi-label">{label}</div>
+    <div class="medf-kpi-note">{note}</div>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def _assert_ui_contract(
+    *,
+    kpi_cards: list[dict[str, str]],
+    themed_figures: list[go.Figure] | None = None,
+    parcoords_figure: go.Figure | None = None,
+) -> None:
+    if not kpi_cards:
+        raise AssertionError("KPI strip must render at least one card.")
+    for index, card in enumerate(kpi_cards):
+        value = safe_str(card.get("value")).strip()
+        if not value:
+            raise AssertionError(f"KPI card {index} rendered an empty value.")
+
+    for figure in themed_figures or []:
+        figure_json = figure.to_plotly_json()
+        layout = figure_json.get("layout", {})
+        meta = layout.get("meta", {}) if isinstance(layout, dict) else {}
+        if not isinstance(meta, dict) or meta.get("medf_plot_theme_applied") is not True:
+            raise AssertionError("Plotly figures must be routed through apply_plot_theme(fig).")
+
+    if parcoords_figure is not None:
+        _assert_tradeoff_parcoords_theme(parcoords_figure)
+        figure_json = parcoords_figure.to_plotly_json()
+        data = figure_json.get("data", [])
+        if not data or data[0].get("type") != "parcoords":
+            raise AssertionError("UI contract expected a parcoords figure.")
+        for index, dimension in enumerate(data[0].get("dimensions", [])):
+            tickfont = dimension.get("tickfont", {})
+            if not isinstance(tickfont, dict) or tickfont.get("color") != PARCOORDS_TICKFONT_HEX:
+                raise AssertionError(
+                    f"Parcoords dimension {index} tickfont color must remain {PARCOORDS_TICKFONT_HEX}."
+                )
+
+
+def _sync_pareto_controls_from_preset(selected_preset: str) -> None:
+    preset = PARETO_PRESETS.get(selected_preset, PARETO_PRESETS["Standard"])
+    if st.session_state.get("pareto_preset_applied") == selected_preset:
+        return
+    st.session_state["pareto_options_to_show"] = int(preset["n_solutions"])
+    st.session_state["pareto_search_breadth"] = int(preset["pop_size"])
+    st.session_state["pareto_search_depth"] = int(preset["n_gen"])
+    st.session_state["pareto_preset_applied"] = selected_preset
+
+
 def _risk_label(score: float) -> tuple[str, str]:
     if score >= 0.8:
-        return "LOW", ACCENT
+        return "LOW", SEM_SUCCESS_HEX
     if score >= 0.6:
-        return "MEDIUM", ACCENT
+        return "MODERATE", SEM_WARNING_HEX
     if score >= 0.4:
-        return "HIGH", ACCENT
-    return "CRITICAL", ACCENT
+        return "HIGH", SEM_DANGER_HEX
+    return "CRITICAL", SEM_DANGER_HEX
 
 
 def _apply_dimension_preset(preset: dict[str, float]) -> None:
@@ -569,7 +971,8 @@ def _build_radar_chart(
         title_text=title_text,
         polar={"radialaxis": {"visible": True, "range": [0, radial_max]}},
         showlegend=False,
-        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+        height=460,
+        margin={"l": 52, "r": 52, "t": 62, "b": 52},
     )
     return figure
 
@@ -601,17 +1004,46 @@ def _build_correlation_heatmap(
     )
     figure.update_layout(
         title=title,
-        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+        margin={"l": 52, "r": 52, "t": 62, "b": 52},
     )
     return figure
 
 
 def main() -> None:
-    st.set_page_config(page_title="MEDF Dashboard", layout="wide")
+    st.set_page_config(page_title="MEDF Governance Platform", layout="wide")
     tokens = _ui_tokens(_get_theme_base())
     inject_css(tokens)
-    st.title("MEDF Dashboard")
-    with st.expander("About Methodology"):
+    _render_institutional_header()
+
+    if "demo_mode" not in st.session_state:
+        st.session_state["demo_mode"] = False
+    if "demo_scenario_results" not in st.session_state:
+        st.session_state["demo_scenario_results"] = {}
+    if "pareto_result" not in st.session_state:
+        st.session_state["pareto_result"] = None
+    if "pareto_result_stakeholder_ids" not in st.session_state:
+        st.session_state["pareto_result_stakeholder_ids"] = []
+    if "last_evaluate_result" not in st.session_state:
+        st.session_state["last_evaluate_result"] = None
+    if "last_conflict_result" not in st.session_state:
+        st.session_state["last_conflict_result"] = None
+
+    page = st.radio(
+        "Page",
+        ["Evaluate", "Conflict Detection", "Pareto Resolution", "Case Studies"],
+        index=0,
+        horizontal=True,
+        label_visibility="collapsed",
+    )
+    st.markdown(f"# {page}")
+
+    executive_kpis = _build_executive_kpis()
+    _render_kpi_strip(executive_kpis)
+    _assert_ui_contract(kpi_cards=executive_kpis)
+
+    _render_bundle_export()
+
+    with st.expander("Methodology Summary", expanded=False):
         st.markdown("### 1. Unified Six-Dimension Ontology")
         st.markdown(
             """
@@ -667,25 +1099,18 @@ def main() -> None:
         st.markdown("Multi-stakeholder trade-offs are summarized using Pareto dominance.")
         st.markdown("- Only non-dominated solutions are retained on the Pareto frontier.")
 
-    page = st.radio(
-        "Page",
-        ["Evaluate", "Conflict Detection", "Pareto Resolution", "Case Studies"],
-        index=0,
-        horizontal=True,
-    )
-    st.subheader(page)
-    _render_bundle_export()
-    if "demo_mode" not in st.session_state:
-        st.session_state["demo_mode"] = False
-    if "demo_scenario_results" not in st.session_state:
-        st.session_state["demo_scenario_results"] = {}
-    if "pareto_result" not in st.session_state:
-        st.session_state["pareto_result"] = None
-    if "pareto_result_stakeholder_ids" not in st.session_state:
-        st.session_state["pareto_result_stakeholder_ids"] = []
+    conference_mode = bool(st.session_state.get("conference_mode", True))
 
     with st.sidebar:
         st.header("Configuration")
+        conference_mode = st.toggle(
+            "Conference Mode",
+            value=conference_mode,
+            help="Prioritize executive visuals and preset controls.",
+        )
+        st.session_state["conference_mode"] = conference_mode
+        st.caption("Conference Mode prioritizes primary outputs.")
+
         st.markdown("**Backend URL**")
         backend_url = st.text_input("Backend URL", value="http://127.0.0.1:8000").rstrip("/")
 
@@ -867,10 +1292,56 @@ def main() -> None:
             else:
                 st.warning("No stakeholders available from backend.")
 
-            st.markdown("**Search Parameters**")
-            pareto_n_solutions = st.slider("n_solutions", min_value=1, max_value=42, value=8, step=1)
-            pareto_pop_size = st.slider("pop_size", min_value=10, max_value=250, value=40, step=10)
-            pareto_n_gen = st.slider("n_gen", min_value=0, max_value=500, value=150, step=10)
+            st.markdown("**Presets**")
+            pareto_preset = st.radio(
+                "Search profile",
+                list(PARETO_PRESETS.keys()),
+                horizontal=True,
+                key="pareto_preset_choice",
+            )
+            _sync_pareto_controls_from_preset(pareto_preset)
+            preset_values = PARETO_PRESETS.get(pareto_preset, PARETO_PRESETS["Standard"])
+            if pareto_preset == "Standard":
+                st.caption("Standard balances runtime and coverage.")
+            else:
+                st.caption("Thorough increases search depth for higher exploration.")
+
+            pareto_n_solutions = int(preset_values["n_solutions"])
+            pareto_pop_size = int(preset_values["pop_size"])
+            pareto_n_gen = int(preset_values["n_gen"])
+
+            with st.expander("Advanced", expanded=False):
+                if conference_mode:
+                    st.caption("Advanced controls are hidden while Conference Mode is enabled.")
+                    st.caption(
+                        "Preset values in use: "
+                        f"options={pareto_n_solutions}, breadth={pareto_pop_size}, depth={pareto_n_gen}."
+                    )
+                else:
+                    pareto_n_solutions = st.slider(
+                        "Options to show",
+                        min_value=1,
+                        max_value=42,
+                        value=int(st.session_state.get("pareto_options_to_show", pareto_n_solutions)),
+                        step=1,
+                        key="pareto_options_to_show",
+                    )
+                    pareto_pop_size = st.slider(
+                        "Search breadth",
+                        min_value=10,
+                        max_value=250,
+                        value=int(st.session_state.get("pareto_search_breadth", pareto_pop_size)),
+                        step=10,
+                        key="pareto_search_breadth",
+                    )
+                    pareto_n_gen = st.slider(
+                        "Search depth",
+                        min_value=0,
+                        max_value=500,
+                        value=int(st.session_state.get("pareto_search_depth", pareto_n_gen)),
+                        step=10,
+                        key="pareto_search_depth",
+                    )
 
             approx_evals = pareto_pop_size * (max(pareto_n_gen, 1) + 1)
             pareto_n_gen_effective = pareto_n_gen
@@ -1011,25 +1482,23 @@ def main() -> None:
                     "scoring_method": scoring_method,
                 },
             )
+            st.session_state["last_evaluate_result"] = result
             overall_score = float(result.get("overall_score", 0.0))
             label, color = _risk_label(overall_score)
+            framework_weighting_mode = _extract_framework_weighting_mode(result.get("notes"))
 
             evaluate_results_card = st.container(border=True)
             with evaluate_results_card:
-                st.subheader("Results")
+                st.markdown("## Primary Visualization")
+                st.caption("Executive summary of the current evaluation run.")
                 metric_col, label_col = st.columns([1, 2])
                 with metric_col:
-                    st.metric("Overall Score", fmt_score(overall_score))
+                    st.metric("Overall Ethical Score", fmt_score(overall_score))
                 with label_col:
                     st.markdown(
-                        f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Risk: {label}</span>",
+                        f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Conflict posture: {label}</span>",
                         unsafe_allow_html=True,
                     )
-                render_if_present("Framework", framework_id)
-                render_if_present("Stakeholders", stakeholder_id)
-                render_if_present("Scoring Method", scoring_method.upper())
-                framework_weighting_mode = _extract_framework_weighting_mode(result.get("notes"))
-                render_if_present("Framework Weighting Mode", framework_weighting_mode)
 
                 framework_scores = result.get("framework_scores", [])
                 if not framework_scores:
@@ -1060,9 +1529,12 @@ def main() -> None:
                 fig.update_layout(
                     polar={"radialaxis": {"visible": True, "range": [0, 1]}},
                     showlegend=False,
-                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
+                    height=460,
+                    margin={"l": 52, "r": 52, "t": 56, "b": 52},
                 )
-                st.plotly_chart(style_plotly(fig, tokens), use_container_width=True, key="evaluate_radar")
+                styled_evaluate_radar = style_plotly(fig, tokens)
+                st.plotly_chart(styled_evaluate_radar, use_container_width=True, key="evaluate_radar")
+                _assert_ui_contract(kpi_cards=executive_kpis, themed_figures=[styled_evaluate_radar])
 
                 table_rows = []
                 for row in framework_scores:
@@ -1080,8 +1552,27 @@ def main() -> None:
                             "risk_level": row_risk,
                         }
                     )
-                st.subheader("Per-Framework Scores")
-                st.dataframe(table_rows, width="stretch", hide_index=True)
+
+                def _render_evaluate_supporting_analysis() -> None:
+                    st.markdown("### Per-Framework Scores")
+                    st.dataframe(table_rows, width="stretch", hide_index=True)
+
+                def _render_evaluate_technical_detail() -> None:
+                    render_if_present("Framework", framework_id)
+                    render_if_present("Stakeholder", stakeholder_id)
+                    render_if_present("Scoring Method", scoring_method.upper())
+                    render_if_present("Framework Weighting Mode", framework_weighting_mode)
+
+                if conference_mode:
+                    with st.expander("Supporting Analysis", expanded=False):
+                        _render_evaluate_supporting_analysis()
+                    with st.expander("Technical Detail", expanded=False):
+                        _render_evaluate_technical_detail()
+                else:
+                    st.markdown("## Supporting Analysis")
+                    _render_evaluate_supporting_analysis()
+                    st.markdown("## Technical Detail")
+                    _render_evaluate_technical_detail()
     elif page == "Conflict Detection":
         if detect_clicked:
             if not framework_id:
@@ -1125,12 +1616,15 @@ def main() -> None:
                     "conflict_metric": conflict_metric,
                 },
             )
-            st.subheader("Conflict Detection Results")
+            st.session_state["last_conflict_result"] = result
+            st.markdown("## Primary Visualization")
+            st.caption("Cross-stakeholder alignment and conflict concentration.")
             summary_text = result.get("summary")
             if summary_text is not None and str(summary_text).strip().lower() not in {"", "undefined"}:
                 st.info(str(summary_text))
+            technical_note = ""
             if not screenshot_mode:
-                st.info(
+                technical_note = (
                     "Contribution (Contrib) is the stakeholder-weighted impact of each dimension for the selected "
                     "AI system: contrib_i = normalized_score_i × stakeholder_weight_i. "
                     "Priority Conflict compares stakeholder priorities directly. "
@@ -1169,60 +1663,10 @@ def main() -> None:
                 if isinstance(rho_contrib_raw, (int, float)):
                     rho_contrib_dev_affected = fmt_score(rho_contrib_raw)
 
-            demo_box = st.container(border=True)
-            with demo_box:
-                st.markdown("**Demo Summary**")
-                metric_col_1, metric_col_2 = st.columns(2)
-                metric_col_1.metric("rho_priority(dev, affected)", rho_weights_dev_affected)
-                metric_col_2.metric("rho_contribution(dev, affected)", rho_contrib_dev_affected)
-
-                stakeholders_for_top1 = list(conflict_stakeholder_ids)
-                if not stakeholders_for_top1:
-                    stakeholders_for_top1 = list(
-                        {
-                            *(
-                                rankings_weights.keys()
-                                if isinstance(rankings_weights, dict)
-                                else []
-                            ),
-                            *(
-                                rankings_contrib.keys()
-                                if isinstance(rankings_contrib, dict)
-                                else []
-                            ),
-                        }
-                    )
-
-                top1_rows = []
-                for stakeholder_id in stakeholders_for_top1:
-                    weights_top_1 = "N/A"
-                    contrib_top_1 = "N/A"
-
-                    if isinstance(rankings_weights, dict):
-                        ranking_weights = rankings_weights.get(stakeholder_id)
-                        if isinstance(ranking_weights, list) and ranking_weights:
-                            weights_top_1 = str(ranking_weights[0])
-
-                    if isinstance(rankings_contrib, dict):
-                        ranking_contrib = rankings_contrib.get(stakeholder_id)
-                        if isinstance(ranking_contrib, list) and ranking_contrib:
-                            contrib_top_1 = str(ranking_contrib[0])
-
-                    top1_rows.append(
-                        {
-                            "stakeholder_id": stakeholder_id,
-                            "top1_weights": weights_top_1,
-                            "top1_contribution": contrib_top_1,
-                        }
-                    )
-
-                if top1_rows:
-                    st.table(top1_rows)
-
             pairwise_rho_weights = metadata.get("pairwise_rho_weights")
             include_rho_weights = isinstance(pairwise_rho_weights, dict)
+            rows = []
             if isinstance(conflicts, list) and conflicts:
-                rows = []
                 for conflict in conflicts:
                     row = {
                         "stakeholder_a_id": conflict.get("stakeholder_a_id"),
@@ -1238,9 +1682,6 @@ def main() -> None:
                         rho_weights = pairwise_rho_weights.get(pair_key)
                         row["rho_weights"] = fmt_score(rho_weights)
                     rows.append(row)
-                st.dataframe(rows, width="stretch", hide_index=True)
-            else:
-                st.info("No stakeholder conflicts were returned.")
 
             if conflict_metric == "Priority Conflict (Weights-Only)":
                 correlation_matrix = correlation_matrix_weights
@@ -1283,9 +1724,74 @@ def main() -> None:
                     title=matrix_title,
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
-                st.plotly_chart(style_plotly(heatmap, tokens), use_container_width=True, key="conflict_heatmap")
+                styled_conflict_heatmap = style_plotly(heatmap, tokens)
+                st.plotly_chart(styled_conflict_heatmap, use_container_width=True, key="conflict_heatmap")
+                _assert_ui_contract(kpi_cards=executive_kpis, themed_figures=[styled_conflict_heatmap])
             else:
                 st.info("No correlation matrix returned in metadata.")
+
+            def _render_conflict_supporting_analysis() -> None:
+                demo_box = st.container(border=True)
+                with demo_box:
+                    st.markdown("### Correlation Snapshot")
+                    metric_col_1, metric_col_2 = st.columns(2)
+                    metric_col_1.metric("rho_priority(dev, affected)", rho_weights_dev_affected)
+                    metric_col_2.metric("rho_contribution(dev, affected)", rho_contrib_dev_affected)
+
+                    stakeholders_for_top1 = list(conflict_stakeholder_ids)
+                    if not stakeholders_for_top1:
+                        stakeholders_for_top1 = list(
+                            {
+                                *(rankings_weights.keys() if isinstance(rankings_weights, dict) else []),
+                                *(rankings_contrib.keys() if isinstance(rankings_contrib, dict) else []),
+                            }
+                        )
+
+                    top1_rows = []
+                    for stakeholder_id in stakeholders_for_top1:
+                        weights_top_1 = "N/A"
+                        contrib_top_1 = "N/A"
+
+                        if isinstance(rankings_weights, dict):
+                            ranking_weights = rankings_weights.get(stakeholder_id)
+                            if isinstance(ranking_weights, list) and ranking_weights:
+                                weights_top_1 = str(ranking_weights[0])
+
+                        if isinstance(rankings_contrib, dict):
+                            ranking_contrib = rankings_contrib.get(stakeholder_id)
+                            if isinstance(ranking_contrib, list) and ranking_contrib:
+                                contrib_top_1 = str(ranking_contrib[0])
+
+                        top1_rows.append(
+                            {
+                                "stakeholder_id": stakeholder_id,
+                                "top1_weights": weights_top_1,
+                                "top1_contribution": contrib_top_1,
+                            }
+                        )
+
+                    if top1_rows:
+                        st.table(top1_rows)
+
+                if rows:
+                    st.dataframe(rows, width="stretch", hide_index=True)
+                else:
+                    st.info("No stakeholder conflicts were returned.")
+
+            if conference_mode:
+                with st.expander("Supporting Analysis", expanded=False):
+                    _render_conflict_supporting_analysis()
+            else:
+                st.markdown("## Supporting Analysis")
+                _render_conflict_supporting_analysis()
+
+            if technical_note:
+                if conference_mode:
+                    with st.expander("Technical Detail", expanded=False):
+                        st.info(technical_note)
+                else:
+                    st.markdown("## Technical Detail")
+                    st.info(technical_note)
     elif page == "Pareto Resolution":
         if generate_pareto_clicked:
             if not framework_id:
@@ -1366,7 +1872,8 @@ def main() -> None:
         if not isinstance(result, dict):
             return
 
-        st.subheader("Pareto Resolution Results")
+        st.markdown("## Primary Visualization")
+        st.caption("Consensus profile and stakeholder distance for the selected solution.")
         summary = result.get("summary")
         if summary is not None and str(summary).strip().lower() not in {"", "undefined"}:
             st.info(str(summary))
@@ -1449,9 +1956,6 @@ def main() -> None:
         parsed_solutions.sort(key=lambda item: (item["rank"] if item["rank"] > 0 else 10**9, item["solution_id"]))
         table_rows.sort(key=lambda item: (item["rank"] if item["rank"] > 0 else 10**9, item["solution_id"]))
 
-        st.subheader("Solutions")
-        st.dataframe(table_rows, width="stretch", hide_index=True)
-
         solution_ids = [str(item["solution_id"]) for item in parsed_solutions]
         if "pareto_selected_id" not in st.session_state:
             st.session_state["pareto_selected_id"] = solution_ids[0]
@@ -1477,6 +1981,7 @@ def main() -> None:
         selected_utility = selected_solution["utility_wsm"]
         selected_rank = int(selected_solution["rank"])
         top_dimension = max(selected_consensus.items(), key=lambda item: float(item[1]))[0]
+        top_dimension_label = DIMENSION_DISPLAY_NAMES.get(top_dimension, top_dimension)
         highest_distance_stakeholder = "N/A"
         if selected_objectives:
             highest_distance_stakeholder = max(
@@ -1489,16 +1994,16 @@ def main() -> None:
             "\n".join(
                 [
                     "**Resolution Summary**",
-                    f"- Rank: {selected_rank}",
-                    f"- Total distance: {fmt_score(selected_total_distance)}",
-                    f"- Utility (WSM ablation): {utility_text}",
-                    f"- Top-1 consensus dimension: {top_dimension}",
-                    f"- Highest stakeholder distance: {highest_distance_stakeholder}",
+                    f"- Rank: {selected_rank}.",
+                    f"- Total distance: {fmt_score(selected_total_distance)}.",
+                    f"- Utility (WSM ablation): {utility_text}.",
+                    f"- Top-1 consensus dimension: {top_dimension_label}.",
+                    f"- Highest stakeholder distance: {highest_distance_stakeholder}.",
                 ]
             )
         )
 
-        st.subheader("Consensus Weights Radar")
+        st.markdown("### Consensus Weights Radar")
         radar_labels = [DIMENSION_DISPLAY_NAMES[dimension] for dimension in UNIFIED_DIMENSIONS]
         radar_values = [float(selected_consensus.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
         radar_labels_closed = radar_labels + [radar_labels[0]]
@@ -1520,23 +2025,26 @@ def main() -> None:
         radar_figure.update_layout(
             polar={"radialaxis": {"visible": True, "range": [0, 1]}},
             showlegend=False,
-            margin={"l": 40, "r": 40, "t": 40, "b": 40},
+            height=460,
+            margin={"l": 52, "r": 52, "t": 56, "b": 52},
         )
+        styled_pareto_radar = style_plotly(radar_figure, tokens)
         st.plotly_chart(
-            style_plotly(radar_figure, tokens),
+            styled_pareto_radar,
             use_container_width=True,
             key=f"pareto_weights_radar_{selected_solution_id}",
         )
 
-        st.subheader("Stakeholder Distance (Lower = Better Alignment)")
+        st.markdown("### Stakeholder Distance (Lower = Better Alignment)")
         distance_values = [float(selected_objectives.get(stakeholder_id, 0.0)) for stakeholder_id in stakeholder_ids]
+        distance_colors = [_distance_semantic(float(value))[1] for value in distance_values]
         bar_figure = go.Figure(
             data=[
                 go.Bar(
                     x=stakeholder_ids,
                     y=distance_values,
                     name="Distance",
-                    marker={"color": BRAND_BLUE_HEX},
+                    marker={"color": distance_colors},
                 )
             ]
         )
@@ -1546,127 +2054,159 @@ def main() -> None:
             yaxis_title="Distance",
             margin={"l": 40, "r": 40, "t": 60, "b": 40},
         )
+        styled_pareto_distance_bar = style_plotly(bar_figure, tokens)
         st.plotly_chart(
-            style_plotly(bar_figure, tokens),
+            styled_pareto_distance_bar,
             use_container_width=True,
             key=f"pareto_distance_bar_{selected_solution_id}",
         )
+        _assert_ui_contract(
+            kpi_cards=executive_kpis,
+            themed_figures=[styled_pareto_radar, styled_pareto_distance_bar],
+        )
 
-        st.subheader("Tradeoff Visualization")
-        if len(stakeholder_ids) == 2:
-            stakeholder_a, stakeholder_b = stakeholder_ids
-            all_x = [
-                float(item["objective_scores"].get(stakeholder_a, 0.0))
-                for item in parsed_solutions
-            ]
-            all_y = [
-                float(item["objective_scores"].get(stakeholder_b, 0.0))
-                for item in parsed_solutions
-            ]
-            all_ranks = [str(item["rank"]) for item in parsed_solutions]
+        def _render_pareto_supporting_analysis() -> None:
+            st.markdown("### Candidate Solutions")
+            st.dataframe(table_rows, width="stretch", hide_index=True)
+            st.markdown("### Tradeoff Visualization")
+            if len(stakeholder_ids) == 2:
+                stakeholder_a, stakeholder_b = stakeholder_ids
+                all_x = [
+                    float(item["objective_scores"].get(stakeholder_a, 0.0))
+                    for item in parsed_solutions
+                ]
+                all_y = [
+                    float(item["objective_scores"].get(stakeholder_b, 0.0))
+                    for item in parsed_solutions
+                ]
+                all_ranks = [str(item["rank"]) for item in parsed_solutions]
 
-            selected_x = float(selected_objectives.get(stakeholder_a, 0.0))
-            selected_y = float(selected_objectives.get(stakeholder_b, 0.0))
+                selected_x = float(selected_objectives.get(stakeholder_a, 0.0))
+                selected_y = float(selected_objectives.get(stakeholder_b, 0.0))
 
-            scatter_figure = go.Figure()
-            scatter_figure.add_trace(
-                go.Scatter(
-                    x=all_x,
-                    y=all_y,
-                    mode="markers+text",
-                    text=all_ranks,
-                    textposition="top center",
-                    name="Pareto solutions",
-                    marker={"size": 9, "color": BRAND_BLUE_HEX},
+                scatter_figure = go.Figure()
+                scatter_figure.add_trace(
+                    go.Scatter(
+                        x=all_x,
+                        y=all_y,
+                        mode="markers+text",
+                        text=all_ranks,
+                        textposition="top center",
+                        name="Pareto solutions",
+                        marker={"size": 9, "color": BRAND_BLUE_HEX},
+                    )
                 )
-            )
-            scatter_figure.add_trace(
-                go.Scatter(
-                    x=[selected_x],
-                    y=[selected_y],
-                    mode="markers",
-                    name="Selected",
-                    marker={"size": 14, "color": TEXT, "symbol": "diamond"},
+                scatter_figure.add_trace(
+                    go.Scatter(
+                        x=[selected_x],
+                        y=[selected_y],
+                        mode="markers",
+                        name="Selected",
+                        marker={"size": 14, "color": TEXT, "symbol": "diamond"},
+                    )
                 )
-            )
-            scatter_figure.update_layout(
-                title=f"Tradeoff: {stakeholder_a} vs {stakeholder_b}",
-                xaxis_title=f"{stakeholder_a} distance",
-                yaxis_title=f"{stakeholder_b} distance",
-                margin={"l": 40, "r": 40, "t": 60, "b": 40},
-            )
-            st.plotly_chart(
-                style_plotly(scatter_figure, tokens),
-                use_container_width=True,
-                key=f"pareto_tradeoff_scatter_{stakeholder_a}_{stakeholder_b}",
-            )
-        elif len(stakeholder_ids) >= 3:
-            stakeholder_display_labels = {
-                "developer": "Developer",
-                "regulator": "Regulator",
-                "affected_community": "Affected Community",
-            }
-            dimension_specs = [
-                {
-                    "label": stakeholder_display_labels.get(
-                        stakeholder_id,
-                        stakeholder_id.replace("_", " ").title(),
-                    ),
-                    "values": [
-                        float(item["objective_scores"].get(stakeholder_id, 0.0))
-                        for item in parsed_solutions
-                    ],
+                scatter_figure.update_layout(
+                    title=f"Tradeoff: {stakeholder_a} vs {stakeholder_b}",
+                    xaxis_title=f"{stakeholder_a} distance",
+                    yaxis_title=f"{stakeholder_b} distance",
+                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                )
+                styled_scatter_figure = style_plotly(scatter_figure, tokens)
+                st.plotly_chart(
+                    styled_scatter_figure,
+                    use_container_width=True,
+                    key=f"pareto_tradeoff_scatter_{stakeholder_a}_{stakeholder_b}",
+                )
+                _assert_ui_contract(kpi_cards=executive_kpis, themed_figures=[styled_scatter_figure])
+            elif len(stakeholder_ids) >= 3:
+                stakeholder_display_labels = {
+                    "developer": "Developer",
+                    "regulator": "Regulator",
+                    "affected_community": "Affected Community",
                 }
-                for stakeholder_id in stakeholder_ids
-            ]
-            line_color = [float(item["total_distance"]) for item in parsed_solutions]
-            parallel_figure = go.Figure(
-                data=go.Parcoords(
-                    line={
-                        "color": line_color,
-                        "colorscale": "Viridis",
-                        "showscale": True,
-                        "colorbar": {
-                            "title": {
-                                "text": "Total Distance",
-                                "side": "right",
-                                "font": {"color": TEXT, "size": 11},
+                dimension_specs = [
+                    {
+                        "label": stakeholder_display_labels.get(
+                            stakeholder_id,
+                            stakeholder_id.replace("_", " ").title(),
+                        ),
+                        "values": [
+                            float(item["objective_scores"].get(stakeholder_id, 0.0))
+                            for item in parsed_solutions
+                        ],
+                    }
+                    for stakeholder_id in stakeholder_ids
+                ]
+                line_color = [float(item["total_distance"]) for item in parsed_solutions]
+                parallel_figure = go.Figure(
+                    data=go.Parcoords(
+                        line={
+                            "color": line_color,
+                            "colorscale": "Viridis",
+                            "showscale": True,
+                            "colorbar": {
+                                "title": {
+                                    "text": "Total Distance",
+                                    "side": "right",
+                                    "font": {"color": TEXT, "size": 11},
+                                },
+                                "tickfont": {"color": TEXT},
+                                "x": 1.08,
+                                "xanchor": "left",
                             },
-                            "tickfont": {"color": TEXT},
-                            "x": 1.08,
-                            "xanchor": "left",
                         },
-                    },
-                    dimensions=dimension_specs,
+                        dimensions=dimension_specs,
+                    )
                 )
+                parallel_figure.update_traces(
+                    domain={"y": [0.0, 0.86]},
+                    dimensions=dimension_specs,
+                    labelfont={"color": TEXT, "size": 12},
+                    tickfont={"color": TEXT, "size": 11},
+                )
+                parallel_figure.update_layout(
+                    font={"color": TEXT},
+                    title={
+                        "text": "Stakeholder Distance Tradeoffs",
+                        "y": 0.99,
+                        "yanchor": "top",
+                        "x": 0.01,
+                        "xanchor": "left",
+                    },
+                    margin={"l": 40, "r": 140, "t": 130, "b": 48},
+                )
+                parallel_figure = style_plotly(parallel_figure, tokens)
+                st.plotly_chart(
+                    parallel_figure,
+                    use_container_width=True,
+                    key=f"pareto_tradeoff_parallel_{len(stakeholder_ids)}",
+                )
+                _assert_ui_contract(
+                    kpi_cards=executive_kpis,
+                    themed_figures=[parallel_figure],
+                    parcoords_figure=parallel_figure,
+                )
+                st.caption(f"Selected solution: {selected_solution_id} (rank {selected_rank}).")
+            else:
+                st.info("Select at least 2 stakeholders to view tradeoffs.")
+
+        def _render_pareto_technical_detail() -> None:
+            st.caption(
+                "Search parameters: "
+                f"options={pareto_n_solutions}, breadth={pareto_pop_size}, depth={pareto_n_gen_effective}."
             )
-            parallel_figure.update_traces(
-                domain={"y": [0.0, 0.86]},
-                dimensions=dimension_specs,
-                labelfont={"color": TEXT, "size": 12},
-                tickfont={"color": TEXT, "size": 11},
-            )
-            parallel_figure.update_layout(
-                font={"color": TEXT},
-                title={
-                    "text": "Stakeholder Distance Tradeoffs",
-                    "y": 0.99,
-                    "yanchor": "top",
-                    "x": 0.01,
-                    "xanchor": "left",
-                },
-                margin={"l": 40, "r": 140, "t": 130, "b": 48},
-            )
-            parallel_figure = style_plotly(parallel_figure, tokens)
-            _assert_tradeoff_parcoords_theme(parallel_figure)
-            st.plotly_chart(
-                parallel_figure,
-                use_container_width=True,
-                key=f"pareto_tradeoff_parallel_{len(stakeholder_ids)}",
-            )
-            st.caption(f"Selected solution: {selected_solution_id} (rank {selected_rank})")
+            st.caption(f"Stakeholders in scope: {', '.join(stakeholder_ids)}.")
+
+        if conference_mode:
+            with st.expander("Supporting Analysis", expanded=False):
+                _render_pareto_supporting_analysis()
+            with st.expander("Technical Detail", expanded=False):
+                _render_pareto_technical_detail()
         else:
-            st.info("Select at least 2 stakeholders to view tradeoffs.")
+            st.markdown("## Supporting Analysis")
+            _render_pareto_supporting_analysis()
+            st.markdown("## Technical Detail")
+            _render_pareto_technical_detail()
     else:
         case_framework_ids = [framework_id] if framework_id else []
         case_stakeholder_ids = ["developer", "regulator", "affected_community"]
@@ -1683,7 +2223,10 @@ def main() -> None:
             case_result_key = f"case_result_{case_id}_{framework_key}"
             case_export_key = f"case_export_{case_id}_{framework_key}"
 
-            with st.expander(f"Case: {case_name}", expanded=not case_screenshot_mode):
+            with st.expander(
+                f"Case: {case_name}",
+                expanded=(not case_screenshot_mode and not conference_mode),
+            ):
                 st.write(case_description)
                 if not case_screenshot_mode:
                     st.caption(
@@ -2073,7 +2616,12 @@ def main() -> None:
                                     for stakeholder_id in case_stakeholder_ids
                                 ],
                                 name="Distance",
-                                marker={"color": BRAND_BLUE_HEX},
+                                marker={
+                                    "color": [
+                                        _distance_semantic(float(rank_1_objectives.get(stakeholder_id, 0.0)))[1]
+                                        for stakeholder_id in case_stakeholder_ids
+                                    ]
+                                },
                             )
                         ]
                     )

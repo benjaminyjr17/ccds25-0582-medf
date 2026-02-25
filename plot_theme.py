@@ -5,10 +5,20 @@ from typing import Any
 import plotly.graph_objects as go
 
 BG = "#0B1220"
-CARD_BG = "#111827"
+CARD_BG = "#0F172A"
 TEXT = "#E6E6E6"
-MUTED = "#A7B0C0"
+MUTED = "#9CA3AF"
 ACCENT = "#22C55E"
+GRID = "rgba(156,163,175,0.10)"
+AXIS_LINE = "rgba(156,163,175,0.24)"
+
+
+def _coerce_margin_value(value: Any, fallback: int) -> int:
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return fallback
+    return parsed if parsed > 0 else fallback
 
 
 def _human_label(label: str) -> str:
@@ -20,48 +30,67 @@ def apply_plot_theme(fig: go.Figure) -> go.Figure:
     if title_text.lower() == "undefined":
         title_text = ""
 
+    raw_margin: dict[str, Any] = {}
+    if getattr(fig.layout, "margin", None) is not None:
+        raw_margin = fig.layout.margin.to_plotly_json()
+    margin = {
+        "l": max(_coerce_margin_value(raw_margin.get("l"), 56), 56),
+        "r": max(_coerce_margin_value(raw_margin.get("r"), 56), 56),
+        "t": max(_coerce_margin_value(raw_margin.get("t"), 72), 72),
+        "b": max(_coerce_margin_value(raw_margin.get("b"), 56), 56),
+    }
+
     fig.update_layout(
         template="plotly_dark",
         paper_bgcolor=BG,
         plot_bgcolor=BG,
         font=dict(color=TEXT, size=13),
-        title=dict(text=title_text, font=dict(color=TEXT), y=0.98, yanchor="top"),
+        title=dict(text=title_text, font=dict(color=TEXT, size=16), y=0.98, yanchor="top"),
         legend=dict(
             font=dict(color=TEXT, size=12),
             title=dict(font=dict(color=TEXT, size=12)),
         ),
+        margin=margin,
     )
     fig.update_xaxes(
-        tickfont=dict(color=TEXT),
-        titlefont=dict(color=TEXT),
-        gridcolor="rgba(167,176,192,0.16)",
-        linecolor="rgba(167,176,192,0.28)",
-        zerolinecolor="rgba(167,176,192,0.28)",
+        tickfont=dict(color=TEXT, size=12),
+        titlefont=dict(color=TEXT, size=13),
+        automargin=True,
+        gridcolor=GRID,
+        linecolor=AXIS_LINE,
+        zerolinecolor=AXIS_LINE,
+        showline=True,
     )
     fig.update_yaxes(
-        tickfont=dict(color=TEXT),
-        titlefont=dict(color=TEXT),
-        gridcolor="rgba(167,176,192,0.16)",
-        linecolor="rgba(167,176,192,0.28)",
-        zerolinecolor="rgba(167,176,192,0.28)",
+        tickfont=dict(color=TEXT, size=12),
+        titlefont=dict(color=TEXT, size=13),
+        automargin=True,
+        gridcolor=GRID,
+        linecolor=AXIS_LINE,
+        zerolinecolor=AXIS_LINE,
+        showline=True,
     )
 
     if hasattr(fig.layout, "polar"):
+        current_height = getattr(fig.layout, "height", None)
+        normalized_height = _coerce_margin_value(current_height, 0)
+        if normalized_height < 460:
+            fig.update_layout(height=460)
         fig.update_layout(
             polar=dict(
                 bgcolor=BG,
                 radialaxis=dict(
-                    gridcolor="rgba(167,176,192,0.16)",
-                    linecolor="rgba(167,176,192,0.28)",
-                    tickfont=dict(color=TEXT),
+                    gridcolor=GRID,
+                    linecolor=AXIS_LINE,
+                    tickfont=dict(color=TEXT, size=12),
                     tickcolor=TEXT,
-                    titlefont=dict(color=TEXT),
+                    titlefont=dict(color=TEXT, size=13),
                     showline=True,
                 ),
                 angularaxis=dict(
-                    gridcolor="rgba(167,176,192,0.16)",
-                    linecolor="rgba(167,176,192,0.28)",
-                    tickfont=dict(color=TEXT),
+                    gridcolor=GRID,
+                    linecolor=AXIS_LINE,
+                    tickfont=dict(color=TEXT, size=12),
                     tickcolor=TEXT,
                     showline=True,
                 ),
