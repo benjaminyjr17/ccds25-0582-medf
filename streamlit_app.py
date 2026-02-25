@@ -592,6 +592,10 @@ def _build_executive_kpis() -> list[dict[str, str]]:
 
     conflict_overview = _conflict_overview(conflict_result)
     consensus_overview = _consensus_overview(pareto_result)
+    divergence_value = safe_str(consensus_overview["divergence"])
+    if ":" in divergence_value:
+        raw_stakeholder_id, remainder = divergence_value.split(":", 1)
+        divergence_value = f"{_format_kpi_stakeholder_label(raw_stakeholder_id.strip())}:{remainder}"
 
     return [
         {
@@ -618,11 +622,20 @@ def _build_executive_kpis() -> list[dict[str, str]]:
         {
             "icon": "↔",
             "label": "Highest Stakeholder Divergence",
-            "value": consensus_overview["divergence"],
+            "value": divergence_value,
             "note": consensus_overview["divergence_note"],
             "color": consensus_overview["divergence_color"],
         },
     ]
+
+
+def _format_kpi_stakeholder_label(value: str) -> str:
+    mapping = {
+        "developer": "Developer",
+        "regulator": "Regulator",
+        "affected_community": "Affected Community",
+    }
+    return mapping.get(value, value)
 
 
 def _render_kpi_strip(cards: list[dict[str, str]]) -> None:
