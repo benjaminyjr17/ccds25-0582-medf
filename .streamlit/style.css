@@ -1,6 +1,7 @@
 /* Sidebar and section headings */
 section[data-testid="stSidebar"] {
   border-right: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 0.5rem;
 }
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
@@ -12,6 +13,10 @@ section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
   color: #e6edf3 !important;
 }
 
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+  margin-bottom: 0.35rem;
+}
+
 /* Inputs and selectors */
 [data-baseweb="select"] > div,
 [data-testid="stTextInputRootElement"] > div,
@@ -21,6 +26,10 @@ section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: #e6edf3 !important;
 }
+[data-baseweb="tag"] {
+  background: rgba(29, 78, 216, 0.2) !important;
+  color: #dbeafe !important;
+}
 
 /* Buttons */
 button[kind="primary"],
@@ -29,12 +38,13 @@ button[kind="secondary"] {
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
 }
 button[kind="primary"] {
-  background: #ff4b4b !important;
+  background: #1d4ed8 !important;
   color: #ffffff !important;
+  border-color: #1d4ed8 !important;
 }
 button[kind="primary"]:hover {
-  background: #e03d3d !important;
-  border-color: #ff7b7b !important;
+  background: #1e40af !important;
+  border-color: #1e3a8a !important;
 }
 button[kind="secondary"] {
   background: #161b22 !important;

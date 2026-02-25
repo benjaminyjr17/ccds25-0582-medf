@@ -22,6 +22,8 @@ UNIFIED_DIMENSIONS = [
     "accountability",
 ]
 
+BRAND_BLUE = "#1D4ED8"
+
 DIMENSION_DISPLAY_NAMES = {
     "transparency_explainability": "Transparency and Explainability",
     "fairness_nondiscrimination": "Fairness and Non-discrimination",
@@ -47,12 +49,12 @@ def _flip_likert_profile(profile: dict[str, float]) -> dict[str, float]:
 
 
 BASELINE_DIMENSION_SCORES = {
-    # A plausible mid-risk enterprise AI system with stronger safety/accountability controls.
-    "transparency_explainability": 4.0,
-    "fairness_nondiscrimination": 4.0,
-    "safety_robustness": 5.0,
-    "privacy_data_governance": 4.0,
-    "human_agency_oversight": 4.0,
+    # Mixed-risk enterprise AI: strong safety/accountability controls, moderate privacy, and weaker fairness/transparency.
+    "transparency_explainability": 3.5,
+    "fairness_nondiscrimination": 3.0,
+    "safety_robustness": 5.5,
+    "privacy_data_governance": 4.5,
+    "human_agency_oversight": 3.5,
     "accountability": 5.0,
 }
 
@@ -181,8 +183,8 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
             "text": "#e5e7eb",
             "muted_text": "#9ca3af",
             "border": "rgba(255,255,255,0.10)",
-            "primary": "#ef4444",
-            "primary_hover": "#dc2626",
+            "primary": BRAND_BLUE,
+            "primary_hover": "#1E40AF",
             "plot_text": "#e5e7eb",
             "plot_grid": "rgba(255,255,255,0.18)",
             "plot_axis": "rgba(255,255,255,0.30)",
@@ -194,12 +196,22 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
         "text": "#111827",
         "muted_text": "#6b7280",
         "border": "rgba(17,24,39,0.10)",
-        "primary": "#ef4444",
-        "primary_hover": "#dc2626",
+        "primary": BRAND_BLUE,
+        "primary_hover": "#1E40AF",
         "plot_text": "#111827",
         "plot_grid": "rgba(17,24,39,0.12)",
         "plot_axis": "rgba(17,24,39,0.22)",
     }
+
+
+def _hex_to_rgba(hex_color: str, alpha: float) -> str:
+    color = hex_color.lstrip("#")
+    if len(color) != 6:
+        return f"rgba(29,78,216,{alpha})"
+    red = int(color[0:2], 16)
+    green = int(color[2:4], 16)
+    blue = int(color[4:6], 16)
+    return f"rgba({red},{green},{blue},{alpha})"
 
 
 def inject_css(tokens: dict[str, str]) -> None:
@@ -596,6 +608,8 @@ def _build_radar_chart(
             theta=radar_labels_closed,
             fill="toself",
             name=title,
+            line={"color": BRAND_BLUE, "width": 2},
+            fillcolor=_hex_to_rgba(BRAND_BLUE, 0.20),
         )
     )
     figure.update_layout(
@@ -948,9 +962,9 @@ def main() -> None:
             st.subheader("Dimension Scores (Likert 1–7)")
             if page in {"Conflict Detection", "Pareto Resolution"}:
                 preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
-                if preset_col_1.button("Preset: Baseline (4.0,4.0,5.0,4.0,4.0,5.0)"):
+                if preset_col_1.button("Preset: Baseline (3.5,3.0,5.5,4.5,3.5,5.0)"):
                     _apply_dimension_preset(PRESET_BASELINE)
-                if preset_col_2.button("Preset: Flipped (4.0,4.0,3.0,4.0,4.0,3.0)"):
+                if preset_col_2.button("Preset: Flipped (4.5,5.0,2.5,3.5,4.5,3.0)"):
                     _apply_dimension_preset(PRESET_FLIPPED)
                 if preset_col_3.button("Preset: Safety-heavy (4.0,4.0,7.0,4.0,4.0,4.0)"):
                     _apply_dimension_preset(PRESET_SAFETY_HEAVY)
@@ -1075,6 +1089,8 @@ def main() -> None:
                     theta=radar_labels_closed,
                     fill="toself",
                     name=first_framework.get("framework_id", "framework"),
+                    line={"color": BRAND_BLUE, "width": 2},
+                    fillcolor=_hex_to_rgba(BRAND_BLUE, 0.20),
                 )
             )
             fig.update_layout(
@@ -1511,6 +1527,8 @@ def main() -> None:
                     theta=radar_labels_closed,
                     fill="toself",
                     name=selected_solution_id,
+                    line={"color": BRAND_BLUE, "width": 2},
+                    fillcolor=_hex_to_rgba(BRAND_BLUE, 0.20),
                 )
             )
             radar_figure.update_layout(
@@ -1532,6 +1550,7 @@ def main() -> None:
                         x=stakeholder_ids,
                         y=distance_values,
                         name="Distance",
+                        marker={"color": BRAND_BLUE},
                     )
                 ]
             )
@@ -1572,7 +1591,7 @@ def main() -> None:
                         text=all_ranks,
                         textposition="top center",
                         name="Pareto solutions",
-                        marker={"size": 9, "color": "#1f77b4"},
+                        marker={"size": 9, "color": BRAND_BLUE},
                     )
                 )
                 scatter_figure.add_trace(
@@ -2036,6 +2055,7 @@ def main() -> None:
                                     for stakeholder_id in case_stakeholder_ids
                                 ],
                                 name="Distance",
+                                marker={"color": BRAND_BLUE},
                             )
                         ]
                     )
