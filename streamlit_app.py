@@ -13,6 +13,8 @@ import plotly.graph_objects as go
 import requests
 import streamlit as st
 
+from plot_theme import ACCENT, BG, CARD_BG, MUTED, TEXT, apply_plot_theme as _shared_apply_plot_theme
+
 UNIFIED_DIMENSIONS = [
     "transparency_explainability",
     "fairness_nondiscrimination",
@@ -22,14 +24,8 @@ UNIFIED_DIMENSIONS = [
     "accountability",
 ]
 
-BG = "#0B1220"
-CARD_BG = "#0F172A"
-TEXT = "#E5E7EB"
-MUTED = "#A7B0C0"
-ACCENT = "#4C78A8"
-
 BRAND_BLUE_HEX = ACCENT
-BRAND_BLUE_FILL_RGBA = "rgba(76, 120, 168, 0.24)"
+BRAND_BLUE_FILL_RGBA = "rgba(34, 197, 94, 0.24)"
 
 DIMENSION_DISPLAY_NAMES = {
     "transparency_explainability": "Transparency and Explainability",
@@ -254,133 +250,9 @@ def apply_plot_theme(fig: go.Figure, title: str | None = None) -> go.Figure:
     title_text = safe_str(title).strip() if title is not None else current_title
     if title_text.lower() == "undefined":
         title_text = ""
-
-    existing_margin = getattr(fig.layout, "margin", None)
-
-    def _margin_value(side: str, default: int) -> int:
-        raw_value = getattr(existing_margin, side, None) if existing_margin is not None else None
-        if raw_value is None:
-            return default
-        return max(default, int(raw_value))
-
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor=CARD_BG,
-        plot_bgcolor=CARD_BG,
-        font=dict(color=TEXT, size=13),
-        title=dict(
-            text=title_text,
-            font=dict(color=TEXT, size=17),
-            y=0.98,
-            yanchor="top",
-        ),
-        legend=dict(
-            font=dict(color=MUTED, size=12),
-            title=dict(font=dict(color=MUTED, size=12)),
-        ),
-        margin=dict(
-            t=_margin_value("t", 80),
-            r=_margin_value("r", 30),
-            b=_margin_value("b", 50),
-            l=_margin_value("l", 60),
-        ),
-    )
-    fig.update_xaxes(
-        tickfont=dict(color=MUTED, size=11),
-        title_font=dict(color=TEXT, size=13),
-        title_standoff=14,
-        gridcolor="rgba(167,176,192,0.16)",
-        linecolor="rgba(167,176,192,0.30)",
-        zerolinecolor="rgba(167,176,192,0.30)",
-    )
-    fig.update_yaxes(
-        tickfont=dict(color=MUTED, size=11),
-        title_font=dict(color=TEXT, size=13),
-        title_standoff=16,
-        gridcolor="rgba(167,176,192,0.16)",
-        linecolor="rgba(167,176,192,0.30)",
-        zerolinecolor="rgba(167,176,192,0.30)",
-    )
-
-    if hasattr(fig.layout, "polar"):
-        fig.update_layout(
-            polar=dict(
-                bgcolor=CARD_BG,
-                radialaxis=dict(
-                    gridcolor="rgba(167,176,192,0.16)",
-                    linecolor="rgba(167,176,192,0.30)",
-                    tickfont=dict(color=MUTED),
-                    tickcolor=MUTED,
-                    titlefont=dict(color=TEXT),
-                    showline=True,
-                ),
-                angularaxis=dict(
-                    gridcolor="rgba(167,176,192,0.16)",
-                    linecolor="rgba(167,176,192,0.30)",
-                    tickfont=dict(color=MUTED),
-                    tickcolor=MUTED,
-                    showline=True,
-                ),
-            )
-        )
-
-    for trace in fig.data:
-        if isinstance(trace, go.Heatmap):
-            if trace.colorbar is None:
-                trace.colorbar = {}
-            trace.colorbar.tickfont = dict(color=MUTED, size=11)
-            if trace.colorbar.title is None:
-                trace.colorbar.title = {}
-            trace.colorbar.title.font = dict(color=TEXT, size=12)
-
-        if isinstance(trace, go.Parcoords):
-            parcoords_dimensions: list[dict[str, Any]] = []
-            for dimension in getattr(trace, "dimensions", []) or []:
-                label = safe_str(getattr(dimension, "label", "")).strip()
-                if label:
-                    if label.lower() == "affected community":
-                        label = "Affected Community"
-                    elif label in {"developer", "regulator", "affected_community"}:
-                        label = label.replace("_", " ").title()
-                parcoords_dimensions.append(
-                    {
-                        "label": label,
-                        "values": list(getattr(dimension, "values", []) or []),
-                    }
-                )
-            if parcoords_dimensions:
-                trace.dimensions = parcoords_dimensions
-                raw_dimensions = trace._props.get("dimensions", [])
-                for raw_dimension in raw_dimensions:
-                    raw_dimension["tickfont"] = {"color": TEXT}
-            trace.labelfont = dict(color=TEXT, size=12)
-            trace.tickfont = dict(color=TEXT, size=11)
-            if getattr(trace, "line", None) is not None:
-                colorbar = getattr(trace.line, "colorbar", None)
-                if colorbar is not None:
-                    title_obj = getattr(colorbar, "title", None)
-                    colorbar_title = safe_str(getattr(title_obj, "text", None)).strip()
-                    if not colorbar_title:
-                        colorbar_title = "Total distance"
-                    colorbar.tickfont = dict(color=TEXT, size=11)
-                    colorbar.title = dict(
-                        text=colorbar_title,
-                        side="right",
-                        font=dict(color=TEXT, size=11),
-                    )
-                    colorbar.x = 1.06
-                    colorbar.xanchor = "left"
-                    fig.update_layout(
-                        margin=dict(
-                            t=_margin_value("t", 110),
-                            r=_margin_value("r", 150),
-                            b=_margin_value("b", 50),
-                            l=_margin_value("l", 60),
-                        ),
-                        title=dict(y=0.98, yanchor="top"),
-                    )
-
-    return fig
+    if title_text:
+        fig.update_layout(title={"text": title_text})
+    return _shared_apply_plot_theme(fig)
 
 
 def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
@@ -1756,7 +1628,7 @@ def main() -> None:
                         "showscale": True,
                         "colorbar": {
                             "title": {
-                                "text": "Total distance",
+                                "text": "Total Distance",
                                 "side": "right",
                                 "font": {"color": TEXT, "size": 11},
                             },

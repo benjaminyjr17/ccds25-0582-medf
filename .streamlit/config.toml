@@ -1,7 +1,8 @@
 [theme]
 base="dark"
-primaryColor="#4C78A8"
+primaryColor="#22C55E"
 backgroundColor="#0B1220"
-secondaryBackgroundColor="#0F172A"
-textColor="#E5E7EB"
+secondaryBackgroundColor="#111827"
+textColor="#E6E6E6"
+chartCategoricalColors=["#22C55E","#3ABAB4","#5DA8A1","#7A8CA0","#9A7FBF"]
 font="sans serif"
