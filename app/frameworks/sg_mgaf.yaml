@@ -7,6 +7,9 @@ criteria:
     name: Fairness and Inclusion
     dimension: fairness_nondiscrimination
     description: Promote fairness outcomes and avoid discriminatory harm.
+    principles:
+      - SG-FAIR-1
+      - SG-FAIR-2
     assessment_questions:
       - Are fairness impacts reviewed for affected communities and user groups?
       - Are corrective measures defined for inequitable outcomes?
@@ -15,6 +18,11 @@ criteria:
     name: Internal Governance
     dimension: accountability
     description: Set governance structures and clear accountability ownership.
+    principles:
+      - SG-GOV-1
+      - SG-GOV-2
+      - SG-GOV-3
+      - SG-GOV-4
     assessment_questions:
       - Are governance responsibilities assigned across product and compliance teams?
       - Are accountability checkpoints integrated into lifecycle stage-gates?
@@ -25,6 +33,12 @@ criteria:
     name: Communication and Explainability
     dimension: transparency_explainability
     description: Communicate AI behavior, limitations, and recourse.
+    principles:
+      - SG-TRN-1
+      - SG-TRN-2
+      - SG-TRN-3
+      - SG-TRN-4
+      - SG-TRN-5
     assessment_questions:
       - Are user-facing disclosures provided on system purpose and limitations?
       - Are explanations tailored for affected users and operational teams?
@@ -36,6 +50,9 @@ criteria:
     name: Data Governance
     dimension: privacy_data_governance
     description: Ensure strong personal data governance and protection controls.
+    principles:
+      - SG-DG-1
+      - SG-DG-2
     assessment_questions:
       - Are data governance controls aligned with privacy and retention obligations?
       - Are access restrictions and protection safeguards monitored and enforced?
@@ -44,6 +61,10 @@ criteria:
     name: Operations Management
     dimension: safety_robustness
     description: Maintain model quality, robustness, and operational safeguards.
+    principles:
+      - SG-OPS-1
+      - SG-OPS-2
+      - SG-OPS-3
     assessment_questions:
       - Are operational safeguards in place for model reliability and drift?
       - Are robustness checks integrated into monitoring and release workflows?
@@ -53,6 +74,11 @@ criteria:
     name: Human-in-the-loop Oversight
     dimension: human_agency_oversight
     description: Provide human override and escalation pathways where needed.
+    principles:
+      - SG-HO-1
+      - SG-HO-2
+      - SG-HO-3
+      - SG-HO-4
     assessment_questions:
       - Are human override controls available for high-impact decisions?
       - Are operator responsibilities and escalation routes clearly documented?

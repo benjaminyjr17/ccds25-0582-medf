@@ -7,6 +7,10 @@ criteria:
     name: Fairness and Non-discrimination
     dimension: fairness_nondiscrimination
     description: Assess fairness and discrimination risk across impacted groups.
+    requirements:
+      - ALTAI-FR-1
+      - ALTAI-FR-2
+      - ALTAI-FR-3
     assessment_questions:
       - Are impacted groups and vulnerable populations explicitly identified?
       - Are bias testing and mitigation controls documented across the lifecycle?
@@ -16,6 +20,10 @@ criteria:
     name: Accountability
     dimension: accountability
     description: Define responsibility, governance, and remediation ownership.
+    requirements:
+      - ALTAI-AC-1
+      - ALTAI-AC-2
+      - ALTAI-AC-3
     assessment_questions:
       - Are accountable owners assigned for deployment, monitoring, and incident response?
       - Is there a governance process for escalation and corrective action?
@@ -25,6 +33,9 @@ criteria:
     name: Transparency and Explainability
     dimension: transparency_explainability
     description: Ensure traceability and explainability for relevant decisions.
+    requirements:
+      - ALTAI-TR-1
+      - ALTAI-TR-2
     assessment_questions:
       - Is model behavior traceable through documentation and decision logs?
       - Are explanations available to affected users and operators at decision time?
@@ -33,6 +44,12 @@ criteria:
     name: Privacy and Data Governance
     dimension: privacy_data_governance
     description: Enforce privacy controls and lawful data lifecycle management.
+    requirements:
+      - ALTAI-PR-1
+      - ALTAI-PR-2
+      - ALTAI-PR-3
+      - ALTAI-PR-4
+      - ALTAI-PR-5
     assessment_questions:
       - Is personal data collection limited to a clear lawful purpose?
       - Are retention, deletion, and access controls enforced and auditable?
@@ -44,6 +61,12 @@ criteria:
     name: Technical Robustness and Safety
     dimension: safety_robustness
     description: Address reliability, resilience, and misuse prevention.
+    requirements:
+      - ALTAI-SF-1
+      - ALTAI-SF-2
+      - ALTAI-SF-3
+      - ALTAI-SF-4
+      - ALTAI-SF-5
     assessment_questions:
       - Are robustness tests performed across realistic stress and edge conditions?
       - Is there monitoring for model drift and performance degradation in production?
@@ -55,6 +78,11 @@ criteria:
     name: Human Agency and Oversight
     dimension: human_agency_oversight
     description: Preserve meaningful human control and intervention capability.
+    requirements:
+      - ALTAI-HO-1
+      - ALTAI-HO-2
+      - ALTAI-HO-3
+      - ALTAI-HO-4
     assessment_questions:
       - Can authorized humans override or halt automated decisions?
       - Are operator roles and decision authority clearly defined?

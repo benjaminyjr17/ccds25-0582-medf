@@ -11,9 +11,11 @@ Major changes require version bump and schema hash update.
 
 from __future__ import annotations
 
+from pathlib import Path
 from uuid import uuid4
 
 import numpy as np
+import yaml
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -32,6 +34,7 @@ from app.models import (
 from app.scoring_engine import topsis_score, wsm_scores
 
 router = APIRouter(prefix="/api", tags=["Evaluation"])
+_FRAMEWORKS_DIR = Path(__file__).resolve().parent.parent / "frameworks"
 
 
 def _get_dimension_scores(payload: EvaluateRequest) -> dict[str, float]:
@@ -149,39 +152,85 @@ def _ordered_criteria_types(framework_id: str, framework_dimensions: list) -> li
     return criteria_types
 
 
-def _framework_coverage_weights(framework) -> dict[str, float]:
+def _framework_section_weights(framework) -> dict[str, float]:
     dimension_map = {dimension.name: dimension for dimension in framework.dimensions}
     missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in dimension_map]
     if missing:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=(
-                f"Framework '{framework.id}' is missing dimensions for coverage weighting: "
+                f"Framework '{framework.id}' is missing dimensions for section-based weighting: "
                 + ", ".join(missing)
             ),
         )
 
+    raw_dimension_map: dict[str, dict] = {}
+    candidate_paths = (
+        _FRAMEWORKS_DIR / f"{framework.id}.yaml",
+        _FRAMEWORKS_DIR / f"{framework.id}.yml",
+    )
+    framework_path = next((path for path in candidate_paths if path.exists()), None)
+
+    if framework_path is not None:
+        try:
+            with framework_path.open("r", encoding="utf-8") as file_obj:
+                raw_framework = yaml.safe_load(file_obj) or {}
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to parse framework YAML for '{framework.id}': {exc}",
+            ) from exc
+
+        raw_dimensions = raw_framework.get("dimensions")
+        if not isinstance(raw_dimensions, list):
+            raw_dimensions = raw_framework.get("criteria")
+        if isinstance(raw_dimensions, list):
+            for item in raw_dimensions:
+                if not isinstance(item, dict):
+                    continue
+                raw_dimension = item.get("dimension")
+                if raw_dimension is None:
+                    continue
+                raw_key = str(raw_dimension).strip().lower()
+                if raw_key in UNIFIED_DIMENSIONS:
+                    raw_dimension_map[raw_key] = item
+
     raw_counts: dict[str, float] = {}
     for dimension in UNIFIED_DIMENSIONS:
+        raw_dimension = raw_dimension_map.get(dimension, {})
         dimension_obj = dimension_map[dimension]
         count_value = None
 
-        assessment_questions = getattr(dimension_obj, "assessment_questions", None)
-        if isinstance(assessment_questions, list):
-            non_empty_questions = [
-                str(question).strip()
-                for question in assessment_questions
-                if str(question).strip()
-            ]
+        # Prioritized section-structure fields for legitimate framework-derived priors.
+        for key in ("requirements", "subcategories", "principles", "outcomes", "categories", "sections"):
+            section_like = raw_dimension.get(key)
+            if isinstance(section_like, list) and len(section_like) > 0:
+                count_value = float(len(section_like))
+                break
+
+        assessment_questions = raw_dimension.get("assessment_questions")
+        if assessment_questions is None:
+            assessment_questions = getattr(dimension_obj, "assessment_questions", None)
+        if count_value is None and isinstance(assessment_questions, list):
+            section_ids = {
+                str(item.get("section_id")).strip()
+                for item in assessment_questions
+                if isinstance(item, dict) and str(item.get("section_id", "")).strip()
+            }
+            if section_ids:
+                count_value = float(len(section_ids))
+
+        if count_value is None and isinstance(assessment_questions, list):
+            non_empty_questions = []
+            for item in assessment_questions:
+                if isinstance(item, dict):
+                    text = str(item.get("text", "")).strip()
+                else:
+                    text = str(item).strip()
+                if text:
+                    non_empty_questions.append(text)
             if non_empty_questions:
                 count_value = float(len(non_empty_questions))
-
-        if count_value is None:
-            for key in ("criteria", "subcriteria", "items"):
-                list_like = getattr(dimension_obj, key, None)
-                if isinstance(list_like, list) and len(list_like) > 0:
-                    count_value = float(len(list_like))
-                    break
 
         if count_value is None:
             count_value = 1.0
@@ -191,13 +240,13 @@ def _framework_coverage_weights(framework) -> dict[str, float]:
         except (TypeError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Framework '{framework.id}' has invalid coverage count for '{dimension}'.",
+                detail=f"Framework '{framework.id}' has invalid section count for '{dimension}'.",
             ) from exc
 
         if not np.isfinite(count) or count < 0.0:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Framework '{framework.id}' has non-finite or negative coverage count for '{dimension}'.",
+                detail=f"Framework '{framework.id}' has non-finite or negative section count for '{dimension}'.",
             )
 
         raw_counts[dimension] = count
@@ -207,7 +256,7 @@ def _framework_coverage_weights(framework) -> dict[str, float]:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=(
-                f"Framework '{framework.id}' coverage counts produce invalid normalization sum "
+                f"Framework '{framework.id}' section counts produce invalid normalization sum "
                 f"({total:.4f})."
             ),
         )
@@ -284,7 +333,7 @@ def evaluate(
             )
 
         criteria_types = _ordered_criteria_types(framework.id, framework.dimensions)
-        framework_default_weights = _framework_coverage_weights(framework)
+        framework_default_weights = _framework_section_weights(framework)
 
         stakeholder_results: list[float] = []
         aggregated_dimension_scores: dict[str, float] = {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
@@ -382,7 +431,7 @@ def evaluate(
         overall_score=overall_score,
         notes=(
             "Evaluation computed from supplied ai_system.context.dimension_scores. "
-            "framework_weighting=coverage_counts(product_pooling). "
+            "framework_weighting=section_based_product_pooling. "
             f"run_id={run_id}"
         ),
     )
