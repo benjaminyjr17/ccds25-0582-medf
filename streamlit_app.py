@@ -57,43 +57,43 @@ PRESET_SAFETY_HEAVY = {
     "accountability": 3,
 }
 
-DEMO_SCENARIO = {
-    "name": "AI Hiring Screening System",
-    "description": "Automated resume screening for job applicants using ML scoring.",
-    "dimension_scores": {
-        "transparency_explainability": 2,
-        "fairness_nondiscrimination": 1,
-        "safety_robustness": 4,
-        "privacy_data_governance": 2,
-        "human_agency_oversight": 3,
-        "accountability": 2,
-    },
+DEMO_SCENARIO_NAME = "Hiring Screening (Demo)"
+DEMO_SCENARIO_DESCRIPTION = (
+    "Automated resume screening for job applicants using ML scoring."
+)
+DEMO_DIMENSION_SCORES = {
+    "transparency_explainability": 2,
+    "fairness_nondiscrimination": 1,
+    "safety_robustness": 4,
+    "privacy_data_governance": 1,
+    "human_agency_oversight": 2,
+    "accountability": 3,
 }
 
 DEMO_WEIGHTS = {
     "developer": {
-        "transparency_explainability": 0.15,
-        "fairness_nondiscrimination": 0.15,
-        "safety_robustness": 0.30,
-        "privacy_data_governance": 0.15,
-        "human_agency_oversight": 0.15,
-        "accountability": 0.10,
+        "transparency_explainability": 0.10,
+        "fairness_nondiscrimination": 0.10,
+        "safety_robustness": 0.40,
+        "privacy_data_governance": 0.10,
+        "human_agency_oversight": 0.10,
+        "accountability": 0.20,
     },
     "regulator": {
         "transparency_explainability": 0.20,
-        "fairness_nondiscrimination": 0.25,
+        "fairness_nondiscrimination": 0.15,
         "safety_robustness": 0.20,
-        "privacy_data_governance": 0.15,
+        "privacy_data_governance": 0.20,
         "human_agency_oversight": 0.10,
-        "accountability": 0.10,
+        "accountability": 0.15,
     },
     "affected_community": {
         "transparency_explainability": 0.15,
         "fairness_nondiscrimination": 0.35,
         "safety_robustness": 0.10,
-        "privacy_data_governance": 0.20,
+        "privacy_data_governance": 0.15,
         "human_agency_oversight": 0.15,
-        "accountability": 0.05,
+        "accountability": 0.10,
     },
 }
 
@@ -885,9 +885,9 @@ def main() -> None:
     ai_system_description = "MVP evaluation input"
     if demo_active:
         ai_system_id = "demo_hiring_screening_system"
-        ai_system_name = str(DEMO_SCENARIO["name"])
-        ai_system_description = str(DEMO_SCENARIO["description"])
-        for dimension, value in DEMO_SCENARIO["dimension_scores"].items():
+        ai_system_name = str(DEMO_SCENARIO_NAME)
+        ai_system_description = str(DEMO_SCENARIO_DESCRIPTION)
+        for dimension, value in DEMO_DIMENSION_SCORES.items():
             st.session_state[f"score_{dimension}"] = int(value)
     dimension_scores: dict[str, float] = {
         dimension: float(value)
@@ -2022,33 +2022,42 @@ def main() -> None:
                             }
                         )
 
-    demo_results_by_framework = st.session_state.get("demo_scenario_results", {})
-    if not isinstance(demo_results_by_framework, dict):
-        demo_results_by_framework = {}
-        st.session_state["demo_scenario_results"] = demo_results_by_framework
+    demo_results_by_context = st.session_state.get("demo_scenario_results", {})
+    if not isinstance(demo_results_by_context, dict):
+        demo_results_by_context = {}
+        st.session_state["demo_scenario_results"] = demo_results_by_context
 
-    demo_framework_key = framework_id or "__no_framework__"
+    resolved_framework_id = framework_id
+    if not resolved_framework_id:
+        for item in frameworks:
+            if isinstance(item, dict) and item.get("id"):
+                resolved_framework_id = str(item["id"])
+                break
+
+    demo_scoring_method = scoring_method if scoring_method in {"topsis", "wsm"} else "topsis"
+    demo_result_key = f"{resolved_framework_id or '__no_framework__'}|{demo_scoring_method}"
+
     if demo_active:
         st.session_state["demo_mode"] = False
-        if not framework_id:
-            st.error("Please select a framework before running the demo scenario.")
+        if not resolved_framework_id:
+            st.error("No framework is available to run the demo scenario.")
         else:
-            demo_results_by_framework.pop(demo_framework_key, None)
-            demo_stakeholder_ids = list(DEMO_WEIGHTS.keys())
+            demo_results_by_context.pop(demo_result_key, None)
+            demo_stakeholder_ids = ["developer", "regulator", "affected_community"]
             demo_weights_payload = {
                 stakeholder_id: {
-                    dimension: float(weights[dimension])
+                    dimension: float(DEMO_WEIGHTS[stakeholder_id][dimension])
                     for dimension in UNIFIED_DIMENSIONS
                 }
-                for stakeholder_id, weights in DEMO_WEIGHTS.items()
+                for stakeholder_id in demo_stakeholder_ids
             }
             demo_ai_system_payload = {
                 "id": "demo_hiring_screening_system",
-                "name": str(DEMO_SCENARIO["name"]),
-                "description": str(DEMO_SCENARIO["description"]),
+                "name": DEMO_SCENARIO_NAME,
+                "description": DEMO_SCENARIO_DESCRIPTION,
                 "context": {
                     "dimension_scores": {
-                        dimension: float(DEMO_SCENARIO["dimension_scores"][dimension])
+                        dimension: float(DEMO_DIMENSION_SCORES[dimension])
                         for dimension in UNIFIED_DIMENSIONS
                     }
                 },
@@ -2056,25 +2065,27 @@ def main() -> None:
 
             demo_evaluate_payload = {
                 "ai_system": demo_ai_system_payload,
-                "framework_ids": [framework_id],
+                "framework_ids": [resolved_framework_id],
                 "stakeholder_ids": demo_stakeholder_ids,
                 "weights": demo_weights_payload,
-                "scoring_method": "topsis",
+                "scoring_method": demo_scoring_method,
             }
             demo_conflicts_payload = {
                 "ai_system": demo_ai_system_payload,
-                "framework_ids": [framework_id],
+                "framework_ids": [resolved_framework_id],
                 "stakeholder_ids": demo_stakeholder_ids,
                 "weights": demo_weights_payload,
             }
             demo_pareto_payload = {
                 "ai_system": demo_ai_system_payload,
-                "framework_ids": [framework_id],
+                "framework_ids": [resolved_framework_id],
                 "stakeholder_ids": demo_stakeholder_ids,
                 "weights": demo_weights_payload,
                 "n_solutions": 8,
                 "pop_size": 40,
                 "n_gen": 80,
+                "seed": 7,
+                "deterministic_mode": True,
             }
 
             with st.spinner("Running demo scenario (Evaluate → Conflicts → Pareto)..."):
@@ -2085,11 +2096,7 @@ def main() -> None:
                     timeout=60,
                 )
                 if not ok_eval:
-                    show_api_error(
-                        "Demo scenario evaluation failed",
-                        evaluate_error,
-                        evaluate_data,
-                    )
+                    show_api_error("Demo scenario evaluation failed", evaluate_error, evaluate_data)
                 else:
                     ok_conflict, conflicts_data, conflicts_error = api_call(
                         "POST",
@@ -2117,8 +2124,9 @@ def main() -> None:
                                 pareto_data,
                             )
                         else:
-                            demo_results_by_framework[demo_framework_key] = {
-                                "framework_id": framework_id,
+                            demo_results_by_context[demo_result_key] = {
+                                "framework_id": resolved_framework_id,
+                                "scoring_method": demo_scoring_method,
                                 "evaluate_payload": demo_evaluate_payload,
                                 "conflicts_payload": demo_conflicts_payload,
                                 "pareto_payload": demo_pareto_payload,
@@ -2141,15 +2149,16 @@ def main() -> None:
                                 },
                                 ui_context={
                                     "page": page,
-                                    "framework_id": framework_id,
+                                    "framework_id": resolved_framework_id,
                                     "stakeholder_ids": demo_stakeholder_ids,
-                                    "scenario_name": DEMO_SCENARIO["name"],
+                                    "scoring_method": demo_scoring_method,
+                                    "scenario_name": DEMO_SCENARIO_NAME,
                                 },
                             )
                             _write_ui_run_log(
                                 run_id=str(bundle.get("run_id", str(uuid4()))),
                                 page_name="demo_scenario",
-                                case_name="ai_hiring_screening_system",
+                                case_name="hiring_screening_demo",
                                 payload={
                                     "timestamp_utc": datetime.utcnow().isoformat() + "Z",
                                     "requests": {
@@ -2164,196 +2173,125 @@ def main() -> None:
                                     },
                                 },
                             )
-            st.session_state["demo_scenario_results"] = demo_results_by_framework
+            st.session_state["demo_scenario_results"] = demo_results_by_context
 
-    demo_result = demo_results_by_framework.get(demo_framework_key)
+    demo_result = demo_results_by_context.get(demo_result_key)
     if isinstance(demo_result, dict):
-        st.divider()
-        st.subheader("Demo Scenario Results")
-        st.info("Demo Scenario: AI Hiring Screening System")
-        render_if_present("Framework", demo_result.get("framework_id"))
-        render_if_present("Stakeholders", ", ".join(DEMO_WEIGHTS.keys()))
-        render_if_present("Scoring Method", "TOPSIS")
-
         demo_evaluate_result = demo_result.get("evaluate_response", {})
         demo_conflicts_result = demo_result.get("conflicts_response", {})
         demo_pareto_result = demo_result.get("pareto_response", {})
 
-        st.markdown("### Demo Evaluation")
+        st.divider()
+        st.subheader("Demo Scenario Results")
+        st.success(
+            f"{DEMO_SCENARIO_NAME} completed using framework '{demo_result.get('framework_id')}'."
+        )
+        render_if_present("Scoring Method", str(demo_result.get("scoring_method", "")).upper())
+
+        st.markdown("### Evaluation")
         demo_overall = float(demo_evaluate_result.get("overall_score", 0.0))
         st.metric("Overall Score", fmt_score(demo_overall))
 
-        demo_framework_scores = demo_evaluate_result.get("framework_scores", [])
-        if isinstance(demo_framework_scores, list) and demo_framework_scores:
-            demo_first_framework = demo_framework_scores[0]
-            demo_dim_scores = (
-                demo_first_framework.get("dimension_scores", {})
-                if isinstance(demo_first_framework, dict)
-                else {}
-            )
-            if isinstance(demo_dim_scores, dict):
-                demo_eval_radar = _build_radar_chart(
+        stakeholder_scores: dict[str, float] = {}
+        evaluate_stakeholder_scores = demo_evaluate_result.get("stakeholder_scores")
+        if isinstance(evaluate_stakeholder_scores, dict):
+            for stakeholder_id, value in evaluate_stakeholder_scores.items():
+                if isinstance(value, (int, float)):
+                    stakeholder_scores[str(stakeholder_id)] = float(value)
+                elif isinstance(value, dict):
+                    raw_score = value.get("overall_score")
+                    if isinstance(raw_score, (int, float)):
+                        stakeholder_scores[str(stakeholder_id)] = float(raw_score)
+
+        if not stakeholder_scores and isinstance(demo_conflicts_result, dict):
+            metadata = demo_conflicts_result.get("metadata", {})
+            if isinstance(metadata, dict):
+                metadata_scores = metadata.get("stakeholder_scores")
+                if isinstance(metadata_scores, dict):
+                    for stakeholder_id, value in metadata_scores.items():
+                        if isinstance(value, (int, float)):
+                            stakeholder_scores[str(stakeholder_id)] = float(value)
+
+        if stakeholder_scores:
+            stakeholder_rows = [
+                {"stakeholder": stakeholder_id, "overall_score": fmt_score(score)}
+                for stakeholder_id, score in stakeholder_scores.items()
+            ]
+            stakeholder_rows.sort(key=lambda item: item["stakeholder"])
+            st.dataframe(stakeholder_rows, width="stretch", hide_index=True)
+
+        st.markdown("### Conflicts")
+        top_conflict_pair = "N/A"
+        top_conflict_level = "N/A"
+        top_conflict_rho: float | None = None
+        conflicts = demo_conflicts_result.get("conflicts", []) if isinstance(demo_conflicts_result, dict) else []
+        if isinstance(conflicts, list) and conflicts:
+            conflict_candidates: list[dict[str, Any]] = []
+            for conflict in conflicts:
+                if not isinstance(conflict, dict):
+                    continue
+                rho = conflict.get("spearman_rho")
+                if not isinstance(rho, (int, float)):
+                    continue
+                stakeholder_a = str(conflict.get("stakeholder_a_id", "")).strip()
+                stakeholder_b = str(conflict.get("stakeholder_b_id", "")).strip()
+                if not stakeholder_a or not stakeholder_b:
+                    continue
+                conflict_candidates.append(
                     {
-                        dimension: float(demo_dim_scores.get(dimension, 0.0))
-                        for dimension in UNIFIED_DIMENSIONS
-                    },
-                    title="Demo Evaluation Dimension Scores",
-                    radial_max=1.0,
+                        "pair": f"{stakeholder_a} vs {stakeholder_b}",
+                        "level": str(conflict.get("conflict_level", "N/A")),
+                        "rho": float(rho),
+                    }
                 )
-                st.plotly_chart(
-                    style_plotly(demo_eval_radar, tokens),
-                    width="stretch",
-                    key=f"demo_eval_radar_{demo_framework_key}",
-                )
+            if conflict_candidates:
+                top_conflict = min(conflict_candidates, key=lambda item: item["rho"])
+                top_conflict_pair = top_conflict["pair"]
+                top_conflict_level = top_conflict["level"]
+                top_conflict_rho = float(top_conflict["rho"])
 
-        st.markdown("### Demo Conflict Analysis")
-        demo_conflict_metadata = (
-            demo_conflicts_result.get("metadata", {})
-            if isinstance(demo_conflicts_result, dict)
-            else {}
-        )
-        demo_matrix_weights = (
-            demo_conflict_metadata.get("correlation_matrix_weights")
-            if isinstance(demo_conflict_metadata, dict)
-            else None
-        )
-        demo_matrix_contrib = (
-            demo_conflict_metadata.get("correlation_matrix_contrib")
-            if isinstance(demo_conflict_metadata, dict)
-            else None
-        )
-        demo_labels = list(DEMO_WEIGHTS.keys())
-        if isinstance(demo_matrix_weights, dict):
-            demo_labels = [label for label in demo_labels if label in demo_matrix_weights]
-            if not demo_labels:
-                demo_labels = list(demo_matrix_weights.keys())
+        render_if_present("Top conflicting pair", top_conflict_pair)
+        render_if_present("Conflict level", top_conflict_level)
+        render_if_present("Spearman rho", fmt_score(top_conflict_rho))
 
-        demo_matrix_col_1, demo_matrix_col_2 = st.columns(2)
-        with demo_matrix_col_1:
-            if isinstance(demo_matrix_weights, dict):
-                demo_weights_heatmap = _build_correlation_heatmap(
-                    demo_matrix_weights,
-                    labels=demo_labels,
-                    title="Weights-only Correlation",
-                )
-                st.plotly_chart(
-                    style_plotly(demo_weights_heatmap, tokens),
-                    width="stretch",
-                    key=f"demo_weights_heatmap_{demo_framework_key}",
-                )
-        with demo_matrix_col_2:
-            if isinstance(demo_matrix_contrib, dict):
-                demo_contrib_heatmap = _build_correlation_heatmap(
-                    demo_matrix_contrib,
-                    labels=demo_labels,
-                    title="Contrib-based Correlation",
-                )
-                st.plotly_chart(
-                    style_plotly(demo_contrib_heatmap, tokens),
-                    width="stretch",
-                    key=f"demo_contrib_heatmap_{demo_framework_key}",
-                )
+        st.markdown("### Pareto Frontier")
+        pareto_solutions = demo_pareto_result.get("pareto_solutions", []) if isinstance(demo_pareto_result, dict) else []
+        pareto_count = len(pareto_solutions) if isinstance(pareto_solutions, list) else 0
+        render_if_present("Pareto points", pareto_count)
 
-        st.markdown("### Demo Pareto Resolution")
-        demo_pareto_solutions = (
-            demo_pareto_result.get("pareto_solutions", [])
-            if isinstance(demo_pareto_result, dict)
-            else []
-        )
-        demo_pareto_metadata = (
-            demo_pareto_result.get("metadata", {})
-            if isinstance(demo_pareto_result, dict)
-            else {}
-        )
-        demo_ablation_utilities = (
-            demo_pareto_metadata.get("ablation_utility_by_solution")
-            if isinstance(demo_pareto_metadata, dict)
-            else {}
-        )
-        if not isinstance(demo_ablation_utilities, dict):
-            demo_ablation_utilities = {}
-
-        demo_solution_rows: list[dict[str, Any]] = []
-        demo_rank_1_solution: dict[str, Any] | None = None
-        for solution in demo_pareto_solutions if isinstance(demo_pareto_solutions, list) else []:
-            if not isinstance(solution, dict):
-                continue
-            solution_id = str(solution.get("solution_id", "")).strip()
-            if not solution_id:
-                continue
-            try:
-                rank = int(solution.get("rank", 0))
-            except (TypeError, ValueError):
-                rank = 0
-            objectives_raw = solution.get("objective_scores", {})
-            objectives = (
-                {str(key): float(value) for key, value in objectives_raw.items()}
-                if isinstance(objectives_raw, dict)
-                else {}
-            )
-            total_distance = float(sum(objectives.values()))
-            utility = demo_ablation_utilities.get(solution_id)
-            utility_value = float(utility) if isinstance(utility, (int, float)) else None
-            row: dict[str, Any] = {
-                "rank": rank,
-                "solution_id": solution_id,
-                "total_distance": fmt_score(total_distance),
-                "utility_wsm": fmt_score(utility_value),
-            }
-            for stakeholder_id in DEMO_WEIGHTS:
-                row[stakeholder_id] = fmt_score(objectives.get(stakeholder_id))
-            demo_solution_rows.append(row)
-            if demo_rank_1_solution is None or rank < int(demo_rank_1_solution.get("rank", 10**9)):
-                demo_rank_1_solution = solution
-
-        demo_solution_rows.sort(key=lambda item: (item["rank"] if item["rank"] > 0 else 10**9, item["solution_id"]))
-        if demo_solution_rows:
-            st.dataframe(demo_solution_rows[:5], width="stretch", hide_index=True)
-
-        if isinstance(demo_rank_1_solution, dict):
-            consensus_raw = demo_rank_1_solution.get("weights", {}).get("consensus", {})
-            consensus_weights = (
-                {dimension: float(consensus_raw.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS}
-                if isinstance(consensus_raw, dict)
-                else {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
-            )
-            demo_consensus_radar = _build_radar_chart(
-                consensus_weights,
-                title="Demo Rank 1 Consensus Weights",
-                radial_max=1.0,
-            )
-            st.plotly_chart(
-                style_plotly(demo_consensus_radar, tokens),
-                width="stretch",
-                key=f"demo_consensus_radar_{demo_framework_key}",
-            )
-
-            rank_1_objectives_raw = demo_rank_1_solution.get("objective_scores", {})
-            rank_1_objectives = (
-                {str(key): float(value) for key, value in rank_1_objectives_raw.items()}
-                if isinstance(rank_1_objectives_raw, dict)
-                else {}
-            )
-            demo_distance_bar = go.Figure(
-                data=[
-                    go.Bar(
-                        x=list(DEMO_WEIGHTS.keys()),
-                        y=[float(rank_1_objectives.get(stakeholder_id, 0.0)) for stakeholder_id in DEMO_WEIGHTS],
-                        name="Distance",
+        sample_rows: list[dict[str, Any]] = []
+        if isinstance(pareto_solutions, list):
+            for solution in pareto_solutions:
+                if not isinstance(solution, dict):
+                    continue
+                solution_id = str(solution.get("solution_id", "")).strip()
+                if not solution_id:
+                    continue
+                objective_scores = solution.get("objective_scores", {})
+                total_distance = 0.0
+                if isinstance(objective_scores, dict):
+                    total_distance = float(
+                        sum(float(value) for value in objective_scores.values() if isinstance(value, (int, float)))
                     )
-                ]
-            )
-            demo_distance_bar.update_layout(
-                title="Demo Stakeholder Distance (Lower = Better Alignment)",
-                xaxis_title="Stakeholder",
-                yaxis_title="Distance",
-                margin={"l": 40, "r": 40, "t": 60, "b": 40},
-            )
-            st.plotly_chart(
-                style_plotly(demo_distance_bar, tokens),
-                width="stretch",
-                key=f"demo_distance_bar_{demo_framework_key}",
-            )
+                sample_rows.append(
+                    {
+                        "solution_id": solution_id,
+                        "rank": int(solution.get("rank", 0)) if isinstance(solution.get("rank"), (int, float)) else 0,
+                        "total_distance": total_distance,
+                    }
+                )
+
+        if sample_rows:
+            sample_rows.sort(key=lambda item: (item["total_distance"], item["rank"], item["solution_id"]))
+            sample_table = [
+                {
+                    "solution_id": item["solution_id"],
+                    "rank": item["rank"] if item["rank"] > 0 else "—",
+                    "total_distance": fmt_score(item["total_distance"]),
+                }
+                for item in sample_rows[:3]
+            ]
+            st.dataframe(sample_table, width="stretch", hide_index=True)
 
     st.caption("MEDF v1.0 — Feature Frozen Build • Reproducible Artifact")
 
