@@ -396,7 +396,7 @@ def _render_institutional_header() -> None:
     st.markdown(
         """
 <div class="medf-header">
-    <div class="medf-title">MEDF — Multi-Stakeholder Ethical Decision Framework.</div>
+    <div class="medf-title">MEDF: Multi-Stakeholder Ethical Decision Framework.</div>
     <div class="medf-subtitle">Governance-grade evaluation. Stakeholder conflict detection. Pareto-based resolution.</div>
     <div class="medf-separator"></div>
 </div>
@@ -655,6 +655,8 @@ def _assert_ui_contract(
     kpi_cards: list[dict[str, str]],
     themed_figures: list[go.Figure] | None = None,
     parcoords_figure: go.Figure | None = None,
+    pareto_weights: dict[str, float] | None = None,
+    enforce_pareto_weights_sum_to_one: bool = False,
 ) -> None:
     if not kpi_cards:
         raise AssertionError("KPI strip must render at least one card.")
@@ -682,6 +684,23 @@ def _assert_ui_contract(
                 raise AssertionError(
                     f"Parcoords dimension {index} tickfont color must remain {PARCOORDS_TICKFONT_HEX}."
                 )
+
+    if pareto_weights is not None:
+        if not isinstance(pareto_weights, dict) or not pareto_weights:
+            raise AssertionError("Pareto weights vector must be non-empty.")
+        weight_sum = 0.0
+        for dimension, raw_value in pareto_weights.items():
+            try:
+                value = float(raw_value)
+            except (TypeError, ValueError) as exc:
+                raise AssertionError(f"Pareto weight for '{dimension}' must be numeric.") from exc
+            if not math.isfinite(value):
+                raise AssertionError(f"Pareto weight for '{dimension}' must be finite.")
+            weight_sum += value
+        if enforce_pareto_weights_sum_to_one and abs(weight_sum - 1.0) > 1e-6:
+            raise AssertionError(
+                f"Pareto weights must sum to 1.0 (±1e-6); got {weight_sum:.10f}."
+            )
 
 
 def _sync_pareto_controls_from_preset(selected_preset: str) -> None:
@@ -1306,15 +1325,21 @@ def main() -> None:
             else:
                 st.caption("Thorough increases search depth for higher exploration.")
 
-            pareto_n_solutions = int(preset_values["n_solutions"])
-            pareto_pop_size = int(preset_values["pop_size"])
-            pareto_n_gen = int(preset_values["n_gen"])
+            pareto_n_solutions = int(
+                st.session_state.get("pareto_options_to_show", preset_values["n_solutions"])
+            )
+            pareto_pop_size = int(
+                st.session_state.get("pareto_search_breadth", preset_values["pop_size"])
+            )
+            pareto_n_gen = int(
+                st.session_state.get("pareto_search_depth", preset_values["n_gen"])
+            )
 
             with st.expander("Advanced", expanded=False):
                 if conference_mode:
                     st.caption("Advanced controls are hidden while Conference Mode is enabled.")
                     st.caption(
-                        "Preset values in use: "
+                        "Current values in use: "
                         f"options={pareto_n_solutions}, breadth={pareto_pop_size}, depth={pareto_n_gen}."
                     )
                 else:
@@ -1342,6 +1367,10 @@ def main() -> None:
                         step=10,
                         key="pareto_search_depth",
                     )
+
+            pareto_n_solutions = int(st.session_state.get("pareto_options_to_show", pareto_n_solutions))
+            pareto_pop_size = int(st.session_state.get("pareto_search_breadth", pareto_pop_size))
+            pareto_n_gen = int(st.session_state.get("pareto_search_depth", pareto_n_gen))
 
             approx_evals = pareto_pop_size * (max(pareto_n_gen, 1) + 1)
             pareto_n_gen_effective = pareto_n_gen
@@ -2004,6 +2033,12 @@ def main() -> None:
         )
 
         st.markdown("### Consensus Weights Radar")
+        st.caption(
+            "Weights shown are derived from backend `/api/pareto` output "
+            "(`pareto_solutions[*].weights.consensus`): candidate consensus vectors are "
+            "simplex-normalized and selected using salience-weighted distance objectives "
+            "against stakeholder weight vectors."
+        )
         radar_labels = [DIMENSION_DISPLAY_NAMES[dimension] for dimension in UNIFIED_DIMENSIONS]
         radar_values = [float(selected_consensus.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
         radar_labels_closed = radar_labels + [radar_labels[0]]
@@ -2063,6 +2098,8 @@ def main() -> None:
         _assert_ui_contract(
             kpi_cards=executive_kpis,
             themed_figures=[styled_pareto_radar, styled_pareto_distance_bar],
+            pareto_weights=selected_consensus,
+            enforce_pareto_weights_sum_to_one=True,
         )
 
         def _render_pareto_supporting_analysis() -> None:
@@ -2600,6 +2637,10 @@ def main() -> None:
                         rank_1_consensus,
                         title="Rank 1 Consensus Weights",
                         radial_max=1.0,
+                    )
+                    st.caption(
+                        "Weights shown are derived from backend `/api/pareto` output "
+                        "(`pareto_solutions[*].weights.consensus`) and are displayed without UI-side reweighting."
                     )
                     st.plotly_chart(
                         style_plotly(consensus_radar, tokens),
