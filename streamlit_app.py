@@ -623,73 +623,59 @@ def main() -> None:
     inject_css(tokens)
     st.title("MEDF Dashboard")
     with st.expander("About Methodology"):
+        st.markdown("### 1. Unified Six-Dimension Ontology")
         st.markdown(
             """
-### 1. Framework-Derived Weighting
-
-Each ethical framework (EU ALTAI, NIST AI RMF, Singapore Model AI Governance Framework) is mapped into a unified six-dimension ontology:
-
-- Transparency & Explainability  
-- Fairness & Non-Discrimination  
-- Safety & Robustness  
-- Privacy & Data Governance  
-- Human Agency & Oversight  
-- Accountability  
-
-Framework weights are derived from the framework’s internal structure (e.g., number of requirements, subcategories, or principles mapped to each dimension).  
-This creates a **framework prior** that reflects normative emphasis.
-
----
-
-### 2. Stakeholder Preference Modeling
-
-Each stakeholder is assigned a weight vector over the six dimensions.
-
-Effective weights are computed using product pooling:
-
-w_eff ∝ w_stakeholder × w_framework
-
-The result is normalized to sum to 1.
-
-This ensures:
-- Stakeholder preferences remain primary
-- Framework emphasis acts as a normative lens
-- Weighting is transparent and reproducible
-
----
-
-### 3. Scoring Methods
-
-Two multi-criteria methods are supported:
-
-- **TOPSIS** (Technique for Order Preference by Similarity to Ideal Solution)
-- **Weighted Sum Model (WSM)**
-
-Both operate over the unified dimension vector.
-
----
-
-### 4. Conflict Detection
-
-Two conflict modes are implemented:
-
-• **Weights-only conflict**
-  Measures disagreement in stakeholder priorities.
-
-• **Contribution-based conflict**
-  Measures disagreement after adjusting for system performance:
-  contribution_i = normalized_score_i × stakeholder_weight_i
-
-Spearman rank correlation is used to detect divergence.
-
----
-
-### 5. Pareto Frontier
-
-Multi-stakeholder trade-offs are analyzed using Pareto dominance.
-Only non-dominated solutions are retained.
+- Transparency and Explainability.
+- Fairness and Non-Discrimination.
+- Safety and Robustness.
+- Privacy and Data Governance.
+- Human Agency and Oversight.
+- Accountability.
 """
         )
+
+        st.markdown("---")
+        st.markdown("### 2. Framework-Derived Prior")
+        st.markdown(
+            "Framework weights are derived from internal structure "
+            "(e.g., requirements, subcategories, principles) mapped to the unified dimensions."
+        )
+        st.latex(r"w^{fw}_i = \frac{c_i}{\sum_{j=1}^{6} c_j}")
+        st.markdown("where $c_i$ is the framework coverage count for dimension $i$.")
+
+        st.markdown("---")
+        st.markdown("### 3. Stakeholder Preference Modeling")
+        st.markdown(
+            "Each stakeholder provides a preference vector over the same six dimensions."
+        )
+        st.latex(r"\tilde{w}_i = w^{stake}_i \cdot w^{fw}_i")
+        st.latex(r"w^{eff}_i = \frac{\tilde{w}_i}{\sum_{j=1}^{6} \tilde{w}_j}")
+
+        st.markdown("---")
+        st.markdown("### 4. Scoring Methods")
+        st.markdown(
+            """
+- TOPSIS (Technique for Order Preference by Similarity to Ideal Solution).
+- Weighted Sum Model (WSM).
+"""
+        )
+
+        st.markdown("---")
+        st.markdown("### 5. Conflict Detection")
+        st.markdown(
+            """
+- Weights-only conflict compares stakeholder priorities directly.
+- Contribution-based conflict compares stakeholder rankings after accounting for system performance.
+"""
+        )
+        st.latex(r"\text{contrib}_i = \hat{x}_i \cdot w^{stake}_i")
+        st.markdown("where $\\hat{x}_i$ is the normalized system score on dimension $i$.")
+
+        st.markdown("---")
+        st.markdown("### 6. Pareto Frontier")
+        st.markdown("Multi-stakeholder trade-offs are summarized using Pareto dominance.")
+        st.markdown("- Only non-dominated solutions are retained on the Pareto frontier.")
 
     page = st.radio(
         "Page",
