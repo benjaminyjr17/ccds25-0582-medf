@@ -13,8 +13,6 @@ import plotly.graph_objects as go
 import requests
 import streamlit as st
 
-from dashboard.plot_theme import DARK_PLOT_CANVAS, apply_dark_plot_theme
-
 UNIFIED_DIMENSIONS = [
     "transparency_explainability",
     "fairness_nondiscrimination",
@@ -24,8 +22,8 @@ UNIFIED_DIMENSIONS = [
     "accountability",
 ]
 
-BRAND_BLUE_HEX = "#1E3A8A"
-BRAND_BLUE_FILL_RGBA = "rgba(30, 58, 138, 0.20)"
+BRAND_BLUE_HEX = "#3B82F6"
+BRAND_BLUE_FILL_RGBA = "rgba(59, 130, 246, 0.22)"
 
 DIMENSION_DISPLAY_NAMES = {
     "transparency_explainability": "Transparency and Explainability",
@@ -179,46 +177,22 @@ def _get_theme_base():
 
 
 def _ui_tokens(theme_base: str) -> dict[str, str]:
-    if theme_base == "dark":
-        return {
-            "bg": "#0b0f19",
-            "panel_bg": "#0f172a",
-            "sidebar_bg": "#0b1220",
-            "text": "#e5e7eb",
-            "muted_text": "#9ca3af",
-            "border": "rgba(255,255,255,0.10)",
-            "primary": BRAND_BLUE_HEX,
-            "primary_hover": "#1E40AF",
-            "plot_text": "#f8fafc",
-            "plot_grid": "rgba(255,255,255,0.18)",
-            "plot_axis": "rgba(255,255,255,0.30)",
-            "plot_canvas_bg": DARK_PLOT_CANVAS,
-        }
     return {
-        "bg": "#ffffff",
-        "panel_bg": "#ffffff",
-        "sidebar_bg": "#f8fafc",
-        "text": "#111827",
-        "muted_text": "#6b7280",
-        "border": "rgba(17,24,39,0.10)",
-        "primary": BRAND_BLUE_HEX,
-        "primary_hover": "#1E40AF",
-        "plot_text": "#111827",
-        "plot_grid": "rgba(17,24,39,0.12)",
-        "plot_axis": "rgba(17,24,39,0.22)",
-        "plot_canvas_bg": DARK_PLOT_CANVAS,
+        "bg": "#0B1220",
+        "panel_bg": "#0F172A",
+        "sidebar_bg": "#111C33",
+        "text": "#E5E7EB",
+        "muted_text": "#A7B0C0",
+        "subtle_text": "#7C8598",
+        "border": "#243045",
+        "primary": "#3B82F6",
+        "primary_hover": "#2563EB",
+        "success": "#22C55E",
+        "warning": "#F59E0B",
+        "danger": "#EF4444",
     }
 
 def inject_css(tokens: dict[str, str]) -> None:
-    css_path = Path(".streamlit") / "style.css"
-    if css_path.exists():
-        try:
-            css_content = css_path.read_text(encoding="utf-8")
-            st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
-            return
-        except Exception:
-            pass
-
     st.markdown(
         f"""
 <style>
@@ -227,45 +201,37 @@ html, body, [data-testid="stAppViewContainer"] {{
     color: {tokens["text"]};
 }}
 [data-testid="stAppViewContainer"] .main .block-container {{
-    padding-top: 1.6rem;
-    padding-bottom: 1.25rem;
+    max-width: 1240px;
+    padding-top: 1.35rem;
+    padding-bottom: 1.15rem;
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
 }}
 section[data-testid="stSidebar"] {{
     background: {tokens["sidebar_bg"]};
     border-right: 1px solid {tokens["border"]};
-    padding-top: 0.5rem;
+    padding-top: 0.6rem;
 }}
-h1, h2, h3 {{
+h1, h2, h3, h4 {{
     color: {tokens["text"]};
     letter-spacing: 0.01em;
 }}
-p, label, [data-testid="stMarkdownContainer"], [data-testid="stCaptionContainer"] {{
+[data-testid="stMarkdownContainer"], p, label {{
     color: {tokens["text"]};
 }}
 [data-testid="stCaptionContainer"] {{
     color: {tokens["muted_text"]};
 }}
-button[kind="primary"] {{
-    background: {tokens["primary"]} !important;
-    border: 1px solid {tokens["primary"]} !important;
-    border-radius: 8px !important;
-}}
-button[kind="primary"]:hover {{
-    background: {tokens["primary_hover"]} !important;
-    border-color: {tokens["primary_hover"]} !important;
-}}
-button[kind="secondary"] {{
-    border-radius: 8px !important;
-    border: 1px solid {tokens["border"]} !important;
-}}
-[data-testid="stExpander"] {{
-    border: 1px solid {tokens["border"]} !important;
-    border-radius: 10px !important;
+.medf-card {{
     background: {tokens["panel_bg"]};
+    border: 1px solid {tokens["border"]} !important;
+    border-radius: 12px;
+    padding: 0.95rem 1rem;
 }}
-[data-testid="stDataFrame"], .stTable {{
+[data-testid="stExpander"], [data-testid="stDataFrame"], .stTable {{
+    background: {tokens["panel_bg"]};
     border: 1px solid {tokens["border"]};
-    border-radius: 8px;
+    border-radius: 12px;
 }}
 [data-testid="stHorizontalBlock"] hr, hr {{
     border-color: {tokens["border"]};
@@ -276,24 +242,152 @@ button[kind="secondary"] {{
     )
 
 
+def apply_plotly_style(fig: go.Figure, title: str | None = None) -> go.Figure:
+    current_title = safe_str(getattr(getattr(fig.layout, "title", None), "text", None)).strip()
+    title_text = safe_str(title).strip() if title is not None else current_title
+    if title_text.lower() == "undefined":
+        title_text = ""
+
+    existing_margin = getattr(fig.layout, "margin", None)
+
+    def _margin_value(side: str, default: int) -> int:
+        raw_value = getattr(existing_margin, side, None) if existing_margin is not None else None
+        if raw_value is None:
+            return default
+        return max(default, int(raw_value))
+
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#E5E7EB", size=13),
+        title=dict(
+            text=title_text,
+            font=dict(color="#E5E7EB", size=18),
+            y=0.98,
+            yanchor="top",
+        ),
+        legend=dict(
+            font=dict(color="#A7B0C0", size=12),
+            title=dict(font=dict(color="#A7B0C0", size=12)),
+        ),
+        margin=dict(
+            t=_margin_value("t", 80),
+            r=_margin_value("r", 30),
+            b=_margin_value("b", 50),
+            l=_margin_value("l", 60),
+        ),
+    )
+    fig.update_xaxes(
+        tickfont=dict(color="#A7B0C0", size=11),
+        title_font=dict(color="#E5E7EB", size=13),
+        title_standoff=14,
+        gridcolor="rgba(167,176,192,0.18)",
+        linecolor="#243045",
+        zerolinecolor="#243045",
+    )
+    fig.update_yaxes(
+        tickfont=dict(color="#A7B0C0", size=11),
+        title_font=dict(color="#E5E7EB", size=13),
+        title_standoff=16,
+        gridcolor="rgba(167,176,192,0.18)",
+        linecolor="#243045",
+        zerolinecolor="#243045",
+    )
+
+    if hasattr(fig.layout, "polar"):
+        fig.update_layout(
+            polar=dict(
+                bgcolor="rgba(0,0,0,0)",
+                radialaxis=dict(
+                    gridcolor="rgba(167,176,192,0.18)",
+                    linecolor="#243045",
+                    tickfont=dict(color="#A7B0C0"),
+                    tickcolor="#A7B0C0",
+                    titlefont=dict(color="#E5E7EB"),
+                    showline=True,
+                ),
+                angularaxis=dict(
+                    gridcolor="rgba(167,176,192,0.18)",
+                    linecolor="#243045",
+                    tickfont=dict(color="#A7B0C0"),
+                    tickcolor="#A7B0C0",
+                    showline=True,
+                ),
+            )
+        )
+
+    for trace in fig.data:
+        if isinstance(trace, go.Heatmap):
+            if trace.colorbar is None:
+                trace.colorbar = {}
+            trace.colorbar.tickfont = dict(color="#A7B0C0", size=11)
+            if trace.colorbar.title is None:
+                trace.colorbar.title = {}
+            trace.colorbar.title.font = dict(color="#E5E7EB", size=12)
+
+        if isinstance(trace, go.Parcoords):
+            parcoords_dimensions: list[dict[str, Any]] = []
+            for dimension in getattr(trace, "dimensions", []) or []:
+                label = safe_str(getattr(dimension, "label", "")).strip()
+                if label:
+                    if label.lower() == "affected community":
+                        label = "Affected community"
+                    elif label in {"developer", "regulator", "affected_community"}:
+                        label = label.replace("_", " ").title()
+                parcoords_dimensions.append(
+                    {
+                        "label": label,
+                        "values": list(getattr(dimension, "values", []) or []),
+                    }
+                )
+            if parcoords_dimensions:
+                trace.dimensions = parcoords_dimensions
+            trace.labelfont = dict(color="#E5E7EB", size=12)
+            trace.tickfont = dict(color="#A7B0C0", size=11)
+            if getattr(trace, "line", None) is not None:
+                colorbar = getattr(trace.line, "colorbar", None)
+                if colorbar is not None:
+                    title_obj = getattr(colorbar, "title", None)
+                    colorbar_title = safe_str(getattr(title_obj, "text", None)).strip()
+                    if not colorbar_title:
+                        colorbar_title = "Total distance"
+                    colorbar.tickfont = dict(color="#A7B0C0", size=11)
+                    colorbar.title = dict(
+                        text=colorbar_title,
+                        side="right",
+                        font=dict(color="#E5E7EB", size=11),
+                    )
+                    colorbar.x = 1.08
+                    colorbar.xanchor = "left"
+                    fig.update_layout(
+                        margin=dict(
+                            t=_margin_value("t", 110),
+                            r=_margin_value("r", 140),
+                            b=_margin_value("b", 50),
+                            l=_margin_value("l", 60),
+                        ),
+                        title=dict(y=0.98, yanchor="top"),
+                    )
+
+    return fig
+
+
 def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
+    _ = tokens
     existing_title = safe_str(getattr(getattr(fig.layout, "title", None), "text", None)).strip()
     title_text = existing_title if existing_title and existing_title.lower() != "undefined" else ""
-    return apply_dark_plot_theme(
-        fig,
-        title_text=title_text,
-        canvas_bg=tokens.get("plot_canvas_bg", DARK_PLOT_CANVAS),
-    )
+    return apply_plotly_style(fig, title=title_text)
 
 
 def _risk_label(score: float) -> tuple[str, str]:
     if score >= 0.8:
-        return "LOW", "green"
+        return "LOW", "#22C55E"
     if score >= 0.6:
-        return "MEDIUM", "goldenrod"
+        return "MEDIUM", "#F59E0B"
     if score >= 0.4:
-        return "HIGH", "orange"
-    return "CRITICAL", "red"
+        return "HIGH", "#EF4444"
+    return "CRITICAL", "#EF4444"
 
 
 def _apply_dimension_preset(preset: dict[str, float]) -> None:
@@ -388,8 +482,8 @@ def safe_str(x: Any) -> str:
     return "" if x is None else str(x)
 
 
-def fmt_minus(text: str) -> str:
-    return str(text).replace("–", UNICODE_MINUS).replace("-", UNICODE_MINUS)
+def fmt_minus(s: str) -> str:
+    return str(s).replace("-", UNICODE_MINUS).replace("–", UNICODE_MINUS)
 
 
 def render_if_present(label: str, value: Any) -> None:
@@ -1052,7 +1146,7 @@ def main() -> None:
                 showlegend=False,
                 margin={"l": 40, "r": 40, "t": 40, "b": 40},
             )
-            st.plotly_chart(style_plotly(fig, tokens), width="stretch", key="evaluate_radar")
+            st.plotly_chart(style_plotly(fig, tokens), use_container_width=True, key="evaluate_radar")
 
             table_rows = []
             for row in framework_scores:
@@ -1273,7 +1367,7 @@ def main() -> None:
                     title=matrix_title,
                     margin={"l": 40, "r": 40, "t": 60, "b": 40},
                 )
-                st.plotly_chart(style_plotly(heatmap, tokens), width="stretch", key="conflict_heatmap")
+                st.plotly_chart(style_plotly(heatmap, tokens), use_container_width=True, key="conflict_heatmap")
             else:
                 st.info("No correlation matrix returned in metadata.")
     elif page == "Pareto Resolution":
@@ -1514,7 +1608,7 @@ def main() -> None:
         )
         st.plotly_chart(
             style_plotly(radar_figure, tokens),
-            width="stretch",
+            use_container_width=True,
             key=f"pareto_weights_radar_{selected_solution_id}",
         )
 
@@ -1538,7 +1632,7 @@ def main() -> None:
         )
         st.plotly_chart(
             style_plotly(bar_figure, tokens),
-            width="stretch",
+            use_container_width=True,
             key=f"pareto_distance_bar_{selected_solution_id}",
         )
 
@@ -1587,7 +1681,7 @@ def main() -> None:
             )
             st.plotly_chart(
                 style_plotly(scatter_figure, tokens),
-                width="stretch",
+                use_container_width=True,
                 key=f"pareto_tradeoff_scatter_{stakeholder_a}_{stakeholder_b}",
             )
         elif len(stakeholder_ids) >= 3:
@@ -1620,9 +1714,9 @@ def main() -> None:
                             "title": {
                                 "text": "Total distance",
                                 "side": "right",
-                                "font": {"color": "#E6E6E6", "size": 11},
+                                "font": {"color": "#E5E7EB", "size": 11},
                             },
-                            "tickfont": {"color": "#E6E6E6"},
+                            "tickfont": {"color": "#A7B0C0"},
                             "x": 1.08,
                             "xanchor": "left",
                         },
@@ -1633,11 +1727,11 @@ def main() -> None:
             parallel_figure.update_traces(
                 domain={"y": [0.0, 0.86]},
                 dimensions=dimension_specs,
-                labelfont={"color": "#E6E6E6", "size": 12},
-                tickfont={"color": "#E6E6E6", "size": 11},
+                labelfont={"color": "#E5E7EB", "size": 12},
+                tickfont={"color": "#A7B0C0", "size": 11},
             )
             parallel_figure.update_layout(
-                font={"color": "#E6E6E6"},
+                font={"color": "#E5E7EB"},
                 title={
                     "text": "Stakeholder Distance Tradeoffs",
                     "y": 0.99,
@@ -1649,7 +1743,7 @@ def main() -> None:
             )
             st.plotly_chart(
                 style_plotly(parallel_figure, tokens),
-                width="stretch",
+                use_container_width=True,
                 key=f"pareto_tradeoff_parallel_{len(stakeholder_ids)}",
             )
             st.caption(f"Selected solution: {selected_solution_id} (rank {selected_rank})")
@@ -1892,7 +1986,7 @@ def main() -> None:
                         )
                         st.plotly_chart(
                             style_plotly(eval_radar, tokens),
-                            width="stretch",
+                            use_container_width=True,
                             key=f"case_{case_id}_evaluation_radar",
                         )
                     else:
@@ -1930,7 +2024,7 @@ def main() -> None:
                         )
                         st.plotly_chart(
                             style_plotly(weights_heatmap, tokens),
-                            width="stretch",
+                            use_container_width=True,
                             key=f"case_{case_id}_weights_heatmap",
                         )
                     else:
@@ -1944,7 +2038,7 @@ def main() -> None:
                         )
                         st.plotly_chart(
                             style_plotly(contrib_heatmap, tokens),
-                            width="stretch",
+                            use_container_width=True,
                             key=f"case_{case_id}_contrib_heatmap",
                         )
                     else:
@@ -2048,7 +2142,7 @@ def main() -> None:
                     )
                     st.plotly_chart(
                         style_plotly(consensus_radar, tokens),
-                        width="stretch",
+                        use_container_width=True,
                         key=f"case_{case_id}_consensus_radar_{rank_1_solution['solution_id']}",
                     )
 
@@ -2073,7 +2167,7 @@ def main() -> None:
                     )
                     st.plotly_chart(
                         style_plotly(stakeholder_distance_bar, tokens),
-                        width="stretch",
+                        use_container_width=True,
                         key=f"case_{case_id}_distance_bar_{rank_1_solution['solution_id']}",
                     )
                 else:
