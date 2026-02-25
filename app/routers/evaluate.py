@@ -42,7 +42,7 @@ def _get_dimension_scores(payload: EvaluateRequest) -> dict[str, float]:
     raw_scores = context.get("dimension_scores")
     if not isinstance(raw_scores, dict):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=(
                 "ai_system.context.dimension_scores is required and must contain all 6 "
                 "unified dimensions with Likert scores in [1, 5]."
@@ -52,7 +52,7 @@ def _get_dimension_scores(payload: EvaluateRequest) -> dict[str, float]:
     missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in raw_scores]
     if missing:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=(
                 "ai_system.context.dimension_scores is missing dimensions: "
                 + ", ".join(missing)
@@ -66,13 +66,13 @@ def _get_dimension_scores(payload: EvaluateRequest) -> dict[str, float]:
             value = float(raw_value)
         except (TypeError, ValueError) as exc:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f"Invalid dimension score for '{dimension}'. Must be a number in [1, 5].",
             ) from exc
 
         if value < 1.0 or value > 5.0:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f"Dimension '{dimension}' score must be in [1, 5].",
             )
         normalized[dimension] = value
@@ -83,14 +83,14 @@ def _get_dimension_scores(payload: EvaluateRequest) -> dict[str, float]:
 def _validate_weights(weights: dict[str, float], stakeholder_id: str) -> dict[str, float]:
     if not isinstance(weights, dict):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"Weights for stakeholder '{stakeholder_id}' must be a key/value object.",
         )
 
     missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in weights]
     if missing:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=(
                 f"Weights for stakeholder '{stakeholder_id}' are missing dimensions: "
                 + ", ".join(missing)
@@ -104,12 +104,12 @@ def _validate_weights(weights: dict[str, float], stakeholder_id: str) -> dict[st
             value = float(raw_value)
         except (TypeError, ValueError) as exc:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f"Invalid weight for '{dimension}' in stakeholder '{stakeholder_id}'.",
             ) from exc
         if value < 0.0 or value > 1.0:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=f"Weight for '{dimension}' in stakeholder '{stakeholder_id}' must be in [0, 1].",
             )
         normalized[dimension] = value
@@ -117,7 +117,7 @@ def _validate_weights(weights: dict[str, float], stakeholder_id: str) -> dict[st
     total = sum(normalized.values())
     if abs(total - 1.0) > 0.01:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=(
                 f"Weights for stakeholder '{stakeholder_id}' must sum to 1.0 (±0.01); got {total:.4f}."
             ),
@@ -274,13 +274,13 @@ def _effective_weights(ws: dict[str, float], wf: dict[str, float]) -> np.ndarray
     effective_sum = float(np.sum(effective_vector))
     if effective_sum <= 0.0 or not np.isfinite(effective_sum):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Effective weights are invalid after framework weighting (non-finite or zero sum).",
         )
     effective_vector = effective_vector / effective_sum
     if not np.all(np.isfinite(effective_vector)):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Effective weights contain non-finite values after normalization.",
         )
     return effective_vector
@@ -373,7 +373,7 @@ def evaluate(
                     )
                 except ValueError as exc:
                     raise HTTPException(
-                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                         detail=f"Invalid TOPSIS input for stakeholder '{stakeholder_id}': {exc}",
                     ) from exc
             elif payload.scoring_method == ScoringMethod.WSM:
@@ -386,7 +386,7 @@ def evaluate(
                     )
                 except ValueError as exc:
                     raise HTTPException(
-                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                         detail=f"Invalid WSM input for stakeholder '{stakeholder_id}': {exc}",
                     ) from exc
             else:
