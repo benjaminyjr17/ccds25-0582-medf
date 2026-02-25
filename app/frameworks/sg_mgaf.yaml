@@ -7,29 +7,29 @@ criteria:
     name: Fairness and Inclusion
     dimension: fairness_nondiscrimination
     description: Promote fairness outcomes and avoid discriminatory harm.
-    weight: 0.17
+    weight: 0.12
   - id: mgaf_accountability
     name: Internal Governance
     dimension: accountability
     description: Set governance structures and clear accountability ownership.
-    weight: 0.17
+    weight: 0.20
   - id: mgaf_transparency
     name: Communication and Explainability
     dimension: transparency_explainability
     description: Communicate AI behavior, limitations, and recourse.
-    weight: 0.17
+    weight: 0.22
   - id: mgaf_privacy
     name: Data Governance
     dimension: privacy_data_governance
     description: Ensure strong personal data governance and protection controls.
-    weight: 0.16
+    weight: 0.12
   - id: mgaf_safety
     name: Operations Management
     dimension: safety_robustness
     description: Maintain model quality, robustness, and operational safeguards.
-    weight: 0.17
+    weight: 0.16
   - id: mgaf_human_oversight
     name: Human-in-the-loop Oversight
     dimension: human_agency_oversight
     description: Provide human override and escalation pathways where needed.
-    weight: 0.16
+    weight: 0.18

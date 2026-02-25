@@ -7,29 +7,29 @@ criteria:
     name: Fairness Risk Management
     dimension: fairness_nondiscrimination
     description: Identify and mitigate inequitable model outcomes.
-    weight: 0.17
+    weight: 0.10
   - id: rmf_accountability
     name: Govern
     dimension: accountability
     description: Establish governance and accountability controls.
-    weight: 0.17
+    weight: 0.30
   - id: rmf_transparency
     name: Explainability and Traceability
     dimension: transparency_explainability
     description: Support transparency and decision traceability.
-    weight: 0.17
+    weight: 0.12
   - id: rmf_privacy
     name: Data and Privacy Risk
     dimension: privacy_data_governance
     description: Manage privacy and data governance risks.
-    weight: 0.16
+    weight: 0.12
   - id: rmf_safety
     name: Robustness and Reliability
     dimension: safety_robustness
     description: Manage robustness, resilience, and safety risk.
-    weight: 0.17
+    weight: 0.24
   - id: rmf_human_oversight
     name: Human Oversight
     dimension: human_agency_oversight
     description: Include meaningful human review and oversight practices.
-    weight: 0.16
+    weight: 0.12
