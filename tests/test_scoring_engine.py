@@ -35,8 +35,8 @@ def test_topsis_weights_sum_validation() -> None:
 def test_topsis_cost_criterion_behavior() -> None:
     decision_matrix = np.array(
         [
-            [1.0, 5.0],
-            [5.0, 4.0],
+            [1.0, 7.0],
+            [7.0, 6.0],
         ],
         dtype=float,
     )
@@ -57,7 +57,7 @@ def test_topsis_cost_criterion_behavior() -> None:
 
 
 def test_wsm_simple() -> None:
-    scores = np.array([1.0, 5.0], dtype=float)
+    scores = np.array([1.0, 7.0], dtype=float)
     weights = np.array([0.25, 0.75], dtype=float)
 
     value = wsm_score(scores, weights)
@@ -69,7 +69,7 @@ def test_wsm_scores_multiple_rows() -> None:
     decision_matrix = np.array(
         [
             [1.0, 1.0, 1.0],
-            [5.0, 5.0, 5.0],
+            [7.0, 7.0, 7.0],
         ],
         dtype=float,
     )

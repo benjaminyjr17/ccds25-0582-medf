@@ -30,10 +30,12 @@ from app.models import (
     ConflictReport,
     ConflictRequest,
     ErrorResponse,
+    LIKERT_MAX,
+    LIKERT_MIN,
     StakeholderConflict,
     UNIFIED_DIMENSIONS,
 )
-from app.scoring_engine import topsis_score
+from app.scoring_engine import normalize_likert, topsis_score, validate_likert
 from app.audit_log import write_audit_record
 
 router = APIRouter(prefix="/api", tags=["Conflict Detection"])
@@ -90,13 +92,18 @@ def _extract_dimension_scores(payload: ConflictRequest) -> np.ndarray:
         except (TypeError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Invalid score for '{dimension}'.",
+                detail=(
+                    f"Invalid score for '{dimension}'. "
+                    f"Must be a number in [{LIKERT_MIN}, {LIKERT_MAX}]."
+                ),
             ) from exc
-        if score < 1.0 or score > 5.0:
+        try:
+            validate_likert(score, LIKERT_MIN, LIKERT_MAX)
+        except ValueError as exc:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Score for '{dimension}' must be between 1 and 5.",
-            )
+                detail=f"Score for '{dimension}' must be between {LIKERT_MIN} and {LIKERT_MAX}.",
+            ) from exc
         ordered_scores.append(score)
 
     return np.asarray(ordered_scores, dtype=float)
@@ -221,7 +228,10 @@ def analyze_conflicts(
 
     decision_vector = _extract_dimension_scores(payload)
     decision_matrix = decision_vector.reshape(1, len(UNIFIED_DIMENSIONS))
-    normalized_scores = np.clip((decision_vector - 1.0) / 4.0, 0.0, 1.0)
+    normalized_scores = np.array(
+        [normalize_likert(score, LIKERT_MIN, LIKERT_MAX) for score in decision_vector],
+        dtype=float,
+    )
 
     criteria_types = _ordered_criteria_types(framework.id, framework.dimensions)
 
@@ -265,8 +275,8 @@ def analyze_conflicts(
         topsis_matrix = np.vstack(
             [
                 decision_matrix,
-                np.full((1, len(UNIFIED_DIMENSIONS)), 5.0, dtype=float),
-                np.full((1, len(UNIFIED_DIMENSIONS)), 1.0, dtype=float),
+                np.full((1, len(UNIFIED_DIMENSIONS)), LIKERT_MAX, dtype=float),
+                np.full((1, len(UNIFIED_DIMENSIONS)), LIKERT_MIN, dtype=float),
             ]
         )
         try:
@@ -275,6 +285,8 @@ def analyze_conflicts(
                     decision_matrix=topsis_matrix,
                     weights=weight_vector,
                     criteria_types=criteria_types,
+                    scale_min=LIKERT_MIN,
+                    scale_max=LIKERT_MAX,
                 )[0]
             )
         except ValueError as exc:

@@ -27,11 +27,13 @@ from app.models import (
     EvaluateRequest,
     EvaluationResult,
     FrameworkScore,
+    LIKERT_MAX,
+    LIKERT_MIN,
     RiskLevel,
     ScoringMethod,
     UNIFIED_DIMENSIONS,
 )
-from app.scoring_engine import topsis_score, wsm_scores
+from app.scoring_engine import normalize_likert, topsis_score, validate_likert, wsm_scores
 
 router = APIRouter(prefix="/api", tags=["Evaluation"])
 _FRAMEWORKS_DIR = Path(__file__).resolve().parent.parent / "frameworks"
@@ -45,7 +47,7 @@ def _get_dimension_scores(payload: EvaluateRequest) -> dict[str, float]:
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=(
                 "ai_system.context.dimension_scores is required and must contain all 6 "
-                "unified dimensions with Likert scores in [1, 5]."
+                f"unified dimensions with Likert scores in [{LIKERT_MIN}, {LIKERT_MAX}]."
             ),
         )
 
@@ -67,14 +69,19 @@ def _get_dimension_scores(payload: EvaluateRequest) -> dict[str, float]:
         except (TypeError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=f"Invalid dimension score for '{dimension}'. Must be a number in [1, 5].",
+                detail=(
+                    f"Invalid dimension score for '{dimension}'. "
+                    f"Must be a number in [{LIKERT_MIN}, {LIKERT_MAX}]."
+                ),
             ) from exc
 
-        if value < 1.0 or value > 5.0:
+        try:
+            validate_likert(value, LIKERT_MIN, LIKERT_MAX)
+        except ValueError as exc:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=f"Dimension '{dimension}' score must be in [1, 5].",
-            )
+                detail=f"Dimension '{dimension}' score must be in [{LIKERT_MIN}, {LIKERT_MAX}].",
+            ) from exc
         normalized[dimension] = value
 
     return normalized
@@ -319,7 +326,10 @@ def evaluate(
         dtype=float,
     )
     decision_matrix = decision_vector.reshape(1, len(UNIFIED_DIMENSIONS))
-    normalized_vector = np.clip((decision_vector - 1.0) / 4.0, 0.0, 1.0)
+    normalized_vector = np.array(
+        [normalize_likert(value, LIKERT_MIN, LIKERT_MAX) for value in decision_vector],
+        dtype=float,
+    )
 
     framework_scores: list[FrameworkScore] = []
     framework_overall_scores: list[float] = []
@@ -359,8 +369,8 @@ def evaluate(
                 topsis_matrix = np.vstack(
                     [
                         decision_matrix,
-                        np.full((1, len(UNIFIED_DIMENSIONS)), 5.0, dtype=float),
-                        np.full((1, len(UNIFIED_DIMENSIONS)), 1.0, dtype=float),
+                        np.full((1, len(UNIFIED_DIMENSIONS)), LIKERT_MAX, dtype=float),
+                        np.full((1, len(UNIFIED_DIMENSIONS)), LIKERT_MIN, dtype=float),
                     ]
                 )
                 try:
@@ -369,6 +379,8 @@ def evaluate(
                             decision_matrix=topsis_matrix,
                             weights=effective_weight_vector,
                             criteria_types=criteria_types,
+                            scale_min=LIKERT_MIN,
+                            scale_max=LIKERT_MAX,
                         )[0]
                     )
                 except ValueError as exc:
@@ -382,6 +394,8 @@ def evaluate(
                         wsm_scores(
                             decision_matrix=decision_matrix,
                             weights=effective_weight_vector,
+                            scale_min=LIKERT_MIN,
+                            scale_max=LIKERT_MAX,
                         )[0]
                     )
                 except ValueError as exc:

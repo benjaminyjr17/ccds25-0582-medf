@@ -4,7 +4,7 @@ import warnings
 
 import numpy as np
 
-from app.models import UNIFIED_DIMENSIONS
+from app.models import LIKERT_MAX, LIKERT_MIN, UNIFIED_DIMENSIONS
 
 _WEIGHT_SUM_TOLERANCE = 1e-6
 _RECIPROCAL_TOLERANCE = 1e-3
@@ -26,6 +26,29 @@ def _validate_scale(scale_min: float, scale_max: float) -> None:
         raise ValueError("scale_min and scale_max must be finite.")
     if scale_max <= scale_min:
         raise ValueError("scale_max must be greater than scale_min.")
+
+
+def likert_denominator(mn: float = LIKERT_MIN, mx: float = LIKERT_MAX) -> float:
+    _validate_scale(mn, mx)
+    return float(mx - mn)
+
+
+def validate_likert(x: float, mn: float = LIKERT_MIN, mx: float = LIKERT_MAX) -> None:
+    _validate_scale(mn, mx)
+    try:
+        value = float(x)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Likert score must be numeric in [{mn}, {mx}].") from exc
+    if not np.isfinite(value):
+        raise ValueError(f"Likert score must be finite in [{mn}, {mx}].")
+    if value < mn or value > mx:
+        raise ValueError(f"Likert score must be within [{mn}, {mx}].")
+
+
+def normalize_likert(x: float, mn: float = LIKERT_MIN, mx: float = LIKERT_MAX) -> float:
+    validate_likert(x, mn, mx)
+    value = float(x)
+    return float((value - mn) / likert_denominator(mn, mx))
 
 
 def _validate_weights(weights: np.ndarray, n_dims: int) -> np.ndarray:
@@ -72,8 +95,8 @@ def topsis_score(
     weights: np.ndarray,
     criteria_types: list[str],
     *,
-    scale_min: float = 1.0,
-    scale_max: float = 5.0,
+    scale_min: float = LIKERT_MIN,
+    scale_max: float = LIKERT_MAX,
     return_debug: bool = False,
 ) -> np.ndarray | tuple[np.ndarray, dict[str, np.ndarray | list[str] | float]]:
     _validate_scale(scale_min, scale_max)
@@ -152,8 +175,8 @@ def wsm_score(
     scores: np.ndarray,
     weights: np.ndarray,
     *,
-    scale_min: float = 1.0,
-    scale_max: float = 5.0,
+    scale_min: float = LIKERT_MIN,
+    scale_max: float = LIKERT_MAX,
 ) -> float:
     _validate_scale(scale_min, scale_max)
     vector = np.asarray(scores, dtype=float)
@@ -175,8 +198,8 @@ def wsm_scores(
     decision_matrix: np.ndarray,
     weights: np.ndarray,
     *,
-    scale_min: float = 1.0,
-    scale_max: float = 5.0,
+    scale_min: float = LIKERT_MIN,
+    scale_max: float = LIKERT_MAX,
 ) -> np.ndarray:
     _validate_scale(scale_min, scale_max)
     matrix = _validate_decision_matrix(
@@ -241,7 +264,7 @@ def compute_scores(
 ) -> dict[str, float | dict[str, float]]:
     method_key = method.lower().strip()
     score_vector = np.array(
-        [float(dimension_scores.get(dimension, 1.0)) for dimension in UNIFIED_DIMENSIONS],
+        [float(dimension_scores.get(dimension, LIKERT_MIN)) for dimension in UNIFIED_DIMENSIONS],
         dtype=float,
     )
     weight_vector = np.array(
@@ -254,14 +277,16 @@ def compute_scores(
         decision_matrix = np.vstack(
             [
                 score_vector,
-                np.full(len(UNIFIED_DIMENSIONS), 5.0, dtype=float),
-                np.full(len(UNIFIED_DIMENSIONS), 1.0, dtype=float),
+                np.full(len(UNIFIED_DIMENSIONS), LIKERT_MAX, dtype=float),
+                np.full(len(UNIFIED_DIMENSIONS), LIKERT_MIN, dtype=float),
             ]
         )
         topsis_values, debug = topsis_score(
             decision_matrix=decision_matrix,
             weights=validated_weights,
             criteria_types=["benefit"] * len(UNIFIED_DIMENSIONS),
+            scale_min=LIKERT_MIN,
+            scale_max=LIKERT_MAX,
             return_debug=True,
         )
         overall_score = float(topsis_values[0])
@@ -278,8 +303,18 @@ def compute_scores(
             where=denom > 0.0,
         ) * validated_weights
     elif method_key in {"wsm", "ahp"}:
-        overall_score = float(wsm_score(score_vector, validated_weights))
-        scaled = (score_vector - 1.0) / 4.0
+        overall_score = float(
+            wsm_score(
+                score_vector,
+                validated_weights,
+                scale_min=LIKERT_MIN,
+                scale_max=LIKERT_MAX,
+            )
+        )
+        scaled = np.array(
+            [normalize_likert(value, LIKERT_MIN, LIKERT_MAX) for value in score_vector],
+            dtype=float,
+        )
         per_dimension_array = np.clip(scaled * validated_weights, 0.0, 1.0)
     else:
         raise ValueError(f"Unsupported scoring method '{method_key}'.")
@@ -304,8 +339,8 @@ if __name__ == "__main__":
     decision = np.vstack(
         [
             facial_recognition[0],
-            np.full(len(UNIFIED_DIMENSIONS), 5.0, dtype=float),
-            np.full(len(UNIFIED_DIMENSIONS), 1.0, dtype=float),
+            np.full(len(UNIFIED_DIMENSIONS), LIKERT_MAX, dtype=float),
+            np.full(len(UNIFIED_DIMENSIONS), LIKERT_MIN, dtype=float),
         ]
     )
 
@@ -313,6 +348,8 @@ if __name__ == "__main__":
         decision_matrix=decision,
         weights=developer_weights,
         criteria_types=criteria,
+        scale_min=LIKERT_MIN,
+        scale_max=LIKERT_MAX,
         return_debug=True,
     )
 

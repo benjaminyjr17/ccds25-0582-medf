@@ -74,12 +74,12 @@ def test_api_responses_never_emit_literal_undefined() -> None:
             "description": "Cosmetic regression test system",
             "context": {
                 "dimension_scores": {
-                    "transparency_explainability": 2,
+                    "transparency_explainability": 2.5,
                     "fairness_nondiscrimination": 1,
-                    "safety_robustness": 4,
+                    "safety_robustness": 5.5,
                     "privacy_data_governance": 1,
-                    "human_agency_oversight": 2,
-                    "accountability": 3,
+                    "human_agency_oversight": 2.5,
+                    "accountability": 4.0,
                 }
             },
         },
@@ -105,12 +105,12 @@ def test_api_responses_never_emit_literal_undefined() -> None:
             "description": "Cosmetic regression test system",
             "context": {
                 "dimension_scores": {
-                    "transparency_explainability": 2,
+                    "transparency_explainability": 2.5,
                     "fairness_nondiscrimination": 1,
-                    "safety_robustness": 4,
+                    "safety_robustness": 5.5,
                     "privacy_data_governance": 1,
-                    "human_agency_oversight": 2,
-                    "accountability": 3,
+                    "human_agency_oversight": 2.5,
+                    "accountability": 4.0,
                 }
             },
         },
@@ -125,12 +125,12 @@ def test_api_responses_never_emit_literal_undefined() -> None:
             "description": "Cosmetic regression test system",
             "context": {
                 "dimension_scores": {
-                    "transparency_explainability": 2,
+                    "transparency_explainability": 2.5,
                     "fairness_nondiscrimination": 1,
-                    "safety_robustness": 4,
+                    "safety_robustness": 5.5,
                     "privacy_data_governance": 1,
-                    "human_agency_oversight": 2,
-                    "accountability": 3,
+                    "human_agency_oversight": 2.5,
+                    "accountability": 4.0,
                 }
             },
         },

@@ -38,10 +38,13 @@ from app.models import (
     AISystemInput,
     ConflictReport,
     ErrorResponse,
+    LIKERT_MAX,
+    LIKERT_MIN,
     ParetoSolution,
     UNIFIED_DIMENSIONS,
 )
 from app.audit_log import write_audit_record
+from app.scoring_engine import normalize_likert, validate_likert
 
 router = APIRouter(prefix="/api", tags=["Pareto"])
 
@@ -78,17 +81,25 @@ def _extract_x_normalized_or_422(ai_system: AISystemInput) -> np.ndarray:
         except (TypeError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Invalid score for '{dimension}'.",
+                detail=(
+                    f"Invalid score for '{dimension}'. "
+                    f"Must be a number in [{LIKERT_MIN}, {LIKERT_MAX}]."
+                ),
             ) from exc
-        if score < 1.0 or score > 5.0:
+        try:
+            validate_likert(score, LIKERT_MIN, LIKERT_MAX)
+        except ValueError as exc:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Score for '{dimension}' must be between 1 and 5.",
-            )
+                detail=f"Score for '{dimension}' must be between {LIKERT_MIN} and {LIKERT_MAX}.",
+            ) from exc
         ordered_scores.append(score)
 
     likert = np.asarray(ordered_scores, dtype=float)
-    return np.clip((likert - 1.0) / 4.0, 0.0, 1.0)
+    return np.asarray(
+        [normalize_likert(score, LIKERT_MIN, LIKERT_MAX) for score in likert],
+        dtype=float,
+    )
 
 
 def _validate_weight_vector_or_422(raw_weights: dict[str, float], stakeholder_id: str) -> dict[str, float]:
@@ -275,10 +286,12 @@ class ParetoRequest(BaseModel):
                 raise ValueError(
                     f"Invalid ai_system.context.dimension_scores value for '{dimension}'."
                 ) from exc
-            if score < 1.0 or score > 5.0:
+            try:
+                validate_likert(score, LIKERT_MIN, LIKERT_MAX)
+            except ValueError as exc:
                 raise ValueError(
-                    f"ai_system.context.dimension_scores['{dimension}'] must be between 1 and 5."
-                )
+                    f"ai_system.context.dimension_scores['{dimension}'] must be between {LIKERT_MIN} and {LIKERT_MAX}."
+                ) from exc
 
         return self
 

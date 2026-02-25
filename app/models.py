@@ -44,7 +44,7 @@ DIMENSION_DISPLAY_NAMES: Dict[str, str] = {
 WEIGHT_MIN: float = 0.0
 WEIGHT_MAX: float = 1.0
 LIKERT_MIN: float = 1.0
-LIKERT_MAX: float = 5.0
+LIKERT_MAX: float = 7.0
 
 
 class CriteriaType(str, Enum):

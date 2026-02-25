@@ -20,12 +20,12 @@ def test_pareto_endpoint_returns_consensus_solutions() -> None:
             "description": "Law enforcement system",
             "context": {
                 "dimension_scores": {
-                    "transparency_explainability": 2,
+                    "transparency_explainability": 2.5,
                     "fairness_nondiscrimination": 1,
-                    "safety_robustness": 4,
+                    "safety_robustness": 5.5,
                     "privacy_data_governance": 1,
-                    "human_agency_oversight": 2,
-                    "accountability": 3,
+                    "human_agency_oversight": 2.5,
+                    "accountability": 4.0,
                 }
             },
         },
@@ -112,12 +112,12 @@ def test_pareto_deterministic_mode_repeatability() -> None:
             "description": "Law enforcement system",
             "context": {
                 "dimension_scores": {
-                    "transparency_explainability": 2,
+                    "transparency_explainability": 2.5,
                     "fairness_nondiscrimination": 1,
-                    "safety_robustness": 4,
+                    "safety_robustness": 5.5,
                     "privacy_data_governance": 1,
-                    "human_agency_oversight": 2,
-                    "accountability": 3,
+                    "human_agency_oversight": 2.5,
+                    "accountability": 4.0,
                 }
             },
         },

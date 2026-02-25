@@ -31,45 +31,68 @@ DIMENSION_DISPLAY_NAMES = {
     "accountability": "Accountability",
 }
 
-PRESET_BASELINE = {
-    "transparency_explainability": 2,
-    "fairness_nondiscrimination": 1,
-    "safety_robustness": 4,
-    "privacy_data_governance": 1,
-    "human_agency_oversight": 2,
-    "accountability": 3,
-}
+LIKERT_MIN = 1.0
+LIKERT_MAX = 7.0
 
-PRESET_FLIPPED = {
-    "transparency_explainability": 4,
-    "fairness_nondiscrimination": 5,
-    "safety_robustness": 1,
-    "privacy_data_governance": 5,
-    "human_agency_oversight": 5,
-    "accountability": 4,
-}
 
-PRESET_SAFETY_HEAVY = {
-    "transparency_explainability": 3,
-    "fairness_nondiscrimination": 3,
-    "safety_robustness": 5,
-    "privacy_data_governance": 3,
-    "human_agency_oversight": 3,
-    "accountability": 3,
-}
+def map_1_5_to_1_7(x: float) -> float:
+    return 1.0 + (float(x) - 1.0) * 1.5
+
+
+def _map_vector_1_5_to_1_7(vector: dict[str, float]) -> dict[str, float]:
+    return {
+        dimension: round(map_1_5_to_1_7(float(vector[dimension])), 1)
+        for dimension in UNIFIED_DIMENSIONS
+    }
+
+
+PRESET_BASELINE = _map_vector_1_5_to_1_7(
+    {
+        "transparency_explainability": 2,
+        "fairness_nondiscrimination": 1,
+        "safety_robustness": 4,
+        "privacy_data_governance": 1,
+        "human_agency_oversight": 2,
+        "accountability": 3,
+    }
+)
+
+PRESET_FLIPPED = _map_vector_1_5_to_1_7(
+    {
+        "transparency_explainability": 4,
+        "fairness_nondiscrimination": 5,
+        "safety_robustness": 1,
+        "privacy_data_governance": 5,
+        "human_agency_oversight": 5,
+        "accountability": 4,
+    }
+)
+
+PRESET_SAFETY_HEAVY = _map_vector_1_5_to_1_7(
+    {
+        "transparency_explainability": 3,
+        "fairness_nondiscrimination": 3,
+        "safety_robustness": 5,
+        "privacy_data_governance": 3,
+        "human_agency_oversight": 3,
+        "accountability": 3,
+    }
+)
 
 DEMO_SCENARIO_NAME = "Hiring Screening (Demo)"
 DEMO_SCENARIO_DESCRIPTION = (
     "Automated resume screening for job applicants using ML scoring."
 )
-DEMO_DIMENSION_SCORES = {
-    "transparency_explainability": 2,
-    "fairness_nondiscrimination": 1,
-    "safety_robustness": 4,
-    "privacy_data_governance": 1,
-    "human_agency_oversight": 2,
-    "accountability": 3,
-}
+DEMO_DIMENSION_SCORES = _map_vector_1_5_to_1_7(
+    {
+        "transparency_explainability": 2,
+        "fairness_nondiscrimination": 1,
+        "safety_robustness": 4,
+        "privacy_data_governance": 1,
+        "human_agency_oversight": 2,
+        "accountability": 3,
+    }
+)
 
 DEMO_WEIGHTS = {
     "developer": {
@@ -109,14 +132,16 @@ CASE_STUDIES = [
             "It is designed to expose structural disagreement between technical and affected-community priorities. "
             "Expected behavior: weights-only developer↔affected correlation is negative and Pareto tradeoffs are visible."
         ),
-        "dimension_scores": {
-            "transparency_explainability": 2,
-            "fairness_nondiscrimination": 1,
-            "safety_robustness": 4,
-            "privacy_data_governance": 1,
-            "human_agency_oversight": 2,
-            "accountability": 3,
-        },
+        "dimension_scores": _map_vector_1_5_to_1_7(
+            {
+                "transparency_explainability": 2,
+                "fairness_nondiscrimination": 1,
+                "safety_robustness": 4,
+                "privacy_data_governance": 1,
+                "human_agency_oversight": 2,
+                "accountability": 3,
+            }
+        ),
     },
     {
         "id": "hiring_recommendation",
@@ -126,14 +151,16 @@ CASE_STUDIES = [
             "Scores are balanced overall but emphasize human-agency controls and accountability. "
             "It is useful for examining whether stakeholder conflict remains moderate under less extreme inputs."
         ),
-        "dimension_scores": {
-            "transparency_explainability": 3,
-            "fairness_nondiscrimination": 2,
-            "safety_robustness": 3,
-            "privacy_data_governance": 3,
-            "human_agency_oversight": 4,
-            "accountability": 3,
-        },
+        "dimension_scores": _map_vector_1_5_to_1_7(
+            {
+                "transparency_explainability": 3,
+                "fairness_nondiscrimination": 2,
+                "safety_robustness": 3,
+                "privacy_data_governance": 3,
+                "human_agency_oversight": 4,
+                "accountability": 3,
+            }
+        ),
     },
     {
         "id": "healthcare_diagnostic",
@@ -143,14 +170,16 @@ CASE_STUDIES = [
             "Privacy and accountability remain high, reflecting regulated healthcare deployment constraints. "
             "It helps illustrate consensus behavior when risk tolerance is low and reliability is prioritized."
         ),
-        "dimension_scores": {
-            "transparency_explainability": 3,
-            "fairness_nondiscrimination": 3,
-            "safety_robustness": 5,
-            "privacy_data_governance": 4,
-            "human_agency_oversight": 3,
-            "accountability": 4,
-        },
+        "dimension_scores": _map_vector_1_5_to_1_7(
+            {
+                "transparency_explainability": 3,
+                "fairness_nondiscrimination": 3,
+                "safety_robustness": 5,
+                "privacy_data_governance": 4,
+                "human_agency_oversight": 3,
+                "accountability": 4,
+            }
+        ),
     },
 ]
 
@@ -338,9 +367,9 @@ def _risk_label(score: float) -> tuple[str, str]:
     return "CRITICAL", "red"
 
 
-def _apply_dimension_preset(preset: dict[str, int]) -> None:
+def _apply_dimension_preset(preset: dict[str, float]) -> None:
     for dimension, score in preset.items():
-        st.session_state[f"score_{dimension}"] = int(score)
+        st.session_state[f"score_{dimension}"] = float(score)
 
 
 class APICallError(Exception):
@@ -914,7 +943,7 @@ def main() -> None:
         ai_system_name = str(DEMO_SCENARIO_NAME)
         ai_system_description = str(DEMO_SCENARIO_DESCRIPTION)
         for dimension, value in DEMO_DIMENSION_SCORES.items():
-            st.session_state[f"score_{dimension}"] = int(value)
+            st.session_state[f"score_{dimension}"] = float(value)
     dimension_scores: dict[str, float] = {
         dimension: float(value)
         for dimension, value in PRESET_BASELINE.items()
@@ -928,29 +957,30 @@ def main() -> None:
             ai_system_description = st.text_area("AI system description", value=ai_system_description)
 
         with col_right:
-            st.subheader("Dimension Scores (Likert 1–5)")
+            st.subheader("Dimension Scores (Likert 1–7)")
             if page in {"Conflict Detection", "Pareto Resolution"}:
                 preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
-                if preset_col_1.button("Preset: Baseline (2,1,4,1,2,3)"):
+                if preset_col_1.button("Preset: Baseline (2.5,1.0,5.5,1.0,2.5,4.0)"):
                     _apply_dimension_preset(PRESET_BASELINE)
-                if preset_col_2.button("Preset: Flipped (4,5,1,5,5,4)"):
+                if preset_col_2.button("Preset: Flipped (5.5,7.0,1.0,7.0,7.0,5.5)"):
                     _apply_dimension_preset(PRESET_FLIPPED)
-                if preset_col_3.button("Preset: Safety-heavy (3,3,5,3,3,3)"):
+                if preset_col_3.button("Preset: Safety-heavy (4.0,4.0,7.0,4.0,4.0,4.0)"):
                     _apply_dimension_preset(PRESET_SAFETY_HEAVY)
 
             default_scores = PRESET_BASELINE
             for dimension in UNIFIED_DIMENSIONS:
                 session_key = f"score_{dimension}"
                 if session_key not in st.session_state:
-                    st.session_state[session_key] = int(default_scores[dimension])
+                    st.session_state[session_key] = float(default_scores[dimension])
             for dimension in UNIFIED_DIMENSIONS:
                 dimension_scores[dimension] = float(
                     st.slider(
                         DIMENSION_DISPLAY_NAMES[dimension],
-                        min_value=1,
-                        max_value=5,
-                        value=int(st.session_state[f"score_{dimension}"]),
-                        step=1,
+                        min_value=LIKERT_MIN,
+                        max_value=LIKERT_MAX,
+                        value=float(st.session_state[f"score_{dimension}"]),
+                        step=0.1,
+                        format="%.1f",
                         key=f"score_{dimension}",
                     )
                 )
@@ -1629,7 +1659,7 @@ def main() -> None:
                     st.caption(
                         "Input dimension scores: "
                         + ", ".join(
-                            f"{DIMENSION_DISPLAY_NAMES[dimension]}={int(case_scores[dimension])}"
+                            f"{DIMENSION_DISPLAY_NAMES[dimension]}={case_scores[dimension]:.1f}"
                             for dimension in UNIFIED_DIMENSIONS
                         )
                     )

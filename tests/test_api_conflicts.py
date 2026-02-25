@@ -19,12 +19,12 @@ def test_conflicts_endpoint_returns_pairwise_spearman_results() -> None:
             "description": "Stage 2 conflicts integration test system",
             "context": {
                 "dimension_scores": {
-                    "transparency_explainability": 2,
+                    "transparency_explainability": 2.5,
                     "fairness_nondiscrimination": 1,
-                    "safety_robustness": 4,
+                    "safety_robustness": 5.5,
                     "privacy_data_governance": 1,
-                    "human_agency_oversight": 2,
-                    "accountability": 3,
+                    "human_agency_oversight": 2.5,
+                    "accountability": 4.0,
                 }
             },
         },

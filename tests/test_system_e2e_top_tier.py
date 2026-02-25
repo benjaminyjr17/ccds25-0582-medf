@@ -18,18 +18,18 @@ DIMENSIONS = list(UNIFIED_DIMENSIONS)
 EPS = 1e-9
 
 S_BASE = {
-    "transparency_explainability": 2.0,
+    "transparency_explainability": 2.5,
     "fairness_nondiscrimination": 1.0,
-    "safety_robustness": 4.0,
+    "safety_robustness": 5.5,
     "privacy_data_governance": 1.0,
-    "human_agency_oversight": 2.0,
-    "accountability": 3.0,
+    "human_agency_oversight": 2.5,
+    "accountability": 4.0,
 }
-S_ALL_EQUAL = {dimension: 3.0 for dimension in DIMENSIONS}
+S_ALL_EQUAL = {dimension: 4.0 for dimension in DIMENSIONS}
 S_ONE_DOMINANT = {
     "transparency_explainability": 1.0,
     "fairness_nondiscrimination": 1.0,
-    "safety_robustness": 5.0,
+    "safety_robustness": 7.0,
     "privacy_data_governance": 1.0,
     "human_agency_oversight": 1.0,
     "accountability": 1.0,
@@ -37,11 +37,11 @@ S_ONE_DOMINANT = {
 S_ZERO_VECTOR = {dimension: 0.0 for dimension in DIMENSIONS}
 S_BOUNDARY = {
     "transparency_explainability": 1.0,
-    "fairness_nondiscrimination": 5.0,
+    "fairness_nondiscrimination": 7.0,
     "safety_robustness": 1.0,
-    "privacy_data_governance": 5.0,
+    "privacy_data_governance": 7.0,
     "human_agency_oversight": 1.0,
-    "accountability": 5.0,
+    "accountability": 7.0,
 }
 
 W_UNIFORM = {dimension: 1.0 / len(DIMENSIONS) for dimension in DIMENSIONS}
@@ -576,7 +576,7 @@ def test_invalid_dimension_scores_rejected_or_handled() -> None:
 
         for label, score_map in (
             ("zero_vector", S_ZERO_VECTOR),
-            ("out_of_range", {**S_BASE, "safety_robustness": 6.0}),
+            ("out_of_range", {**S_BASE, "safety_robustness": 8.0}),
             ("boundary", S_BOUNDARY),
         ):
             payload = _evaluate_payload(
