@@ -288,29 +288,79 @@ def _apply_dimension_preset(preset: dict[str, int]) -> None:
         st.session_state[f"score_{dimension}"] = int(score)
 
 
+class APICallError(Exception):
+    def __init__(self, error_text: str, data: Any = None):
+        super().__init__(error_text)
+        self.error_text = error_text
+        self.data = data
+
+
+def api_call(method: str, url: str, payload: Any = None, timeout: int = 30) -> tuple[bool, Any, str]:
+    try:
+        response = requests.request(
+            method=method.upper(),
+            url=url,
+            json=payload if payload is not None else None,
+            timeout=timeout,
+        )
+    except Exception as exc:
+        return False, None, f"Request failed: {exc}"
+
+    try:
+        data: Any = response.json()
+    except ValueError:
+        data = response.text
+
+    if response.status_code != 200:
+        detail = ""
+        if isinstance(data, dict):
+            raw_detail = data.get("detail")
+            if raw_detail is not None:
+                detail = str(raw_detail)
+        elif isinstance(data, str):
+            detail = data.strip()
+        detail_suffix = f" {detail}" if detail else ""
+        return (
+            False,
+            data,
+            f"{method.upper()} request failed with status {response.status_code}.{detail_suffix}".strip(),
+        )
+
+    return True, data, ""
+
+
+def _format_debug_payload(value: Any) -> str:
+    safe_value = _safe_json(value)
+    if isinstance(safe_value, (dict, list)):
+        return json.dumps(safe_value, indent=2, sort_keys=True)
+    return str(safe_value)
+
+
+def show_api_error(context: str, error_text: str, data: Any) -> None:
+    st.error(f"{context}: {error_text}")
+    if data is None:
+        return
+    with st.expander("API error details"):
+        st.code(_format_debug_payload(data), language="json")
+
+
 @st.cache_data(show_spinner=False, ttl=60)
 def load_frameworks(backend_url: str) -> list[dict[str, Any]]:
-    response = requests.get(f"{backend_url}/api/frameworks", timeout=15)
-    response.raise_for_status()
-    try:
-        payload = response.json()
-    except ValueError as exc:
-        raise ValueError("Invalid JSON received from /api/frameworks.") from exc
+    ok, payload, error_text = api_call("GET", f"{backend_url}/api/frameworks", timeout=15)
+    if not ok:
+        raise APICallError(error_text, payload)
     if not isinstance(payload, list):
-        raise ValueError("Unexpected /api/frameworks response shape.")
+        raise APICallError("Unexpected /api/frameworks response shape.", payload)
     return payload
 
 
 @st.cache_data(show_spinner=False, ttl=60)
 def load_stakeholders(backend_url: str) -> list[dict[str, Any]]:
-    response = requests.get(f"{backend_url}/api/stakeholders", timeout=15)
-    response.raise_for_status()
-    try:
-        payload = response.json()
-    except ValueError as exc:
-        raise ValueError("Invalid JSON received from /api/stakeholders.") from exc
+    ok, payload, error_text = api_call("GET", f"{backend_url}/api/stakeholders", timeout=15)
+    if not ok:
+        raise APICallError(error_text, payload)
     if not isinstance(payload, list):
-        raise ValueError("Unexpected /api/stakeholders response shape.")
+        raise APICallError("Unexpected /api/stakeholders response shape.", payload)
     return payload
 
 
@@ -552,6 +602,8 @@ def main() -> None:
             try:
                 frameworks = load_frameworks(backend_url)
                 stakeholders = load_stakeholders(backend_url)
+            except APICallError as exc:
+                show_api_error("Failed to load backend data", exc.error_text, exc.data)
             except Exception as exc:
                 st.error(f"Failed to load backend data: {exc}")
 
@@ -805,21 +857,16 @@ def main() -> None:
             }
 
             with st.spinner("Evaluating..."):
-                try:
-                    response = requests.post(
-                        f"{backend_url}/api/evaluate",
-                        json=payload,
-                        timeout=30,
-                    )
-                except Exception as exc:
-                    st.error(f"Request failed: {exc}")
-                    return
+                ok, result, error_text = api_call(
+                    "POST",
+                    f"{backend_url}/api/evaluate",
+                    payload=payload,
+                    timeout=30,
+                )
 
-            if response.status_code != 200:
-                st.error(response.text)
+            if not ok:
+                show_api_error("Evaluation failed", error_text, result)
                 return
-
-            result = response.json()
             _update_last_run_bundle(
                 page_name="Evaluate",
                 backend_url=backend_url,
@@ -917,21 +964,16 @@ def main() -> None:
             }
 
             with st.spinner("Detecting conflicts..."):
-                try:
-                    response = requests.post(
-                        f"{backend_url}/api/conflicts",
-                        json=payload,
-                        timeout=30,
-                    )
-                except Exception as exc:
-                    st.error(f"Request failed: {exc}")
-                    return
+                ok, result, error_text = api_call(
+                    "POST",
+                    f"{backend_url}/api/conflicts",
+                    payload=payload,
+                    timeout=30,
+                )
 
-            if response.status_code != 200:
-                st.error(response.text)
+            if not ok:
+                show_api_error("Conflict detection failed", error_text, result)
                 return
-
-            result = response.json()
             _update_last_run_bundle(
                 page_name="Conflict Detection",
                 backend_url=backend_url,
@@ -1124,21 +1166,16 @@ def main() -> None:
             }
 
             with st.spinner("Generating Pareto solutions..."):
-                try:
-                    response = requests.post(
-                        f"{backend_url}/api/pareto",
-                        json=payload,
-                        timeout=60,
-                    )
-                except Exception as exc:
-                    st.error(f"Request failed: {exc}")
-                    return
+                ok, result, error_text = api_call(
+                    "POST",
+                    f"{backend_url}/api/pareto",
+                    payload=payload,
+                    timeout=60,
+                )
 
-            if response.status_code != 200:
-                st.error(response.text)
+            if not ok:
+                show_api_error("Pareto generation failed", error_text, result)
                 return
-
-            result = response.json()
             bundle = _update_last_run_bundle(
                 page_name="Pareto Resolution",
                 backend_url=backend_url,
@@ -1443,6 +1480,7 @@ def main() -> None:
                 run_case_clicked = st.button("Run Case Study", key=f"run_case_{case_id}", type="primary")
 
                 if run_case_clicked:
+                    st.session_state.pop(case_result_key, None)
                     try:
                         if not framework_id:
                             st.error("Please select a framework in the sidebar before running a case study.")
@@ -1527,44 +1565,55 @@ def main() -> None:
                         }
 
                         with st.spinner("Running Evaluate → Conflicts → Pareto..."):
-                            try:
-                                evaluate_response = requests.post(
-                                    f"{backend_url}/api/evaluate",
-                                    json=evaluate_payload,
-                                    timeout=60,
+                            ok_eval, evaluate_data, evaluate_error = api_call(
+                                "POST",
+                                f"{backend_url}/api/evaluate",
+                                payload=evaluate_payload,
+                                timeout=60,
+                            )
+                            if not ok_eval:
+                                show_api_error(
+                                    f"Case Study '{case_name}' evaluation failed",
+                                    evaluate_error,
+                                    evaluate_data,
                                 )
-                                if evaluate_response.status_code != 200:
-                                    st.error(evaluate_response.text)
-                                    continue
+                                continue
 
-                                conflicts_response = requests.post(
-                                    f"{backend_url}/api/conflicts",
-                                    json=conflicts_payload,
-                                    timeout=60,
+                            ok_conflict, conflicts_data, conflicts_error = api_call(
+                                "POST",
+                                f"{backend_url}/api/conflicts",
+                                payload=conflicts_payload,
+                                timeout=60,
+                            )
+                            if not ok_conflict:
+                                show_api_error(
+                                    f"Case Study '{case_name}' conflict detection failed",
+                                    conflicts_error,
+                                    conflicts_data,
                                 )
-                                if conflicts_response.status_code != 200:
-                                    st.error(conflicts_response.text)
-                                    continue
+                                continue
 
-                                pareto_response = requests.post(
-                                    f"{backend_url}/api/pareto",
-                                    json=pareto_payload,
-                                    timeout=90,
+                            ok_pareto, pareto_data, pareto_error = api_call(
+                                "POST",
+                                f"{backend_url}/api/pareto",
+                                payload=pareto_payload,
+                                timeout=90,
+                            )
+                            if not ok_pareto:
+                                show_api_error(
+                                    f"Case Study '{case_name}' pareto generation failed",
+                                    pareto_error,
+                                    pareto_data,
                                 )
-                                if pareto_response.status_code != 200:
-                                    st.error(pareto_response.text)
-                                    continue
-                            except Exception as exc:
-                                st.error(f"Case API call failed: {exc}")
                                 continue
 
                         st.session_state[case_result_key] = {
                             "evaluate_payload": evaluate_payload,
                             "conflicts_payload": conflicts_payload,
                             "pareto_payload": pareto_payload,
-                            "evaluate_response": evaluate_response.json(),
-                            "conflicts_response": conflicts_response.json(),
-                            "pareto_response": pareto_response.json(),
+                            "evaluate_response": evaluate_data,
+                            "conflicts_response": conflicts_data,
+                            "pareto_response": pareto_data,
                         }
                         bundle = _update_last_run_bundle(
                             page_name="Case Studies",
@@ -1575,9 +1624,9 @@ def main() -> None:
                                 "pareto": pareto_payload,
                             },
                             responses_payloads={
-                                "evaluate": evaluate_response.json(),
-                                "conflicts": conflicts_response.json(),
-                                "pareto": pareto_response.json(),
+                                "evaluate": evaluate_data,
+                                "conflicts": conflicts_data,
+                                "pareto": pareto_data,
                             },
                             ui_context={
                                 "page": page,
@@ -1599,9 +1648,9 @@ def main() -> None:
                                     "pareto": pareto_payload,
                                 },
                                 "responses": {
-                                    "evaluate": evaluate_response.json(),
-                                    "conflicts": conflicts_response.json(),
-                                    "pareto": pareto_response.json(),
+                                    "evaluate": evaluate_data,
+                                    "conflicts": conflicts_data,
+                                    "pareto": pareto_data,
                                 },
                             },
                         )
