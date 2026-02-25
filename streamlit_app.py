@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import math
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -96,6 +97,8 @@ DEMO_WEIGHTS = {
         "accountability": 0.10,
     },
 }
+
+HARD_CAP_EVALS = 50_000
 
 CASE_STUDIES = [
     {
@@ -193,6 +196,15 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
 
 
 def inject_css(tokens: dict[str, str]) -> None:
+    css_path = Path(".streamlit") / "style.css"
+    if css_path.exists():
+        try:
+            css_content = css_path.read_text(encoding="utf-8")
+            st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
+            return
+        except Exception:
+            pass
+
     st.markdown(
         f"""
 <style>
@@ -252,38 +264,41 @@ button[kind="secondary"] {{
 
 def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
     axis_style = dict(
-        gridcolor=tokens["plot_grid"],
-        tickfont=dict(color=tokens["plot_text"]),
-        titlefont=dict(color=tokens["plot_text"]),
-        linecolor=tokens["plot_axis"],
-        zerolinecolor=tokens["plot_axis"],
+        gridcolor="#d0d7de",
+        tickfont=dict(color="#111111"),
+        titlefont=dict(color="#111111"),
+        linecolor="#b0b7c3",
+        zerolinecolor="#b0b7c3",
+        showline=True,
     )
 
     fig.update_layout(
-        font=dict(color=tokens["plot_text"], size=14),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        template="plotly_white",
+        font=dict(color="black", size=14),
+        font_color="black",
+        paper_bgcolor="white",
+        plot_bgcolor="white",
         margin=dict(l=40, r=40, t=60, b=40),
-        title=dict(font=dict(color=tokens["plot_text"])),
+        title=dict(font=dict(color="black")),
     )
 
     if hasattr(fig.layout, "polar"):
         fig.update_layout(
             polar=dict(
-                bgcolor="rgba(0,0,0,0)",
+                bgcolor="white",
                 radialaxis=dict(
-                    gridcolor=tokens["plot_grid"],
-                    linecolor=tokens["plot_axis"],
-                    tickfont=dict(color=tokens["plot_text"]),
-                    tickcolor=tokens["plot_axis"],
+                    gridcolor="#d0d7de",
+                    linecolor="#b0b7c3",
+                    tickfont=dict(color="black"),
+                    tickcolor="#b0b7c3",
                     range=[0, 1],
                     showline=True,
                 ),
                 angularaxis=dict(
-                    gridcolor=tokens["plot_grid"],
-                    linecolor=tokens["plot_axis"],
-                    tickfont=dict(color=tokens["plot_text"]),
-                    tickcolor=tokens["plot_axis"],
+                    gridcolor="#d0d7de",
+                    linecolor="#b0b7c3",
+                    tickfont=dict(color="black"),
+                    tickcolor="#b0b7c3",
                     showline=True,
                 ),
             )
@@ -299,16 +314,16 @@ def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
         if isinstance(trace, go.Heatmap):
             if trace.colorbar is None:
                 trace.colorbar = {}
-            trace.colorbar.tickfont = dict(color=tokens["plot_text"])
+            trace.colorbar.tickfont = dict(color="black")
             if trace.colorbar.title is None:
                 trace.colorbar.title = {}
-            trace.colorbar.title.font = dict(color=tokens["plot_text"])
+            trace.colorbar.title.font = dict(color="black")
         if isinstance(trace, go.Parcoords) and getattr(trace, "line", None) is not None:
             colorbar = getattr(trace.line, "colorbar", None)
             if colorbar is not None:
-                colorbar.tickfont = dict(color=tokens["plot_text"])
+                colorbar.tickfont = dict(color="black")
                 if colorbar.title is not None:
-                    colorbar.title.font = dict(color=tokens["plot_text"])
+                    colorbar.title.font = dict(color="black")
 
     return fig
 
@@ -427,20 +442,20 @@ def render_if_present(label: str, value: Any) -> None:
 
 def fmt_score(x: Any) -> str:
     if x is None:
-        return "—"
+        return "N/A"
     try:
         return f"{float(x):.4f}"
     except (TypeError, ValueError):
-        return "—"
+        return "N/A"
 
 
 def fmt_small(x: Any) -> str:
     if x is None:
-        return "—"
+        return "N/A"
     try:
         return f"{float(x):.3f}"
     except (TypeError, ValueError):
-        return "—"
+        return "N/A"
 
 
 def _extract_framework_weighting_mode(notes: Any) -> str | None:
@@ -692,6 +707,7 @@ def main() -> None:
 
     with st.sidebar:
         st.header("Configuration")
+        st.markdown("**Backend URL**")
         backend_url = st.text_input("Backend URL", value="http://127.0.0.1:8000").rstrip("/")
 
         frameworks: list[dict[str, Any]] = []
@@ -718,6 +734,7 @@ def main() -> None:
         pareto_n_solutions = 8
         pareto_pop_size = 40
         pareto_n_gen = 80
+        pareto_n_gen_effective = pareto_n_gen
         generate_pareto_clicked = False
         case_screenshot_mode = False
 
@@ -753,7 +770,7 @@ def main() -> None:
         }
 
         if page == "Evaluate":
-            st.markdown("**Scoring Method**")
+            st.markdown("**Method**")
             scoring_method = st.radio("Scoring method", ["topsis", "wsm"], horizontal=True)
 
             st.markdown("**Stakeholders**")
@@ -829,7 +846,7 @@ def main() -> None:
                 ]
             else:
                 st.warning("No stakeholders available from backend.")
-            st.markdown("**Scoring Method**")
+            st.markdown("**Method**")
             conflict_metric = st.radio(
                 "Conflict metric",
                 ["Weights-only (priority conflict)", "Contrib-based (system-salience conflict)"],
@@ -863,9 +880,18 @@ def main() -> None:
                 st.warning("No stakeholders available from backend.")
 
             st.markdown("**Search Parameters**")
-            pareto_n_solutions = st.slider("n_solutions", min_value=1, max_value=20, value=8, step=1)
-            pareto_pop_size = st.slider("pop_size", min_value=16, max_value=128, value=40, step=8)
-            pareto_n_gen = st.slider("n_gen", min_value=20, max_value=200, value=80, step=10)
+            pareto_n_solutions = st.slider("n_solutions", min_value=1, max_value=42, value=8, step=1)
+            pareto_pop_size = st.slider("pop_size", min_value=20, max_value=200, value=40, step=10)
+            pareto_n_gen = st.slider("n_gen", min_value=0, max_value=500, value=150, step=10)
+
+            approx_evals = pareto_pop_size * (max(pareto_n_gen, 1) + 1)
+            pareto_n_gen_effective = pareto_n_gen
+            if approx_evals > HARD_CAP_EVALS:
+                pareto_n_gen_effective = max(0, math.floor(HARD_CAP_EVALS / pareto_pop_size) - 1)
+                st.warning("The selected search size is large; n_gen will be capped to keep the demo responsive.")
+                st.caption(
+                    f"Note: n_gen was capped to {pareto_n_gen_effective} to keep the demo responsive."
+                )
 
             if len(pareto_stakeholder_ids) < 2:
                 st.warning("Select at least 2 stakeholders to enable Pareto generation.")
@@ -1277,7 +1303,7 @@ def main() -> None:
                 "stakeholder_ids": pareto_stakeholder_ids,
                 "n_solutions": pareto_n_solutions,
                 "pop_size": pareto_pop_size,
-                "n_gen": pareto_n_gen,
+                "n_gen": pareto_n_gen_effective,
             }
 
             with st.spinner("Generating Pareto solutions..."):
@@ -1287,6 +1313,22 @@ def main() -> None:
                     payload=payload,
                     timeout=60,
                 )
+
+            if (
+                not ok
+                and payload.get("n_gen") == 0
+                and "status 422" in error_text.lower()
+            ):
+                st.caption("Note: n_gen=0 is not supported by the backend, so it was adjusted to 1.")
+                payload = dict(payload)
+                payload["n_gen"] = 1
+                with st.spinner("Retrying Pareto generation with n_gen=1..."):
+                    ok, result, error_text = api_call(
+                        "POST",
+                        f"{backend_url}/api/pareto",
+                        payload=payload,
+                        timeout=60,
+                    )
 
             if not ok:
                 show_api_error("Pareto generation failed", error_text, result)
@@ -1302,7 +1344,7 @@ def main() -> None:
                     "stakeholder_ids": pareto_stakeholder_ids,
                     "n_solutions": pareto_n_solutions,
                     "pop_size": pareto_pop_size,
-                    "n_gen": pareto_n_gen,
+                    "n_gen": payload.get("n_gen", pareto_n_gen_effective),
                 },
             )
             _write_ui_run_log(
@@ -1782,7 +1824,7 @@ def main() -> None:
                 pareto_result = case_result.get("pareto_response", {})
 
                 st.divider()
-                st.markdown("### Section A — Evaluation Result")
+                st.markdown("### Section A: Evaluation Result")
                 overall_score = float(evaluate_result.get("overall_score", 0.0))
                 st.metric("Overall Score", fmt_score(overall_score))
 
@@ -1811,7 +1853,7 @@ def main() -> None:
                     st.warning("No evaluation framework scores returned.")
 
                 st.divider()
-                st.markdown("### Section B — Conflict Analysis")
+                st.markdown("### Section B: Conflict Analysis")
                 conflict_metadata = conflicts_result.get("metadata", {}) if isinstance(conflicts_result, dict) else {}
                 matrix_weights = (
                     conflict_metadata.get("correlation_matrix_weights")
@@ -1876,7 +1918,7 @@ def main() -> None:
                 rho_col_2.metric("dev↔affected contrib rho", rho_contrib)
 
                 st.divider()
-                st.markdown("### Section C — Pareto Resolution")
+                st.markdown("### Section C: Pareto Resolution")
                 pareto_solutions = pareto_result.get("pareto_solutions", []) if isinstance(pareto_result, dict) else []
                 pareto_metadata = pareto_result.get("metadata", {}) if isinstance(pareto_result, dict) else {}
                 ablation_utilities = (
@@ -1989,7 +2031,7 @@ def main() -> None:
                     st.warning("No Pareto solutions were returned.")
 
                 st.divider()
-                st.markdown("### Section D — Export JSON")
+                st.markdown("### Section D: Export JSON")
                 export_clicked = st.button("Export Case JSON", key=f"export_case_{case_id}")
                 if export_clicked:
                     st.session_state[case_export_key] = True
@@ -2286,14 +2328,14 @@ def main() -> None:
             sample_table = [
                 {
                     "solution_id": item["solution_id"],
-                    "rank": item["rank"] if item["rank"] > 0 else "—",
+                    "rank": item["rank"] if item["rank"] > 0 else "N/A",
                     "total_distance": fmt_score(item["total_distance"]),
                 }
                 for item in sample_rows[:3]
             ]
             st.dataframe(sample_table, width="stretch", hide_index=True)
 
-    st.caption("MEDF v1.0 — Feature Frozen Build • Reproducible Artifact")
+    st.caption("MEDF v1.0: Feature Frozen Build • Reproducible Artifact")
 
 
 if __name__ == "__main__":
