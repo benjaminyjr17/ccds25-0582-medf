@@ -335,6 +335,33 @@ def render_if_present(label: str, value: Any) -> None:
         st.caption(text)
 
 
+def fmt_score(x: Any) -> str:
+    if x is None:
+        return "—"
+    try:
+        return f"{float(x):.4f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
+def fmt_small(x: Any) -> str:
+    if x is None:
+        return "—"
+    try:
+        return f"{float(x):.3f}"
+    except (TypeError, ValueError):
+        return "—"
+
+
+def _extract_framework_weighting_mode(notes: Any) -> str | None:
+    if not isinstance(notes, str):
+        return None
+    marker = "framework_weighting="
+    if marker not in notes:
+        return None
+    return notes.split(marker, 1)[1].strip().split()[0]
+
+
 def _extract_run_id_from_responses(responses: dict[str, Any]) -> str:
     for response in responses.values():
         if not isinstance(response, dict):
@@ -550,6 +577,7 @@ def main() -> None:
             if isinstance(item, dict)
         }
         if framework_options:
+            st.markdown("**Framework**")
             framework_label = st.selectbox("Framework", list(framework_options.keys()))
             framework_id = str(framework_options[framework_label].get("id", ""))
         else:
@@ -571,10 +599,10 @@ def main() -> None:
         }
 
         if page == "Evaluate":
-            st.markdown("**Method**")
+            st.markdown("**Scoring Method**")
             scoring_method = st.radio("Scoring method", ["topsis", "wsm"], horizontal=True)
 
-            st.markdown("**Stakeholder**")
+            st.markdown("**Stakeholders**")
             if stakeholder_options:
                 stakeholder_label = st.selectbox("Stakeholder", list(stakeholder_options.keys()))
                 selected_stakeholder = stakeholder_options[stakeholder_label]
@@ -647,7 +675,7 @@ def main() -> None:
                 ]
             else:
                 st.warning("No stakeholders available from backend.")
-            st.markdown("**Method**")
+            st.markdown("**Scoring Method**")
             conflict_metric = st.radio(
                 "Conflict metric",
                 ["Weights-only (priority conflict)", "Contrib-based (system-salience conflict)"],
@@ -810,13 +838,17 @@ def main() -> None:
             st.subheader("Results")
             metric_col, label_col = st.columns([1, 2])
             with metric_col:
-                st.metric("Overall Score", f"{overall_score:.4f}")
+                st.metric("Overall Score", fmt_score(overall_score))
             with label_col:
                 st.markdown(
                     f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Risk: {label}</span>",
                     unsafe_allow_html=True,
                 )
-            render_if_present("", result.get("notes"))
+            render_if_present("Framework", framework_id)
+            render_if_present("Stakeholders", stakeholder_id)
+            render_if_present("Scoring Method", scoring_method.upper())
+            framework_weighting_mode = _extract_framework_weighting_mode(result.get("notes"))
+            render_if_present("Framework Weighting Mode", framework_weighting_mode)
 
             framework_scores = result.get("framework_scores", [])
             if not framework_scores:
@@ -858,7 +890,7 @@ def main() -> None:
                 table_rows.append(
                     {
                         "framework_id": row_framework_id,
-                        "score": round(row_score, 4),
+                        "score": fmt_score(row_score),
                         "risk_level": row_risk,
                     }
                 )
@@ -942,14 +974,14 @@ def main() -> None:
                     .get("affected_community")
                 )
                 if isinstance(rho_weights_raw, (int, float)):
-                    rho_weights_dev_affected = f"{float(rho_weights_raw):.4f}"
+                    rho_weights_dev_affected = fmt_score(rho_weights_raw)
             if isinstance(correlation_matrix_contrib, dict):
                 rho_contrib_raw = (
                     correlation_matrix_contrib.get("developer", {})
                     .get("affected_community")
                 )
                 if isinstance(rho_contrib_raw, (int, float)):
-                    rho_contrib_dev_affected = f"{float(rho_contrib_raw):.4f}"
+                    rho_contrib_dev_affected = fmt_score(rho_contrib_raw)
 
             demo_box = st.container(border=True)
             with demo_box:
@@ -1009,7 +1041,7 @@ def main() -> None:
                     row = {
                         "stakeholder_a_id": conflict.get("stakeholder_a_id"),
                         "stakeholder_b_id": conflict.get("stakeholder_b_id"),
-                        "spearman_rho": round(float(conflict.get("spearman_rho", 0.0)), 4),
+                        "spearman_rho": fmt_score(conflict.get("spearman_rho")),
                         "conflict_level": conflict.get("conflict_level"),
                         "conflicting_dimensions": conflict.get("conflicting_dimensions", []),
                     }
@@ -1018,11 +1050,7 @@ def main() -> None:
                         stakeholder_b = str(conflict.get("stakeholder_b_id", ""))
                         pair_key = "|".join(sorted((stakeholder_a, stakeholder_b)))
                         rho_weights = pairwise_rho_weights.get(pair_key)
-                        row["rho_weights"] = (
-                            round(float(rho_weights), 4)
-                            if rho_weights is not None
-                            else None
-                        )
+                        row["rho_weights"] = fmt_score(rho_weights)
                     rows.append(row)
                 st.dataframe(rows, width="stretch", hide_index=True)
             else:
@@ -1048,7 +1076,7 @@ def main() -> None:
                     for row in labels
                 ]
                 z_text = [
-                    [f"{value:.2f}" for value in row]
+                    [fmt_small(value) for value in row]
                     for row in z_values
                 ]
 
@@ -1194,11 +1222,11 @@ def main() -> None:
                 row: dict[str, Any] = {
                     "rank": rank,
                     "solution_id": solution_id,
-                    "total_distance": round(total_distance, 4),
-                    "utility_wsm": round(utility_wsm, 4) if utility_wsm is not None else None,
+                    "total_distance": fmt_score(total_distance),
+                    "utility_wsm": fmt_score(utility_wsm),
                 }
                 for stakeholder_id in stakeholder_ids:
-                    row[stakeholder_id] = round(float(objective_scores.get(stakeholder_id, 0.0)), 4)
+                    row[stakeholder_id] = fmt_score(objective_scores.get(stakeholder_id))
                 table_rows.append(row)
                 parsed_solutions.append(
                     {
@@ -1239,16 +1267,14 @@ def main() -> None:
                     selected_objectives.items(), key=lambda item: float(item[1])
                 )[0]
 
-            utility_text = "N/A"
-            if isinstance(selected_utility, float):
-                utility_text = f"{selected_utility:.4f}"
+            utility_text = fmt_score(selected_utility)
 
             st.info(
                 "\n".join(
                     [
                         "**Resolution Summary**",
                         f"- Rank: {selected_rank}",
-                        f"- Total distance: {selected_total_distance:.4f}",
+                        f"- Total distance: {fmt_score(selected_total_distance)}",
                         f"- Utility (WSM ablation): {utility_text}",
                         f"- Top-1 consensus dimension: {top_dimension}",
                         f"- Highest stakeholder distance: {highest_distance_stakeholder}",
@@ -1594,7 +1620,7 @@ def main() -> None:
                 st.divider()
                 st.markdown("### Section A — Evaluation Result")
                 overall_score = float(evaluate_result.get("overall_score", 0.0))
-                st.metric("Overall Score", f"{overall_score:.4f}")
+                st.metric("Overall Score", fmt_score(overall_score))
 
                 framework_scores = evaluate_result.get("framework_scores", [])
                 if isinstance(framework_scores, list) and framework_scores:
@@ -1675,11 +1701,11 @@ def main() -> None:
                 if isinstance(matrix_weights, dict):
                     rho_value = matrix_weights.get("developer", {}).get("affected_community")
                     if isinstance(rho_value, (int, float)):
-                        rho_weights = f"{float(rho_value):.4f}"
+                        rho_weights = fmt_score(rho_value)
                 if isinstance(matrix_contrib, dict):
                     rho_value = matrix_contrib.get("developer", {}).get("affected_community")
                     if isinstance(rho_value, (int, float)):
-                        rho_contrib = f"{float(rho_value):.4f}"
+                        rho_contrib = fmt_score(rho_value)
 
                 rho_col_1, rho_col_2 = st.columns(2)
                 rho_col_1.metric("dev↔affected weights rho", rho_weights)
@@ -1726,11 +1752,11 @@ def main() -> None:
                     row: dict[str, Any] = {
                         "rank": rank,
                         "solution_id": solution_id,
-                        "total_distance": round(total_distance, 4),
-                        "utility_wsm": round(utility_value, 4) if utility_value is not None else None,
+                        "total_distance": fmt_score(total_distance),
+                        "utility_wsm": fmt_score(utility_value),
                     }
                     for stakeholder_id in case_stakeholder_ids:
-                        row[stakeholder_id] = round(float(objective_scores.get(stakeholder_id, 0.0)), 4)
+                        row[stakeholder_id] = fmt_score(objective_scores.get(stakeholder_id))
 
                     consensus_raw = solution.get("weights", {}).get("consensus", {})
                     consensus_weights = (
