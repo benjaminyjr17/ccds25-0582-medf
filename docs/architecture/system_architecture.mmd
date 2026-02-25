@@ -1,0 +1,68 @@
+flowchart LR
+
+  subgraph UI["UI Layer"]
+    USER["User / Examiner"]
+    ST["Streamlit UI<br/>(localhost:8501)"]
+    USER --> ST
+  end
+
+  subgraph API["API Layer"]
+    FA["FastAPI Backend<br/>(Uvicorn, localhost:8000)"]
+    RFW["Router: /api/frameworks"]
+    RST["Router: /api/stakeholders"]
+    REV["Router: /api/evaluate"]
+    RCF["Router: /api/conflicts"]
+    RPR["Router: /api/pareto"]
+
+    RFW --> FA
+    RST --> FA
+    REV --> FA
+    RCF --> FA
+    RPR --> FA
+  end
+
+  subgraph ENG["Core Engines"]
+    FW["Framework Weighting<br/>(section/coverage-derived prior wf)"]
+    SW["Stakeholder Weighting (ws)<br/>+ Product Pooling<br/>(w_eff ∝ ws × wf)"]
+    SE["Scoring Engine<br/>(TOPSIS, WSM)"]
+    CE["Conflict Engine<br/>(weights-only, contribution-based, Spearman)"]
+    PE["Pareto Engine<br/>(non-dominated frontier)"]
+
+    FW --> SW
+    SW --> SE
+  end
+
+  subgraph DATA["Data / Config"]
+    YAML["Framework YAML Registry<br/>(eu_altai.yaml, nist_ai_rmf.yaml, sg_mgaf.yaml)"]
+    DB["SQLite DB (stakeholders, profiles)<br/>(optional persistence)"]
+    LOG["Audit / Logs (optional)"]
+  end
+
+  subgraph TEST["Testing & Quality"]
+    PYT["Pytest E2E + Edge Case Suite<br/>(31 tests)"]
+    CI["GitHub Actions CI"]
+    CI --> PYT
+  end
+
+  ST -->|"GET /api/frameworks"| RFW
+  ST -->|"GET /api/stakeholders"| RST
+  ST -->|"POST /api/evaluate"| REV
+  ST -->|"POST /api/conflicts"| RCF
+  ST -->|"POST /api/pareto"| RPR
+
+  REV --> FW
+  REV --> SW
+  REV --> SE
+
+  RCF --> CE
+  RPR --> PE
+
+  FA -->|"load at startup / registry"| YAML
+  FA -->|"read stakeholder weights / profiles"| DB
+  FA -.->|"JSONL records"| LOG
+
+  PYT -.->|"TestClient / endpoint assertions"| RFW
+  PYT -.->|"TestClient / endpoint assertions"| RST
+  PYT -.->|"TestClient / endpoint assertions"| REV
+  PYT -.->|"TestClient / endpoint assertions"| RCF
+  PYT -.->|"TestClient / endpoint assertions"| RPR
