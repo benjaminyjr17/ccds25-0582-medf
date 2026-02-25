@@ -582,6 +582,74 @@ def main() -> None:
     tokens = _ui_tokens(_get_theme_base())
     inject_css(tokens)
     st.title("MEDF Dashboard")
+    with st.expander("About Methodology"):
+        st.markdown(
+            """
+### 1. Framework-Derived Weighting
+
+Each ethical framework (EU ALTAI, NIST AI RMF, Singapore Model AI Governance Framework) is mapped into a unified six-dimension ontology:
+
+- Transparency & Explainability  
+- Fairness & Non-Discrimination  
+- Safety & Robustness  
+- Privacy & Data Governance  
+- Human Agency & Oversight  
+- Accountability  
+
+Framework weights are derived from the framework’s internal structure (e.g., number of requirements, subcategories, or principles mapped to each dimension).  
+This creates a **framework prior** that reflects normative emphasis.
+
+---
+
+### 2. Stakeholder Preference Modeling
+
+Each stakeholder is assigned a weight vector over the six dimensions.
+
+Effective weights are computed using product pooling:
+
+w_eff ∝ w_stakeholder × w_framework
+
+The result is normalized to sum to 1.
+
+This ensures:
+- Stakeholder preferences remain primary
+- Framework emphasis acts as a normative lens
+- Weighting is transparent and reproducible
+
+---
+
+### 3. Scoring Methods
+
+Two multi-criteria methods are supported:
+
+- **TOPSIS** (Technique for Order Preference by Similarity to Ideal Solution)
+- **Weighted Sum Model (WSM)**
+
+Both operate over the unified dimension vector.
+
+---
+
+### 4. Conflict Detection
+
+Two conflict modes are implemented:
+
+• **Weights-only conflict**
+  Measures disagreement in stakeholder priorities.
+
+• **Contribution-based conflict**
+  Measures disagreement after adjusting for system performance:
+  contribution_i = normalized_score_i × stakeholder_weight_i
+
+Spearman rank correlation is used to detect divergence.
+
+---
+
+### 5. Pareto Frontier
+
+Multi-stakeholder trade-offs are analyzed using Pareto dominance.
+Only non-dominated solutions are retained.
+"""
+        )
 
     page = st.radio(
         "Page",
