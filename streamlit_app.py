@@ -36,6 +36,7 @@ DIMENSION_DISPLAY_NAMES = {
 
 LIKERT_MIN = 1.0
 LIKERT_MAX = 7.0
+UNICODE_MINUS = "\u2212"
 
 
 def _flip_likert_profile(profile: dict[str, float]) -> dict[str, float]:
@@ -186,7 +187,7 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
             "border": "rgba(255,255,255,0.10)",
             "primary": BRAND_BLUE_HEX,
             "primary_hover": "#1E40AF",
-            "plot_text": "#e5e7eb",
+            "plot_text": "#f8fafc",
             "plot_grid": "rgba(255,255,255,0.18)",
             "plot_axis": "rgba(255,255,255,0.30)",
         }
@@ -272,12 +273,18 @@ button[kind="secondary"] {{
 
 
 def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
+    plot_text = tokens.get("plot_text", "#111827")
+    plot_grid = tokens.get("plot_grid", "rgba(17,24,39,0.12)")
+    plot_axis = tokens.get("plot_axis", "rgba(17,24,39,0.22)")
+    is_dark_theme = _get_theme_base() == "dark"
+    canvas_bg = tokens["panel_bg"] if is_dark_theme else "white"
+
     axis_style = dict(
-        gridcolor="#d0d7de",
-        tickfont=dict(color="#111111"),
-        titlefont=dict(color="#111111"),
-        linecolor="#b0b7c3",
-        zerolinecolor="#b0b7c3",
+        gridcolor=plot_grid,
+        tickfont=dict(color=plot_text),
+        titlefont=dict(color=plot_text),
+        linecolor=plot_axis,
+        zerolinecolor=plot_axis,
         showline=True,
     )
 
@@ -286,31 +293,36 @@ def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
 
     fig.update_layout(
         template="plotly_white",
-        font=dict(color="black", size=14),
-        font_color="black",
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        margin=dict(l=40, r=40, t=60, b=40),
-        title_text=title_text,
+        font=dict(color=plot_text, size=14),
+        font_color=plot_text,
+        paper_bgcolor=canvas_bg,
+        plot_bgcolor=canvas_bg,
+        margin=dict(l=40, r=40, t=84, b=48),
+        title=dict(
+            text=title_text,
+            font=dict(color=plot_text),
+            y=0.98,
+            yanchor="top",
+        ),
     )
 
     if hasattr(fig.layout, "polar"):
         fig.update_layout(
             polar=dict(
-                bgcolor="white",
+                bgcolor=canvas_bg,
                 radialaxis=dict(
-                    gridcolor="#d0d7de",
-                    linecolor="#b0b7c3",
-                    tickfont=dict(color="black"),
-                    tickcolor="#b0b7c3",
+                    gridcolor=plot_grid,
+                    linecolor=plot_axis,
+                    tickfont=dict(color=plot_text),
+                    tickcolor=plot_axis,
                     range=[0, 1],
                     showline=True,
                 ),
                 angularaxis=dict(
-                    gridcolor="#d0d7de",
-                    linecolor="#b0b7c3",
-                    tickfont=dict(color="black"),
-                    tickcolor="#b0b7c3",
+                    gridcolor=plot_grid,
+                    linecolor=plot_axis,
+                    tickfont=dict(color=plot_text),
+                    tickcolor=plot_axis,
                     showline=True,
                 ),
             )
@@ -321,21 +333,26 @@ def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
             xaxis=axis_style,
             yaxis=axis_style,
         )
+        fig.update_xaxes(title_standoff=12)
+        fig.update_yaxes(title_standoff=14)
 
     for trace in fig.data:
         if isinstance(trace, go.Heatmap):
             if trace.colorbar is None:
                 trace.colorbar = {}
-            trace.colorbar.tickfont = dict(color="black")
+            trace.colorbar.tickfont = dict(color=plot_text)
             if trace.colorbar.title is None:
                 trace.colorbar.title = {}
-            trace.colorbar.title.font = dict(color="black")
-        if isinstance(trace, go.Parcoords) and getattr(trace, "line", None) is not None:
-            colorbar = getattr(trace.line, "colorbar", None)
-            if colorbar is not None:
-                colorbar.tickfont = dict(color="black")
-                if colorbar.title is not None:
-                    colorbar.title.font = dict(color="black")
+            trace.colorbar.title.font = dict(color=plot_text)
+        if isinstance(trace, go.Parcoords):
+            trace.labelfont = dict(color=plot_text, size=12)
+            trace.tickfont = dict(color=plot_text, size=11)
+            if getattr(trace, "line", None) is not None:
+                colorbar = getattr(trace.line, "colorbar", None)
+                if colorbar is not None:
+                    colorbar.tickfont = dict(color=plot_text)
+                    if colorbar.title is not None:
+                        colorbar.title.font = dict(color=plot_text)
 
     return fig
 
@@ -442,6 +459,10 @@ def safe_str(x: Any) -> str:
     return "" if x is None else str(x)
 
 
+def fmt_minus(text: str) -> str:
+    return str(text).replace("–", UNICODE_MINUS).replace("-", UNICODE_MINUS)
+
+
 def render_if_present(label: str, value: Any) -> None:
     text = safe_str(value).strip()
     if not text or text.lower() == "undefined":
@@ -457,7 +478,7 @@ def fmt_score(x: Any) -> str:
     if x is None:
         return "N/A"
     try:
-        return f"{float(x):.4f}"
+        return fmt_minus(f"{float(x):.4f}")
     except (TypeError, ValueError):
         return "N/A"
 
@@ -466,7 +487,7 @@ def fmt_small(x: Any) -> str:
     if x is None:
         return "N/A"
     try:
-        return f"{float(x):.3f}"
+        return fmt_minus(f"{float(x):.3f}")
     except (TypeError, ValueError):
         return "N/A"
 
@@ -628,7 +649,7 @@ def _build_correlation_heatmap(
         [float(matrix.get(row, {}).get(col, 0.0)) for col in labels]
         for row in labels
     ]
-    z_text = [[f"{value:.2f}" for value in row] for row in z_values]
+    z_text = [[fmt_minus(f"{value:.2f}") for value in row] for row in z_values]
 
     figure = go.Figure(
         data=go.Heatmap(
@@ -1663,9 +1684,16 @@ def main() -> None:
                     dimensions=dimension_specs,
                 )
             )
+            parallel_figure.update_traces(domain={"y": [0.0, 0.86]})
             parallel_figure.update_layout(
-                title="Stakeholder Distance Tradeoffs",
-                margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                title={
+                    "text": "Stakeholder Distance Tradeoffs",
+                    "y": 0.99,
+                    "yanchor": "top",
+                    "x": 0.01,
+                    "xanchor": "left",
+                },
+                margin={"l": 40, "r": 40, "t": 130, "b": 48},
             )
             st.plotly_chart(
                 style_plotly(parallel_figure, tokens),
