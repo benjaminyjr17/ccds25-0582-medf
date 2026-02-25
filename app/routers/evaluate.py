@@ -196,6 +196,27 @@ def evaluate(
             )
 
         criteria_types = _ordered_criteria_types(framework.id, framework.dimensions)
+        framework_weight_defaults = {
+            dimension.name: float(dimension.weight_default)
+            for dimension in framework.dimensions
+        }
+        missing_framework_weights = [
+            dimension
+            for dimension in UNIFIED_DIMENSIONS
+            if dimension not in framework_weight_defaults
+        ]
+        if missing_framework_weights:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(
+                    f"Framework '{framework.id}' is missing default weights for dimensions: "
+                    + ", ".join(missing_framework_weights)
+                ),
+            )
+        framework_weight_vector = np.array(
+            [framework_weight_defaults[dimension] for dimension in UNIFIED_DIMENSIONS],
+            dtype=float,
+        )
 
         stakeholder_results: list[float] = []
         aggregated_dimension_scores: dict[str, float] = {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
@@ -216,6 +237,17 @@ def evaluate(
                 [stakeholder_weights[dimension] for dimension in UNIFIED_DIMENSIONS],
                 dtype=float,
             )
+            effective_weight_vector = weight_vector * framework_weight_vector
+            effective_weight_sum = float(np.sum(effective_weight_vector))
+            if effective_weight_sum <= 0.0 or not np.isfinite(effective_weight_sum):
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=(
+                        f"Effective weights are invalid for stakeholder '{stakeholder_id}' "
+                        f"and framework '{framework.id}'."
+                    ),
+                )
+            effective_weight_vector = effective_weight_vector / effective_weight_sum
 
             if payload.scoring_method == ScoringMethod.TOPSIS:
                 topsis_matrix = np.vstack(
@@ -229,7 +261,7 @@ def evaluate(
                     score_value = float(
                         topsis_score(
                             decision_matrix=topsis_matrix,
-                            weights=weight_vector,
+                            weights=effective_weight_vector,
                             criteria_types=criteria_types,
                         )[0]
                     )
@@ -243,7 +275,7 @@ def evaluate(
                     score_value = float(
                         wsm_scores(
                             decision_matrix=decision_matrix,
-                            weights=weight_vector,
+                            weights=effective_weight_vector,
                         )[0]
                     )
                 except ValueError as exc:
@@ -258,7 +290,7 @@ def evaluate(
                 )
 
             stakeholder_results.append(score_value)
-            per_dimension_contrib = np.clip(normalized_vector * weight_vector, 0.0, 1.0)
+            per_dimension_contrib = np.clip(normalized_vector * effective_weight_vector, 0.0, 1.0)
             for dimension in UNIFIED_DIMENSIONS:
                 index = UNIFIED_DIMENSIONS.index(dimension)
                 aggregated_dimension_scores[dimension] += float(per_dimension_contrib[index])
@@ -293,6 +325,7 @@ def evaluate(
         overall_score=overall_score,
         notes=(
             "Evaluation computed from supplied ai_system.context.dimension_scores. "
+            "Framework-aware effective weights applied (stakeholder × framework weight_default). "
             f"run_id={run_id}"
         ),
     )
