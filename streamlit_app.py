@@ -22,8 +22,14 @@ UNIFIED_DIMENSIONS = [
     "accountability",
 ]
 
-BRAND_BLUE_HEX = "#3B82F6"
-BRAND_BLUE_FILL_RGBA = "rgba(59, 130, 246, 0.22)"
+BG = "#0B1220"
+CARD_BG = "#0F172A"
+TEXT = "#E5E7EB"
+MUTED = "#A7B0C0"
+ACCENT = "#4C78A8"
+
+BRAND_BLUE_HEX = ACCENT
+BRAND_BLUE_FILL_RGBA = "rgba(76, 120, 168, 0.24)"
 
 DIMENSION_DISPLAY_NAMES = {
     "transparency_explainability": "Transparency and Explainability",
@@ -177,19 +183,13 @@ def _get_theme_base():
 
 
 def _ui_tokens(theme_base: str) -> dict[str, str]:
+    _ = theme_base
     return {
-        "bg": "#0B1220",
-        "panel_bg": "#0F172A",
-        "sidebar_bg": "#111C33",
-        "text": "#E5E7EB",
-        "muted_text": "#A7B0C0",
-        "subtle_text": "#7C8598",
-        "border": "#243045",
-        "primary": "#3B82F6",
-        "primary_hover": "#2563EB",
-        "success": "#22C55E",
-        "warning": "#F59E0B",
-        "danger": "#EF4444",
+        "BG": BG,
+        "CARD_BG": CARD_BG,
+        "TEXT": TEXT,
+        "MUTED": MUTED,
+        "ACCENT": ACCENT,
     }
 
 def inject_css(tokens: dict[str, str]) -> None:
@@ -197,44 +197,51 @@ def inject_css(tokens: dict[str, str]) -> None:
         f"""
 <style>
 html, body, [data-testid="stAppViewContainer"] {{
-    background: {tokens["bg"]};
-    color: {tokens["text"]};
+    background: {tokens["BG"]};
+    color: {tokens["TEXT"]};
 }}
 [data-testid="stAppViewContainer"] .main .block-container {{
     max-width: 1240px;
-    padding-top: 1.35rem;
-    padding-bottom: 1.15rem;
-    padding-left: 1.1rem;
-    padding-right: 1.1rem;
+    padding-top: 1.10rem;
+    padding-bottom: 1.00rem;
+    padding-left: 1.10rem;
+    padding-right: 1.10rem;
 }}
 section[data-testid="stSidebar"] {{
-    background: {tokens["sidebar_bg"]};
-    border-right: 1px solid {tokens["border"]};
+    background: {tokens["CARD_BG"]};
+    border-right: 1px solid rgba(167,176,192,0.24);
     padding-top: 0.6rem;
 }}
 h1, h2, h3, h4 {{
-    color: {tokens["text"]};
+    color: {tokens["TEXT"]};
     letter-spacing: 0.01em;
 }}
 [data-testid="stMarkdownContainer"], p, label {{
-    color: {tokens["text"]};
+    color: {tokens["TEXT"]};
 }}
 [data-testid="stCaptionContainer"] {{
-    color: {tokens["muted_text"]};
+    color: {tokens["MUTED"]};
 }}
 .medf-card {{
-    background: {tokens["panel_bg"]};
-    border: 1px solid {tokens["border"]} !important;
+    background: {tokens["CARD_BG"]};
+    border: 1px solid rgba(167,176,192,0.24) !important;
     border-radius: 12px;
     padding: 0.95rem 1rem;
+    margin-bottom: 0.9rem;
+}}
+[data-testid="stVerticalBlockBorderWrapper"] {{
+    background: {tokens["CARD_BG"]};
+    border: 1px solid rgba(167,176,192,0.24) !important;
+    border-radius: 12px;
+    padding: 0.65rem 0.75rem 0.75rem 0.75rem;
 }}
 [data-testid="stExpander"], [data-testid="stDataFrame"], .stTable {{
-    background: {tokens["panel_bg"]};
-    border: 1px solid {tokens["border"]};
+    background: {tokens["CARD_BG"]};
+    border: 1px solid rgba(167,176,192,0.24);
     border-radius: 12px;
 }}
 [data-testid="stHorizontalBlock"] hr, hr {{
-    border-color: {tokens["border"]};
+    border-color: rgba(167,176,192,0.24);
 }}
 </style>
 """,
@@ -242,7 +249,7 @@ h1, h2, h3, h4 {{
     )
 
 
-def apply_plotly_style(fig: go.Figure, title: str | None = None) -> go.Figure:
+def apply_plot_theme(fig: go.Figure, title: str | None = None) -> go.Figure:
     current_title = safe_str(getattr(getattr(fig.layout, "title", None), "text", None)).strip()
     title_text = safe_str(title).strip() if title is not None else current_title
     if title_text.lower() == "undefined":
@@ -258,18 +265,18 @@ def apply_plotly_style(fig: go.Figure, title: str | None = None) -> go.Figure:
 
     fig.update_layout(
         template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#E5E7EB", size=13),
+        paper_bgcolor=CARD_BG,
+        plot_bgcolor=CARD_BG,
+        font=dict(color=TEXT, size=13),
         title=dict(
             text=title_text,
-            font=dict(color="#E5E7EB", size=18),
+            font=dict(color=TEXT, size=17),
             y=0.98,
             yanchor="top",
         ),
         legend=dict(
-            font=dict(color="#A7B0C0", size=12),
-            title=dict(font=dict(color="#A7B0C0", size=12)),
+            font=dict(color=MUTED, size=12),
+            title=dict(font=dict(color=MUTED, size=12)),
         ),
         margin=dict(
             t=_margin_value("t", 80),
@@ -279,39 +286,39 @@ def apply_plotly_style(fig: go.Figure, title: str | None = None) -> go.Figure:
         ),
     )
     fig.update_xaxes(
-        tickfont=dict(color="#A7B0C0", size=11),
-        title_font=dict(color="#E5E7EB", size=13),
+        tickfont=dict(color=MUTED, size=11),
+        title_font=dict(color=TEXT, size=13),
         title_standoff=14,
-        gridcolor="rgba(167,176,192,0.18)",
-        linecolor="#243045",
-        zerolinecolor="#243045",
+        gridcolor="rgba(167,176,192,0.16)",
+        linecolor="rgba(167,176,192,0.30)",
+        zerolinecolor="rgba(167,176,192,0.30)",
     )
     fig.update_yaxes(
-        tickfont=dict(color="#A7B0C0", size=11),
-        title_font=dict(color="#E5E7EB", size=13),
+        tickfont=dict(color=MUTED, size=11),
+        title_font=dict(color=TEXT, size=13),
         title_standoff=16,
-        gridcolor="rgba(167,176,192,0.18)",
-        linecolor="#243045",
-        zerolinecolor="#243045",
+        gridcolor="rgba(167,176,192,0.16)",
+        linecolor="rgba(167,176,192,0.30)",
+        zerolinecolor="rgba(167,176,192,0.30)",
     )
 
     if hasattr(fig.layout, "polar"):
         fig.update_layout(
             polar=dict(
-                bgcolor="rgba(0,0,0,0)",
+                bgcolor=CARD_BG,
                 radialaxis=dict(
-                    gridcolor="rgba(167,176,192,0.18)",
-                    linecolor="#243045",
-                    tickfont=dict(color="#A7B0C0"),
-                    tickcolor="#A7B0C0",
-                    titlefont=dict(color="#E5E7EB"),
+                    gridcolor="rgba(167,176,192,0.16)",
+                    linecolor="rgba(167,176,192,0.30)",
+                    tickfont=dict(color=MUTED),
+                    tickcolor=MUTED,
+                    titlefont=dict(color=TEXT),
                     showline=True,
                 ),
                 angularaxis=dict(
-                    gridcolor="rgba(167,176,192,0.18)",
-                    linecolor="#243045",
-                    tickfont=dict(color="#A7B0C0"),
-                    tickcolor="#A7B0C0",
+                    gridcolor="rgba(167,176,192,0.16)",
+                    linecolor="rgba(167,176,192,0.30)",
+                    tickfont=dict(color=MUTED),
+                    tickcolor=MUTED,
                     showline=True,
                 ),
             )
@@ -321,10 +328,10 @@ def apply_plotly_style(fig: go.Figure, title: str | None = None) -> go.Figure:
         if isinstance(trace, go.Heatmap):
             if trace.colorbar is None:
                 trace.colorbar = {}
-            trace.colorbar.tickfont = dict(color="#A7B0C0", size=11)
+            trace.colorbar.tickfont = dict(color=MUTED, size=11)
             if trace.colorbar.title is None:
                 trace.colorbar.title = {}
-            trace.colorbar.title.font = dict(color="#E5E7EB", size=12)
+            trace.colorbar.title.font = dict(color=TEXT, size=12)
 
         if isinstance(trace, go.Parcoords):
             parcoords_dimensions: list[dict[str, Any]] = []
@@ -332,7 +339,7 @@ def apply_plotly_style(fig: go.Figure, title: str | None = None) -> go.Figure:
                 label = safe_str(getattr(dimension, "label", "")).strip()
                 if label:
                     if label.lower() == "affected community":
-                        label = "Affected community"
+                        label = "Affected Community"
                     elif label in {"developer", "regulator", "affected_community"}:
                         label = label.replace("_", " ").title()
                 parcoords_dimensions.append(
@@ -343,8 +350,11 @@ def apply_plotly_style(fig: go.Figure, title: str | None = None) -> go.Figure:
                 )
             if parcoords_dimensions:
                 trace.dimensions = parcoords_dimensions
-            trace.labelfont = dict(color="#E5E7EB", size=12)
-            trace.tickfont = dict(color="#A7B0C0", size=11)
+                raw_dimensions = trace._props.get("dimensions", [])
+                for raw_dimension in raw_dimensions:
+                    raw_dimension["tickfont"] = {"color": TEXT}
+            trace.labelfont = dict(color=TEXT, size=12)
+            trace.tickfont = dict(color=TEXT, size=11)
             if getattr(trace, "line", None) is not None:
                 colorbar = getattr(trace.line, "colorbar", None)
                 if colorbar is not None:
@@ -352,18 +362,18 @@ def apply_plotly_style(fig: go.Figure, title: str | None = None) -> go.Figure:
                     colorbar_title = safe_str(getattr(title_obj, "text", None)).strip()
                     if not colorbar_title:
                         colorbar_title = "Total distance"
-                    colorbar.tickfont = dict(color="#A7B0C0", size=11)
+                    colorbar.tickfont = dict(color=TEXT, size=11)
                     colorbar.title = dict(
                         text=colorbar_title,
                         side="right",
-                        font=dict(color="#E5E7EB", size=11),
+                        font=dict(color=TEXT, size=11),
                     )
-                    colorbar.x = 1.08
+                    colorbar.x = 1.06
                     colorbar.xanchor = "left"
                     fig.update_layout(
                         margin=dict(
                             t=_margin_value("t", 110),
-                            r=_margin_value("r", 140),
+                            r=_margin_value("r", 150),
                             b=_margin_value("b", 50),
                             l=_margin_value("l", 60),
                         ),
@@ -377,17 +387,47 @@ def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
     _ = tokens
     existing_title = safe_str(getattr(getattr(fig.layout, "title", None), "text", None)).strip()
     title_text = existing_title if existing_title and existing_title.lower() != "undefined" else ""
-    return apply_plotly_style(fig, title=title_text)
+    return apply_plot_theme(fig, title=title_text)
+
+
+def _assert_tradeoff_parcoords_theme(fig: go.Figure) -> None:
+    fig_json = fig.to_plotly_json()
+    data = fig_json.get("data", [])
+    if not data or data[0].get("type") != "parcoords":
+        raise AssertionError("Tradeoff chart must be a parcoords figure.")
+
+    dimensions = data[0].get("dimensions", [])
+    if not isinstance(dimensions, list) or not dimensions:
+        raise AssertionError("Parcoords dimensions are missing.")
+
+    for index, dimension in enumerate(dimensions):
+        label = safe_str(dimension.get("label", "")).strip()
+        if not label or "_" in label or label != label.title():
+            raise AssertionError(f"Parcoords dimension {index} label is not human-friendly: {label!r}")
+        tickfont = dimension.get("tickfont", {})
+        if not isinstance(tickfont, dict) or tickfont.get("color") != TEXT:
+            raise AssertionError(f"Parcoords dimension {index} tickfont color must be {TEXT}.")
+
+    line = data[0].get("line", {})
+    colorbar = line.get("colorbar", {}) if isinstance(line, dict) else {}
+    tickfont = colorbar.get("tickfont", {}) if isinstance(colorbar, dict) else {}
+    if not isinstance(tickfont, dict) or tickfont.get("color") != TEXT:
+        raise AssertionError(f"Parcoords colorbar tickfont color must be {TEXT}.")
+
+    title = colorbar.get("title", {}) if isinstance(colorbar, dict) else {}
+    title_font = title.get("font", {}) if isinstance(title, dict) else {}
+    if not isinstance(title_font, dict) or title_font.get("color") != TEXT:
+        raise AssertionError(f"Parcoords colorbar title font color must be {TEXT}.")
 
 
 def _risk_label(score: float) -> tuple[str, str]:
     if score >= 0.8:
-        return "LOW", "#22C55E"
+        return "LOW", ACCENT
     if score >= 0.6:
-        return "MEDIUM", "#F59E0B"
+        return "MEDIUM", ACCENT
     if score >= 0.4:
-        return "HIGH", "#EF4444"
-    return "CRITICAL", "#EF4444"
+        return "HIGH", ACCENT
+    return "CRITICAL", ACCENT
 
 
 def _apply_dimension_preset(preset: dict[str, float]) -> None:
@@ -997,40 +1037,42 @@ def main() -> None:
     }
 
     if page != "Case Studies":
-        col_left, col_right = st.columns([1, 1])
-        with col_left:
-            ai_system_id = st.text_input("AI system id", value=ai_system_id)
-            ai_system_name = st.text_input("AI system name", value=ai_system_name)
-            ai_system_description = st.text_area("AI system description", value=ai_system_description)
+        input_card = st.container(border=True)
+        with input_card:
+            col_left, col_right = st.columns([1, 1])
+            with col_left:
+                ai_system_id = st.text_input("AI system id", value=ai_system_id)
+                ai_system_name = st.text_input("AI system name", value=ai_system_name)
+                ai_system_description = st.text_area("AI system description", value=ai_system_description)
 
-        with col_right:
-            st.subheader("Dimension Scores (Likert 1–7)")
-            if page in {"Conflict Detection", "Pareto Resolution"}:
-                preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
-                if preset_col_1.button("Preset: Baseline (3.5,3.0,5.5,4.5,3.5,5.0)"):
-                    _apply_dimension_preset(PRESET_BASELINE)
-                if preset_col_2.button("Preset: Flipped (4.5,5.0,2.5,3.5,4.5,3.0)"):
-                    _apply_dimension_preset(PRESET_FLIPPED)
-                if preset_col_3.button("Preset: Safety-heavy (4.0,4.0,7.0,4.0,4.0,4.0)"):
-                    _apply_dimension_preset(PRESET_SAFETY_HEAVY)
+            with col_right:
+                st.subheader("Dimension Scores (Likert 1–7)")
+                if page in {"Conflict Detection", "Pareto Resolution"}:
+                    preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
+                    if preset_col_1.button("Preset: Baseline (3.5,3.0,5.5,4.5,3.5,5.0)"):
+                        _apply_dimension_preset(PRESET_BASELINE)
+                    if preset_col_2.button("Preset: Flipped (4.5,5.0,2.5,3.5,4.5,3.0)"):
+                        _apply_dimension_preset(PRESET_FLIPPED)
+                    if preset_col_3.button("Preset: Safety-heavy (4.0,4.0,7.0,4.0,4.0,4.0)"):
+                        _apply_dimension_preset(PRESET_SAFETY_HEAVY)
 
-            default_scores = PRESET_BASELINE
-            for dimension in UNIFIED_DIMENSIONS:
-                session_key = f"score_{dimension}"
-                if session_key not in st.session_state:
-                    st.session_state[session_key] = float(default_scores[dimension])
-            for dimension in UNIFIED_DIMENSIONS:
-                dimension_scores[dimension] = float(
-                    st.slider(
-                        DIMENSION_DISPLAY_NAMES[dimension],
-                        min_value=LIKERT_MIN,
-                        max_value=LIKERT_MAX,
-                        value=float(st.session_state[f"score_{dimension}"]),
-                        step=0.1,
-                        format="%.1f",
-                        key=f"score_{dimension}",
+                default_scores = PRESET_BASELINE
+                for dimension in UNIFIED_DIMENSIONS:
+                    session_key = f"score_{dimension}"
+                    if session_key not in st.session_state:
+                        st.session_state[session_key] = float(default_scores[dimension])
+                for dimension in UNIFIED_DIMENSIONS:
+                    dimension_scores[dimension] = float(
+                        st.slider(
+                            DIMENSION_DISPLAY_NAMES[dimension],
+                            min_value=LIKERT_MIN,
+                            max_value=LIKERT_MAX,
+                            value=float(st.session_state[f"score_{dimension}"]),
+                            step=0.1,
+                            format="%.1f",
+                            key=f"score_{dimension}",
+                        )
                     )
-                )
     else:
         if not case_screenshot_mode:
             selected_framework_text = framework_id or "N/A"
@@ -1100,72 +1142,74 @@ def main() -> None:
             overall_score = float(result.get("overall_score", 0.0))
             label, color = _risk_label(overall_score)
 
-            st.subheader("Results")
-            metric_col, label_col = st.columns([1, 2])
-            with metric_col:
-                st.metric("Overall Score", fmt_score(overall_score))
-            with label_col:
-                st.markdown(
-                    f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Risk: {label}</span>",
-                    unsafe_allow_html=True,
+            evaluate_results_card = st.container(border=True)
+            with evaluate_results_card:
+                st.subheader("Results")
+                metric_col, label_col = st.columns([1, 2])
+                with metric_col:
+                    st.metric("Overall Score", fmt_score(overall_score))
+                with label_col:
+                    st.markdown(
+                        f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Risk: {label}</span>",
+                        unsafe_allow_html=True,
+                    )
+                render_if_present("Framework", framework_id)
+                render_if_present("Stakeholders", stakeholder_id)
+                render_if_present("Scoring Method", scoring_method.upper())
+                framework_weighting_mode = _extract_framework_weighting_mode(result.get("notes"))
+                render_if_present("Framework Weighting Mode", framework_weighting_mode)
+
+                framework_scores = result.get("framework_scores", [])
+                if not framework_scores:
+                    st.warning("No framework scores returned.")
+                    return
+
+                first_framework = framework_scores[0]
+                dim_scores = first_framework.get("dimension_scores", {})
+                framework_trace_name = safe_str(first_framework.get("framework_id", "framework")).strip()
+                if framework_trace_name.lower() == "undefined":
+                    framework_trace_name = ""
+                radar_labels = [DIMENSION_DISPLAY_NAMES[dimension] for dimension in UNIFIED_DIMENSIONS]
+                radar_values = [float(dim_scores.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
+                radar_labels_closed = radar_labels + [radar_labels[0]]
+                radar_values_closed = radar_values + [radar_values[0]]
+
+                fig = go.Figure()
+                fig.add_trace(
+                    go.Scatterpolar(
+                        r=radar_values_closed,
+                        theta=radar_labels_closed,
+                        fill="toself",
+                        name=framework_trace_name,
+                        line={"color": BRAND_BLUE_HEX, "width": 2},
+                        fillcolor=BRAND_BLUE_FILL_RGBA,
+                    )
                 )
-            render_if_present("Framework", framework_id)
-            render_if_present("Stakeholders", stakeholder_id)
-            render_if_present("Scoring Method", scoring_method.upper())
-            framework_weighting_mode = _extract_framework_weighting_mode(result.get("notes"))
-            render_if_present("Framework Weighting Mode", framework_weighting_mode)
-
-            framework_scores = result.get("framework_scores", [])
-            if not framework_scores:
-                st.warning("No framework scores returned.")
-                return
-
-            first_framework = framework_scores[0]
-            dim_scores = first_framework.get("dimension_scores", {})
-            framework_trace_name = safe_str(first_framework.get("framework_id", "framework")).strip()
-            if framework_trace_name.lower() == "undefined":
-                framework_trace_name = ""
-            radar_labels = [DIMENSION_DISPLAY_NAMES[dimension] for dimension in UNIFIED_DIMENSIONS]
-            radar_values = [float(dim_scores.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
-            radar_labels_closed = radar_labels + [radar_labels[0]]
-            radar_values_closed = radar_values + [radar_values[0]]
-
-            fig = go.Figure()
-            fig.add_trace(
-                go.Scatterpolar(
-                    r=radar_values_closed,
-                    theta=radar_labels_closed,
-                    fill="toself",
-                    name=framework_trace_name,
-                    line={"color": BRAND_BLUE_HEX, "width": 2},
-                    fillcolor=BRAND_BLUE_FILL_RGBA,
+                fig.update_layout(
+                    polar={"radialaxis": {"visible": True, "range": [0, 1]}},
+                    showlegend=False,
+                    margin={"l": 40, "r": 40, "t": 40, "b": 40},
                 )
-            )
-            fig.update_layout(
-                polar={"radialaxis": {"visible": True, "range": [0, 1]}},
-                showlegend=False,
-                margin={"l": 40, "r": 40, "t": 40, "b": 40},
-            )
-            st.plotly_chart(style_plotly(fig, tokens), use_container_width=True, key="evaluate_radar")
+                st.plotly_chart(style_plotly(fig, tokens), use_container_width=True, key="evaluate_radar")
 
-            table_rows = []
-            for row in framework_scores:
-                row_score = float(row.get("score", 0.0))
-                row_risk = row.get("risk_level")
-                if row_risk is None or str(row_risk).strip().lower() in {"", "undefined"}:
-                    row_risk = _risk_label(row_score)[0].lower()
-                row_framework_id = row.get("framework_id")
-                if row_framework_id is None or str(row_framework_id).strip().lower() in {"", "undefined"}:
-                    row_framework_id = "framework"
-                table_rows.append(
-                    {
-                        "framework_id": row_framework_id,
-                        "score": fmt_score(row_score),
-                        "risk_level": row_risk,
-                    }
-                )
-            st.subheader("Per-Framework Scores")
-            st.dataframe(table_rows, width="stretch", hide_index=True)
+                table_rows = []
+                for row in framework_scores:
+                    row_score = float(row.get("score", 0.0))
+                    row_risk = row.get("risk_level")
+                    if row_risk is None or str(row_risk).strip().lower() in {"", "undefined"}:
+                        row_risk = _risk_label(row_score)[0].lower()
+                    row_framework_id = row.get("framework_id")
+                    if row_framework_id is None or str(row_framework_id).strip().lower() in {"", "undefined"}:
+                        row_framework_id = "framework"
+                    table_rows.append(
+                        {
+                            "framework_id": row_framework_id,
+                            "score": fmt_score(row_score),
+                            "risk_level": row_risk,
+                        }
+                    )
+                st.subheader("Per-Framework Scores")
+                st.dataframe(table_rows, width="stretch", hide_index=True)
     elif page == "Conflict Detection":
         if detect_clicked:
             if not framework_id:
@@ -1670,7 +1714,7 @@ def main() -> None:
                     y=[selected_y],
                     mode="markers",
                     name="Selected",
-                    marker={"size": 14, "color": "#d62728", "symbol": "diamond"},
+                    marker={"size": 14, "color": TEXT, "symbol": "diamond"},
                 )
             )
             scatter_figure.update_layout(
@@ -1688,7 +1732,7 @@ def main() -> None:
             stakeholder_display_labels = {
                 "developer": "Developer",
                 "regulator": "Regulator",
-                "affected_community": "Affected community",
+                "affected_community": "Affected Community",
             }
             dimension_specs = [
                 {
@@ -1714,9 +1758,9 @@ def main() -> None:
                             "title": {
                                 "text": "Total distance",
                                 "side": "right",
-                                "font": {"color": "#E5E7EB", "size": 11},
+                                "font": {"color": TEXT, "size": 11},
                             },
-                            "tickfont": {"color": "#A7B0C0"},
+                            "tickfont": {"color": TEXT},
                             "x": 1.08,
                             "xanchor": "left",
                         },
@@ -1727,11 +1771,11 @@ def main() -> None:
             parallel_figure.update_traces(
                 domain={"y": [0.0, 0.86]},
                 dimensions=dimension_specs,
-                labelfont={"color": "#E5E7EB", "size": 12},
-                tickfont={"color": "#A7B0C0", "size": 11},
+                labelfont={"color": TEXT, "size": 12},
+                tickfont={"color": TEXT, "size": 11},
             )
             parallel_figure.update_layout(
-                font={"color": "#E5E7EB"},
+                font={"color": TEXT},
                 title={
                     "text": "Stakeholder Distance Tradeoffs",
                     "y": 0.99,
@@ -1741,8 +1785,10 @@ def main() -> None:
                 },
                 margin={"l": 40, "r": 140, "t": 130, "b": 48},
             )
+            parallel_figure = style_plotly(parallel_figure, tokens)
+            _assert_tradeoff_parcoords_theme(parallel_figure)
             st.plotly_chart(
-                style_plotly(parallel_figure, tokens),
+                parallel_figure,
                 use_container_width=True,
                 key=f"pareto_tradeoff_parallel_{len(stakeholder_ids)}",
             )
