@@ -149,48 +149,73 @@ def _ordered_criteria_types(framework_id: str, framework_dimensions: list) -> li
     return criteria_types
 
 
-def _framework_default_weights(framework) -> dict[str, float]:
+def _framework_coverage_weights(framework) -> dict[str, float]:
     dimension_map = {dimension.name: dimension for dimension in framework.dimensions}
     missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in dimension_map]
     if missing:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=(
-                f"Framework '{framework.id}' is missing default weights for dimensions: "
+                f"Framework '{framework.id}' is missing dimensions for coverage weighting: "
                 + ", ".join(missing)
             ),
         )
 
-    default_weights: dict[str, float] = {}
+    raw_counts: dict[str, float] = {}
     for dimension in UNIFIED_DIMENSIONS:
-        raw_weight = getattr(dimension_map[dimension], "weight_default", None)
+        dimension_obj = dimension_map[dimension]
+        count_value = None
+
+        assessment_questions = getattr(dimension_obj, "assessment_questions", None)
+        if isinstance(assessment_questions, list):
+            non_empty_questions = [
+                str(question).strip()
+                for question in assessment_questions
+                if str(question).strip()
+            ]
+            if non_empty_questions:
+                count_value = float(len(non_empty_questions))
+
+        if count_value is None:
+            for key in ("criteria", "subcriteria", "items"):
+                list_like = getattr(dimension_obj, key, None)
+                if isinstance(list_like, list) and len(list_like) > 0:
+                    count_value = float(len(list_like))
+                    break
+
+        if count_value is None:
+            count_value = 1.0
+
         try:
-            weight = float(raw_weight)
+            count = float(count_value)
         except (TypeError, ValueError) as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Framework '{framework.id}' has invalid weight_default for '{dimension}'.",
+                detail=f"Framework '{framework.id}' has invalid coverage count for '{dimension}'.",
             ) from exc
 
-        if not np.isfinite(weight) or weight < 0.0:
+        if not np.isfinite(count) or count < 0.0:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Framework '{framework.id}' has non-finite or negative weight_default for '{dimension}'.",
+                detail=f"Framework '{framework.id}' has non-finite or negative coverage count for '{dimension}'.",
             )
 
-        default_weights[dimension] = weight
+        raw_counts[dimension] = count
 
-    total = float(sum(default_weights.values()))
-    if abs(total - 1.0) > 0.01:
+    total = float(sum(raw_counts.values()))
+    if total <= 0.0 or not np.isfinite(total):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=(
-                f"Framework '{framework.id}' default weights must sum to 1.0 (±0.01); "
-                f"got {total:.4f}."
+                f"Framework '{framework.id}' coverage counts produce invalid normalization sum "
+                f"({total:.4f})."
             ),
         )
 
-    return default_weights
+    return {
+        dimension: float(raw_counts[dimension] / total)
+        for dimension in UNIFIED_DIMENSIONS
+    }
 
 
 def _effective_weights(ws: dict[str, float], wf: dict[str, float]) -> np.ndarray:
@@ -259,7 +284,7 @@ def evaluate(
             )
 
         criteria_types = _ordered_criteria_types(framework.id, framework.dimensions)
-        framework_default_weights = _framework_default_weights(framework)
+        framework_default_weights = _framework_coverage_weights(framework)
 
         stakeholder_results: list[float] = []
         aggregated_dimension_scores: dict[str, float] = {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
@@ -357,7 +382,7 @@ def evaluate(
         overall_score=overall_score,
         notes=(
             "Evaluation computed from supplied ai_system.context.dimension_scores. "
-            "framework_weighting=product(ws,wf). "
+            "framework_weighting=coverage_counts(product_pooling). "
             f"run_id={run_id}"
         ),
     )

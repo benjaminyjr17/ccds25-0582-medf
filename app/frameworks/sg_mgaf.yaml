@@ -7,29 +7,55 @@ criteria:
     name: Fairness and Inclusion
     dimension: fairness_nondiscrimination
     description: Promote fairness outcomes and avoid discriminatory harm.
+    assessment_questions:
+      - Are fairness impacts reviewed for affected communities and user groups?
+      - Are corrective measures defined for inequitable outcomes?
     weight: 0.12
   - id: mgaf_accountability
     name: Internal Governance
     dimension: accountability
     description: Set governance structures and clear accountability ownership.
+    assessment_questions:
+      - Are governance responsibilities assigned across product and compliance teams?
+      - Are accountability checkpoints integrated into lifecycle stage-gates?
+      - Are decision logs maintained for key design and deployment choices?
+      - Are issue escalation and remediation workflows periodically reviewed?
     weight: 0.20
   - id: mgaf_transparency
     name: Communication and Explainability
     dimension: transparency_explainability
     description: Communicate AI behavior, limitations, and recourse.
+    assessment_questions:
+      - Are user-facing disclosures provided on system purpose and limitations?
+      - Are explanations tailored for affected users and operational teams?
+      - Are channels available for questions, complaints, and contestability?
+      - Are documentation artifacts updated when model behavior changes?
+      - Are communication plans in place for high-impact incidents?
     weight: 0.22
   - id: mgaf_privacy
     name: Data Governance
     dimension: privacy_data_governance
     description: Ensure strong personal data governance and protection controls.
+    assessment_questions:
+      - Are data governance controls aligned with privacy and retention obligations?
+      - Are access restrictions and protection safeguards monitored and enforced?
     weight: 0.12
   - id: mgaf_safety
     name: Operations Management
     dimension: safety_robustness
     description: Maintain model quality, robustness, and operational safeguards.
+    assessment_questions:
+      - Are operational safeguards in place for model reliability and drift?
+      - Are robustness checks integrated into monitoring and release workflows?
+      - Are contingency procedures defined for degraded or unsafe performance?
     weight: 0.16
   - id: mgaf_human_oversight
     name: Human-in-the-loop Oversight
     dimension: human_agency_oversight
     description: Provide human override and escalation pathways where needed.
+    assessment_questions:
+      - Are human override controls available for high-impact decisions?
+      - Are operator responsibilities and escalation routes clearly documented?
+      - Are oversight checkpoints applied for exception and edge cases?
+      - Are affected users given meaningful recourse and human review options?
     weight: 0.18

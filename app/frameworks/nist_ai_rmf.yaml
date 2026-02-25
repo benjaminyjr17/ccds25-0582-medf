@@ -7,29 +7,54 @@ criteria:
     name: Fairness Risk Management
     dimension: fairness_nondiscrimination
     description: Identify and mitigate inequitable model outcomes.
+    assessment_questions:
+      - Are fairness risks identified with measurable indicators?
+      - Are mitigation controls validated after model updates?
     weight: 0.10
   - id: rmf_accountability
     name: Govern
     dimension: accountability
     description: Establish governance and accountability controls.
+    assessment_questions:
+      - Are governance roles and risk ownership formally assigned?
+      - Are AI risk decisions recorded with rationale and approvers?
+      - Are policy controls mapped to operational procedures?
+      - Are independent reviews or audits scheduled and tracked?
+      - Are incident response responsibilities defined and exercised?
+      - Are corrective actions monitored to closure with accountability?
     weight: 0.30
   - id: rmf_transparency
     name: Explainability and Traceability
     dimension: transparency_explainability
     description: Support transparency and decision traceability.
+    assessment_questions:
+      - Are model assumptions and limitations documented for stakeholders?
+      - Are decision traces available for post-hoc review and audit?
     weight: 0.12
   - id: rmf_privacy
     name: Data and Privacy Risk
     dimension: privacy_data_governance
     description: Manage privacy and data governance risks.
+    assessment_questions:
+      - Are privacy risks assessed for data collection and processing activities?
+      - Are governance controls in place for data access and retention?
     weight: 0.12
   - id: rmf_safety
     name: Robustness and Reliability
     dimension: safety_robustness
     description: Manage robustness, resilience, and safety risk.
+    assessment_questions:
+      - Are reliability thresholds defined and monitored in operations?
+      - Are stress, failure mode, and robustness evaluations routinely executed?
+      - Are safety incidents captured and used to update controls?
+      - Are resilience controls validated against foreseeable disruptions?
+      - Are deployment gates tied to safety and reliability evidence?
     weight: 0.24
   - id: rmf_human_oversight
     name: Human Oversight
     dimension: human_agency_oversight
     description: Include meaningful human review and oversight practices.
+    assessment_questions:
+      - Are human review checkpoints defined for high-impact decisions?
+      - Are escalation procedures available when automation confidence is low?
     weight: 0.12

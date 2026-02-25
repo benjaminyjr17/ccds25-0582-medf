@@ -7,29 +7,57 @@ criteria:
     name: Fairness and Non-discrimination
     dimension: fairness_nondiscrimination
     description: Assess fairness and discrimination risk across impacted groups.
+    assessment_questions:
+      - Are impacted groups and vulnerable populations explicitly identified?
+      - Are bias testing and mitigation controls documented across the lifecycle?
+      - Is there a remediation path for discriminatory outcomes?
     weight: 0.14
   - id: altai_accountability
     name: Accountability
     dimension: accountability
     description: Define responsibility, governance, and remediation ownership.
+    assessment_questions:
+      - Are accountable owners assigned for deployment, monitoring, and incident response?
+      - Is there a governance process for escalation and corrective action?
+      - Are audit and reporting responsibilities documented end-to-end?
     weight: 0.14
   - id: altai_transparency
     name: Transparency and Explainability
     dimension: transparency_explainability
     description: Ensure traceability and explainability for relevant decisions.
+    assessment_questions:
+      - Is model behavior traceable through documentation and decision logs?
+      - Are explanations available to affected users and operators at decision time?
     weight: 0.12
   - id: altai_privacy
     name: Privacy and Data Governance
     dimension: privacy_data_governance
     description: Enforce privacy controls and lawful data lifecycle management.
+    assessment_questions:
+      - Is personal data collection limited to a clear lawful purpose?
+      - Are retention, deletion, and access controls enforced and auditable?
+      - Is sensitive data handled with appropriate minimization and protection?
+      - Are data lineage and provenance documented across processing steps?
+      - Are third-party data transfers governed by explicit contractual controls?
     weight: 0.20
   - id: altai_safety
     name: Technical Robustness and Safety
     dimension: safety_robustness
     description: Address reliability, resilience, and misuse prevention.
+    assessment_questions:
+      - Are robustness tests performed across realistic stress and edge conditions?
+      - Is there monitoring for model drift and performance degradation in production?
+      - Are fallback or safe-fail mechanisms defined for unsafe operating states?
+      - Are cybersecurity and adversarial resilience controls in place?
+      - Is misuse/abuse prevention evaluated before deployment?
     weight: 0.22
   - id: altai_human_oversight
     name: Human Agency and Oversight
     dimension: human_agency_oversight
     description: Preserve meaningful human control and intervention capability.
+    assessment_questions:
+      - Can authorized humans override or halt automated decisions?
+      - Are operator roles and decision authority clearly defined?
+      - Are escalation pathways available for contested outcomes?
+      - Is user recourse available when decisions have significant impact?
     weight: 0.18
