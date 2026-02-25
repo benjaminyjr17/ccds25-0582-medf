@@ -22,7 +22,8 @@ UNIFIED_DIMENSIONS = [
     "accountability",
 ]
 
-BRAND_BLUE = "#1D4ED8"
+BRAND_BLUE_HEX = "#1E3A8A"
+BRAND_BLUE_FILL_RGBA = "rgba(30, 58, 138, 0.20)"
 
 DIMENSION_DISPLAY_NAMES = {
     "transparency_explainability": "Transparency and Explainability",
@@ -183,7 +184,7 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
             "text": "#e5e7eb",
             "muted_text": "#9ca3af",
             "border": "rgba(255,255,255,0.10)",
-            "primary": BRAND_BLUE,
+            "primary": BRAND_BLUE_HEX,
             "primary_hover": "#1E40AF",
             "plot_text": "#e5e7eb",
             "plot_grid": "rgba(255,255,255,0.18)",
@@ -196,23 +197,12 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
         "text": "#111827",
         "muted_text": "#6b7280",
         "border": "rgba(17,24,39,0.10)",
-        "primary": BRAND_BLUE,
+        "primary": BRAND_BLUE_HEX,
         "primary_hover": "#1E40AF",
         "plot_text": "#111827",
         "plot_grid": "rgba(17,24,39,0.12)",
         "plot_axis": "rgba(17,24,39,0.22)",
     }
-
-
-def _hex_to_rgba(hex_color: str, alpha: float) -> str:
-    color = hex_color.lstrip("#")
-    if len(color) != 6:
-        return f"rgba(29,78,216,{alpha})"
-    red = int(color[0:2], 16)
-    green = int(color[2:4], 16)
-    blue = int(color[4:6], 16)
-    return f"rgba({red},{green},{blue},{alpha})"
-
 
 def inject_css(tokens: dict[str, str]) -> None:
     css_path = Path(".streamlit") / "style.css"
@@ -608,8 +598,8 @@ def _build_radar_chart(
             theta=radar_labels_closed,
             fill="toself",
             name=title,
-            line={"color": BRAND_BLUE, "width": 2},
-            fillcolor=_hex_to_rgba(BRAND_BLUE, 0.20),
+            line={"color": BRAND_BLUE_HEX, "width": 2},
+            fillcolor=BRAND_BLUE_FILL_RGBA,
         )
     )
     figure.update_layout(
@@ -1089,8 +1079,8 @@ def main() -> None:
                     theta=radar_labels_closed,
                     fill="toself",
                     name=first_framework.get("framework_id", "framework"),
-                    line={"color": BRAND_BLUE, "width": 2},
-                    fillcolor=_hex_to_rgba(BRAND_BLUE, 0.20),
+                    line={"color": BRAND_BLUE_HEX, "width": 2},
+                    fillcolor=BRAND_BLUE_FILL_RGBA,
                 )
             )
             fig.update_layout(
@@ -1527,8 +1517,8 @@ def main() -> None:
                     theta=radar_labels_closed,
                     fill="toself",
                     name=selected_solution_id,
-                    line={"color": BRAND_BLUE, "width": 2},
-                    fillcolor=_hex_to_rgba(BRAND_BLUE, 0.20),
+                    line={"color": BRAND_BLUE_HEX, "width": 2},
+                    fillcolor=BRAND_BLUE_FILL_RGBA,
                 )
             )
             radar_figure.update_layout(
@@ -1550,7 +1540,7 @@ def main() -> None:
                         x=stakeholder_ids,
                         y=distance_values,
                         name="Distance",
-                        marker={"color": BRAND_BLUE},
+                        marker={"color": BRAND_BLUE_HEX},
                     )
                 ]
             )
@@ -1591,7 +1581,7 @@ def main() -> None:
                         text=all_ranks,
                         textposition="top center",
                         name="Pareto solutions",
-                        marker={"size": 9, "color": BRAND_BLUE},
+                        marker={"size": 9, "color": BRAND_BLUE_HEX},
                     )
                 )
                 scatter_figure.add_trace(
@@ -2055,7 +2045,7 @@ def main() -> None:
                                     for stakeholder_id in case_stakeholder_ids
                                 ],
                                 name="Distance",
-                                marker={"color": BRAND_BLUE},
+                                marker={"color": BRAND_BLUE_HEX},
                             )
                         ]
                     )

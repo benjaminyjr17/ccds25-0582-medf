@@ -27,7 +27,7 @@ section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
   color: #e6edf3 !important;
 }
 [data-baseweb="tag"] {
-  background: rgba(29, 78, 216, 0.2) !important;
+  background: rgba(30, 58, 138, 0.2) !important;
   color: #dbeafe !important;
 }
 
@@ -38,13 +38,13 @@ button[kind="secondary"] {
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
 }
 button[kind="primary"] {
-  background: #1d4ed8 !important;
+  background: #1e3a8a !important;
   color: #ffffff !important;
-  border-color: #1d4ed8 !important;
+  border-color: #1e3a8a !important;
 }
 button[kind="primary"]:hover {
-  background: #1e40af !important;
-  border-color: #1e3a8a !important;
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
 }
 button[kind="secondary"] {
   background: #161b22 !important;
