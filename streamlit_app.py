@@ -321,6 +321,20 @@ def _safe_json(value: Any) -> Any:
         return str(value)
 
 
+def render_if_present(label: str, value: Any) -> None:
+    if value is None:
+        return
+
+    text = value.strip() if isinstance(value, str) else str(value).strip()
+    if not text or text.lower() == "undefined":
+        return
+
+    if label:
+        st.caption(f"{label}: {text}")
+    else:
+        st.caption(text)
+
+
 def _extract_run_id_from_responses(responses: dict[str, Any]) -> str:
     for response in responses.values():
         if not isinstance(response, dict):
@@ -802,6 +816,7 @@ def main() -> None:
                     f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Risk: {label}</span>",
                     unsafe_allow_html=True,
                 )
+            render_if_present("", result.get("notes"))
 
             framework_scores = result.get("framework_scores", [])
             if not framework_scores:
@@ -835,11 +850,14 @@ def main() -> None:
             for row in framework_scores:
                 row_score = float(row.get("score", 0.0))
                 row_risk = row.get("risk_level")
-                if row_risk is None:
+                if row_risk is None or str(row_risk).strip().lower() in {"", "undefined"}:
                     row_risk = _risk_label(row_score)[0].lower()
+                row_framework_id = row.get("framework_id")
+                if row_framework_id is None or str(row_framework_id).strip().lower() in {"", "undefined"}:
+                    row_framework_id = "framework"
                 table_rows.append(
                     {
-                        "framework_id": row.get("framework_id"),
+                        "framework_id": row_framework_id,
                         "score": round(row_score, 4),
                         "risk_level": row_risk,
                     }
@@ -895,8 +913,9 @@ def main() -> None:
                 },
             )
             st.subheader("Conflict Detection Results")
-            if result.get("summary"):
-                st.info(str(result["summary"]))
+            summary_text = result.get("summary")
+            if summary_text is not None and str(summary_text).strip().lower() not in {"", "undefined"}:
+                st.info(str(summary_text))
             if not screenshot_mode:
                 st.caption("Switch conflict metric in the sidebar to compare weights-only vs contrib-based views.")
 
@@ -1118,7 +1137,7 @@ def main() -> None:
             )
             st.subheader("Pareto Resolution Results")
             summary = result.get("summary")
-            if summary:
+            if summary is not None and str(summary).strip().lower() not in {"", "undefined"}:
                 st.info(str(summary))
 
             solutions = result.get("pareto_solutions", [])
