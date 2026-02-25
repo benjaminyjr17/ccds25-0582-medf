@@ -190,6 +190,47 @@ def _compute_objectives(
     return objectives
 
 
+def _dominates_minimize(a: np.ndarray, b: np.ndarray, *, eps: float = 1e-12) -> bool:
+    return bool(np.all(a <= b + eps) and np.any(a < b - eps))
+
+
+def _filter_nondominated(
+    rows: list[tuple[np.ndarray, np.ndarray, float, tuple[float, ...]]],
+) -> list[tuple[np.ndarray, np.ndarray, float, tuple[float, ...]]]:
+    # Incremental skyline update keeps this O(n * frontier_size) instead of O(n^2),
+    # which is important for high pop_size/n_gen stress runs.
+    ordered_rows = sorted(
+        rows,
+        key=lambda item: (
+            float(np.sum(item[1])),
+            -float(item[2]),
+            item[3],
+        ),
+    )
+
+    frontier: list[tuple[np.ndarray, np.ndarray, float, tuple[float, ...]]] = []
+    for row in ordered_rows:
+        row_objectives = row[1]
+        dominated = False
+        survivors: list[tuple[np.ndarray, np.ndarray, float, tuple[float, ...]]] = []
+
+        for existing in frontier:
+            existing_objectives = existing[1]
+            if _dominates_minimize(existing_objectives, row_objectives):
+                dominated = True
+                break
+            if not _dominates_minimize(row_objectives, existing_objectives):
+                survivors.append(existing)
+
+        if dominated:
+            continue
+
+        survivors.append(row)
+        frontier = survivors
+
+    return frontier
+
+
 class ParetoRequest(BaseModel):
     ai_system: AISystemInput
     framework_id: str | None = None
@@ -407,14 +448,17 @@ def generate_pareto_solutions(
         utility_wsm = float(np.dot(consensus_weights, x_normalized))
         deduped.append((consensus_weights, objective_vector, utility_wsm, dedupe_key))
 
-    deduped.sort(
+    nondominated = _filter_nondominated(deduped)
+    ranked_pool = nondominated if nondominated else deduped
+
+    ranked_pool.sort(
         key=lambda item: (
             float(np.sum(item[1])),
             -float(item[2]),
             item[3],
         )
     )
-    selected = deduped[: payload.n_solutions]
+    selected = ranked_pool[: payload.n_solutions]
 
     pareto_solutions: list[ParetoSolution] = []
     ablation_utility_by_solution: dict[str, float] = {}
