@@ -282,11 +282,7 @@ def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
     )
 
     existing_title = safe_str(getattr(getattr(fig.layout, "title", None), "text", None)).strip()
-    title_layout: dict[str, Any] | None
-    if existing_title and existing_title.lower() != "undefined":
-        title_layout = {"text": existing_title, "font": {"color": "black"}}
-    else:
-        title_layout = None
+    title_text = existing_title if existing_title and existing_title.lower() != "undefined" else ""
 
     fig.update_layout(
         template="plotly_white",
@@ -295,7 +291,7 @@ def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
         paper_bgcolor="white",
         plot_bgcolor="white",
         margin=dict(l=40, r=40, t=60, b=40),
-        title=title_layout,
+        title_text=title_text,
     )
 
     if hasattr(fig.layout, "polar"):
@@ -614,7 +610,7 @@ def _build_radar_chart(
         )
     )
     figure.update_layout(
-        title=title_text or None,
+        title_text=title_text,
         polar={"radialaxis": {"visible": True, "range": [0, radial_max]}},
         showlegend=False,
         margin={"l": 40, "r": 40, "t": 60, "b": 40},
@@ -727,6 +723,10 @@ def main() -> None:
         st.session_state["demo_mode"] = False
     if "demo_scenario_results" not in st.session_state:
         st.session_state["demo_scenario_results"] = {}
+    if "pareto_result" not in st.session_state:
+        st.session_state["pareto_result"] = None
+    if "pareto_result_stakeholder_ids" not in st.session_state:
+        st.session_state["pareto_result_stakeholder_ids"] = []
 
     with st.sidebar:
         st.header("Configuration")
@@ -1376,6 +1376,8 @@ def main() -> None:
             if not ok:
                 show_api_error("Pareto generation failed", error_text, result)
                 return
+            st.session_state["pareto_result"] = result
+            st.session_state["pareto_result_stakeholder_ids"] = list(pareto_stakeholder_ids)
             bundle = _update_last_run_bundle(
                 page_name="Pareto Resolution",
                 backend_url=backend_url,
@@ -1400,262 +1402,279 @@ def main() -> None:
                     "response": result,
                 },
             )
-            st.subheader("Pareto Resolution Results")
-            summary = result.get("summary")
-            if summary is not None and str(summary).strip().lower() not in {"", "undefined"}:
-                st.info(str(summary))
+        result = st.session_state.get("pareto_result")
+        if not isinstance(result, dict):
+            return
 
-            solutions = result.get("pareto_solutions", [])
-            metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
-            if not isinstance(solutions, list) or not solutions:
-                st.warning("No Pareto solutions were returned.")
-                return
+        st.subheader("Pareto Resolution Results")
+        summary = result.get("summary")
+        if summary is not None and str(summary).strip().lower() not in {"", "undefined"}:
+            st.info(str(summary))
 
-            metadata_stakeholder_ids = metadata.get("stakeholder_ids")
-            if isinstance(metadata_stakeholder_ids, list):
-                stakeholder_ids = [str(item) for item in metadata_stakeholder_ids]
-            else:
-                stakeholder_ids = list(pareto_stakeholder_ids)
-            if not stakeholder_ids:
-                stakeholder_ids = list(pareto_stakeholder_ids)
+        solutions = result.get("pareto_solutions", [])
+        metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
+        if not isinstance(solutions, list) or not solutions:
+            st.warning("No Pareto solutions were returned.")
+            return
 
-            ablation_utility = metadata.get("ablation_utility_by_solution")
-            if not isinstance(ablation_utility, dict):
-                ablation_utility = {}
+        metadata_stakeholder_ids = metadata.get("stakeholder_ids")
+        if isinstance(metadata_stakeholder_ids, list):
+            stakeholder_ids = [str(item) for item in metadata_stakeholder_ids]
+        else:
+            stakeholder_ids = [str(item) for item in st.session_state.get("pareto_result_stakeholder_ids", [])]
+        if not stakeholder_ids:
+            stakeholder_ids = list(pareto_stakeholder_ids)
 
-            parsed_solutions: list[dict[str, Any]] = []
-            table_rows: list[dict[str, Any]] = []
-            for raw_solution in solutions:
-                solution_id = str(raw_solution.get("solution_id", "")).strip()
-                if not solution_id:
-                    continue
+        ablation_utility = metadata.get("ablation_utility_by_solution")
+        if not isinstance(ablation_utility, dict):
+            ablation_utility = {}
 
-                raw_rank = raw_solution.get("rank", 0)
-                try:
-                    rank = int(raw_rank)
-                except (TypeError, ValueError):
-                    rank = 0
+        parsed_solutions: list[dict[str, Any]] = []
+        table_rows: list[dict[str, Any]] = []
+        for raw_solution in solutions:
+            solution_id = str(raw_solution.get("solution_id", "")).strip()
+            if not solution_id:
+                continue
 
-                raw_objectives = raw_solution.get("objective_scores", {})
-                objective_scores = (
-                    {str(key): float(value) for key, value in raw_objectives.items()}
-                    if isinstance(raw_objectives, dict)
-                    else {}
-                )
-                total_distance = sum(float(objective_scores.get(stakeholder_id, 0.0)) for stakeholder_id in stakeholder_ids)
+            raw_rank = raw_solution.get("rank", 0)
+            try:
+                rank = int(raw_rank)
+            except (TypeError, ValueError):
+                rank = 0
 
-                raw_consensus = raw_solution.get("weights", {}).get("consensus", {})
-                consensus_weights = (
-                    {dimension: float(raw_consensus.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS}
-                    if isinstance(raw_consensus, dict)
-                    else {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
-                )
+            raw_objectives = raw_solution.get("objective_scores", {})
+            objective_scores = (
+                {str(key): float(value) for key, value in raw_objectives.items()}
+                if isinstance(raw_objectives, dict)
+                else {}
+            )
+            total_distance = sum(float(objective_scores.get(stakeholder_id, 0.0)) for stakeholder_id in stakeholder_ids)
 
-                raw_utility = ablation_utility.get(solution_id)
-                utility_wsm: float | None = None
-                if isinstance(raw_utility, (int, float)):
-                    utility_wsm = float(raw_utility)
+            raw_consensus = raw_solution.get("weights", {}).get("consensus", {})
+            consensus_weights = (
+                {dimension: float(raw_consensus.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS}
+                if isinstance(raw_consensus, dict)
+                else {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
+            )
 
-                row: dict[str, Any] = {
+            raw_utility = ablation_utility.get(solution_id)
+            utility_wsm: float | None = None
+            if isinstance(raw_utility, (int, float)):
+                utility_wsm = float(raw_utility)
+
+            row: dict[str, Any] = {
+                "rank": rank,
+                "solution_id": solution_id,
+                "total_distance": fmt_score(total_distance),
+                "utility_wsm": fmt_score(utility_wsm),
+            }
+            for stakeholder_id in stakeholder_ids:
+                row[stakeholder_id] = fmt_score(objective_scores.get(stakeholder_id))
+            table_rows.append(row)
+            parsed_solutions.append(
+                {
                     "rank": rank,
                     "solution_id": solution_id,
-                    "total_distance": fmt_score(total_distance),
-                    "utility_wsm": fmt_score(utility_wsm),
+                    "total_distance": total_distance,
+                    "utility_wsm": utility_wsm,
+                    "consensus_weights": consensus_weights,
+                    "objective_scores": objective_scores,
                 }
-                for stakeholder_id in stakeholder_ids:
-                    row[stakeholder_id] = fmt_score(objective_scores.get(stakeholder_id))
-                table_rows.append(row)
-                parsed_solutions.append(
-                    {
-                        "rank": rank,
-                        "solution_id": solution_id,
-                        "total_distance": total_distance,
-                        "utility_wsm": utility_wsm,
-                        "consensus_weights": consensus_weights,
-                        "objective_scores": objective_scores,
-                    }
-                )
-
-            if not parsed_solutions:
-                st.warning("No valid Pareto solutions were returned.")
-                return
-
-            parsed_solutions.sort(key=lambda item: (item["rank"] if item["rank"] > 0 else 10**9, item["solution_id"]))
-            table_rows.sort(key=lambda item: (item["rank"] if item["rank"] > 0 else 10**9, item["solution_id"]))
-
-            st.subheader("Solutions")
-            st.dataframe(table_rows, width="stretch", hide_index=True)
-
-            solution_ids = [item["solution_id"] for item in parsed_solutions]
-            selected_solution_id = st.selectbox("Select Solution", options=solution_ids)
-            selected_solution = next(
-                item for item in parsed_solutions if item["solution_id"] == selected_solution_id
             )
 
-            selected_consensus = selected_solution["consensus_weights"]
-            selected_objectives = selected_solution["objective_scores"]
-            selected_total_distance = float(selected_solution["total_distance"])
-            selected_utility = selected_solution["utility_wsm"]
-            selected_rank = int(selected_solution["rank"])
-            top_dimension = max(selected_consensus.items(), key=lambda item: float(item[1]))[0]
-            highest_distance_stakeholder = "N/A"
-            if selected_objectives:
-                highest_distance_stakeholder = max(
-                    selected_objectives.items(), key=lambda item: float(item[1])
-                )[0]
+        if not parsed_solutions:
+            st.warning("No valid Pareto solutions were returned.")
+            return
 
-            utility_text = fmt_score(selected_utility)
+        parsed_solutions.sort(key=lambda item: (item["rank"] if item["rank"] > 0 else 10**9, item["solution_id"]))
+        table_rows.sort(key=lambda item: (item["rank"] if item["rank"] > 0 else 10**9, item["solution_id"]))
 
-            st.info(
-                "\n".join(
-                    [
-                        "**Resolution Summary**",
-                        f"- Rank: {selected_rank}",
-                        f"- Total distance: {fmt_score(selected_total_distance)}",
-                        f"- Utility (WSM ablation): {utility_text}",
-                        f"- Top-1 consensus dimension: {top_dimension}",
-                        f"- Highest stakeholder distance: {highest_distance_stakeholder}",
-                    ]
-                )
-            )
+        st.subheader("Solutions")
+        st.dataframe(table_rows, width="stretch", hide_index=True)
 
-            st.subheader("Consensus Weights Radar")
-            radar_labels = [DIMENSION_DISPLAY_NAMES[dimension] for dimension in UNIFIED_DIMENSIONS]
-            radar_values = [float(selected_consensus.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
-            radar_labels_closed = radar_labels + [radar_labels[0]]
-            radar_values_closed = radar_values + [radar_values[0]]
-            solution_trace_name = safe_str(selected_solution_id).strip()
-            if solution_trace_name.lower() == "undefined":
-                solution_trace_name = ""
-            radar_figure = go.Figure()
-            radar_figure.add_trace(
-                go.Scatterpolar(
-                    r=radar_values_closed,
-                    theta=radar_labels_closed,
-                    fill="toself",
-                    name=solution_trace_name,
-                    line={"color": BRAND_BLUE_HEX, "width": 2},
-                    fillcolor=BRAND_BLUE_FILL_RGBA,
-                )
-            )
-            radar_figure.update_layout(
-                polar={"radialaxis": {"visible": True, "range": [0, 1]}},
-                showlegend=False,
-                margin={"l": 40, "r": 40, "t": 40, "b": 40},
-            )
-            st.plotly_chart(
-                style_plotly(radar_figure, tokens),
-                width="stretch",
-                key=f"pareto_weights_radar_{selected_solution_id}",
-            )
+        solution_ids = [str(item["solution_id"]) for item in parsed_solutions]
+        if "pareto_selected_id" not in st.session_state:
+            st.session_state["pareto_selected_id"] = solution_ids[0]
+        if st.session_state["pareto_selected_id"] not in solution_ids:
+            st.session_state["pareto_selected_id"] = solution_ids[0]
+        if st.session_state.get("pareto_solution_select") not in solution_ids:
+            st.session_state["pareto_solution_select"] = st.session_state["pareto_selected_id"]
 
-            st.subheader("Stakeholder Distance (Lower = Better Alignment)")
-            distance_values = [float(selected_objectives.get(stakeholder_id, 0.0)) for stakeholder_id in stakeholder_ids]
-            bar_figure = go.Figure(
-                data=[
-                    go.Bar(
-                        x=stakeholder_ids,
-                        y=distance_values,
-                        name="Distance",
-                        marker={"color": BRAND_BLUE_HEX},
-                    )
+        selected_solution_id = st.selectbox(
+            "Select Solution",
+            solution_ids,
+            index=solution_ids.index(st.session_state["pareto_selected_id"]),
+            key="pareto_solution_select",
+        )
+        st.session_state["pareto_selected_id"] = selected_solution_id
+        selected_solution = next(
+            item for item in parsed_solutions if item["solution_id"] == st.session_state["pareto_selected_id"]
+        )
+
+        selected_consensus = selected_solution["consensus_weights"]
+        selected_objectives = selected_solution["objective_scores"]
+        selected_total_distance = float(selected_solution["total_distance"])
+        selected_utility = selected_solution["utility_wsm"]
+        selected_rank = int(selected_solution["rank"])
+        top_dimension = max(selected_consensus.items(), key=lambda item: float(item[1]))[0]
+        highest_distance_stakeholder = "N/A"
+        if selected_objectives:
+            highest_distance_stakeholder = max(
+                selected_objectives.items(), key=lambda item: float(item[1])
+            )[0]
+
+        utility_text = fmt_score(selected_utility)
+
+        st.info(
+            "\n".join(
+                [
+                    "**Resolution Summary**",
+                    f"- Rank: {selected_rank}",
+                    f"- Total distance: {fmt_score(selected_total_distance)}",
+                    f"- Utility (WSM ablation): {utility_text}",
+                    f"- Top-1 consensus dimension: {top_dimension}",
+                    f"- Highest stakeholder distance: {highest_distance_stakeholder}",
                 ]
             )
-            bar_figure.update_layout(
-                title="Stakeholder Distance (Lower = Better Alignment)",
-                xaxis_title="Stakeholder",
-                yaxis_title="Distance",
+        )
+
+        st.subheader("Consensus Weights Radar")
+        radar_labels = [DIMENSION_DISPLAY_NAMES[dimension] for dimension in UNIFIED_DIMENSIONS]
+        radar_values = [float(selected_consensus.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
+        radar_labels_closed = radar_labels + [radar_labels[0]]
+        radar_values_closed = radar_values + [radar_values[0]]
+        solution_trace_name = safe_str(selected_solution_id).strip()
+        if solution_trace_name.lower() == "undefined":
+            solution_trace_name = ""
+        radar_figure = go.Figure()
+        radar_figure.add_trace(
+            go.Scatterpolar(
+                r=radar_values_closed,
+                theta=radar_labels_closed,
+                fill="toself",
+                name=solution_trace_name,
+                line={"color": BRAND_BLUE_HEX, "width": 2},
+                fillcolor=BRAND_BLUE_FILL_RGBA,
+            )
+        )
+        radar_figure.update_layout(
+            polar={"radialaxis": {"visible": True, "range": [0, 1]}},
+            showlegend=False,
+            margin={"l": 40, "r": 40, "t": 40, "b": 40},
+        )
+        st.plotly_chart(
+            style_plotly(radar_figure, tokens),
+            width="stretch",
+            key=f"pareto_weights_radar_{selected_solution_id}",
+        )
+
+        st.subheader("Stakeholder Distance (Lower = Better Alignment)")
+        distance_values = [float(selected_objectives.get(stakeholder_id, 0.0)) for stakeholder_id in stakeholder_ids]
+        bar_figure = go.Figure(
+            data=[
+                go.Bar(
+                    x=stakeholder_ids,
+                    y=distance_values,
+                    name="Distance",
+                    marker={"color": BRAND_BLUE_HEX},
+                )
+            ]
+        )
+        bar_figure.update_layout(
+            title="Stakeholder Distance (Lower = Better Alignment)",
+            xaxis_title="Stakeholder",
+            yaxis_title="Distance",
+            margin={"l": 40, "r": 40, "t": 60, "b": 40},
+        )
+        st.plotly_chart(
+            style_plotly(bar_figure, tokens),
+            width="stretch",
+            key=f"pareto_distance_bar_{selected_solution_id}",
+        )
+
+        st.subheader("Tradeoff Visualization")
+        if len(stakeholder_ids) == 2:
+            stakeholder_a, stakeholder_b = stakeholder_ids
+            all_x = [
+                float(item["objective_scores"].get(stakeholder_a, 0.0))
+                for item in parsed_solutions
+            ]
+            all_y = [
+                float(item["objective_scores"].get(stakeholder_b, 0.0))
+                for item in parsed_solutions
+            ]
+            all_ranks = [str(item["rank"]) for item in parsed_solutions]
+
+            selected_x = float(selected_objectives.get(stakeholder_a, 0.0))
+            selected_y = float(selected_objectives.get(stakeholder_b, 0.0))
+
+            scatter_figure = go.Figure()
+            scatter_figure.add_trace(
+                go.Scatter(
+                    x=all_x,
+                    y=all_y,
+                    mode="markers+text",
+                    text=all_ranks,
+                    textposition="top center",
+                    name="Pareto solutions",
+                    marker={"size": 9, "color": BRAND_BLUE_HEX},
+                )
+            )
+            scatter_figure.add_trace(
+                go.Scatter(
+                    x=[selected_x],
+                    y=[selected_y],
+                    mode="markers",
+                    name="Selected",
+                    marker={"size": 14, "color": "#d62728", "symbol": "diamond"},
+                )
+            )
+            scatter_figure.update_layout(
+                title=f"Tradeoff: {stakeholder_a} vs {stakeholder_b}",
+                xaxis_title=f"{stakeholder_a} distance",
+                yaxis_title=f"{stakeholder_b} distance",
                 margin={"l": 40, "r": 40, "t": 60, "b": 40},
             )
             st.plotly_chart(
-                style_plotly(bar_figure, tokens),
+                style_plotly(scatter_figure, tokens),
                 width="stretch",
-                key=f"pareto_distance_bar_{selected_solution_id}",
+                key=f"pareto_tradeoff_scatter_{stakeholder_a}_{stakeholder_b}",
             )
-
-            st.subheader("Tradeoff Visualization")
-            if len(stakeholder_ids) == 2:
-                stakeholder_a, stakeholder_b = stakeholder_ids
-                all_x = [
-                    float(item["objective_scores"].get(stakeholder_a, 0.0))
-                    for item in parsed_solutions
-                ]
-                all_y = [
-                    float(item["objective_scores"].get(stakeholder_b, 0.0))
-                    for item in parsed_solutions
-                ]
-                all_ranks = [str(item["rank"]) for item in parsed_solutions]
-
-                selected_x = float(selected_objectives.get(stakeholder_a, 0.0))
-                selected_y = float(selected_objectives.get(stakeholder_b, 0.0))
-
-                scatter_figure = go.Figure()
-                scatter_figure.add_trace(
-                    go.Scatter(
-                        x=all_x,
-                        y=all_y,
-                        mode="markers+text",
-                        text=all_ranks,
-                        textposition="top center",
-                        name="Pareto solutions",
-                        marker={"size": 9, "color": BRAND_BLUE_HEX},
-                    )
+        elif len(stakeholder_ids) >= 3:
+            dimension_specs = [
+                {
+                    "label": stakeholder_id,
+                    "values": [
+                        float(item["objective_scores"].get(stakeholder_id, 0.0))
+                        for item in parsed_solutions
+                    ],
+                }
+                for stakeholder_id in stakeholder_ids
+            ]
+            line_color = [float(item["total_distance"]) for item in parsed_solutions]
+            parallel_figure = go.Figure(
+                data=go.Parcoords(
+                    line={
+                        "color": line_color,
+                        "colorscale": "Viridis",
+                        "showscale": True,
+                        "colorbar": {"title": "Total distance"},
+                    },
+                    dimensions=dimension_specs,
                 )
-                scatter_figure.add_trace(
-                    go.Scatter(
-                        x=[selected_x],
-                        y=[selected_y],
-                        mode="markers",
-                        name="Selected",
-                        marker={"size": 14, "color": "#d62728", "symbol": "diamond"},
-                    )
-                )
-                scatter_figure.update_layout(
-                    title=f"Tradeoff: {stakeholder_a} vs {stakeholder_b}",
-                    xaxis_title=f"{stakeholder_a} distance",
-                    yaxis_title=f"{stakeholder_b} distance",
-                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                )
-                st.plotly_chart(
-                    style_plotly(scatter_figure, tokens),
-                    width="stretch",
-                    key=f"pareto_tradeoff_scatter_{stakeholder_a}_{stakeholder_b}",
-                )
-            elif len(stakeholder_ids) >= 3:
-                dimension_specs = [
-                    {
-                        "label": stakeholder_id,
-                        "values": [
-                            float(item["objective_scores"].get(stakeholder_id, 0.0))
-                            for item in parsed_solutions
-                        ],
-                    }
-                    for stakeholder_id in stakeholder_ids
-                ]
-                line_color = [float(item["total_distance"]) for item in parsed_solutions]
-                parallel_figure = go.Figure(
-                    data=go.Parcoords(
-                        line={
-                            "color": line_color,
-                            "colorscale": "Viridis",
-                            "showscale": True,
-                            "colorbar": {"title": "Total distance"},
-                        },
-                        dimensions=dimension_specs,
-                    )
-                )
-                parallel_figure.update_layout(
-                    title="Stakeholder Distance Tradeoffs",
-                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
-                )
-                st.plotly_chart(
-                    style_plotly(parallel_figure, tokens),
-                    width="stretch",
-                    key=f"pareto_tradeoff_parallel_{len(stakeholder_ids)}",
-                )
-                st.caption(f"Selected solution: {selected_solution_id} (rank {selected_rank})")
-            else:
-                st.info("Select at least 2 stakeholders to view tradeoffs.")
+            )
+            parallel_figure.update_layout(
+                title="Stakeholder Distance Tradeoffs",
+                margin={"l": 40, "r": 40, "t": 60, "b": 40},
+            )
+            st.plotly_chart(
+                style_plotly(parallel_figure, tokens),
+                width="stretch",
+                key=f"pareto_tradeoff_parallel_{len(stakeholder_ids)}",
+            )
+            st.caption(f"Selected solution: {selected_solution_id} (rank {selected_rank})")
+        else:
+            st.info("Select at least 2 stakeholders to view tradeoffs.")
     else:
         case_framework_ids = [framework_id] if framework_id else []
         case_stakeholder_ids = ["developer", "regulator", "affected_community"]
@@ -2385,7 +2404,7 @@ def main() -> None:
             ]
             st.dataframe(sample_table, width="stretch", hide_index=True)
 
-    st.caption("MEDF v1.0: Feature Frozen Build • Reproducible Artifact.")
+    st.caption("MEDF v2.0: Feature Frozen Build • Reproducible Artifact.")
 
 
 if __name__ == "__main__":
