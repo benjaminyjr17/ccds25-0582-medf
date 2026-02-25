@@ -6,9 +6,16 @@ Engineering freeze tag: `fyp-freeze-v1.0.0`.
 
 ---
 
-## Project Description
+## Executive Summary
 
-The Multi-Stakeholder Ethical Decision Framework (MEDF) is an academic evaluation platform for AI governance analysis across multiple ethical frameworks and stakeholder perspectives. The frozen release includes multi-framework scoring, conflict detection, Pareto-based consensus optimization with NSGA-II, deterministic mode for reproducibility, an institutional-grade Streamlit interface, audit logging for traceability, and release smoke and stress validation for stability assurance.
+The Multi-Stakeholder Ethical Decision Framework (MEDF) is a methodological and computational framework for governance-oriented evaluation of AI systems. It addresses a core governance problem: ethical assessment practices that treat framework selection and stakeholder perspective as fixed inputs rather than contested variables. MEDF introduces an integrated approach that combines multi-framework evaluation, stakeholder conflict modeling, and Pareto-based consensus optimization under deterministic controls. Operationally, the system provides API-driven analysis, institutional Streamlit presentation workflows, audit traceability, and repeatable validation procedures suitable for regulatory, policy, and academic review.
+
+## Governance Context
+
+- Multi-framework evaluation enables the same AI system to be assessed under distinct normative structures without collapsing framework semantics into a single score model.
+- Stakeholder conflict modeling identifies disagreement patterns across developer, regulator, and affected-community preference vectors.
+- Pre-deployment risk identification is supported through comparative scoring, conflict intensity analysis, and consensus tradeoff diagnostics before operational rollout.
+- Regulatory applicability is aligned with evidence-oriented governance workflows, including auditable computations, reproducibility controls, and stable endpoint contracts.
 
 ## System Capabilities
 
@@ -21,16 +28,64 @@ The Multi-Stakeholder Ethical Decision Framework (MEDF) is an academic evaluatio
 - Stress-tested performance under high-load parameters.
 - Complete pytest validation suite.
 
-## Architecture Overview
+## Formal Methodology
 
-- Streamlit UI layer for institutional analytics presentation and governance review workflows.
-- FastAPI orchestration layer for request validation, routing, and response serialization.
-- Scoring engine for MCDA-based evaluation using TOPSIS, WSM, and AHP-supported workflows.
-- Conflict engine for stakeholder disagreement quantification using salience-weighted ranking analysis.
-- Pareto engine for NSGA-II consensus weight search with deterministic execution controls.
-- Framework YAML registry for harmonized ethical dimension mapping and framework metadata loading.
-- SQLite stakeholder store for default profiles and persisted stakeholder configuration state.
-- Audit log for endpoint-level request and response traceability.
+### Optimization Objective
+
+The consensus optimization objective is expressed as follows.
+
+```text
+minimize sum_i s_i |w_i - w_k|.
+```
+
+- `s_i` denotes stakeholder salience coefficients.
+- `w_i` denotes stakeholder-specific weight components.
+- `w_k` denotes candidate consensus weight components across the unified dimension space.
+- The objective minimizes salience-weighted absolute deviation between stakeholder preferences and candidate consensus vectors.
+
+### Salience, Constraints, and Frontier Construction
+
+- Salience vectors are constructed from stakeholder participation and weighting context so that stakeholder influence is explicitly represented during conflict and optimization analysis.
+- Stakeholder weight validation enforces numeric inputs, complete unified-dimension coverage, bounded values, and near-unit sum constraints.
+- Simplex normalization is applied so accepted weight vectors are non-negative and sum to 1.0 within model tolerance.
+- Pareto frontier generation is performed with NSGA-II and non-dominated filtering over stakeholder objective scores.
+- Deterministic seed control is exposed through request parameters and deterministic mode flags for repeatable optimization behavior.
+- Ablation utility recording is retained through evaluation study procedures and stress-test artifacts to isolate the contribution of modeling components.
+
+## System Architecture
+
+- Streamlit presentation layer for governance-facing visualization and review workflows.
+- FastAPI orchestration layer for validation, routing, and response serialization.
+- Scoring engine implementing TOPSIS and WSM pathways with AHP-supported weighting workflows.
+- Conflict engine implementing salience-weighted stakeholder disagreement analysis.
+- Pareto optimization engine implementing NSGA-II consensus search.
+- Framework YAML registry for framework metadata and unified-dimension mappings.
+- SQLite stakeholder store for persisted stakeholder profiles and defaults.
+- Audit logging layer for request-response traceability.
+- Separation of concerns is maintained by isolating presentation, orchestration, scoring, conflict, optimization, registry, and persistence responsibilities.
+
+## Validation and Robustness
+
+- Complete pytest validation suite execution at freeze time.
+- Deterministic stress testing with repeated endpoint calls.
+- High-limit Pareto configuration validation (`n_solutions=50`, `pop_size=256`, `n_gen=300`).
+- Smoke test runner execution through `scripts/release_smoke.sh`.
+- Reproducibility guarantees verified through repeated deterministic runs and invariant checks.
+
+## Determinism and Reproducibility
+
+- Seed control is provided through Pareto request parameters.
+- Deterministic mode enforces repeatable optimization behavior when enabled.
+- Non-flaky test behavior was observed during release validation runs.
+- Stress-run verification was conducted under repeated deterministic configurations.
+
+## Engineering Freeze and Governance Stability
+
+- Freeze tag: `fyp-freeze-v1.0.0`.
+- Repository state at freeze validation: clean and traceable.
+- Feature development policy: no post-freeze feature additions.
+- Hotfix policy: only critical defect remediation under a new release tag.
+- Scope boundaries: freeze constraints apply to API surface, scoring pathways, conflict logic, optimization behavior, and governance UI contracts.
 
 ## Methodological Foundation
 
@@ -67,7 +122,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Running Backend
+## Backend Execution
 
 Use the backend command below.
 
@@ -81,7 +136,7 @@ Backend documentation endpoint.
 http://localhost:8000/api/docs
 ```
 
-## Running Frontend
+## Frontend Execution
 
 Use the dashboard command below.
 
@@ -120,33 +175,19 @@ Run release smoke and stress validation.
 bash scripts/release_smoke.sh
 ```
 
-## Determinism and Validation
-
-- Seed control is exposed through Pareto request parameters.
-- Deterministic mode enforces repeatable optimization behavior when enabled.
-- Stress validation is executed with high-load settings (`n_solutions=50`, `pop_size=256`, `n_gen=300`).
-- Reproducibility guarantees are validated through repeated deterministic runs and invariant checks.
-
-## Engineering Freeze State
-
-- Tag name: `fyp-freeze-v1.0.0`.
-- Test status: complete pytest suite passing at freeze time.
-- Smoke validation status: release smoke and stress runner passing.
-- Freeze policy: post-tag changes are limited to critical defect remediation under a new tag.
-
 ## Case Studies
 
 - Facial Recognition for Law Enforcement.
 - Hiring Recommendation Algorithm.
 - Healthcare Diagnostic AI.
 
-## Limitations
+## Limitations and Scope Boundaries
 
-- The platform targets academic research and evaluation, not production hardening.
-- Authentication and access control are not implemented in this release.
-- Deployment guidance is centered on localhost execution.
-- Maximum-parameter Pareto runs can require multiple seconds.
+- No authentication or authorization layer is implemented in this release.
+- Execution guidance targets localhost deployment configurations.
 - Framework normative priors are not directly embedded in the Pareto objective function.
+- The platform remains a research-grade prototype for evaluation and policy analysis workflows.
+- High-load Pareto configurations can require multi-second execution time.
 
 ## Repository Description (Short Version)
 
