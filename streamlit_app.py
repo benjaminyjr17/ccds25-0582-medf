@@ -35,64 +35,47 @@ LIKERT_MIN = 1.0
 LIKERT_MAX = 7.0
 
 
-def map_1_5_to_1_7(x: float) -> float:
-    return 1.0 + (float(x) - 1.0) * 1.5
-
-
-def _map_vector_1_5_to_1_7(vector: dict[str, float]) -> dict[str, float]:
-    return {
-        dimension: round(map_1_5_to_1_7(float(vector[dimension])), 1)
-        for dimension in UNIFIED_DIMENSIONS
+def _flip_likert_profile(profile: dict[str, float]) -> dict[str, float]:
+    flipped = {
+        dimension: round((LIKERT_MIN + LIKERT_MAX) - float(score), 1)
+        for dimension, score in profile.items()
     }
+    for dimension, score in flipped.items():
+        if score < LIKERT_MIN or score > LIKERT_MAX:
+            raise ValueError(f"Flipped preset score for '{dimension}' is out of range.")
+    return flipped
 
 
-PRESET_BASELINE = _map_vector_1_5_to_1_7(
-    {
-        "transparency_explainability": 2,
-        "fairness_nondiscrimination": 1,
-        "safety_robustness": 4,
-        "privacy_data_governance": 1,
-        "human_agency_oversight": 2,
-        "accountability": 3,
-    }
-)
+BASELINE_DIMENSION_SCORES = {
+    # A plausible mid-risk enterprise AI system with stronger safety/accountability controls.
+    "transparency_explainability": 4.0,
+    "fairness_nondiscrimination": 4.0,
+    "safety_robustness": 5.0,
+    "privacy_data_governance": 4.0,
+    "human_agency_oversight": 4.0,
+    "accountability": 5.0,
+}
 
-PRESET_FLIPPED = _map_vector_1_5_to_1_7(
-    {
-        "transparency_explainability": 4,
-        "fairness_nondiscrimination": 5,
-        "safety_robustness": 1,
-        "privacy_data_governance": 5,
-        "human_agency_oversight": 5,
-        "accountability": 4,
-    }
-)
+FLIPPED_DIMENSION_SCORES = _flip_likert_profile(BASELINE_DIMENSION_SCORES)
 
-PRESET_SAFETY_HEAVY = _map_vector_1_5_to_1_7(
-    {
-        "transparency_explainability": 3,
-        "fairness_nondiscrimination": 3,
-        "safety_robustness": 5,
-        "privacy_data_governance": 3,
-        "human_agency_oversight": 3,
-        "accountability": 3,
-    }
-)
+PRESET_BASELINE = dict(BASELINE_DIMENSION_SCORES)
+PRESET_FLIPPED = dict(FLIPPED_DIMENSION_SCORES)
+
+# A system profile that emphasizes strong safety controls while keeping other dimensions moderate.
+PRESET_SAFETY_HEAVY = {
+    "transparency_explainability": 4.0,
+    "fairness_nondiscrimination": 4.0,
+    "safety_robustness": 7.0,
+    "privacy_data_governance": 4.0,
+    "human_agency_oversight": 4.0,
+    "accountability": 4.0,
+}
 
 DEMO_SCENARIO_NAME = "Hiring Screening (Demo)"
 DEMO_SCENARIO_DESCRIPTION = (
     "Automated resume screening for job applicants using ML scoring."
 )
-DEMO_DIMENSION_SCORES = _map_vector_1_5_to_1_7(
-    {
-        "transparency_explainability": 2,
-        "fairness_nondiscrimination": 1,
-        "safety_robustness": 4,
-        "privacy_data_governance": 1,
-        "human_agency_oversight": 2,
-        "accountability": 3,
-    }
-)
+DEMO_DIMENSION_SCORES = dict(BASELINE_DIMENSION_SCORES)
 
 DEMO_WEIGHTS = {
     "developer": {
@@ -130,18 +113,17 @@ CASE_STUDIES = [
         "description": (
             "This scenario models law-enforcement facial recognition with low fairness and privacy ratings. "
             "It is designed to expose structural disagreement between technical and affected-community priorities. "
-            "Expected behavior: weights-only developer↔affected correlation is negative and Pareto tradeoffs are visible."
+            "Expected behavior: Priority Conflict (Weights-Only) developer↔affected correlation is negative, "
+            "and Pareto tradeoffs are visible."
         ),
-        "dimension_scores": _map_vector_1_5_to_1_7(
-            {
-                "transparency_explainability": 2,
-                "fairness_nondiscrimination": 1,
-                "safety_robustness": 4,
-                "privacy_data_governance": 1,
-                "human_agency_oversight": 2,
-                "accountability": 3,
-            }
-        ),
+        "dimension_scores": {
+            "transparency_explainability": 2.5,
+            "fairness_nondiscrimination": 1.0,
+            "safety_robustness": 5.5,
+            "privacy_data_governance": 1.0,
+            "human_agency_oversight": 2.5,
+            "accountability": 4.0,
+        },
     },
     {
         "id": "hiring_recommendation",
@@ -151,16 +133,14 @@ CASE_STUDIES = [
             "Scores are balanced overall but emphasize human-agency controls and accountability. "
             "It is useful for examining whether stakeholder conflict remains moderate under less extreme inputs."
         ),
-        "dimension_scores": _map_vector_1_5_to_1_7(
-            {
-                "transparency_explainability": 3,
-                "fairness_nondiscrimination": 2,
-                "safety_robustness": 3,
-                "privacy_data_governance": 3,
-                "human_agency_oversight": 4,
-                "accountability": 3,
-            }
-        ),
+        "dimension_scores": {
+            "transparency_explainability": 4.0,
+            "fairness_nondiscrimination": 2.5,
+            "safety_robustness": 4.0,
+            "privacy_data_governance": 4.0,
+            "human_agency_oversight": 5.5,
+            "accountability": 4.0,
+        },
     },
     {
         "id": "healthcare_diagnostic",
@@ -170,16 +150,14 @@ CASE_STUDIES = [
             "Privacy and accountability remain high, reflecting regulated healthcare deployment constraints. "
             "It helps illustrate consensus behavior when risk tolerance is low and reliability is prioritized."
         ),
-        "dimension_scores": _map_vector_1_5_to_1_7(
-            {
-                "transparency_explainability": 3,
-                "fairness_nondiscrimination": 3,
-                "safety_robustness": 5,
-                "privacy_data_governance": 4,
-                "human_agency_oversight": 3,
-                "accountability": 4,
-            }
-        ),
+        "dimension_scores": {
+            "transparency_explainability": 4.0,
+            "fairness_nondiscrimination": 4.0,
+            "safety_robustness": 7.0,
+            "privacy_data_governance": 5.5,
+            "human_agency_oversight": 4.0,
+            "accountability": 5.5,
+        },
     },
 ]
 
@@ -693,7 +671,7 @@ def main() -> None:
         st.markdown(
             "Each stakeholder provides a preference vector over the same six dimensions."
         )
-        st.latex(r"\tilde{w}_i = w^{stake}_i \cdot w^{fw}_i")
+        st.latex(r"\tilde{w}_i = w^{stake}_i \times w^{fw}_i")
         st.latex(r"w^{eff}_i = \frac{\tilde{w}_i}{\sum_{j=1}^{6} \tilde{w}_j}")
 
         st.markdown("---")
@@ -709,11 +687,12 @@ def main() -> None:
         st.markdown("### 5. Conflict Detection")
         st.markdown(
             """
-- Weights-only conflict compares stakeholder priorities directly.
-- Contribution-based conflict compares stakeholder rankings after accounting for system performance.
+- Priority Conflict (Weights-Only) compares stakeholder priorities directly.
+- System-Salience Conflict (Contribution-Based) compares stakeholder rankings after accounting for system performance.
+- Contribution (Contrib) is the stakeholder-weighted impact of each dimension for the selected AI system.
 """
         )
-        st.latex(r"\text{contrib}_i = \hat{x}_i \cdot w^{stake}_i")
+        st.latex(r"\text{contrib}_i = \hat{x}_i \times w^{stake}_i")
         st.markdown("where $\\hat{x}_i$ is the normalized system score on dimension $i$.")
 
         st.markdown("---")
@@ -754,7 +733,7 @@ def main() -> None:
         framework_label = ""
         stakeholder_id = ""
         scoring_method = "topsis"
-        conflict_metric = "Weights-only (priority conflict)"
+        conflict_metric = "Priority Conflict (Weights-Only)"
         detect_clicked = False
         screenshot_mode = False
         selected_stakeholder: dict[str, Any] | None = None
@@ -878,8 +857,17 @@ def main() -> None:
             st.markdown("**Method**")
             conflict_metric = st.radio(
                 "Conflict metric",
-                ["Weights-only (priority conflict)", "Contrib-based (system-salience conflict)"],
+                [
+                    "Priority Conflict (Weights-Only)",
+                    "System-Salience Conflict (Contribution-Based)",
+                ],
                 index=0,
+            )
+            st.caption(
+                "Contribution (Contrib) is the stakeholder-weighted impact of a dimension for the selected AI system: "
+                "contrib_i = normalized_score_i × stakeholder_weight_i. "
+                "System-Salience Conflict compares stakeholders after accounting for system performance, "
+                "not only stated priorities."
             )
             st.markdown("**Display**")
             screenshot_mode = st.checkbox("Screenshot mode", value=False)
@@ -910,7 +898,7 @@ def main() -> None:
 
             st.markdown("**Search Parameters**")
             pareto_n_solutions = st.slider("n_solutions", min_value=1, max_value=42, value=8, step=1)
-            pareto_pop_size = st.slider("pop_size", min_value=20, max_value=200, value=40, step=10)
+            pareto_pop_size = st.slider("pop_size", min_value=10, max_value=250, value=40, step=10)
             pareto_n_gen = st.slider("n_gen", min_value=0, max_value=500, value=150, step=10)
 
             approx_evals = pareto_pop_size * (max(pareto_n_gen, 1) + 1)
@@ -960,9 +948,9 @@ def main() -> None:
             st.subheader("Dimension Scores (Likert 1–7)")
             if page in {"Conflict Detection", "Pareto Resolution"}:
                 preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
-                if preset_col_1.button("Preset: Baseline (2.5,1.0,5.5,1.0,2.5,4.0)"):
+                if preset_col_1.button("Preset: Baseline (4.0,4.0,5.0,4.0,4.0,5.0)"):
                     _apply_dimension_preset(PRESET_BASELINE)
-                if preset_col_2.button("Preset: Flipped (5.5,7.0,1.0,7.0,7.0,5.5)"):
+                if preset_col_2.button("Preset: Flipped (4.0,4.0,3.0,4.0,4.0,3.0)"):
                     _apply_dimension_preset(PRESET_FLIPPED)
                 if preset_col_3.button("Preset: Safety-heavy (4.0,4.0,7.0,4.0,4.0,4.0)"):
                     _apply_dimension_preset(PRESET_SAFETY_HEAVY)
@@ -1162,7 +1150,12 @@ def main() -> None:
             if summary_text is not None and str(summary_text).strip().lower() not in {"", "undefined"}:
                 st.info(str(summary_text))
             if not screenshot_mode:
-                st.caption("Switch conflict metric in the sidebar to compare weights-only vs contrib-based views.")
+                st.info(
+                    "Contribution (Contrib) is the stakeholder-weighted impact of each dimension for the selected "
+                    "AI system: contrib_i = normalized_score_i × stakeholder_weight_i. "
+                    "Priority Conflict compares stakeholder priorities directly. "
+                    "System-Salience Conflict compares stakeholder rankings after accounting for system performance."
+                )
 
             conflicts = result.get("conflicts", [])
             metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
@@ -1200,8 +1193,8 @@ def main() -> None:
             with demo_box:
                 st.markdown("**Demo Summary**")
                 metric_col_1, metric_col_2 = st.columns(2)
-                metric_col_1.metric("rho_weights(dev, affected)", rho_weights_dev_affected)
-                metric_col_2.metric("rho_contrib(dev, affected)", rho_contrib_dev_affected)
+                metric_col_1.metric("rho_priority(dev, affected)", rho_weights_dev_affected)
+                metric_col_2.metric("rho_contribution(dev, affected)", rho_contrib_dev_affected)
 
                 stakeholders_for_top1 = list(conflict_stakeholder_ids)
                 if not stakeholders_for_top1:
@@ -1239,7 +1232,7 @@ def main() -> None:
                         {
                             "stakeholder_id": stakeholder_id,
                             "top1_weights": weights_top_1,
-                            "top1_contrib": contrib_top_1,
+                            "top1_contribution": contrib_top_1,
                         }
                     )
 
@@ -1269,12 +1262,12 @@ def main() -> None:
             else:
                 st.info("No stakeholder conflicts were returned.")
 
-            if conflict_metric == "Weights-only (priority conflict)":
+            if conflict_metric == "Priority Conflict (Weights-Only)":
                 correlation_matrix = correlation_matrix_weights
-                matrix_title = "Stakeholder Spearman Correlation Matrix (Weights-only)"
+                matrix_title = "Stakeholder Spearman Correlation Matrix (Priority Conflict, Weights-Only)"
             else:
                 correlation_matrix = correlation_matrix_contrib
-                matrix_title = "Stakeholder Spearman Correlation Matrix (Contrib-based)"
+                matrix_title = "Stakeholder Spearman Correlation Matrix (System-Salience Conflict, Contribution-Based)"
 
             if isinstance(correlation_matrix, dict) and correlation_matrix:
                 labels = [
@@ -1908,7 +1901,7 @@ def main() -> None:
                         weights_heatmap = _build_correlation_heatmap(
                             matrix_weights,
                             labels=matrix_labels,
-                            title="Weights-only Correlation",
+                            title="Priority Conflict (Weights-Only) Correlation",
                         )
                         st.plotly_chart(
                             style_plotly(weights_heatmap, tokens),
@@ -1916,13 +1909,13 @@ def main() -> None:
                             key=f"case_{case_id}_weights_heatmap",
                         )
                     else:
-                        st.info("Weights-only matrix unavailable.")
+                        st.info("Priority Conflict matrix is unavailable.")
                 with matrix_col_2:
                     if isinstance(matrix_contrib, dict):
                         contrib_heatmap = _build_correlation_heatmap(
                             matrix_contrib,
                             labels=matrix_labels,
-                            title="Contrib-based Correlation",
+                            title="System-Salience Conflict (Contribution-Based) Correlation",
                         )
                         st.plotly_chart(
                             style_plotly(contrib_heatmap, tokens),
@@ -1930,7 +1923,7 @@ def main() -> None:
                             key=f"case_{case_id}_contrib_heatmap",
                         )
                     else:
-                        st.info("Contrib-based matrix unavailable.")
+                        st.info("System-Salience Conflict matrix is unavailable.")
 
                 rho_weights = "N/A"
                 rho_contrib = "N/A"
@@ -1945,7 +1938,7 @@ def main() -> None:
 
                 rho_col_1, rho_col_2 = st.columns(2)
                 rho_col_1.metric("dev↔affected weights rho", rho_weights)
-                rho_col_2.metric("dev↔affected contrib rho", rho_contrib)
+                rho_col_2.metric("dev↔affected contribution rho", rho_contrib)
 
                 st.divider()
                 st.markdown("### Section C: Pareto Resolution")
@@ -2365,7 +2358,7 @@ def main() -> None:
             ]
             st.dataframe(sample_table, width="stretch", hide_index=True)
 
-    st.caption("MEDF v1.0: Feature Frozen Build • Reproducible Artifact")
+    st.caption("MEDF v1.0: Feature Frozen Build • Reproducible Artifact.")
 
 
 if __name__ == "__main__":
