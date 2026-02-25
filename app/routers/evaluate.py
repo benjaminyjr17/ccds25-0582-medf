@@ -149,6 +149,69 @@ def _ordered_criteria_types(framework_id: str, framework_dimensions: list) -> li
     return criteria_types
 
 
+def _framework_default_weights(framework) -> dict[str, float]:
+    dimension_map = {dimension.name: dimension for dimension in framework.dimensions}
+    missing = [dimension for dimension in UNIFIED_DIMENSIONS if dimension not in dimension_map]
+    if missing:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=(
+                f"Framework '{framework.id}' is missing default weights for dimensions: "
+                + ", ".join(missing)
+            ),
+        )
+
+    default_weights: dict[str, float] = {}
+    for dimension in UNIFIED_DIMENSIONS:
+        raw_weight = getattr(dimension_map[dimension], "weight_default", None)
+        try:
+            weight = float(raw_weight)
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Framework '{framework.id}' has invalid weight_default for '{dimension}'.",
+            ) from exc
+
+        if not np.isfinite(weight) or weight < 0.0:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Framework '{framework.id}' has non-finite or negative weight_default for '{dimension}'.",
+            )
+
+        default_weights[dimension] = weight
+
+    total = float(sum(default_weights.values()))
+    if abs(total - 1.0) > 0.01:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=(
+                f"Framework '{framework.id}' default weights must sum to 1.0 (±0.01); "
+                f"got {total:.4f}."
+            ),
+        )
+
+    return default_weights
+
+
+def _effective_weights(ws: dict[str, float], wf: dict[str, float]) -> np.ndarray:
+    stakeholder_vector = np.array([ws[dimension] for dimension in UNIFIED_DIMENSIONS], dtype=float)
+    framework_vector = np.array([wf[dimension] for dimension in UNIFIED_DIMENSIONS], dtype=float)
+    effective_vector = stakeholder_vector * framework_vector
+    effective_sum = float(np.sum(effective_vector))
+    if effective_sum <= 0.0 or not np.isfinite(effective_sum):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Effective weights are invalid after framework weighting (non-finite or zero sum).",
+        )
+    effective_vector = effective_vector / effective_sum
+    if not np.all(np.isfinite(effective_vector)):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Effective weights contain non-finite values after normalization.",
+        )
+    return effective_vector
+
+
 def _risk_level(overall_score: float) -> RiskLevel:
     if overall_score >= 0.8:
         return RiskLevel.LOW
@@ -196,27 +259,7 @@ def evaluate(
             )
 
         criteria_types = _ordered_criteria_types(framework.id, framework.dimensions)
-        framework_weight_defaults = {
-            dimension.name: float(dimension.weight_default)
-            for dimension in framework.dimensions
-        }
-        missing_framework_weights = [
-            dimension
-            for dimension in UNIFIED_DIMENSIONS
-            if dimension not in framework_weight_defaults
-        ]
-        if missing_framework_weights:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=(
-                    f"Framework '{framework.id}' is missing default weights for dimensions: "
-                    + ", ".join(missing_framework_weights)
-                ),
-            )
-        framework_weight_vector = np.array(
-            [framework_weight_defaults[dimension] for dimension in UNIFIED_DIMENSIONS],
-            dtype=float,
-        )
+        framework_default_weights = _framework_default_weights(framework)
 
         stakeholder_results: list[float] = []
         aggregated_dimension_scores: dict[str, float] = {dimension: 0.0 for dimension in UNIFIED_DIMENSIONS}
@@ -233,21 +276,10 @@ def evaluate(
                 payload.weights.get(stakeholder_id) or stakeholder.weights,
                 stakeholder_id,
             )
-            weight_vector = np.array(
-                [stakeholder_weights[dimension] for dimension in UNIFIED_DIMENSIONS],
-                dtype=float,
+            effective_weight_vector = _effective_weights(
+                stakeholder_weights,
+                framework_default_weights,
             )
-            effective_weight_vector = weight_vector * framework_weight_vector
-            effective_weight_sum = float(np.sum(effective_weight_vector))
-            if effective_weight_sum <= 0.0 or not np.isfinite(effective_weight_sum):
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail=(
-                        f"Effective weights are invalid for stakeholder '{stakeholder_id}' "
-                        f"and framework '{framework.id}'."
-                    ),
-                )
-            effective_weight_vector = effective_weight_vector / effective_weight_sum
 
             if payload.scoring_method == ScoringMethod.TOPSIS:
                 topsis_matrix = np.vstack(
@@ -325,7 +357,7 @@ def evaluate(
         overall_score=overall_score,
         notes=(
             "Evaluation computed from supplied ai_system.context.dimension_scores. "
-            "Framework-aware effective weights applied (stakeholder × framework weight_default). "
+            "framework_weighting=product(ws,wf). "
             f"run_id={run_id}"
         ),
     )
