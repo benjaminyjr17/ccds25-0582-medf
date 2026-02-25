@@ -515,6 +515,7 @@ def main() -> None:
                 st.error(f"Failed to load backend data: {exc}")
 
         framework_id = ""
+        framework_label = ""
         stakeholder_id = ""
         scoring_method = "topsis"
         conflict_metric = "Weights-only (priority conflict)"
@@ -726,7 +727,13 @@ def main() -> None:
                 )
     else:
         if not case_screenshot_mode:
-            st.caption("Fixed framework: eu_altai | Fixed stakeholders: developer, regulator, affected_community")
+            selected_framework_text = framework_id or "N/A"
+            if framework_label:
+                selected_framework_text = f"{framework_label} [{framework_id}]"
+            st.caption(
+                f"Selected framework: {selected_framework_text} | "
+                "Fixed stakeholders: developer, regulator, affected_community"
+            )
 
     if page == "Evaluate":
         evaluate_clicked = st.button("Evaluate", type="primary")
@@ -1362,7 +1369,7 @@ def main() -> None:
             else:
                 st.info("Select at least 2 stakeholders to view tradeoffs.")
     else:
-        case_framework_ids = ["eu_altai"]
+        case_framework_ids = [framework_id] if framework_id else []
         case_stakeholder_ids = ["developer", "regulator", "affected_community"]
 
         for case in CASE_STUDIES:
@@ -1373,8 +1380,9 @@ def main() -> None:
                 dimension: float(case["dimension_scores"][dimension])
                 for dimension in UNIFIED_DIMENSIONS
             }
-            case_result_key = f"case_result_{case_id}"
-            case_export_key = f"case_export_{case_id}"
+            framework_key = framework_id or "no_framework_selected"
+            case_result_key = f"case_result_{case_id}_{framework_key}"
+            case_export_key = f"case_export_{case_id}_{framework_key}"
 
             with st.expander(f"Case: {case_name}", expanded=not case_screenshot_mode):
                 st.write(case_description)
@@ -1391,6 +1399,10 @@ def main() -> None:
 
                 if run_case_clicked:
                     try:
+                        if not framework_id:
+                            st.error("Please select a framework in the sidebar before running a case study.")
+                            continue
+
                         stakeholder_by_id = {
                             str(item.get("id", "")): item
                             for item in stakeholders
@@ -1524,7 +1536,7 @@ def main() -> None:
                             },
                             ui_context={
                                 "page": page,
-                                "framework_id": case_framework_ids[0],
+                                "framework_id": framework_id,
                                 "stakeholder_ids": case_stakeholder_ids,
                                 "case_id": case_id,
                                 "case_name": case_name,
