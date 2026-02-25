@@ -1591,9 +1591,17 @@ def main() -> None:
                 key=f"pareto_tradeoff_scatter_{stakeholder_a}_{stakeholder_b}",
             )
         elif len(stakeholder_ids) >= 3:
+            stakeholder_display_labels = {
+                "developer": "Developer",
+                "regulator": "Regulator",
+                "affected_community": "Affected community",
+            }
             dimension_specs = [
                 {
-                    "label": stakeholder_id,
+                    "label": stakeholder_display_labels.get(
+                        stakeholder_id,
+                        stakeholder_id.replace("_", " ").title(),
+                    ),
                     "values": [
                         float(item["objective_scores"].get(stakeholder_id, 0.0))
                         for item in parsed_solutions
@@ -1608,13 +1616,28 @@ def main() -> None:
                         "color": line_color,
                         "colorscale": "Viridis",
                         "showscale": True,
-                        "colorbar": {"title": "Total distance"},
+                        "colorbar": {
+                            "title": {
+                                "text": "Total distance",
+                                "side": "right",
+                                "font": {"color": "#E6E6E6", "size": 11},
+                            },
+                            "tickfont": {"color": "#E6E6E6"},
+                            "x": 1.08,
+                            "xanchor": "left",
+                        },
                     },
                     dimensions=dimension_specs,
                 )
             )
-            parallel_figure.update_traces(domain={"y": [0.0, 0.86]})
+            parallel_figure.update_traces(
+                domain={"y": [0.0, 0.86]},
+                dimensions=dimension_specs,
+                labelfont={"color": "#E6E6E6", "size": 12},
+                tickfont={"color": "#E6E6E6", "size": 11},
+            )
             parallel_figure.update_layout(
+                font={"color": "#E6E6E6"},
                 title={
                     "text": "Stakeholder Distance Tradeoffs",
                     "y": 0.99,
@@ -1622,7 +1645,7 @@ def main() -> None:
                     "x": 0.01,
                     "xanchor": "left",
                 },
-                margin={"l": 40, "r": 40, "t": 130, "b": 48},
+                margin={"l": 40, "r": 140, "t": 130, "b": 48},
             )
             st.plotly_chart(
                 style_plotly(parallel_figure, tokens),
