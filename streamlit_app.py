@@ -281,6 +281,13 @@ def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
         showline=True,
     )
 
+    existing_title = safe_str(getattr(getattr(fig.layout, "title", None), "text", None)).strip()
+    title_layout: dict[str, Any] | None
+    if existing_title and existing_title.lower() != "undefined":
+        title_layout = {"text": existing_title, "font": {"color": "black"}}
+    else:
+        title_layout = None
+
     fig.update_layout(
         template="plotly_white",
         font=dict(color="black", size=14),
@@ -288,7 +295,7 @@ def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
         paper_bgcolor="white",
         plot_bgcolor="white",
         margin=dict(l=40, r=40, t=60, b=40),
-        title=dict(font=dict(color="black")),
+        title=title_layout,
     )
 
     if hasattr(fig.layout, "polar"):
@@ -435,11 +442,12 @@ def _safe_json(value: Any) -> Any:
         return str(value)
 
 
-def render_if_present(label: str, value: Any) -> None:
-    if value is None:
-        return
+def safe_str(x: Any) -> str:
+    return "" if x is None else str(x)
 
-    text = value.strip() if isinstance(value, str) else str(value).strip()
+
+def render_if_present(label: str, value: Any) -> None:
+    text = safe_str(value).strip()
     if not text or text.lower() == "undefined":
         return
 
@@ -590,6 +598,9 @@ def _build_radar_chart(
     radar_values = [float(values_by_dimension.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
     radar_labels_closed = radar_labels + [radar_labels[0]]
     radar_values_closed = radar_values + [radar_values[0]]
+    title_text = safe_str(title).strip()
+    if title_text.lower() == "undefined":
+        title_text = ""
 
     figure = go.Figure()
     figure.add_trace(
@@ -597,13 +608,13 @@ def _build_radar_chart(
             r=radar_values_closed,
             theta=radar_labels_closed,
             fill="toself",
-            name=title,
+            name=title_text,
             line={"color": BRAND_BLUE_HEX, "width": 2},
             fillcolor=BRAND_BLUE_FILL_RGBA,
         )
     )
     figure.update_layout(
-        title=title,
+        title=title_text or None,
         polar={"radialaxis": {"visible": True, "range": [0, radial_max]}},
         showlegend=False,
         margin={"l": 40, "r": 40, "t": 60, "b": 40},
@@ -1067,6 +1078,9 @@ def main() -> None:
 
             first_framework = framework_scores[0]
             dim_scores = first_framework.get("dimension_scores", {})
+            framework_trace_name = safe_str(first_framework.get("framework_id", "framework")).strip()
+            if framework_trace_name.lower() == "undefined":
+                framework_trace_name = ""
             radar_labels = [DIMENSION_DISPLAY_NAMES[dimension] for dimension in UNIFIED_DIMENSIONS]
             radar_values = [float(dim_scores.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
             radar_labels_closed = radar_labels + [radar_labels[0]]
@@ -1078,7 +1092,7 @@ def main() -> None:
                     r=radar_values_closed,
                     theta=radar_labels_closed,
                     fill="toself",
-                    name=first_framework.get("framework_id", "framework"),
+                    name=framework_trace_name,
                     line={"color": BRAND_BLUE_HEX, "width": 2},
                     fillcolor=BRAND_BLUE_FILL_RGBA,
                 )
@@ -1510,13 +1524,16 @@ def main() -> None:
             radar_values = [float(selected_consensus.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
             radar_labels_closed = radar_labels + [radar_labels[0]]
             radar_values_closed = radar_values + [radar_values[0]]
+            solution_trace_name = safe_str(selected_solution_id).strip()
+            if solution_trace_name.lower() == "undefined":
+                solution_trace_name = ""
             radar_figure = go.Figure()
             radar_figure.add_trace(
                 go.Scatterpolar(
                     r=radar_values_closed,
                     theta=radar_labels_closed,
                     fill="toself",
-                    name=selected_solution_id,
+                    name=solution_trace_name,
                     line={"color": BRAND_BLUE_HEX, "width": 2},
                     fillcolor=BRAND_BLUE_FILL_RGBA,
                 )
