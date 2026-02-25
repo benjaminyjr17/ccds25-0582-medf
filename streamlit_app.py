@@ -13,6 +13,8 @@ import plotly.graph_objects as go
 import requests
 import streamlit as st
 
+from dashboard.plot_theme import DARK_PLOT_CANVAS, apply_dark_plot_theme
+
 UNIFIED_DIMENSIONS = [
     "transparency_explainability",
     "fairness_nondiscrimination",
@@ -190,6 +192,7 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
             "plot_text": "#f8fafc",
             "plot_grid": "rgba(255,255,255,0.18)",
             "plot_axis": "rgba(255,255,255,0.30)",
+            "plot_canvas_bg": DARK_PLOT_CANVAS,
         }
     return {
         "bg": "#ffffff",
@@ -203,6 +206,7 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
         "plot_text": "#111827",
         "plot_grid": "rgba(17,24,39,0.12)",
         "plot_axis": "rgba(17,24,39,0.22)",
+        "plot_canvas_bg": DARK_PLOT_CANVAS,
     }
 
 def inject_css(tokens: dict[str, str]) -> None:
@@ -273,88 +277,13 @@ button[kind="secondary"] {{
 
 
 def style_plotly(fig: go.Figure, tokens: dict[str, str]) -> go.Figure:
-    plot_text = tokens.get("plot_text", "#111827")
-    plot_grid = tokens.get("plot_grid", "rgba(17,24,39,0.12)")
-    plot_axis = tokens.get("plot_axis", "rgba(17,24,39,0.22)")
-    is_dark_theme = _get_theme_base() == "dark"
-    canvas_bg = tokens["panel_bg"] if is_dark_theme else "white"
-
-    axis_style = dict(
-        gridcolor=plot_grid,
-        tickfont=dict(color=plot_text),
-        titlefont=dict(color=plot_text),
-        linecolor=plot_axis,
-        zerolinecolor=plot_axis,
-        showline=True,
-    )
-
     existing_title = safe_str(getattr(getattr(fig.layout, "title", None), "text", None)).strip()
     title_text = existing_title if existing_title and existing_title.lower() != "undefined" else ""
-
-    fig.update_layout(
-        template="plotly_white",
-        font=dict(color=plot_text, size=14),
-        font_color=plot_text,
-        paper_bgcolor=canvas_bg,
-        plot_bgcolor=canvas_bg,
-        margin=dict(l=40, r=40, t=84, b=48),
-        title=dict(
-            text=title_text,
-            font=dict(color=plot_text),
-            y=0.98,
-            yanchor="top",
-        ),
+    return apply_dark_plot_theme(
+        fig,
+        title_text=title_text,
+        canvas_bg=tokens.get("plot_canvas_bg", DARK_PLOT_CANVAS),
     )
-
-    if hasattr(fig.layout, "polar"):
-        fig.update_layout(
-            polar=dict(
-                bgcolor=canvas_bg,
-                radialaxis=dict(
-                    gridcolor=plot_grid,
-                    linecolor=plot_axis,
-                    tickfont=dict(color=plot_text),
-                    tickcolor=plot_axis,
-                    range=[0, 1],
-                    showline=True,
-                ),
-                angularaxis=dict(
-                    gridcolor=plot_grid,
-                    linecolor=plot_axis,
-                    tickfont=dict(color=plot_text),
-                    tickcolor=plot_axis,
-                    showline=True,
-                ),
-            )
-        )
-
-    if hasattr(fig.layout, "xaxis"):
-        fig.update_layout(
-            xaxis=axis_style,
-            yaxis=axis_style,
-        )
-        fig.update_xaxes(title_standoff=12)
-        fig.update_yaxes(title_standoff=14)
-
-    for trace in fig.data:
-        if isinstance(trace, go.Heatmap):
-            if trace.colorbar is None:
-                trace.colorbar = {}
-            trace.colorbar.tickfont = dict(color=plot_text)
-            if trace.colorbar.title is None:
-                trace.colorbar.title = {}
-            trace.colorbar.title.font = dict(color=plot_text)
-        if isinstance(trace, go.Parcoords):
-            trace.labelfont = dict(color=plot_text, size=12)
-            trace.tickfont = dict(color=plot_text, size=11)
-            if getattr(trace, "line", None) is not None:
-                colorbar = getattr(trace.line, "colorbar", None)
-                if colorbar is not None:
-                    colorbar.tickfont = dict(color=plot_text)
-                    if colorbar.title is not None:
-                        colorbar.title.font = dict(color=plot_text)
-
-    return fig
 
 
 def _risk_label(score: float) -> tuple[str, str]:
@@ -2432,7 +2361,7 @@ def main() -> None:
             ]
             st.dataframe(sample_table, width="stretch", hide_index=True)
 
-    st.caption("MEDF v2.0: Feature Frozen Build • Reproducible Artifact.")
+    st.caption("MEDF v1.0.0: Feature Frozen Build • Reproducible Artifact.")
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ import random
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -696,3 +697,65 @@ def test_release_candidate_repeatability_subset() -> None:
                     f"{conflicts_context} rho mismatch for pair {(left[0], left[1])}. "
                     f"first={left[2]} second={right[2]}"
                 )
+
+
+@pytest.mark.stress
+def test_release_candidate_seeded_randomized_eval_and_conflicts_stress() -> None:
+    rng = random.Random(20260225)
+    score_candidates = _candidate_steps(LIKERT_MIN, LIKERT_MAX)
+    evaluate_runs = 300
+    conflict_runs = 100
+
+    with TestClient(app) as client:
+        framework_id = _get_framework_ids(client)[0]
+        baseline_weights = _default_weights_from_stakeholders(client, STAKEHOLDERS)
+
+        for run_index in range(evaluate_runs):
+            score_map = {
+                dimension: float(rng.choice(score_candidates))
+                for dimension in DIMENSIONS
+            }
+            payload = _evaluate_payload(
+                framework_id=framework_id,
+                stakeholder_ids=STAKEHOLDERS,
+                weights=baseline_weights,
+                score_map=score_map,
+            )
+            response = client.post("/api/evaluate", json=payload)
+            response_json = _json_or_text(response)
+            context = (
+                "endpoint=/api/evaluate "
+                f"seed=20260225 run={run_index + 1}/{evaluate_runs} framework={framework_id}"
+            )
+            assert response.status_code == 200, (
+                f"{context} status={response.status_code} response_snippet={_snippet(response_json)}"
+            )
+            assert_json_no_nan_inf(response_json, context=context)
+            assert_score_bounds(response_json, context=context)
+
+        conflicts_route_exists = any(
+            getattr(route, "path", "") == "/api/conflicts"
+            for route in app.routes
+        )
+        if conflicts_route_exists:
+            for run_index in range(conflict_runs):
+                score_map = {
+                    dimension: float(rng.choice(score_candidates))
+                    for dimension in DIMENSIONS
+                }
+                payload = _conflicts_payload(
+                    framework_id=framework_id,
+                    stakeholder_ids=STAKEHOLDERS,
+                    score_map=score_map,
+                )
+                response = client.post("/api/conflicts", json=payload)
+                response_json = _json_or_text(response)
+                context = (
+                    "endpoint=/api/conflicts "
+                    f"seed=20260225 run={run_index + 1}/{conflict_runs} framework={framework_id}"
+                )
+                assert response.status_code == 200, (
+                    f"{context} status={response.status_code} response_snippet={_snippet(response_json)}"
+                )
+                assert_json_no_nan_inf(response_json, context=context)
+                assert_rho_bounds(response_json, context=context)
