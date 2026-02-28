@@ -3,6 +3,7 @@
 Author: Benjamin Oliver Yick.
 Supervisor: Dr. Zhang Jiehuang.
 Engineering freeze tag: `fyp-freeze-v1.0.0`.
+Historical: fyp-freeze-v1.0.0 (superseded by v1.0.1-freeze).
 
 ---
 
@@ -82,6 +83,7 @@ minimize sum_i s_i |w_i - w_k|.
 ## Engineering Freeze and Governance Stability
 
 - Freeze tag: `fyp-freeze-v1.0.0`.
+- Historical: fyp-freeze-v1.0.0 (superseded by v1.0.1-freeze).
 - Repository state at freeze validation: clean and traceable.
 - Feature development policy: no post-freeze feature additions.
 - Hotfix policy: only critical defect remediation under a new release tag.

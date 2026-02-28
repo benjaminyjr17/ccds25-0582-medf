@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import math
+import re
 from datetime import datetime
 from html import escape
 from pathlib import Path
@@ -10,6 +11,7 @@ from typing import Any
 from uuid import uuid4
 import zipfile
 
+import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
@@ -860,8 +862,25 @@ def safe_str(x: Any) -> str:
     return "" if x is None else str(x)
 
 
+_DISPLAY_MINUS_PATTERN = re.compile(r"(?<!\w)-(?=\d)")
+
+
 def fmt_minus(s: str) -> str:
-    return str(s).replace("-", UNICODE_MINUS).replace("–", UNICODE_MINUS)
+    text = safe_str(s).replace("–", UNICODE_MINUS)
+    return _DISPLAY_MINUS_PATTERN.sub(UNICODE_MINUS, text)
+
+
+def _format_sentence_like_bullet(text: Any) -> str:
+    cleaned = safe_str(text).strip()
+    if not cleaned:
+        return ""
+    if cleaned.startswith(("http://", "https://")):
+        return cleaned
+    if cleaned.endswith((".", "!", "?", ":", ";")):
+        return cleaned
+    if " " in cleaned and any(character.isalpha() for character in cleaned):
+        return f"{cleaned}."
+    return cleaned
 
 
 def render_if_present(label: str, value: Any) -> None:
@@ -1382,36 +1401,36 @@ def main() -> None:
                 st.session_state.get("pareto_search_depth", preset_values["n_gen"])
             )
 
-            with st.expander("Advanced", expanded=False):
+            with st.expander("Advanced Settings", expanded=False):
                 if conference_mode:
-                    st.caption("Advanced controls are hidden while Conference Mode is enabled.")
+                    st.caption("Advanced settings are hidden while Conference Mode is enabled.")
                     st.caption(
                         "Current values in use: "
                         f"options={pareto_n_solutions}, breadth={pareto_pop_size}, depth={pareto_n_gen}."
                     )
                 else:
                     pareto_n_solutions = st.slider(
-                        "Options to show",
+                        "Options to Show",
                         min_value=1,
-                        max_value=42,
+                        max_value=43,
                         value=int(st.session_state.get("pareto_options_to_show", pareto_n_solutions)),
                         step=1,
                         key="pareto_options_to_show",
                     )
                     pareto_pop_size = st.slider(
-                        "Search breadth",
+                        "Search Breadth",
                         min_value=10,
                         max_value=250,
                         value=int(st.session_state.get("pareto_search_breadth", pareto_pop_size)),
-                        step=10,
+                        step=1,
                         key="pareto_search_breadth",
                     )
                     pareto_n_gen = st.slider(
-                        "Search depth",
+                        "Search Depth",
                         min_value=0,
                         max_value=500,
                         value=int(st.session_state.get("pareto_search_depth", pareto_n_gen)),
-                        step=10,
+                        step=1,
                         key="pareto_search_depth",
                     )
 
@@ -2080,11 +2099,13 @@ def main() -> None:
         )
 
         st.markdown("### Consensus Weights Radar")
-        st.caption(
-            "Weights shown are derived from backend `/api/pareto` output "
-            "(`pareto_solutions[*].weights.consensus`): candidate consensus vectors are "
-            "simplex-normalized and selected using salience-weighted distance objectives "
-            "against stakeholder weight vectors."
+        st.markdown(
+            "Weights shown are derived from backend "
+            f"<code style='color:{BRAND_BLUE_HEX};'>/api/pareto</code> output "
+            f"(<code style='color:{BRAND_BLUE_HEX};'>pareto_solutions[*].weights.consensus</code>): "
+            "candidate consensus vectors are simplex-normalized and selected using salience-weighted "
+            "distance objectives against stakeholder weight vectors.",
+            unsafe_allow_html=True,
         )
         radar_labels = [DIMENSION_DISPLAY_NAMES[dimension] for dimension in UNIFIED_DIMENSIONS]
         radar_values = [float(selected_consensus.get(dimension, 0.0)) for dimension in UNIFIED_DIMENSIONS]
@@ -2131,7 +2152,6 @@ def main() -> None:
             ]
         )
         bar_figure.update_layout(
-            title="Stakeholder Distance (Lower = Better Alignment)",
             xaxis_title="Stakeholder",
             yaxis_title="Distance",
             margin={"l": 40, "r": 40, "t": 60, "b": 40},
@@ -2284,12 +2304,12 @@ def main() -> None:
         if conference_mode:
             with st.expander("Supporting Analysis", expanded=False):
                 _render_pareto_supporting_analysis()
-            with st.expander("Technical Detail", expanded=False):
+            with st.expander("Technical Details", expanded=False):
                 _render_pareto_technical_detail()
         else:
             st.markdown("## Supporting Analysis")
             _render_pareto_supporting_analysis()
-            st.markdown("## Technical Detail")
+            st.markdown("## Technical Details")
             _render_pareto_technical_detail()
     else:
         case_framework_ids = [framework_id] if framework_id else []
@@ -2360,10 +2380,13 @@ def main() -> None:
                     st.markdown("**Assumptions**")
                     if isinstance(case_assumptions, list) and case_assumptions:
                         for assumption in case_assumptions:
-                            if isinstance(assumption, str) and assumption.strip():
-                                st.markdown(f"- {assumption.strip()}")
+                            formatted_assumption = _format_sentence_like_bullet(assumption)
+                            if formatted_assumption:
+                                st.markdown(f"- {formatted_assumption}")
                     elif isinstance(case_assumptions, str) and case_assumptions.strip():
-                        st.markdown(f"- {case_assumptions.strip()}")
+                        formatted_assumption = _format_sentence_like_bullet(case_assumptions)
+                        if formatted_assumption:
+                            st.markdown(f"- {formatted_assumption}")
                     st.divider()
 
                     st.markdown("**Input Dimension Scores**")
@@ -2374,7 +2397,9 @@ def main() -> None:
                         }
                         for dimension in UNIFIED_DIMENSIONS
                     ]
-                    st.table(score_rows)
+                    score_table = pd.DataFrame(score_rows)
+                    score_table.index = range(1, len(score_table) + 1)
+                    st.table(score_table)
 
                 run_case_clicked = st.button("Run Case Study", key=f"run_case_{case_id}", type="primary")
 
@@ -2740,9 +2765,12 @@ def main() -> None:
                         title="Rank 1 Consensus Weights",
                         radial_max=1.0,
                     )
-                    st.caption(
-                        "Weights shown are derived from backend `/api/pareto` output "
-                        "(`pareto_solutions[*].weights.consensus`) and are displayed without UI-side reweighting."
+                    st.markdown(
+                        "Weights shown are derived from backend "
+                        f"<code style='color:{BRAND_BLUE_HEX};'>/api/pareto</code> output "
+                        f"(<code style='color:{BRAND_BLUE_HEX};'>pareto_solutions[*].weights.consensus</code>) "
+                        "and are displayed without UI-side reweighting.",
+                        unsafe_allow_html=True,
                     )
                     st.plotly_chart(
                         style_plotly(consensus_radar, tokens),
@@ -3087,7 +3115,7 @@ def main() -> None:
             ]
             st.dataframe(sample_table, width="stretch", hide_index=True)
 
-    st.caption("MEDF v1.0.0: Feature Frozen Build • Reproducible Artifact.")
+    st.caption("MEDF v1.0.1: Feature Frozen Build • Reproducible Artifact.")
 
 
 if __name__ == "__main__":
