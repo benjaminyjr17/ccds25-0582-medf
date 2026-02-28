@@ -1025,10 +1025,9 @@ def _inject_likert_track_turquoise_css() -> bool:
         )
         progress_selectors.extend(
             [
-                f'{slider_scope} div[role="progressbar"]',
-                f'{slider_scope} > div > div:nth-child(2)',
-                f'{slider_scope} > div > div[style*="width"]',
-                f'{slider_scope} > div > div[style*="transform"]',
+                f'{slider_scope} [role="progressbar"]',
+                f'{slider_scope} div[style*="width"]:first-of-type',
+                f'{slider_scope} div[style*="transform"]:first-of-type',
             ]
         )
         thumb_selectors.append(f'{slider_scope} [role="slider"]')
@@ -1074,10 +1073,9 @@ def _inject_advanced_slider_green_css() -> None:
         )
         progress_selectors.extend(
             [
-                f'{slider_scope} div[role="progressbar"]',
-                f'{slider_scope} > div > div:nth-child(2)',
-                f'{slider_scope} > div > div[style*="width"]',
-                f'{slider_scope} > div > div[style*="transform"]',
+                f'{slider_scope} [role="progressbar"]',
+                f'{slider_scope} div[style*="width"]:first-of-type',
+                f'{slider_scope} div[style*="transform"]:first-of-type',
             ]
         )
         thumb_selectors.append(f'{slider_scope} [role="slider"]')
@@ -1161,7 +1159,31 @@ def _render_slider_dom_probe(enabled: bool) -> None:
 
   const findFillCandidate = (sliderRoot) => {
     const base = sliderRoot.querySelector('[data-baseweb="slider"]');
-    if (!base) return null;
+    if (!base) return { node: null, preferredSelector: "none", unique: false };
+    const progressNodes = Array.from(base.querySelectorAll('[role="progressbar"]'));
+    if (progressNodes.length) {
+      return {
+        node: progressNodes[0],
+        preferredSelector: '[data-baseweb="slider"] [role="progressbar"]',
+        unique: progressNodes.length === 1,
+      };
+    }
+    const widthNodes = Array.from(base.querySelectorAll('div[style*="width"]'));
+    if (widthNodes.length) {
+      return {
+        node: widthNodes[0],
+        preferredSelector: '[data-baseweb="slider"] div[style*="width"]:first-of-type',
+        unique: widthNodes.length === 1,
+      };
+    }
+    const transformNodes = Array.from(base.querySelectorAll('div[style*="transform"]'));
+    if (transformNodes.length) {
+      return {
+        node: transformNodes[0],
+        preferredSelector: '[data-baseweb="slider"] div[style*="transform"]:first-of-type',
+        unique: transformNodes.length === 1,
+      };
+    }
     const nodes = Array.from(base.querySelectorAll("*"));
     let best = null;
     let bestScore = -1000;
@@ -1180,7 +1202,11 @@ def _render_slider_dom_probe(enabled: bool) -> None:
         best = node;
       }
     }
-    return best;
+    return {
+      node: best,
+      preferredSelector: "heuristic fallback",
+      unique: false,
+    };
   };
 
   const render = () => {
@@ -1193,13 +1219,17 @@ def _render_slider_dom_probe(enabled: bool) -> None:
     const items = sliders.map((slider, idx) => {
       const handle = slider.querySelector('[role="slider"][aria-label]');
       const label = handle ? handle.getAttribute("aria-label") : `slider_${idx + 1}`;
-      const candidate = findFillCandidate(slider);
+      const fillProbe = findFillCandidate(slider);
+      const candidate = fillProbe.node;
       if (candidate) {
         candidate.style.outline = "2px solid #ff00ff";
         candidate.style.outlineOffset = "1px";
         candidate.setAttribute("data-medf-probe-outline", "1");
       }
-      return `<li><strong>${esc(label)}</strong><br><code>${esc(summarizeNode(candidate))}</code></li>`;
+      return `<li><strong>${esc(label)}</strong><br>` +
+        `preferred fill selector: <code>${esc(fillProbe.preferredSelector)}</code> ` +
+        `(unique under slider root: <strong>${fillProbe.unique ? "true" : "false"}</strong>)<br>` +
+        `candidate node: <code>${esc(summarizeNode(candidate))}</code></li>`;
     });
     output.innerHTML = `<div style="margin-bottom:0.35rem;">Detected ${items.length} sliders.</div><ol style="margin:0;padding-left:1.1rem;">${items.join("")}</ol>`;
   };
