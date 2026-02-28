@@ -28,8 +28,8 @@
   },
   "source_reference": {
     "type": "deployment-inspired scenario",
-    "citation": "Scenario synthesized for MEDF evaluation from public governance discussions on facial recognition policy and ethics.",
-    "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+    "citation": "This is a deployment-inspired synthetic scenario constructed for MEDF evaluation. The cited source provides governance and risk framing context only and is not evidence of a specific deployed system configuration or measured outcomes.",
+    "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10"
   },
   "assumptions": [
     "Scores are analyst-assigned Likert estimates for a deployment-like scenario and are not direct measurements from a live police system.",

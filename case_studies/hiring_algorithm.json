@@ -28,8 +28,8 @@
   },
   "source_reference": {
     "type": "deployment-inspired scenario",
-    "citation": "Scenario synthesized for MEDF evaluation from algorithmic hiring governance guidance and common enterprise deployment patterns.",
-    "url": "https://www.eeoc.gov/ai-and-algorithmic-fairness-initiative"
+    "citation": "This is a deployment-inspired synthetic scenario constructed for MEDF evaluation. The cited source provides governance and risk framing context only and is not evidence of a specific deployed system configuration or measured outcomes.",
+    "url": "https://www.ftc.gov/business-guidance/technology/artificial-intelligence"
   },
   "assumptions": [
     "Scores are analyst-assigned Likert estimates for a deployment-like enterprise hiring workflow and not outcomes from one named employer.",

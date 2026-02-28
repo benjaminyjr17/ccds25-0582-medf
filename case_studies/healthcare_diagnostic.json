@@ -28,7 +28,7 @@
   },
   "source_reference": {
     "type": "deployment-inspired scenario",
-    "citation": "Scenario synthesized for MEDF evaluation from healthcare AI governance guidance and diagnostic safety literature.",
+    "citation": "This is a deployment-inspired synthetic scenario constructed for MEDF evaluation. The cited source provides governance and risk framing context only and is not evidence of a specific deployed system configuration or measured outcomes.",
     "url": "https://www.who.int/publications/i/item/9789240029200"
   },
   "assumptions": [

@@ -19,32 +19,20 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 
 def _assert_non_empty_assumptions(path: Path, assumptions: Any) -> None:
-    if isinstance(assumptions, str):
-        assert assumptions.strip(), f"{path} assumptions must not be empty."
-        return
-    if isinstance(assumptions, list):
-        assert assumptions, f"{path} assumptions list must not be empty."
-        assert all(
-            isinstance(item, str) and item.strip() for item in assumptions
-        ), f"{path} assumptions list entries must be non-empty strings."
-        return
-    raise AssertionError(f"{path} assumptions must be a non-empty string or list of strings.")
+    assert isinstance(assumptions, list), f"{path} assumptions must be a list of strings."
+    assert assumptions, f"{path} assumptions list must not be empty."
+    assert all(
+        isinstance(item, str) and item.strip() for item in assumptions
+    ), f"{path} assumptions list entries must be non-empty strings."
 
 
 def _assert_source_reference(path: Path, source_reference: Any) -> None:
-    if isinstance(source_reference, str):
-        assert source_reference.strip(), f"{path} source_reference string must not be empty."
-        return
-    if isinstance(source_reference, dict):
-        citation = str(source_reference.get("citation", "")).strip()
-        url = str(source_reference.get("url", "")).strip()
-        assert citation or url, f"{path} source_reference must include citation or url."
-        if url:
-            assert url.startswith(("http://", "https://")), (
-                f"{path} source_reference.url must start with http:// or https://"
-            )
-        return
-    raise AssertionError(f"{path} source_reference must be a non-empty string or object.")
+    assert isinstance(source_reference, dict), f"{path} source_reference must be an object."
+    citation = str(source_reference.get("citation", "")).strip()
+    url = str(source_reference.get("url", "")).strip()
+    assert citation, f"{path} source_reference.citation must be non-empty."
+    assert url, f"{path} source_reference.url must be non-empty."
+    assert url.startswith("https://"), f"{path} source_reference.url must start with https://"
 
 
 def test_case_study_files_are_present_and_schema_valid() -> None:

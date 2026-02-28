@@ -2319,18 +2319,39 @@ def main() -> None:
                 expanded=(not case_screenshot_mode and not conference_mode),
             ):
                 st.write(case_description)
-                if not case_screenshot_mode and case_source_reference:
-                    st.caption(f"Source reference: {case_source_reference}")
-                if not case_screenshot_mode and case_assumptions:
-                    st.caption(f"Assumptions: {case_assumptions}")
                 if not case_screenshot_mode:
-                    st.caption(
-                        "Input dimension scores: "
-                        + ", ".join(
-                            f"{DIMENSION_DISPLAY_NAMES[dimension]}={case_scores[dimension]:.1f}"
-                            for dimension in UNIFIED_DIMENSIONS
-                        )
-                    )
+                    source_citation = ""
+                    source_url = ""
+                    if isinstance(case_source_reference, dict):
+                        source_citation = str(case_source_reference.get("citation", "")).strip()
+                        source_url = str(case_source_reference.get("url", "")).strip()
+                    elif isinstance(case_source_reference, str):
+                        source_citation = case_source_reference.strip()
+
+                    if source_citation or source_url:
+                        st.markdown("**Source Reference**")
+                        if source_citation:
+                            st.write(source_citation)
+                        if source_url:
+                            st.markdown(f"[{source_url}]({source_url})")
+
+                    st.markdown("**Assumptions**")
+                    if isinstance(case_assumptions, list) and case_assumptions:
+                        for assumption in case_assumptions:
+                            if isinstance(assumption, str) and assumption.strip():
+                                st.markdown(f"- {assumption.strip()}")
+                    elif isinstance(case_assumptions, str) and case_assumptions.strip():
+                        st.markdown(f"- {case_assumptions.strip()}")
+
+                    st.markdown("**Input Dimension Scores**")
+                    score_rows = [
+                        {
+                            "Dimension": DIMENSION_DISPLAY_NAMES[dimension],
+                            "Score": f"{case_scores[dimension]:.1f}",
+                        }
+                        for dimension in UNIFIED_DIMENSIONS
+                    ]
+                    st.table(score_rows)
 
                 run_case_clicked = st.button("Run Case Study", key=f"run_case_{case_id}", type="primary")
 
