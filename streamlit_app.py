@@ -2322,18 +2322,40 @@ def main() -> None:
                 if not case_screenshot_mode:
                     source_citation = ""
                     source_url = ""
+                    framing_sentence = (
+                        "This is a deployment-inspired synthetic scenario constructed for MEDF evaluation."
+                    )
                     if isinstance(case_source_reference, dict):
                         source_citation = str(case_source_reference.get("citation", "")).strip()
                         source_url = str(case_source_reference.get("url", "")).strip()
                     elif isinstance(case_source_reference, str):
                         source_citation = case_source_reference.strip()
 
+                    source_citation_display = source_citation
+                    methodological_framing = ""
+                    if framing_sentence in source_citation:
+                        methodological_framing = framing_sentence
+                        source_citation_display = source_citation.replace(framing_sentence, "", 1).strip()
+                        if source_citation_display.startswith("."):
+                            source_citation_display = source_citation_display[1:].strip()
+                    elif "deployment-inspired synthetic scenario" in source_citation.lower():
+                        methodological_framing = source_citation
+                        source_citation_display = ""
+
                     if source_citation or source_url:
                         st.markdown("**Source Reference**")
-                        if source_citation:
-                            st.write(source_citation)
+                        if source_citation_display:
+                            st.write(source_citation_display)
                         if source_url:
                             st.markdown(f"[{source_url}]({source_url})")
+                    st.divider()
+
+                    st.markdown("**Methodological Framing**")
+                    if methodological_framing:
+                        st.write(methodological_framing)
+                    else:
+                        st.write(framing_sentence)
+                    st.divider()
 
                     st.markdown("**Assumptions**")
                     if isinstance(case_assumptions, list) and case_assumptions:
@@ -2342,6 +2364,7 @@ def main() -> None:
                                 st.markdown(f"- {assumption.strip()}")
                     elif isinstance(case_assumptions, str) and case_assumptions.strip():
                         st.markdown(f"- {case_assumptions.strip()}")
+                    st.divider()
 
                     st.markdown("**Input Dimension Scores**")
                     score_rows = [
