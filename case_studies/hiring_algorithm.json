@@ -1,0 +1,34 @@
+{
+  "id": "hiring_algorithm",
+  "name": "Hiring Recommendation Algorithm",
+  "description": "Enterprise candidate-screening model used for shortlisting with high fairness and oversight sensitivity.",
+  "dimension_scores": {
+    "transparency_explainability": 4.0,
+    "fairness_nondiscrimination": 2.5,
+    "safety_robustness": 4.0,
+    "privacy_data_governance": 4.0,
+    "human_agency_oversight": 5.5,
+    "accountability": 4.0
+  },
+  "deployment_context": {
+    "domain": "human resources",
+    "deployment_setting": "decision support for recruiter triage",
+    "region": "multinational enterprise",
+    "stakeholders_impacted": [
+      "applicants",
+      "hr_teams",
+      "compliance_officers",
+      "affected_community"
+    ],
+    "known_risks": [
+      "indirect discrimination",
+      "automation bias",
+      "limited explanation quality"
+    ]
+  },
+  "source_reference": {
+    "type": "deployment-inspired scenario",
+    "citation": "Scenario synthesized for MEDF evaluation from algorithmic hiring governance guidance and common enterprise deployment patterns.",
+    "url": "https://www.eeoc.gov/ai-and-algorithmic-fairness-initiative"
+  }
+}

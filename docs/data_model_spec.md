@@ -1,11 +1,6 @@
-# MEDF Data Model Spec (Reference)
+# MEDF Data Model Spec (Frozen Build)
 
-This repository implements a minimal backend skeleton for the Multi-stakeholder Ethical Decision Framework (MEDF) with:
-
-- FastAPI API layer.
-- Pydantic v2 request/response models.
-- SQLAlchemy 2.0 ORM with SQLite.
-- YAML-based framework registry.
+This repository implements the MEDF backend for multi-framework ethical AI assessment with reproducible API contracts.
 
 ## Core Entities
 
@@ -13,38 +8,50 @@ This repository implements a minimal backend skeleton for the Multi-stakeholder 
 - `id: str`
 - `name: str`
 - `version: str | None`
-- `description: str | None`
-- `criteria: list[FrameworkCriterion]`
+- `dimensions: list[EthicalDimension]`
 
-### FrameworkCriterion
-- `id: str`
-- `name: str`
-- `dimension: "fairness" | "accountability" | "transparency" | "privacy" | "safety" | "human_oversight"`
+### EthicalDimension
+- `name`: one of the 6 unified dimensions
+- `display_name: str`
 - `description: str | None`
-- `weight: float` (required)
+- `weight_default: float` (framework-level prior)
+- `criteria_type: "benefit" | "cost"`
+- `assessment_questions: list[str]`
 
 ### Stakeholder (SQLite + API)
-- `id: str` (API response; sourced from internal DB key)
-- `name: str` (unique)
+- `id: str`
+- `name: str`
 - `role: "developer" | "regulator" | "affected_community" | "custom"`
-- `description: str`
+- `description: str | None`
+- `weights: dict[dimension, float]` (sum to 1.0 ± 0.01)
 
 Default seeded stakeholders:
 - Developer
 - Regulator
 - Affected Community
 
-### EvaluationRequest / EvaluationResponse (API)
-- Input: `case_id`, selected `framework_ids: list[str]`, selected `stakeholder_ids: list[str]`, required `weights` (full six-dimension vector per stakeholder), optional `inputs`.
-- Output: deterministic placeholder `scores` by framework ID.
+### EvaluateRequest / EvaluationResult
+- Input: `ai_system`, `framework_ids`, `stakeholder_ids`, `weights`, `scoring_method`
+- Output: `framework_scores`, `overall_score`, run metadata notes
 
-### ConflictCheckRequest / ConflictCheckResponse (API)
-- Input: selected `framework_ids`, selected `stakeholder_ids`.
-- Output: placeholder conflict summary + metadata until full algorithm integration.
+### ConflictRequest / ConflictReport
+- Input: `ai_system`, selected framework, stakeholder ids, optional weight overrides
+- Output: pairwise conflict list, Spearman rho, conflict levels, correlation matrices
+
+### ParetoRequest / ConflictReport(pareto payload)
+- Input: `ai_system`, selected framework, stakeholder ids, optimization controls (`n_solutions`, `pop_size`, `n_gen`, `seed`, deterministic mode)
+- Output: non-dominated Pareto consensus solutions + objective metadata
 
 ## Implemented Endpoints
 - `GET /api/health`
 - `GET /api/frameworks`
+- `GET /api/frameworks/{framework_id}`
 - `GET /api/stakeholders`
-- `POST /api/evaluate` (stub scoring)
-- `POST /api/conflicts` (stub conflict detection)
+- `POST /api/stakeholders`
+- `POST /api/evaluate`
+- `POST /api/conflicts`
+- `POST /api/pareto`
+
+## Contract Stability
+
+The `/api` surface and OpenAPI fingerprint are locked by `tests/test_api_contract_lock.py`.

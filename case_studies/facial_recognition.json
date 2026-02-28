@@ -1,0 +1,34 @@
+{
+  "id": "facial_recognition",
+  "name": "Facial Recognition (Law Enforcement)",
+  "description": "Urban law-enforcement watchlist matching deployment with elevated fairness and privacy risk exposure.",
+  "dimension_scores": {
+    "transparency_explainability": 2.5,
+    "fairness_nondiscrimination": 1.0,
+    "safety_robustness": 5.5,
+    "privacy_data_governance": 1.0,
+    "human_agency_oversight": 2.5,
+    "accountability": 4.0
+  },
+  "deployment_context": {
+    "domain": "public safety",
+    "deployment_setting": "real-time decision support",
+    "region": "urban municipal operations",
+    "stakeholders_impacted": [
+      "law_enforcement",
+      "regulators",
+      "civil_society",
+      "affected_community"
+    ],
+    "known_risks": [
+      "demographic bias",
+      "privacy intrusion",
+      "contestation and recourse gaps"
+    ]
+  },
+  "source_reference": {
+    "type": "deployment-inspired scenario",
+    "citation": "Scenario synthesized for MEDF evaluation from public governance discussions on facial recognition policy and ethics.",
+    "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+  }
+}

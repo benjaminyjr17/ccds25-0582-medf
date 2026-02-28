@@ -50,7 +50,7 @@ streamlit:
 	.venv/bin/python -m streamlit run streamlit_app.py
 
 test:
-	.venv/bin/pytest -q
+	.venv/bin/pytest -q --strict-markers
 
 docker-build:
 	docker build -t medf-backend .

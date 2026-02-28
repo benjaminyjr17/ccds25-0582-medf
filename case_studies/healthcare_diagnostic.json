@@ -1,0 +1,34 @@
+{
+  "id": "healthcare_diagnostic",
+  "name": "Healthcare Diagnostic AI",
+  "description": "Clinical decision-support deployment where safety, robustness, privacy, and accountability requirements are strict.",
+  "dimension_scores": {
+    "transparency_explainability": 4.0,
+    "fairness_nondiscrimination": 4.0,
+    "safety_robustness": 7.0,
+    "privacy_data_governance": 5.5,
+    "human_agency_oversight": 4.0,
+    "accountability": 5.5
+  },
+  "deployment_context": {
+    "domain": "healthcare",
+    "deployment_setting": "clinical decision support",
+    "region": "hospital network",
+    "stakeholders_impacted": [
+      "clinicians",
+      "patients",
+      "hospital_governance",
+      "regulators"
+    ],
+    "known_risks": [
+      "false positives and false negatives",
+      "distribution shift",
+      "data governance and consent management"
+    ]
+  },
+  "source_reference": {
+    "type": "deployment-inspired scenario",
+    "citation": "Scenario synthesized for MEDF evaluation from healthcare AI governance guidance and diagnostic safety literature.",
+    "url": "https://www.who.int/publications/i/item/9789240029200"
+  }
+}

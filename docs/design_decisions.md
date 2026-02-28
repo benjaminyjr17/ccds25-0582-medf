@@ -90,21 +90,22 @@ Correct; this is a controlled research prototype. Architecture keeps persistence
 The registry enforces strict conversion to typed models and fails fast on missing/invalid files, making failures explicit rather than silent.
 
 ## Decision 5
-**CHOICE**: Deterministic placeholder scoring/conflict modules in Stage 1.
+**CHOICE**: Deterministic TOPSIS/WSM scoring and Spearman-based conflict analysis with stable contracts.
 
 **ALTERNATIVES**:
-- Implement full MCDA and statistical methods immediately
+- Defer algorithm implementation and focus on API shape only.
+- Implement highly customized methods with breaking contract iterations.
 
 **JUSTIFICATION**:
-- Validates end-to-end API contracts and orchestration first.
-- Minimizes confounding factors during integration testing.
-- Supports incremental delivery and staged verification.
+- Provides mathematically explicit, testable outputs for evaluation and viva defense.
+- Preserves deterministic behavior and reproducibility under fixed seeds and payloads.
+- Keeps endpoint contracts stable while allowing non-breaking method improvements.
 
 **TRADE-OFF**:
-- Current scores/conflicts are not methodologically final.
+- Harm-taxonomy specialization and broader empirical validation remain future extensions.
 
 **EXAMINER ATTACK**:
-"This is not yet real ethical scoring."
+"How do you justify trust in these scoring and conflict outputs?"
 
 **DEFENSE**:
-Agreed; Stage 1 explicitly targets architecture correctness and interface stability. Full algorithms are layered next without changing endpoint contracts.
+Algorithms are explicit in code, validated by tests, and deterministic under controlled inputs. The system is positioned as governance decision support with clear scope boundaries and reproducibility guarantees.

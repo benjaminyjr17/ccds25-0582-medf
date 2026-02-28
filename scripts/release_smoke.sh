@@ -125,8 +125,8 @@ echo "CMD: $PY -m py_compile \$(git ls-files '*.py')"
 "$PY" -m py_compile $(git ls-files '*.py')
 echo "PASS: py_compile."
 
-echo "CMD: $PY -m pytest -q"
-"$PY" -m pytest -q
+echo "CMD: $PY -m pytest -q --strict-markers"
+"$PY" -m pytest -q --strict-markers
 echo "PASS: pytest."
 
 BACKEND_PORT="$(find_free_port)"

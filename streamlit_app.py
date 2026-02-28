@@ -126,60 +126,130 @@ PARETO_PRESETS = {
     "Thorough": {"n_solutions": 12, "pop_size": 80, "n_gen": 160},
 }
 
-CASE_STUDIES = [
-    {
-        "id": "facial_recognition",
-        "name": "Facial Recognition (High Stakeholder Disagreement)",
-        "description": (
-            "This scenario models law-enforcement facial recognition with low fairness and privacy ratings. "
-            "It is designed to expose structural disagreement between technical and affected-community priorities. "
-            "Expected behavior: Priority Conflict (Weights-Only) developer↔affected correlation is negative, "
-            "and Pareto tradeoffs are visible."
-        ),
-        "dimension_scores": {
-            "transparency_explainability": 2.5,
-            "fairness_nondiscrimination": 1.0,
-            "safety_robustness": 5.5,
-            "privacy_data_governance": 1.0,
-            "human_agency_oversight": 2.5,
-            "accountability": 4.0,
+CASE_STUDY_FILES: tuple[str, ...] = (
+    "facial_recognition.json",
+    "hiring_algorithm.json",
+    "healthcare_diagnostic.json",
+)
+
+
+def _default_case_studies() -> list[dict[str, Any]]:
+    return [
+        {
+            "id": "facial_recognition",
+            "name": "Facial Recognition (Law Enforcement)",
+            "description": "Deployment-like facial recognition assessment scenario.",
+            "dimension_scores": {
+                "transparency_explainability": 2.5,
+                "fairness_nondiscrimination": 1.0,
+                "safety_robustness": 5.5,
+                "privacy_data_governance": 1.0,
+                "human_agency_oversight": 2.5,
+                "accountability": 4.0,
+            },
         },
-    },
-    {
-        "id": "hiring_recommendation",
-        "name": "Hiring Recommendation (Fairness Dominant)",
-        "description": (
-            "This scenario represents algorithmic hiring support where fairness and oversight drive policy concerns. "
-            "Scores are balanced overall but emphasize human-agency controls and accountability. "
-            "It is useful for examining whether stakeholder conflict remains moderate under less extreme inputs."
-        ),
-        "dimension_scores": {
-            "transparency_explainability": 4.0,
-            "fairness_nondiscrimination": 2.5,
-            "safety_robustness": 4.0,
-            "privacy_data_governance": 4.0,
-            "human_agency_oversight": 5.5,
-            "accountability": 4.0,
+        {
+            "id": "hiring_algorithm",
+            "name": "Hiring Recommendation Algorithm",
+            "description": "Deployment-like algorithmic hiring assessment scenario.",
+            "dimension_scores": {
+                "transparency_explainability": 4.0,
+                "fairness_nondiscrimination": 2.5,
+                "safety_robustness": 4.0,
+                "privacy_data_governance": 4.0,
+                "human_agency_oversight": 5.5,
+                "accountability": 4.0,
+            },
         },
-    },
-    {
-        "id": "healthcare_diagnostic",
-        "name": "Healthcare Diagnostic AI (Safety Dominant)",
-        "description": (
-            "This scenario captures a clinical decision-support context where safety and robustness are primary. "
-            "Privacy and accountability remain high, reflecting regulated healthcare deployment constraints. "
-            "It helps illustrate consensus behavior when risk tolerance is low and reliability is prioritized."
-        ),
-        "dimension_scores": {
-            "transparency_explainability": 4.0,
-            "fairness_nondiscrimination": 4.0,
-            "safety_robustness": 7.0,
-            "privacy_data_governance": 5.5,
-            "human_agency_oversight": 4.0,
-            "accountability": 5.5,
+        {
+            "id": "healthcare_diagnostic",
+            "name": "Healthcare Diagnostic AI",
+            "description": "Deployment-like clinical decision-support assessment scenario.",
+            "dimension_scores": {
+                "transparency_explainability": 4.0,
+                "fairness_nondiscrimination": 4.0,
+                "safety_robustness": 7.0,
+                "privacy_data_governance": 5.5,
+                "human_agency_oversight": 4.0,
+                "accountability": 5.5,
+            },
         },
-    },
-]
+    ]
+
+
+def _validated_case_dimension_scores(raw_scores: Any, *, case_id: str) -> dict[str, float]:
+    if not isinstance(raw_scores, dict):
+        raise ValueError(f"Case '{case_id}' is missing a valid dimension_scores object.")
+
+    normalized: dict[str, float] = {}
+    for dimension in UNIFIED_DIMENSIONS:
+        if dimension not in raw_scores:
+            raise ValueError(f"Case '{case_id}' missing dimension '{dimension}'.")
+        try:
+            value = float(raw_scores[dimension])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Case '{case_id}' has non-numeric score for '{dimension}'.") from exc
+        if value < LIKERT_MIN or value > LIKERT_MAX:
+            raise ValueError(
+                f"Case '{case_id}' score for '{dimension}' must be in [{LIKERT_MIN}, {LIKERT_MAX}]."
+            )
+        normalized[dimension] = value
+
+    return normalized
+
+
+def _load_case_studies_from_files() -> list[dict[str, Any]]:
+    case_dir = Path(__file__).resolve().parent / "case_studies"
+    cases: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+
+    for file_name in CASE_STUDY_FILES:
+        file_path = case_dir / file_name
+        if not file_path.exists():
+            raise RuntimeError(f"Missing case study file: {file_path}")
+
+        with file_path.open("r", encoding="utf-8") as handle:
+            payload = json.load(handle)
+
+        if not isinstance(payload, dict):
+            raise ValueError(f"Case study payload in '{file_name}' must be a JSON object.")
+
+        case_id = str(payload.get("id", "")).strip()
+        name = str(payload.get("name", "")).strip()
+        description = str(payload.get("description", "")).strip()
+
+        if not case_id or not name or not description:
+            raise ValueError(
+                f"Case study '{file_name}' must include non-empty id, name, and description."
+            )
+        if case_id in seen_ids:
+            raise ValueError(f"Duplicate case study id detected: '{case_id}'.")
+        seen_ids.add(case_id)
+
+        dim_scores = _validated_case_dimension_scores(
+            payload.get("dimension_scores"),
+            case_id=case_id,
+        )
+
+        cases.append(
+            {
+                "id": case_id,
+                "name": name,
+                "description": description,
+                "dimension_scores": dim_scores,
+                "deployment_context": payload.get("deployment_context", {}),
+                "source_reference": payload.get("source_reference", {}),
+            }
+        )
+
+    return cases
+
+
+try:
+    CASE_STUDIES = _load_case_studies_from_files()
+except Exception:
+    # Fallback keeps UI operable if local case files are unavailable.
+    CASE_STUDIES = _default_case_studies()
 
 
 def _get_theme_base():

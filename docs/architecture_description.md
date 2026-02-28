@@ -1,81 +1,48 @@
 # MEDF — Architecture Description
-Date: 2026-02-24  
-Version: 1.0.0  
-Scope: Aligned to Stage 1 prompts
+Date: 2026-02-28
+Version: 1.0.0
+Scope: FYP freeze candidate
 
 ## 1. Architecture Overview
-The MEDF system uses a modular three-layer architecture:
-- API and orchestration layer (`FastAPI`) for request handling and contract enforcement.
-- Domain logic layer for framework loading, scoring, and conflict analysis.
-- Data layer (`SQLite` + SQLAlchemy ORM) for stakeholder profile persistence.
 
-Design goal: produce deterministic, auditable Stage 1 outputs while preserving extensibility for advanced scoring and optimization in later stages.
+MEDF uses a modular three-layer architecture:
+- Presentation layer: Streamlit UI (`streamlit_app.py`) for governance-facing workflows.
+- API/orchestration layer: FastAPI routes (`app/routers/*`) for validation, execution, serialization.
+- Data/config layer: SQLite stakeholder store + YAML framework registry.
+
+Design goal: deterministic, auditable, and testable multi-framework ethical assessment for FYP evaluation.
 
 ## 2. Component Design
+
 Core backend components:
-- `app/main.py`: app bootstrap, startup initialization, health endpoint, router wiring.
-- `app/models.py`: Stage 1C schemas (Pydantic v2) + ORM table for stakeholder profiles.
-- `app/database.py`: SQLAlchemy engine/session/base setup.
-- `app/framework_registry.py`: YAML framework ingestion, in-memory registry, harmonisation mapping, default stakeholder seeding.
-- `app/scoring_engine.py`: deterministic placeholder scoring function.
-- `app/conflict_detection.py`: deterministic placeholder conflict and Pareto interfaces.
-- Routers:
-  - `app/routers/frameworks.py`
-  - `app/routers/stakeholders.py`
-  - `app/routers/evaluate.py`
-  - `app/routers/conflicts.py`
+- `app/main.py`: app startup, DB init, framework load, default stakeholder seeding.
+- `app/models.py`: API schemas and ORM models.
+- `app/database.py`: SQLAlchemy engine/session/base.
+- `app/framework_registry.py`: framework ingestion and canonical-dimension enforcement.
+- `app/scoring_engine.py`: TOPSIS/WSM/AHP utilities and Likert normalization.
+- `app/routers/evaluate.py`: multi-framework scoring orchestration.
+- `app/routers/conflicts.py`: stakeholder disagreement analysis.
+- `app/routers/pareto.py`: NSGA-II/non-dominated consensus generation.
+- `app/audit_log.py`: request/response audit persistence.
 
 ## 3. Runtime Flow
-1. Startup initializes DB schema (`init_db()`), loads framework YAMLs (`load_frameworks()`), and seeds default stakeholders (`seed_default_stakeholders()`).
-2. Client requests are validated against Stage 1C request schemas.
-3. Routers call domain services:
-   - frameworks endpoints query in-memory registry,
-   - stakeholders endpoints query/update SQLite,
-   - evaluate endpoint invokes deterministic scoring,
-   - conflicts endpoint computes placeholder conflict report.
-4. Responses return strongly typed Stage 1C response models.
 
-## 4. Architecture Diagram
-```mermaid
-flowchart TD
-    A[Client / Dashboard] --> B[FastAPI App]
+1. Startup: initialize DB, load framework YAMLs, seed default stakeholders.
+2. Request validation: Pydantic schema checks + route-level constraints.
+3. Domain execution:
+   - `/api/evaluate`: framework-weighted stakeholder scoring.
+   - `/api/conflicts`: pairwise conflict metrics and metadata.
+   - `/api/pareto`: deterministic consensus optimization.
+4. Audit write: run metadata and payload snapshots to JSONL.
+5. Streamlit layer renders outputs and allows bundle export.
 
-    subgraph API[API Routers]
-      B --> R1[/api/frameworks]
-      B --> R2[/api/stakeholders]
-      B --> R3[/api/evaluate]
-      B --> R4[/api/conflicts]
-      B --> RH[/api/health]
-    end
+## 4. Diagram Source of Truth
 
-    subgraph Domain[Domain Services]
-      R1 --> FR[framework_registry]
-      R2 --> FR2[framework_registry.get_stakeholder]
-      R3 --> SE[scoring_engine.compute_scores]
-      R3 --> FR3[framework_registry.get_framework/get_stakeholder]
-      R4 --> CD[conflict_detection placeholders]
-      R4 --> SE2[scoring_engine.compute_scores]
-      R4 --> FR4[framework_registry.get_framework/get_stakeholder]
-    end
+- Canonical source: `docs/architecture/system_architecture.mmd`
+- Committed export: `docs/architecture/system_architecture.svg`
 
-    subgraph Data[Data Layer]
-      DB[(SQLite medf.db)]
-      YM[(YAML frameworks/*.yaml)]
-    end
+## 5. Validation Boundary
 
-    FR --> YM
-    FR3 --> YM
-    FR4 --> YM
-    FR2 --> DB
-    R2 --> DB
-    R3 --> DB
-    R4 --> DB
-
-    B --> S[Startup]
-    S --> D1[init_db]
-    S --> D2[load_frameworks]
-    S --> D3[seed_default_stakeholders]
-    D1 --> DB
-    D2 --> YM
-    D3 --> DB
-```
+- API contract lock: `tests/test_api_contract_lock.py`
+- Determinism and invariants: release-candidate test modules in `tests/`
+- End-to-end smoke/stress execution: `scripts/release_smoke.sh`

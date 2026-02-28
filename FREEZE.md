@@ -3,8 +3,8 @@
 ## Tag Information
 
 - Tag name: fyp-freeze-v1.0.0.
-- Commit SHA: <commit_sha>.
-- Freeze date: <YYYY-MM-DD>.
+- Commit SHA: a2a94540d906a67ec92b85c2da15e434bc503b26.
+- Freeze date: 2026-02-25.
 
 This tag represents the finalized engineering state of the Multi-Stakeholder Ethical Decision Framework (MEDF) platform submitted for academic evaluation.
 
@@ -17,7 +17,7 @@ The frozen release includes the following components.
 - Strict stakeholder weight validation with normalization and constraint enforcement.
 - Deterministic mode enabling reproducible Pareto optimization runs.
 - NSGA-II multi-objective optimization for consensus weight generation.
-- Conflict detection using salience-weighted distance metrics across stakeholder vectors.
+- Conflict detection using pairwise stakeholder ranking agreement metrics.
 - Comprehensive audit logging of API requests and responses for traceability.
 - An institutional-grade Streamlit interface with structured KPI strip and governance-oriented layout.
 - A visibility-only Conference Mode for presentation contexts.

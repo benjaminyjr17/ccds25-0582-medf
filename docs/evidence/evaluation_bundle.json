@@ -1,0 +1,3767 @@
+{
+  "meta": {
+    "case_count": 3,
+    "framework_count": 3,
+    "generator": "scripts/generate_evidence_pack.py",
+    "stakeholder_ids": [
+      "developer",
+      "regulator",
+      "affected_community"
+    ]
+  },
+  "rows": [
+    {
+      "conflicts": {
+        "conflicts": [
+          {
+            "conflict_level": "low",
+            "conflicting_dimensions": [
+              "accountability",
+              "human_agency_oversight"
+            ],
+            "spearman_rho": 0.8857142857142858,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator"
+          },
+          {
+            "conflict_level": "low",
+            "conflicting_dimensions": [
+              "accountability",
+              "fairness_nondiscrimination"
+            ],
+            "spearman_rho": 1.0,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community"
+          },
+          {
+            "conflict_level": "low",
+            "conflicting_dimensions": [
+              "accountability",
+              "human_agency_oversight"
+            ],
+            "spearman_rho": 0.8857142857142858,
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community"
+          }
+        ],
+        "metadata": {
+          "ai_system_id": "evidence_facial_recognition",
+          "ai_system_name": "Facial Recognition (Law Enforcement)",
+          "correlation_matrix": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "developer": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "regulator": {
+              "affected_community": 0.8857142857142858,
+              "developer": 0.8857142857142858,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "developer": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "regulator": {
+              "affected_community": 0.8857142857142858,
+              "developer": 0.8857142857142858,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572
+            },
+            "developer": {
+              "affected_community": -0.3142857142857143,
+              "developer": 1.0,
+              "regulator": 0.08571428571428573
+            },
+            "regulator": {
+              "affected_community": 0.2571428571428572,
+              "developer": 0.08571428571428573,
+              "regulator": 1.0
+            }
+          },
+          "framework_id": "eu_altai",
+          "pairwise_rho_weights": {
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572,
+            "developer|regulator": 0.08571428571428573
+          },
+          "run_id": "8df964af-a6bb-43e6-aa5b-7790c0edc34d",
+          "scoring_method": "topsis",
+          "stakeholder_rankings": {
+            "affected_community": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "affected_community": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_scores": {
+            "affected_community": 0.2169310310026319,
+            "developer": 0.4262748732530246,
+            "regulator": 0.3018403167645622
+          }
+        },
+        "pareto_solutions": [],
+        "summary": "Conflict analysis for framework 'eu_altai' indicates low overall stakeholder disagreement."
+      },
+      "evaluate": {
+        "ai_system_id": "evidence_facial_recognition",
+        "framework_scores": [
+          {
+            "dimension_scores": {
+              "accountability": 0.07658538098783817,
+              "fairness_nondiscrimination": 0.0,
+              "human_agency_oversight": 0.040980667935247246,
+              "privacy_data_governance": 0.0,
+              "safety_robustness": 0.16642363696533466,
+              "transparency_explainability": 0.018652960480957506
+            },
+            "framework_id": "eu_altai",
+            "risk_level": "critical",
+            "score": 0.33528141812607143
+          }
+        ],
+        "generated_at": "2026-02-28T06:49:30.108145Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=d21f934b-533f-4e0b-b61e-f030f161e60e",
+        "overall_score": 0.33528141812607143,
+        "scoring_method": "topsis"
+      },
+      "pareto": {
+        "conflicts": [],
+        "metadata": {
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_1cf0a3d5": 0.22245511134328436,
+            "ps_2373aff1": 0.22472885526639183,
+            "ps_574af419": 0.25975412260238995,
+            "ps_62109758": 0.22355345874943786,
+            "ps_6b0a4c52": 0.2214675242325666,
+            "ps_6c7413eb": 0.22406719381070755,
+            "ps_ab8405a6": 0.24567433440156763,
+            "ps_bb4d4e0b": 0.214346076167647
+          },
+          "ai_system_id": "evidence_facial_recognition",
+          "ai_system_name": "Facial Recognition (Law Enforcement)",
+          "deterministic_mode": true,
+          "framework_id": "eu_altai",
+          "n_gen": 80,
+          "n_solutions_returned": 8,
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "pop_size": 40,
+          "run_id": "d0e704b1-3dce-4959-a120-9392bdc9b5a2",
+          "salience_vector": {
+            "accountability": 0.2857142857142857,
+            "fairness_nondiscrimination": 0.0,
+            "human_agency_oversight": 0.14285714285714285,
+            "privacy_data_governance": 0.0,
+            "safety_robustness": 0.42857142857142855,
+            "transparency_explainability": 0.14285714285714285
+          },
+          "seed": 42,
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "accountability": 0.5,
+            "fairness_nondiscrimination": 0.0,
+            "human_agency_oversight": 0.25,
+            "privacy_data_governance": 0.0,
+            "safety_robustness": 0.75,
+            "transparency_explainability": 0.25
+          }
+        },
+        "pareto_solutions": [
+          {
+            "objective_scores": {
+              "affected_community": 0.012797768705778131,
+              "developer": 0.08633474393503723,
+              "regulator": 0.04941326526963284
+            },
+            "rank": 1,
+            "solution_id": "ps_1cf0a3d5",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15821155935818793,
+                "fairness_nondiscrimination": 0.24890514083118082,
+                "human_agency_oversight": 0.1501180322163453,
+                "privacy_data_governance": 0.23131171909649523,
+                "safety_robustness": 0.10591287297131281,
+                "transparency_explainability": 0.10554067552647792
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.007649852072318624,
+              "developer": 0.08815101219660339,
+              "regulator": 0.05399862207900602
+            },
+            "rank": 2,
+            "solution_id": "ps_bb4d4e0b",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14636356295579994,
+                "fairness_nondiscrimination": 0.23928675508774425,
+                "human_agency_oversight": 0.1622206950234059,
+                "privacy_data_governance": 0.2533369262564071,
+                "safety_robustness": 0.10182221152946973,
+                "transparency_explainability": 0.09696984914717303
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0005330321081671069,
+              "developer": 0.09334349574214763,
+              "regulator": 0.057629210027861935
+            },
+            "rank": 3,
+            "solution_id": "ps_6c7413eb",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14895908551851716,
+                "fairness_nondiscrimination": 0.23434390908216018,
+                "human_agency_oversight": 0.1998366227189319,
+                "privacy_data_governance": 0.21778422693074131,
+                "safety_robustness": 0.09971891286860728,
+                "transparency_explainability": 0.09935724288104221
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0087418713554323,
+              "developer": 0.08584800517106995,
+              "regulator": 0.058048995811895335
+            },
+            "rank": 4,
+            "solution_id": "ps_62109758",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1471854815359409,
+                "fairness_nondiscrimination": 0.23980956169118842,
+                "human_agency_oversight": 0.17257493559762063,
+                "privacy_data_governance": 0.2316310630089269,
+                "safety_robustness": 0.10923448908096292,
+                "transparency_explainability": 0.0995644690853602
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.020214035413571904,
+              "developer": 0.09074467626233063,
+              "regulator": 0.04496960945195507
+            },
+            "rank": 5,
+            "solution_id": "ps_6b0a4c52",
+            "weights": {
+              "consensus": {
+                "accountability": 0.163278604719533,
+                "fairness_nondiscrimination": 0.25704160931145464,
+                "human_agency_oversight": 0.12218592451763154,
+                "privacy_data_governance": 0.23912873649737493,
+                "safety_robustness": 0.10938091900978147,
+                "transparency_explainability": 0.10898420594422442
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0175427170718591,
+              "developer": 0.09847401455181785,
+              "regulator": 0.04537195161344916
+            },
+            "rank": 6,
+            "solution_id": "ps_2373aff1",
+            "weights": {
+              "consensus": {
+                "accountability": 0.18042861014214523,
+                "fairness_nondiscrimination": 0.21928703154784052,
+                "human_agency_oversight": 0.1582595411798557,
+                "privacy_data_governance": 0.25347129148806785,
+                "safety_robustness": 0.09562256697966519,
+                "transparency_explainability": 0.09293095866242555
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.027612240434011396,
+              "developer": 0.08097551500590429,
+              "regulator": 0.0566804293935448
+            },
+            "rank": 7,
+            "solution_id": "ps_ab8405a6",
+            "weights": {
+              "consensus": {
+                "accountability": 0.17450607749135832,
+                "fairness_nondiscrimination": 0.18789149886315007,
+                "human_agency_oversight": 0.15075081634108356,
+                "privacy_data_governance": 0.2632368112482435,
+                "safety_robustness": 0.12965978511315282,
+                "transparency_explainability": 0.09395501094301179
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.03535245223552909,
+              "developer": 0.09497579024185238,
+              "regulator": 0.04073849547243333
+            },
+            "rank": 8,
+            "solution_id": "ps_574af419",
+            "weights": {
+              "consensus": {
+                "accountability": 0.20947907258552878,
+                "fairness_nondiscrimination": 0.19861385138790472,
+                "human_agency_oversight": 0.14577466238042808,
+                "privacy_data_governance": 0.21606094210664328,
+                "safety_robustness": 0.1221061056592895,
+                "transparency_explainability": 0.10796536588020567
+              }
+            }
+          }
+        ],
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework eu_altai."
+      },
+      "summary": {
+        "case_id": "facial_recognition",
+        "conflict_pairs": 3,
+        "framework_id": "eu_altai",
+        "mean_spearman_rho": 0.92381,
+        "overall_score": 0.335281,
+        "pareto_solutions": 8,
+        "top_consensus_dimension": "fairness_nondiscrimination"
+      }
+    },
+    {
+      "conflicts": {
+        "conflicts": [
+          {
+            "conflict_level": "low",
+            "conflicting_dimensions": [
+              "accountability",
+              "human_agency_oversight"
+            ],
+            "spearman_rho": 0.8857142857142858,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator"
+          },
+          {
+            "conflict_level": "low",
+            "conflicting_dimensions": [
+              "accountability",
+              "fairness_nondiscrimination"
+            ],
+            "spearman_rho": 1.0,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community"
+          },
+          {
+            "conflict_level": "low",
+            "conflicting_dimensions": [
+              "accountability",
+              "human_agency_oversight"
+            ],
+            "spearman_rho": 0.8857142857142858,
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community"
+          }
+        ],
+        "metadata": {
+          "ai_system_id": "evidence_facial_recognition",
+          "ai_system_name": "Facial Recognition (Law Enforcement)",
+          "correlation_matrix": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "developer": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "regulator": {
+              "affected_community": 0.8857142857142858,
+              "developer": 0.8857142857142858,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "developer": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "regulator": {
+              "affected_community": 0.8857142857142858,
+              "developer": 0.8857142857142858,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572
+            },
+            "developer": {
+              "affected_community": -0.3142857142857143,
+              "developer": 1.0,
+              "regulator": 0.08571428571428573
+            },
+            "regulator": {
+              "affected_community": 0.2571428571428572,
+              "developer": 0.08571428571428573,
+              "regulator": 1.0
+            }
+          },
+          "framework_id": "nist_ai_rmf",
+          "pairwise_rho_weights": {
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572,
+            "developer|regulator": 0.08571428571428573
+          },
+          "run_id": "532ad2ba-b6c1-47fa-a31d-c91d6c264409",
+          "scoring_method": "topsis",
+          "stakeholder_rankings": {
+            "affected_community": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "affected_community": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_scores": {
+            "affected_community": 0.2169310310026319,
+            "developer": 0.4262748732530246,
+            "regulator": 0.3018403167645622
+          }
+        },
+        "pareto_solutions": [],
+        "summary": "Conflict analysis for framework 'nist_ai_rmf' indicates low overall stakeholder disagreement."
+      },
+      "evaluate": {
+        "ai_system_id": "evidence_facial_recognition",
+        "framework_scores": [
+          {
+            "dimension_scores": {
+              "accountability": 0.1703388565457531,
+              "fairness_nondiscrimination": 0.0,
+              "human_agency_oversight": 0.023687615066925415,
+              "privacy_data_governance": 0.0,
+              "safety_robustness": 0.18812509329750712,
+              "transparency_explainability": 0.020610041299696475
+            },
+            "framework_id": "nist_ai_rmf",
+            "risk_level": "high",
+            "score": 0.47004046052907994
+          }
+        ],
+        "generated_at": "2026-02-28T06:49:30.408816Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=0ac0dc85-77c1-42e7-8c0f-139b82e3234e",
+        "overall_score": 0.47004046052907994,
+        "scoring_method": "topsis"
+      },
+      "pareto": {
+        "conflicts": [],
+        "metadata": {
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_0315daaa": 0.214346076167647,
+            "ps_1b93550d": 0.22472885526639183,
+            "ps_1cf85e73": 0.25975412260238995,
+            "ps_30560c52": 0.2214675242325666,
+            "ps_3059e6a0": 0.24567433440156763,
+            "ps_97628187": 0.22406719381070755,
+            "ps_a7268a97": 0.22245511134328436,
+            "ps_c0bde8a5": 0.22355345874943786
+          },
+          "ai_system_id": "evidence_facial_recognition",
+          "ai_system_name": "Facial Recognition (Law Enforcement)",
+          "deterministic_mode": true,
+          "framework_id": "nist_ai_rmf",
+          "n_gen": 80,
+          "n_solutions_returned": 8,
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "pop_size": 40,
+          "run_id": "b01fd9ec-d6fc-4748-a412-c31561e559a7",
+          "salience_vector": {
+            "accountability": 0.2857142857142857,
+            "fairness_nondiscrimination": 0.0,
+            "human_agency_oversight": 0.14285714285714285,
+            "privacy_data_governance": 0.0,
+            "safety_robustness": 0.42857142857142855,
+            "transparency_explainability": 0.14285714285714285
+          },
+          "seed": 42,
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "accountability": 0.5,
+            "fairness_nondiscrimination": 0.0,
+            "human_agency_oversight": 0.25,
+            "privacy_data_governance": 0.0,
+            "safety_robustness": 0.75,
+            "transparency_explainability": 0.25
+          }
+        },
+        "pareto_solutions": [
+          {
+            "objective_scores": {
+              "affected_community": 0.012797768705778131,
+              "developer": 0.08633474393503723,
+              "regulator": 0.04941326526963284
+            },
+            "rank": 1,
+            "solution_id": "ps_a7268a97",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15821155935818793,
+                "fairness_nondiscrimination": 0.24890514083118082,
+                "human_agency_oversight": 0.1501180322163453,
+                "privacy_data_governance": 0.23131171909649523,
+                "safety_robustness": 0.10591287297131281,
+                "transparency_explainability": 0.10554067552647792
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.007649852072318624,
+              "developer": 0.08815101219660339,
+              "regulator": 0.05399862207900602
+            },
+            "rank": 2,
+            "solution_id": "ps_0315daaa",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14636356295579994,
+                "fairness_nondiscrimination": 0.23928675508774425,
+                "human_agency_oversight": 0.1622206950234059,
+                "privacy_data_governance": 0.2533369262564071,
+                "safety_robustness": 0.10182221152946973,
+                "transparency_explainability": 0.09696984914717303
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0005330321081671069,
+              "developer": 0.09334349574214763,
+              "regulator": 0.057629210027861935
+            },
+            "rank": 3,
+            "solution_id": "ps_97628187",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14895908551851716,
+                "fairness_nondiscrimination": 0.23434390908216018,
+                "human_agency_oversight": 0.1998366227189319,
+                "privacy_data_governance": 0.21778422693074131,
+                "safety_robustness": 0.09971891286860728,
+                "transparency_explainability": 0.09935724288104221
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0087418713554323,
+              "developer": 0.08584800517106995,
+              "regulator": 0.058048995811895335
+            },
+            "rank": 4,
+            "solution_id": "ps_c0bde8a5",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1471854815359409,
+                "fairness_nondiscrimination": 0.23980956169118842,
+                "human_agency_oversight": 0.17257493559762063,
+                "privacy_data_governance": 0.2316310630089269,
+                "safety_robustness": 0.10923448908096292,
+                "transparency_explainability": 0.0995644690853602
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.020214035413571904,
+              "developer": 0.09074467626233063,
+              "regulator": 0.04496960945195507
+            },
+            "rank": 5,
+            "solution_id": "ps_30560c52",
+            "weights": {
+              "consensus": {
+                "accountability": 0.163278604719533,
+                "fairness_nondiscrimination": 0.25704160931145464,
+                "human_agency_oversight": 0.12218592451763154,
+                "privacy_data_governance": 0.23912873649737493,
+                "safety_robustness": 0.10938091900978147,
+                "transparency_explainability": 0.10898420594422442
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0175427170718591,
+              "developer": 0.09847401455181785,
+              "regulator": 0.04537195161344916
+            },
+            "rank": 6,
+            "solution_id": "ps_1b93550d",
+            "weights": {
+              "consensus": {
+                "accountability": 0.18042861014214523,
+                "fairness_nondiscrimination": 0.21928703154784052,
+                "human_agency_oversight": 0.1582595411798557,
+                "privacy_data_governance": 0.25347129148806785,
+                "safety_robustness": 0.09562256697966519,
+                "transparency_explainability": 0.09293095866242555
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.027612240434011396,
+              "developer": 0.08097551500590429,
+              "regulator": 0.0566804293935448
+            },
+            "rank": 7,
+            "solution_id": "ps_3059e6a0",
+            "weights": {
+              "consensus": {
+                "accountability": 0.17450607749135832,
+                "fairness_nondiscrimination": 0.18789149886315007,
+                "human_agency_oversight": 0.15075081634108356,
+                "privacy_data_governance": 0.2632368112482435,
+                "safety_robustness": 0.12965978511315282,
+                "transparency_explainability": 0.09395501094301179
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.03535245223552909,
+              "developer": 0.09497579024185238,
+              "regulator": 0.04073849547243333
+            },
+            "rank": 8,
+            "solution_id": "ps_1cf85e73",
+            "weights": {
+              "consensus": {
+                "accountability": 0.20947907258552878,
+                "fairness_nondiscrimination": 0.19861385138790472,
+                "human_agency_oversight": 0.14577466238042808,
+                "privacy_data_governance": 0.21606094210664328,
+                "safety_robustness": 0.1221061056592895,
+                "transparency_explainability": 0.10796536588020567
+              }
+            }
+          }
+        ],
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework nist_ai_rmf."
+      },
+      "summary": {
+        "case_id": "facial_recognition",
+        "conflict_pairs": 3,
+        "framework_id": "nist_ai_rmf",
+        "mean_spearman_rho": 0.92381,
+        "overall_score": 0.47004,
+        "pareto_solutions": 8,
+        "top_consensus_dimension": "fairness_nondiscrimination"
+      }
+    },
+    {
+      "conflicts": {
+        "conflicts": [
+          {
+            "conflict_level": "low",
+            "conflicting_dimensions": [
+              "accountability",
+              "human_agency_oversight"
+            ],
+            "spearman_rho": 0.8857142857142858,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator"
+          },
+          {
+            "conflict_level": "low",
+            "conflicting_dimensions": [
+              "accountability",
+              "fairness_nondiscrimination"
+            ],
+            "spearman_rho": 1.0,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community"
+          },
+          {
+            "conflict_level": "low",
+            "conflicting_dimensions": [
+              "accountability",
+              "human_agency_oversight"
+            ],
+            "spearman_rho": 0.8857142857142858,
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community"
+          }
+        ],
+        "metadata": {
+          "ai_system_id": "evidence_facial_recognition",
+          "ai_system_name": "Facial Recognition (Law Enforcement)",
+          "correlation_matrix": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "developer": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "regulator": {
+              "affected_community": 0.8857142857142858,
+              "developer": 0.8857142857142858,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "developer": {
+              "affected_community": 1.0,
+              "developer": 1.0,
+              "regulator": 0.8857142857142858
+            },
+            "regulator": {
+              "affected_community": 0.8857142857142858,
+              "developer": 0.8857142857142858,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572
+            },
+            "developer": {
+              "affected_community": -0.3142857142857143,
+              "developer": 1.0,
+              "regulator": 0.08571428571428573
+            },
+            "regulator": {
+              "affected_community": 0.2571428571428572,
+              "developer": 0.08571428571428573,
+              "regulator": 1.0
+            }
+          },
+          "framework_id": "sg_mgaf",
+          "pairwise_rho_weights": {
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572,
+            "developer|regulator": 0.08571428571428573
+          },
+          "run_id": "a7b24740-7d3e-489a-bf7c-b98fa1f99288",
+          "scoring_method": "topsis",
+          "stakeholder_rankings": {
+            "affected_community": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "affected_community": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_scores": {
+            "affected_community": 0.2169310310026319,
+            "developer": 0.4262748732530246,
+            "regulator": 0.3018403167645622
+          }
+        },
+        "pareto_solutions": [],
+        "summary": "Conflict analysis for framework 'sg_mgaf' indicates low overall stakeholder disagreement."
+      },
+      "evaluate": {
+        "ai_system_id": "evidence_facial_recognition",
+        "framework_scores": [
+          {
+            "dimension_scores": {
+              "accountability": 0.11252767235926629,
+              "fairness_nondiscrimination": 0.0,
+              "human_agency_oversight": 0.046934297912713474,
+              "privacy_data_governance": 0.0,
+              "safety_robustness": 0.11656487191650854,
+              "transparency_explainability": 0.050971497469955725
+            },
+            "framework_id": "sg_mgaf",
+            "risk_level": "critical",
+            "score": 0.3594848653132723
+          }
+        ],
+        "generated_at": "2026-02-28T06:49:30.700347Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=e6c9e2bb-6e3b-415d-945b-6454165e763f",
+        "overall_score": 0.3594848653132723,
+        "scoring_method": "topsis"
+      },
+      "pareto": {
+        "conflicts": [],
+        "metadata": {
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_048dbd48": 0.2214675242325666,
+            "ps_2688e812": 0.214346076167647,
+            "ps_7eed70fd": 0.22355345874943786,
+            "ps_81cbecb4": 0.22406719381070755,
+            "ps_cc221d44": 0.24567433440156763,
+            "ps_e4cd5e4f": 0.22245511134328436,
+            "ps_e9687b45": 0.25975412260238995,
+            "ps_f1598105": 0.22472885526639183
+          },
+          "ai_system_id": "evidence_facial_recognition",
+          "ai_system_name": "Facial Recognition (Law Enforcement)",
+          "deterministic_mode": true,
+          "framework_id": "sg_mgaf",
+          "n_gen": 80,
+          "n_solutions_returned": 8,
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "pop_size": 40,
+          "run_id": "8bd0a8a4-440a-44ed-b4e0-bc007545ce1e",
+          "salience_vector": {
+            "accountability": 0.2857142857142857,
+            "fairness_nondiscrimination": 0.0,
+            "human_agency_oversight": 0.14285714285714285,
+            "privacy_data_governance": 0.0,
+            "safety_robustness": 0.42857142857142855,
+            "transparency_explainability": 0.14285714285714285
+          },
+          "seed": 42,
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "accountability": 0.5,
+            "fairness_nondiscrimination": 0.0,
+            "human_agency_oversight": 0.25,
+            "privacy_data_governance": 0.0,
+            "safety_robustness": 0.75,
+            "transparency_explainability": 0.25
+          }
+        },
+        "pareto_solutions": [
+          {
+            "objective_scores": {
+              "affected_community": 0.012797768705778131,
+              "developer": 0.08633474393503723,
+              "regulator": 0.04941326526963284
+            },
+            "rank": 1,
+            "solution_id": "ps_e4cd5e4f",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15821155935818793,
+                "fairness_nondiscrimination": 0.24890514083118082,
+                "human_agency_oversight": 0.1501180322163453,
+                "privacy_data_governance": 0.23131171909649523,
+                "safety_robustness": 0.10591287297131281,
+                "transparency_explainability": 0.10554067552647792
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.007649852072318624,
+              "developer": 0.08815101219660339,
+              "regulator": 0.05399862207900602
+            },
+            "rank": 2,
+            "solution_id": "ps_2688e812",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14636356295579994,
+                "fairness_nondiscrimination": 0.23928675508774425,
+                "human_agency_oversight": 0.1622206950234059,
+                "privacy_data_governance": 0.2533369262564071,
+                "safety_robustness": 0.10182221152946973,
+                "transparency_explainability": 0.09696984914717303
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0005330321081671069,
+              "developer": 0.09334349574214763,
+              "regulator": 0.057629210027861935
+            },
+            "rank": 3,
+            "solution_id": "ps_81cbecb4",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14895908551851716,
+                "fairness_nondiscrimination": 0.23434390908216018,
+                "human_agency_oversight": 0.1998366227189319,
+                "privacy_data_governance": 0.21778422693074131,
+                "safety_robustness": 0.09971891286860728,
+                "transparency_explainability": 0.09935724288104221
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0087418713554323,
+              "developer": 0.08584800517106995,
+              "regulator": 0.058048995811895335
+            },
+            "rank": 4,
+            "solution_id": "ps_7eed70fd",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1471854815359409,
+                "fairness_nondiscrimination": 0.23980956169118842,
+                "human_agency_oversight": 0.17257493559762063,
+                "privacy_data_governance": 0.2316310630089269,
+                "safety_robustness": 0.10923448908096292,
+                "transparency_explainability": 0.0995644690853602
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.020214035413571904,
+              "developer": 0.09074467626233063,
+              "regulator": 0.04496960945195507
+            },
+            "rank": 5,
+            "solution_id": "ps_048dbd48",
+            "weights": {
+              "consensus": {
+                "accountability": 0.163278604719533,
+                "fairness_nondiscrimination": 0.25704160931145464,
+                "human_agency_oversight": 0.12218592451763154,
+                "privacy_data_governance": 0.23912873649737493,
+                "safety_robustness": 0.10938091900978147,
+                "transparency_explainability": 0.10898420594422442
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0175427170718591,
+              "developer": 0.09847401455181785,
+              "regulator": 0.04537195161344916
+            },
+            "rank": 6,
+            "solution_id": "ps_f1598105",
+            "weights": {
+              "consensus": {
+                "accountability": 0.18042861014214523,
+                "fairness_nondiscrimination": 0.21928703154784052,
+                "human_agency_oversight": 0.1582595411798557,
+                "privacy_data_governance": 0.25347129148806785,
+                "safety_robustness": 0.09562256697966519,
+                "transparency_explainability": 0.09293095866242555
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.027612240434011396,
+              "developer": 0.08097551500590429,
+              "regulator": 0.0566804293935448
+            },
+            "rank": 7,
+            "solution_id": "ps_cc221d44",
+            "weights": {
+              "consensus": {
+                "accountability": 0.17450607749135832,
+                "fairness_nondiscrimination": 0.18789149886315007,
+                "human_agency_oversight": 0.15075081634108356,
+                "privacy_data_governance": 0.2632368112482435,
+                "safety_robustness": 0.12965978511315282,
+                "transparency_explainability": 0.09395501094301179
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.03535245223552909,
+              "developer": 0.09497579024185238,
+              "regulator": 0.04073849547243333
+            },
+            "rank": 8,
+            "solution_id": "ps_e9687b45",
+            "weights": {
+              "consensus": {
+                "accountability": 0.20947907258552878,
+                "fairness_nondiscrimination": 0.19861385138790472,
+                "human_agency_oversight": 0.14577466238042808,
+                "privacy_data_governance": 0.21606094210664328,
+                "safety_robustness": 0.1221061056592895,
+                "transparency_explainability": 0.10796536588020567
+              }
+            }
+          }
+        ],
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework sg_mgaf."
+      },
+      "summary": {
+        "case_id": "facial_recognition",
+        "conflict_pairs": 3,
+        "framework_id": "sg_mgaf",
+        "mean_spearman_rho": 0.92381,
+        "overall_score": 0.359485,
+        "pareto_solutions": 8,
+        "top_consensus_dimension": "fairness_nondiscrimination"
+      }
+    },
+    {
+      "conflicts": {
+        "conflicts": [
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "accountability"
+            ],
+            "spearman_rho": -0.3142857142857143,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator"
+          },
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "fairness_nondiscrimination"
+            ],
+            "spearman_rho": -0.2,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community"
+          },
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "accountability",
+              "fairness_nondiscrimination"
+            ],
+            "spearman_rho": 0.08571428571428573,
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community"
+          }
+        ],
+        "metadata": {
+          "ai_system_id": "evidence_hiring_algorithm",
+          "ai_system_name": "Hiring Recommendation Algorithm",
+          "correlation_matrix": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.2,
+              "regulator": 0.08571428571428573
+            },
+            "developer": {
+              "affected_community": -0.2,
+              "developer": 1.0,
+              "regulator": -0.3142857142857143
+            },
+            "regulator": {
+              "affected_community": 0.08571428571428573,
+              "developer": -0.3142857142857143,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.2,
+              "regulator": 0.08571428571428573
+            },
+            "developer": {
+              "affected_community": -0.2,
+              "developer": 1.0,
+              "regulator": -0.3142857142857143
+            },
+            "regulator": {
+              "affected_community": 0.08571428571428573,
+              "developer": -0.3142857142857143,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572
+            },
+            "developer": {
+              "affected_community": -0.3142857142857143,
+              "developer": 1.0,
+              "regulator": 0.08571428571428573
+            },
+            "regulator": {
+              "affected_community": 0.2571428571428572,
+              "developer": 0.08571428571428573,
+              "regulator": 1.0
+            }
+          },
+          "framework_id": "eu_altai",
+          "pairwise_rho_weights": {
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572,
+            "developer|regulator": 0.08571428571428573
+          },
+          "run_id": "e4142721-d564-4706-b39a-2dc2248fee3e",
+          "scoring_method": "topsis",
+          "stakeholder_rankings": {
+            "affected_community": [
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "affected_community": [
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_scores": {
+            "affected_community": 0.42019862871711583,
+            "developer": 0.4894381044798461,
+            "regulator": 0.4516442666983418
+          }
+        },
+        "pareto_solutions": [],
+        "summary": "Conflict analysis for framework 'eu_altai' indicates high overall stakeholder disagreement."
+      },
+      "evaluate": {
+        "ai_system_id": "evidence_hiring_algorithm",
+        "framework_scores": [
+          {
+            "dimension_scores": {
+              "accountability": 0.07658538098783817,
+              "fairness_nondiscrimination": 0.04503288657235046,
+              "human_agency_oversight": 0.12294200380574172,
+              "privacy_data_governance": 0.10313249772482831,
+              "safety_robustness": 0.11094909131022308,
+              "transparency_explainability": 0.03730592096191501
+            },
+            "framework_id": "eu_altai",
+            "risk_level": "high",
+            "score": 0.4771896976814805
+          }
+        ],
+        "generated_at": "2026-02-28T06:49:30.993153Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=ad72b5c1-4a4c-495a-af3d-687ab818ee08",
+        "overall_score": 0.4771896976814805,
+        "scoring_method": "topsis"
+      },
+      "pareto": {
+        "conflicts": [],
+        "metadata": {
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_225183e8": 0.46952077309361706,
+            "ps_2ee3b2ca": 0.4793296255594741,
+            "ps_37861dc6": 0.4652218786699993,
+            "ps_65f1839e": 0.4707335929786121,
+            "ps_9bbd4129": 0.4659734527592929,
+            "ps_c4134edb": 0.47800215468548096,
+            "ps_d1b22825": 0.4667996667908564,
+            "ps_d4b89b45": 0.4670838753391128
+          },
+          "ai_system_id": "evidence_hiring_algorithm",
+          "ai_system_name": "Hiring Recommendation Algorithm",
+          "deterministic_mode": true,
+          "framework_id": "eu_altai",
+          "n_gen": 80,
+          "n_solutions_returned": 8,
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "pop_size": 40,
+          "run_id": "17c1e5f2-2fd6-40ea-a7cb-3b2fc5aee0a5",
+          "salience_vector": {
+            "accountability": 0.16666666666666666,
+            "fairness_nondiscrimination": 0.08333333333333333,
+            "human_agency_oversight": 0.25,
+            "privacy_data_governance": 0.16666666666666666,
+            "safety_robustness": 0.16666666666666666,
+            "transparency_explainability": 0.16666666666666666
+          },
+          "seed": 42,
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "accountability": 0.5,
+            "fairness_nondiscrimination": 0.25,
+            "human_agency_oversight": 0.75,
+            "privacy_data_governance": 0.5,
+            "safety_robustness": 0.5,
+            "transparency_explainability": 0.5
+          }
+        },
+        "pareto_solutions": [
+          {
+            "objective_scores": {
+              "affected_community": 0.01676862968782118,
+              "developer": 0.054403108711059474,
+              "regulator": 0.05162395251085124
+            },
+            "rank": 1,
+            "solution_id": "ps_9bbd4129",
+            "weights": {
+              "consensus": {
+                "accountability": 0.18090530690202403,
+                "fairness_nondiscrimination": 0.297413423570036,
+                "human_agency_oversight": 0.1613072346072076,
+                "privacy_data_governance": 0.15241361996990274,
+                "safety_robustness": 0.10276412662611452,
+                "transparency_explainability": 0.10519628832471518
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.020812600703981003,
+              "developer": 0.044777921564358274,
+              "regulator": 0.05756667941714001
+            },
+            "rank": 2,
+            "solution_id": "ps_d1b22825",
+            "weights": {
+              "consensus": {
+                "accountability": 0.16052180702834984,
+                "fairness_nondiscrimination": 0.2899499165332829,
+                "human_agency_oversight": 0.15714858369670845,
+                "privacy_data_governance": 0.14866403086720925,
+                "safety_robustness": 0.1338018712305723,
+                "transparency_explainability": 0.10991379064387725
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.014323546760922304,
+              "developer": 0.05362159504052561,
+              "regulator": 0.05636862133652894
+            },
+            "rank": 3,
+            "solution_id": "ps_37861dc6",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1636196475554825,
+                "fairness_nondiscrimination": 0.3039466442448246,
+                "human_agency_oversight": 0.1648341589248216,
+                "privacy_data_governance": 0.15574608862151898,
+                "safety_robustness": 0.10435709354842244,
+                "transparency_explainability": 0.10749636710492998
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.02600034385299363,
+              "developer": 0.048722127449502405,
+              "regulator": 0.050145780242877476
+            },
+            "rank": 4,
+            "solution_id": "ps_d4b89b45",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1830598803990743,
+                "fairness_nondiscrimination": 0.2826700156969794,
+                "human_agency_oversight": 0.15100551705343074,
+                "privacy_data_governance": 0.14623956035149613,
+                "safety_robustness": 0.12467793263910946,
+                "transparency_explainability": 0.11234709385990994
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.00968791618504625,
+              "developer": 0.056328095919403104,
+              "regulator": 0.05887454861878898
+            },
+            "rank": 5,
+            "solution_id": "ps_65f1839e",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15451925196168118,
+                "fairness_nondiscrimination": 0.29613414327590043,
+                "human_agency_oversight": 0.17906851519034878,
+                "privacy_data_governance": 0.1539380891911029,
+                "safety_robustness": 0.10174930522040279,
+                "transparency_explainability": 0.11459069516056399
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.029463909571102224,
+              "developer": 0.05835764745549607,
+              "regulator": 0.03958831486588728
+            },
+            "rank": 6,
+            "solution_id": "ps_225183e8",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14925350515314645,
+                "fairness_nondiscrimination": 0.2722782875457394,
+                "human_agency_oversight": 0.1503613799202079,
+                "privacy_data_governance": 0.15160450403809736,
+                "safety_robustness": 0.09519432557398241,
+                "transparency_explainability": 0.1813079977688264
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0050310510806912045,
+              "developer": 0.05723011844082135,
+              "regulator": 0.06573545062607611
+            },
+            "rank": 7,
+            "solution_id": "ps_2ee3b2ca",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15467363752030086,
+                "fairness_nondiscrimination": 0.28286217046449924,
+                "human_agency_oversight": 0.20018067270239576,
+                "privacy_data_governance": 0.14780538708515087,
+                "safety_robustness": 0.10983388315185923,
+                "transparency_explainability": 0.10464424907579403
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0023766541114007464,
+              "developer": 0.059253711711942825,
+              "regulator": 0.06679891432611806
+            },
+            "rank": 8,
+            "solution_id": "ps_c4134edb",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1522287284727588,
+                "fairness_nondiscrimination": 0.29174438470255737,
+                "human_agency_oversight": 0.20375300344448105,
+                "privacy_data_governance": 0.1516561805961824,
+                "safety_robustness": 0.10024101954965246,
+                "transparency_explainability": 0.10037668323436792
+              }
+            }
+          }
+        ],
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework eu_altai."
+      },
+      "summary": {
+        "case_id": "hiring_algorithm",
+        "conflict_pairs": 3,
+        "framework_id": "eu_altai",
+        "mean_spearman_rho": -0.142857,
+        "overall_score": 0.47719,
+        "pareto_solutions": 8,
+        "top_consensus_dimension": "fairness_nondiscrimination"
+      }
+    },
+    {
+      "conflicts": {
+        "conflicts": [
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "accountability"
+            ],
+            "spearman_rho": -0.3142857142857143,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator"
+          },
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "fairness_nondiscrimination"
+            ],
+            "spearman_rho": -0.2,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community"
+          },
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "accountability",
+              "fairness_nondiscrimination"
+            ],
+            "spearman_rho": 0.08571428571428573,
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community"
+          }
+        ],
+        "metadata": {
+          "ai_system_id": "evidence_hiring_algorithm",
+          "ai_system_name": "Hiring Recommendation Algorithm",
+          "correlation_matrix": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.2,
+              "regulator": 0.08571428571428573
+            },
+            "developer": {
+              "affected_community": -0.2,
+              "developer": 1.0,
+              "regulator": -0.3142857142857143
+            },
+            "regulator": {
+              "affected_community": 0.08571428571428573,
+              "developer": -0.3142857142857143,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.2,
+              "regulator": 0.08571428571428573
+            },
+            "developer": {
+              "affected_community": -0.2,
+              "developer": 1.0,
+              "regulator": -0.3142857142857143
+            },
+            "regulator": {
+              "affected_community": 0.08571428571428573,
+              "developer": -0.3142857142857143,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572
+            },
+            "developer": {
+              "affected_community": -0.3142857142857143,
+              "developer": 1.0,
+              "regulator": 0.08571428571428573
+            },
+            "regulator": {
+              "affected_community": 0.2571428571428572,
+              "developer": 0.08571428571428573,
+              "regulator": 1.0
+            }
+          },
+          "framework_id": "nist_ai_rmf",
+          "pairwise_rho_weights": {
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572,
+            "developer|regulator": 0.08571428571428573
+          },
+          "run_id": "90ec5db9-1072-47f7-9a97-cacc458e8f48",
+          "scoring_method": "topsis",
+          "stakeholder_rankings": {
+            "affected_community": [
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "affected_community": [
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_scores": {
+            "affected_community": 0.42019862871711583,
+            "developer": 0.4894381044798461,
+            "regulator": 0.4516442666983418
+          }
+        },
+        "pareto_solutions": [],
+        "summary": "Conflict analysis for framework 'nist_ai_rmf' indicates high overall stakeholder disagreement."
+      },
+      "evaluate": {
+        "ai_system_id": "evidence_hiring_algorithm",
+        "framework_scores": [
+          {
+            "dimension_scores": {
+              "accountability": 0.1703388565457531,
+              "fairness_nondiscrimination": 0.03448524655421207,
+              "human_agency_oversight": 0.07106284520077623,
+              "privacy_data_governance": 0.04667860874757426,
+              "safety_robustness": 0.12541672886500474,
+              "transparency_explainability": 0.04122008259939295
+            },
+            "framework_id": "nist_ai_rmf",
+            "risk_level": "high",
+            "score": 0.4816802515612055
+          }
+        ],
+        "generated_at": "2026-02-28T06:49:31.299942Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=66515966-9b1e-4a6b-af13-77787e63b4ec",
+        "overall_score": 0.4816802515612055,
+        "scoring_method": "topsis"
+      },
+      "pareto": {
+        "conflicts": [],
+        "metadata": {
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_0a186196": 0.47800215468548096,
+            "ps_16031f98": 0.4659734527592929,
+            "ps_30d9e02a": 0.4670838753391128,
+            "ps_37226eca": 0.4793296255594741,
+            "ps_8c23d765": 0.4652218786699993,
+            "ps_a5c369e2": 0.4707335929786121,
+            "ps_e8f9cd04": 0.4667996667908564,
+            "ps_ebe39aa6": 0.46952077309361706
+          },
+          "ai_system_id": "evidence_hiring_algorithm",
+          "ai_system_name": "Hiring Recommendation Algorithm",
+          "deterministic_mode": true,
+          "framework_id": "nist_ai_rmf",
+          "n_gen": 80,
+          "n_solutions_returned": 8,
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "pop_size": 40,
+          "run_id": "78614bf1-187b-402e-8fe2-619dc11fbe8c",
+          "salience_vector": {
+            "accountability": 0.16666666666666666,
+            "fairness_nondiscrimination": 0.08333333333333333,
+            "human_agency_oversight": 0.25,
+            "privacy_data_governance": 0.16666666666666666,
+            "safety_robustness": 0.16666666666666666,
+            "transparency_explainability": 0.16666666666666666
+          },
+          "seed": 42,
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "accountability": 0.5,
+            "fairness_nondiscrimination": 0.25,
+            "human_agency_oversight": 0.75,
+            "privacy_data_governance": 0.5,
+            "safety_robustness": 0.5,
+            "transparency_explainability": 0.5
+          }
+        },
+        "pareto_solutions": [
+          {
+            "objective_scores": {
+              "affected_community": 0.01676862968782118,
+              "developer": 0.054403108711059474,
+              "regulator": 0.05162395251085124
+            },
+            "rank": 1,
+            "solution_id": "ps_16031f98",
+            "weights": {
+              "consensus": {
+                "accountability": 0.18090530690202403,
+                "fairness_nondiscrimination": 0.297413423570036,
+                "human_agency_oversight": 0.1613072346072076,
+                "privacy_data_governance": 0.15241361996990274,
+                "safety_robustness": 0.10276412662611452,
+                "transparency_explainability": 0.10519628832471518
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.020812600703981003,
+              "developer": 0.044777921564358274,
+              "regulator": 0.05756667941714001
+            },
+            "rank": 2,
+            "solution_id": "ps_e8f9cd04",
+            "weights": {
+              "consensus": {
+                "accountability": 0.16052180702834984,
+                "fairness_nondiscrimination": 0.2899499165332829,
+                "human_agency_oversight": 0.15714858369670845,
+                "privacy_data_governance": 0.14866403086720925,
+                "safety_robustness": 0.1338018712305723,
+                "transparency_explainability": 0.10991379064387725
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.014323546760922304,
+              "developer": 0.05362159504052561,
+              "regulator": 0.05636862133652894
+            },
+            "rank": 3,
+            "solution_id": "ps_8c23d765",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1636196475554825,
+                "fairness_nondiscrimination": 0.3039466442448246,
+                "human_agency_oversight": 0.1648341589248216,
+                "privacy_data_governance": 0.15574608862151898,
+                "safety_robustness": 0.10435709354842244,
+                "transparency_explainability": 0.10749636710492998
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.02600034385299363,
+              "developer": 0.048722127449502405,
+              "regulator": 0.050145780242877476
+            },
+            "rank": 4,
+            "solution_id": "ps_30d9e02a",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1830598803990743,
+                "fairness_nondiscrimination": 0.2826700156969794,
+                "human_agency_oversight": 0.15100551705343074,
+                "privacy_data_governance": 0.14623956035149613,
+                "safety_robustness": 0.12467793263910946,
+                "transparency_explainability": 0.11234709385990994
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.00968791618504625,
+              "developer": 0.056328095919403104,
+              "regulator": 0.05887454861878898
+            },
+            "rank": 5,
+            "solution_id": "ps_a5c369e2",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15451925196168118,
+                "fairness_nondiscrimination": 0.29613414327590043,
+                "human_agency_oversight": 0.17906851519034878,
+                "privacy_data_governance": 0.1539380891911029,
+                "safety_robustness": 0.10174930522040279,
+                "transparency_explainability": 0.11459069516056399
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.029463909571102224,
+              "developer": 0.05835764745549607,
+              "regulator": 0.03958831486588728
+            },
+            "rank": 6,
+            "solution_id": "ps_ebe39aa6",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14925350515314645,
+                "fairness_nondiscrimination": 0.2722782875457394,
+                "human_agency_oversight": 0.1503613799202079,
+                "privacy_data_governance": 0.15160450403809736,
+                "safety_robustness": 0.09519432557398241,
+                "transparency_explainability": 0.1813079977688264
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0050310510806912045,
+              "developer": 0.05723011844082135,
+              "regulator": 0.06573545062607611
+            },
+            "rank": 7,
+            "solution_id": "ps_37226eca",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15467363752030086,
+                "fairness_nondiscrimination": 0.28286217046449924,
+                "human_agency_oversight": 0.20018067270239576,
+                "privacy_data_governance": 0.14780538708515087,
+                "safety_robustness": 0.10983388315185923,
+                "transparency_explainability": 0.10464424907579403
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0023766541114007464,
+              "developer": 0.059253711711942825,
+              "regulator": 0.06679891432611806
+            },
+            "rank": 8,
+            "solution_id": "ps_0a186196",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1522287284727588,
+                "fairness_nondiscrimination": 0.29174438470255737,
+                "human_agency_oversight": 0.20375300344448105,
+                "privacy_data_governance": 0.1516561805961824,
+                "safety_robustness": 0.10024101954965246,
+                "transparency_explainability": 0.10037668323436792
+              }
+            }
+          }
+        ],
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework nist_ai_rmf."
+      },
+      "summary": {
+        "case_id": "hiring_algorithm",
+        "conflict_pairs": 3,
+        "framework_id": "nist_ai_rmf",
+        "mean_spearman_rho": -0.142857,
+        "overall_score": 0.48168,
+        "pareto_solutions": 8,
+        "top_consensus_dimension": "fairness_nondiscrimination"
+      }
+    },
+    {
+      "conflicts": {
+        "conflicts": [
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "accountability"
+            ],
+            "spearman_rho": -0.3142857142857143,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator"
+          },
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "fairness_nondiscrimination"
+            ],
+            "spearman_rho": -0.2,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community"
+          },
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "accountability",
+              "fairness_nondiscrimination"
+            ],
+            "spearman_rho": 0.08571428571428573,
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community"
+          }
+        ],
+        "metadata": {
+          "ai_system_id": "evidence_hiring_algorithm",
+          "ai_system_name": "Hiring Recommendation Algorithm",
+          "correlation_matrix": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.2,
+              "regulator": 0.08571428571428573
+            },
+            "developer": {
+              "affected_community": -0.2,
+              "developer": 1.0,
+              "regulator": -0.3142857142857143
+            },
+            "regulator": {
+              "affected_community": 0.08571428571428573,
+              "developer": -0.3142857142857143,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.2,
+              "regulator": 0.08571428571428573
+            },
+            "developer": {
+              "affected_community": -0.2,
+              "developer": 1.0,
+              "regulator": -0.3142857142857143
+            },
+            "regulator": {
+              "affected_community": 0.08571428571428573,
+              "developer": -0.3142857142857143,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572
+            },
+            "developer": {
+              "affected_community": -0.3142857142857143,
+              "developer": 1.0,
+              "regulator": 0.08571428571428573
+            },
+            "regulator": {
+              "affected_community": 0.2571428571428572,
+              "developer": 0.08571428571428573,
+              "regulator": 1.0
+            }
+          },
+          "framework_id": "sg_mgaf",
+          "pairwise_rho_weights": {
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572,
+            "developer|regulator": 0.08571428571428573
+          },
+          "run_id": "48368013-e27b-4029-af17-bc6618011442",
+          "scoring_method": "topsis",
+          "stakeholder_rankings": {
+            "affected_community": [
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "affected_community": [
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_scores": {
+            "affected_community": 0.42019862871711583,
+            "developer": 0.4894381044798461,
+            "regulator": 0.4516442666983418
+          }
+        },
+        "pareto_solutions": [],
+        "summary": "Conflict analysis for framework 'sg_mgaf' indicates high overall stakeholder disagreement."
+      },
+      "evaluate": {
+        "ai_system_id": "evidence_hiring_algorithm",
+        "framework_scores": [
+          {
+            "dimension_scores": {
+              "accountability": 0.11252767235926629,
+              "fairness_nondiscrimination": 0.033745453826691967,
+              "human_agency_oversight": 0.14080289373814045,
+              "privacy_data_governance": 0.04645991461100569,
+              "safety_robustness": 0.0777099146110057,
+              "transparency_explainability": 0.10194299493991145
+            },
+            "framework_id": "sg_mgaf",
+            "risk_level": "high",
+            "score": 0.5094102052890283
+          }
+        ],
+        "generated_at": "2026-02-28T06:49:31.595444Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=a3cfddc3-759b-4563-bfc3-08204c4764ad",
+        "overall_score": 0.5094102052890283,
+        "scoring_method": "topsis"
+      },
+      "pareto": {
+        "conflicts": [],
+        "metadata": {
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_28b18417": 0.4667996667908564,
+            "ps_2c93ac5c": 0.4793296255594741,
+            "ps_2d4385aa": 0.4707335929786121,
+            "ps_56d839a1": 0.4652218786699993,
+            "ps_6cf8eef8": 0.47800215468548096,
+            "ps_8560e38c": 0.4670838753391128,
+            "ps_9c3d9488": 0.46952077309361706,
+            "ps_cd389d52": 0.4659734527592929
+          },
+          "ai_system_id": "evidence_hiring_algorithm",
+          "ai_system_name": "Hiring Recommendation Algorithm",
+          "deterministic_mode": true,
+          "framework_id": "sg_mgaf",
+          "n_gen": 80,
+          "n_solutions_returned": 8,
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "pop_size": 40,
+          "run_id": "00331d9d-cd18-4bb6-9740-912dce315b4a",
+          "salience_vector": {
+            "accountability": 0.16666666666666666,
+            "fairness_nondiscrimination": 0.08333333333333333,
+            "human_agency_oversight": 0.25,
+            "privacy_data_governance": 0.16666666666666666,
+            "safety_robustness": 0.16666666666666666,
+            "transparency_explainability": 0.16666666666666666
+          },
+          "seed": 42,
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "accountability": 0.5,
+            "fairness_nondiscrimination": 0.25,
+            "human_agency_oversight": 0.75,
+            "privacy_data_governance": 0.5,
+            "safety_robustness": 0.5,
+            "transparency_explainability": 0.5
+          }
+        },
+        "pareto_solutions": [
+          {
+            "objective_scores": {
+              "affected_community": 0.01676862968782118,
+              "developer": 0.054403108711059474,
+              "regulator": 0.05162395251085124
+            },
+            "rank": 1,
+            "solution_id": "ps_cd389d52",
+            "weights": {
+              "consensus": {
+                "accountability": 0.18090530690202403,
+                "fairness_nondiscrimination": 0.297413423570036,
+                "human_agency_oversight": 0.1613072346072076,
+                "privacy_data_governance": 0.15241361996990274,
+                "safety_robustness": 0.10276412662611452,
+                "transparency_explainability": 0.10519628832471518
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.020812600703981003,
+              "developer": 0.044777921564358274,
+              "regulator": 0.05756667941714001
+            },
+            "rank": 2,
+            "solution_id": "ps_28b18417",
+            "weights": {
+              "consensus": {
+                "accountability": 0.16052180702834984,
+                "fairness_nondiscrimination": 0.2899499165332829,
+                "human_agency_oversight": 0.15714858369670845,
+                "privacy_data_governance": 0.14866403086720925,
+                "safety_robustness": 0.1338018712305723,
+                "transparency_explainability": 0.10991379064387725
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.014323546760922304,
+              "developer": 0.05362159504052561,
+              "regulator": 0.05636862133652894
+            },
+            "rank": 3,
+            "solution_id": "ps_56d839a1",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1636196475554825,
+                "fairness_nondiscrimination": 0.3039466442448246,
+                "human_agency_oversight": 0.1648341589248216,
+                "privacy_data_governance": 0.15574608862151898,
+                "safety_robustness": 0.10435709354842244,
+                "transparency_explainability": 0.10749636710492998
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.02600034385299363,
+              "developer": 0.048722127449502405,
+              "regulator": 0.050145780242877476
+            },
+            "rank": 4,
+            "solution_id": "ps_8560e38c",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1830598803990743,
+                "fairness_nondiscrimination": 0.2826700156969794,
+                "human_agency_oversight": 0.15100551705343074,
+                "privacy_data_governance": 0.14623956035149613,
+                "safety_robustness": 0.12467793263910946,
+                "transparency_explainability": 0.11234709385990994
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.00968791618504625,
+              "developer": 0.056328095919403104,
+              "regulator": 0.05887454861878898
+            },
+            "rank": 5,
+            "solution_id": "ps_2d4385aa",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15451925196168118,
+                "fairness_nondiscrimination": 0.29613414327590043,
+                "human_agency_oversight": 0.17906851519034878,
+                "privacy_data_governance": 0.1539380891911029,
+                "safety_robustness": 0.10174930522040279,
+                "transparency_explainability": 0.11459069516056399
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.029463909571102224,
+              "developer": 0.05835764745549607,
+              "regulator": 0.03958831486588728
+            },
+            "rank": 6,
+            "solution_id": "ps_9c3d9488",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14925350515314645,
+                "fairness_nondiscrimination": 0.2722782875457394,
+                "human_agency_oversight": 0.1503613799202079,
+                "privacy_data_governance": 0.15160450403809736,
+                "safety_robustness": 0.09519432557398241,
+                "transparency_explainability": 0.1813079977688264
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0050310510806912045,
+              "developer": 0.05723011844082135,
+              "regulator": 0.06573545062607611
+            },
+            "rank": 7,
+            "solution_id": "ps_2c93ac5c",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15467363752030086,
+                "fairness_nondiscrimination": 0.28286217046449924,
+                "human_agency_oversight": 0.20018067270239576,
+                "privacy_data_governance": 0.14780538708515087,
+                "safety_robustness": 0.10983388315185923,
+                "transparency_explainability": 0.10464424907579403
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.0023766541114007464,
+              "developer": 0.059253711711942825,
+              "regulator": 0.06679891432611806
+            },
+            "rank": 8,
+            "solution_id": "ps_6cf8eef8",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1522287284727588,
+                "fairness_nondiscrimination": 0.29174438470255737,
+                "human_agency_oversight": 0.20375300344448105,
+                "privacy_data_governance": 0.1516561805961824,
+                "safety_robustness": 0.10024101954965246,
+                "transparency_explainability": 0.10037668323436792
+              }
+            }
+          }
+        ],
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework sg_mgaf."
+      },
+      "summary": {
+        "case_id": "hiring_algorithm",
+        "conflict_pairs": 3,
+        "framework_id": "sg_mgaf",
+        "mean_spearman_rho": -0.142857,
+        "overall_score": 0.50941,
+        "pareto_solutions": 8,
+        "top_consensus_dimension": "fairness_nondiscrimination"
+      }
+    },
+    {
+      "conflicts": {
+        "conflicts": [
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "transparency_explainability"
+            ],
+            "spearman_rho": 0.14285714285714288,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator"
+          },
+          {
+            "conflict_level": "moderate",
+            "conflicting_dimensions": [
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ],
+            "spearman_rho": 0.48571428571428577,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community"
+          },
+          {
+            "conflict_level": "moderate",
+            "conflicting_dimensions": [
+              "fairness_nondiscrimination",
+              "transparency_explainability"
+            ],
+            "spearman_rho": 0.3142857142857143,
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community"
+          }
+        ],
+        "metadata": {
+          "ai_system_id": "evidence_healthcare_diagnostic",
+          "ai_system_name": "Healthcare Diagnostic AI",
+          "correlation_matrix": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 0.48571428571428577,
+              "regulator": 0.3142857142857143
+            },
+            "developer": {
+              "affected_community": 0.48571428571428577,
+              "developer": 1.0,
+              "regulator": 0.14285714285714288
+            },
+            "regulator": {
+              "affected_community": 0.3142857142857143,
+              "developer": 0.14285714285714288,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 0.48571428571428577,
+              "regulator": 0.3142857142857143
+            },
+            "developer": {
+              "affected_community": 0.48571428571428577,
+              "developer": 1.0,
+              "regulator": 0.14285714285714288
+            },
+            "regulator": {
+              "affected_community": 0.3142857142857143,
+              "developer": 0.14285714285714288,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572
+            },
+            "developer": {
+              "affected_community": -0.3142857142857143,
+              "developer": 1.0,
+              "regulator": 0.08571428571428573
+            },
+            "regulator": {
+              "affected_community": 0.2571428571428572,
+              "developer": 0.08571428571428573,
+              "regulator": 1.0
+            }
+          },
+          "framework_id": "eu_altai",
+          "pairwise_rho_weights": {
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572,
+            "developer|regulator": 0.08571428571428573
+          },
+          "run_id": "9f3c132c-2e00-49ee-9962-2d19e1da0bf0",
+          "scoring_method": "topsis",
+          "stakeholder_rankings": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "developer": [
+              "safety_robustness",
+              "privacy_data_governance",
+              "accountability",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "developer": [
+              "safety_robustness",
+              "privacy_data_governance",
+              "accountability",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_scores": {
+            "affected_community": 0.562346969693954,
+            "developer": 0.7037037037037037,
+            "regulator": 0.6127956839379162
+          }
+        },
+        "pareto_solutions": [],
+        "summary": "Conflict analysis for framework 'eu_altai' indicates moderate overall stakeholder disagreement."
+      },
+      "evaluate": {
+        "ai_system_id": "evidence_healthcare_diagnostic",
+        "framework_scores": [
+          {
+            "dimension_scores": {
+              "accountability": 0.11487807148175726,
+              "fairness_nondiscrimination": 0.09006577314470092,
+              "human_agency_oversight": 0.08196133587049449,
+              "privacy_data_governance": 0.15469874658724247,
+              "safety_robustness": 0.22189818262044617,
+              "transparency_explainability": 0.03730592096191501
+            },
+            "framework_id": "eu_altai",
+            "risk_level": "medium",
+            "score": 0.670270296700295
+          }
+        ],
+        "generated_at": "2026-02-28T06:49:31.888594Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=e72f98fa-7c99-418f-918d-059e6b27dc25",
+        "overall_score": 0.670270296700295,
+        "scoring_method": "topsis"
+      },
+      "pareto": {
+        "conflicts": [],
+        "metadata": {
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_4107874d": 0.6338967333532025,
+            "ps_51dc39a7": 0.637063713880298,
+            "ps_79ad19a5": 0.627578163271093,
+            "ps_914cceda": 0.6307339516188474,
+            "ps_b475d6aa": 0.6339245356162689,
+            "ps_d4f97995": 0.6337706213673886,
+            "ps_e0f80a85": 0.646041745627966,
+            "ps_ec0d634d": 0.6316766514140691
+          },
+          "ai_system_id": "evidence_healthcare_diagnostic",
+          "ai_system_name": "Healthcare Diagnostic AI",
+          "deterministic_mode": true,
+          "framework_id": "eu_altai",
+          "n_gen": 80,
+          "n_solutions_returned": 8,
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "pop_size": 40,
+          "run_id": "b5f19910-00a2-49a4-a057-f05e122b7b71",
+          "salience_vector": {
+            "accountability": 0.1875,
+            "fairness_nondiscrimination": 0.125,
+            "human_agency_oversight": 0.125,
+            "privacy_data_governance": 0.1875,
+            "safety_robustness": 0.25,
+            "transparency_explainability": 0.125
+          },
+          "seed": 42,
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "accountability": 0.75,
+            "fairness_nondiscrimination": 0.5,
+            "human_agency_oversight": 0.5,
+            "privacy_data_governance": 0.75,
+            "safety_robustness": 1.0,
+            "transparency_explainability": 0.5
+          }
+        },
+        "pareto_solutions": [
+          {
+            "objective_scores": {
+              "affected_community": 0.013082601751619625,
+              "developer": 0.07369103496802357,
+              "regulator": 0.046830998987722444
+            },
+            "rank": 1,
+            "solution_id": "ps_4107874d",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1713673716856588,
+                "fairness_nondiscrimination": 0.28742576076482296,
+                "human_agency_oversight": 0.16940147032003108,
+                "privacy_data_governance": 0.14982606350791333,
+                "safety_robustness": 0.10719674910961915,
+                "transparency_explainability": 0.11478258461195455
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.006197529038831074,
+              "developer": 0.07647495639397425,
+              "regulator": 0.052923105400102165
+            },
+            "rank": 2,
+            "solution_id": "ps_79ad19a5",
+            "weights": {
+              "consensus": {
+                "accountability": 0.16082374655026885,
+                "fairness_nondiscrimination": 0.28110970942057273,
+                "human_agency_oversight": 0.20394502219256824,
+                "privacy_data_governance": 0.15281056883890706,
+                "safety_robustness": 0.09833916884759795,
+                "transparency_explainability": 0.10297178415008512
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.008739662745590753,
+              "developer": 0.06876742408367427,
+              "regulator": 0.05900749934289039
+            },
+            "rank": 3,
+            "solution_id": "ps_d4f97995",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14847819236678395,
+                "fairness_nondiscrimination": 0.27795665169561345,
+                "human_agency_oversight": 0.20399836070005722,
+                "privacy_data_governance": 0.14875868675949072,
+                "safety_robustness": 0.1189228031716397,
+                "transparency_explainability": 0.10188530530641492
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.017408587933831255,
+              "developer": 0.07851314718328375,
+              "regulator": 0.04096230546826212
+            },
+            "rank": 4,
+            "solution_id": "ps_ec0d634d",
+            "weights": {
+              "consensus": {
+                "accountability": 0.170165753830593,
+                "fairness_nondiscrimination": 0.3014631773709426,
+                "human_agency_oversight": 0.1370422996787442,
+                "privacy_data_governance": 0.150959088823494,
+                "safety_robustness": 0.10279088150109497,
+                "transparency_explainability": 0.13757879879513124
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.019783177373345534,
+              "developer": 0.07133089023872367,
+              "regulator": 0.04597480408536348
+            },
+            "rank": 5,
+            "solution_id": "ps_b475d6aa",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1596920092747907,
+                "fairness_nondiscrimination": 0.23738248433069553,
+                "human_agency_oversight": 0.19962481737892213,
+                "privacy_data_governance": 0.14518968294217938,
+                "safety_robustness": 0.11540822512405258,
+                "transparency_explainability": 0.14270278094935981
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.012970483307201573,
+              "developer": 0.0670907383904299,
+              "regulator": 0.0573675574107607
+            },
+            "rank": 6,
+            "solution_id": "ps_51dc39a7",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15213334787563476,
+                "fairness_nondiscrimination": 0.2601817806514918,
+                "human_agency_oversight": 0.20902028156280178,
+                "privacy_data_governance": 0.1524207473269792,
+                "safety_robustness": 0.12185038015928926,
+                "transparency_explainability": 0.10439346242380317
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.02136230945135404,
+              "developer": 0.07278594731661964,
+              "regulator": 0.04373454838710459
+            },
+            "rank": 7,
+            "solution_id": "ps_914cceda",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1550384621588989,
+                "fairness_nondiscrimination": 0.23020625970579695,
+                "human_agency_oversight": 0.2009541772167342,
+                "privacy_data_governance": 0.14338563607175617,
+                "safety_robustness": 0.1122558541223673,
+                "transparency_explainability": 0.1581596107244464
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.03986699782142488,
+              "developer": 0.08528717677073949,
+              "regulator": 0.018661397535036473
+            },
+            "rank": 8,
+            "solution_id": "ps_e0f80a85",
+            "weights": {
+              "consensus": {
+                "accountability": 0.2416432729930565,
+                "fairness_nondiscrimination": 0.23168071579725855,
+                "human_agency_oversight": 0.13900661997085345,
+                "privacy_data_governance": 0.14672541811069337,
+                "safety_robustness": 0.09789914570405726,
+                "transparency_explainability": 0.1430448274240809
+              }
+            }
+          }
+        ],
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework eu_altai."
+      },
+      "summary": {
+        "case_id": "healthcare_diagnostic",
+        "conflict_pairs": 3,
+        "framework_id": "eu_altai",
+        "mean_spearman_rho": 0.314286,
+        "overall_score": 0.67027,
+        "pareto_solutions": 8,
+        "top_consensus_dimension": "fairness_nondiscrimination"
+      }
+    },
+    {
+      "conflicts": {
+        "conflicts": [
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "transparency_explainability"
+            ],
+            "spearman_rho": 0.14285714285714288,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator"
+          },
+          {
+            "conflict_level": "moderate",
+            "conflicting_dimensions": [
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ],
+            "spearman_rho": 0.48571428571428577,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community"
+          },
+          {
+            "conflict_level": "moderate",
+            "conflicting_dimensions": [
+              "fairness_nondiscrimination",
+              "transparency_explainability"
+            ],
+            "spearman_rho": 0.3142857142857143,
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community"
+          }
+        ],
+        "metadata": {
+          "ai_system_id": "evidence_healthcare_diagnostic",
+          "ai_system_name": "Healthcare Diagnostic AI",
+          "correlation_matrix": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 0.48571428571428577,
+              "regulator": 0.3142857142857143
+            },
+            "developer": {
+              "affected_community": 0.48571428571428577,
+              "developer": 1.0,
+              "regulator": 0.14285714285714288
+            },
+            "regulator": {
+              "affected_community": 0.3142857142857143,
+              "developer": 0.14285714285714288,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 0.48571428571428577,
+              "regulator": 0.3142857142857143
+            },
+            "developer": {
+              "affected_community": 0.48571428571428577,
+              "developer": 1.0,
+              "regulator": 0.14285714285714288
+            },
+            "regulator": {
+              "affected_community": 0.3142857142857143,
+              "developer": 0.14285714285714288,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572
+            },
+            "developer": {
+              "affected_community": -0.3142857142857143,
+              "developer": 1.0,
+              "regulator": 0.08571428571428573
+            },
+            "regulator": {
+              "affected_community": 0.2571428571428572,
+              "developer": 0.08571428571428573,
+              "regulator": 1.0
+            }
+          },
+          "framework_id": "nist_ai_rmf",
+          "pairwise_rho_weights": {
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572,
+            "developer|regulator": 0.08571428571428573
+          },
+          "run_id": "102a7a36-a7f1-4acc-b49a-7930906bb6c9",
+          "scoring_method": "topsis",
+          "stakeholder_rankings": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "developer": [
+              "safety_robustness",
+              "privacy_data_governance",
+              "accountability",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "developer": [
+              "safety_robustness",
+              "privacy_data_governance",
+              "accountability",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_scores": {
+            "affected_community": 0.562346969693954,
+            "developer": 0.7037037037037037,
+            "regulator": 0.6127956839379162
+          }
+        },
+        "pareto_solutions": [],
+        "summary": "Conflict analysis for framework 'nist_ai_rmf' indicates moderate overall stakeholder disagreement."
+      },
+      "evaluate": {
+        "ai_system_id": "evidence_healthcare_diagnostic",
+        "framework_scores": [
+          {
+            "dimension_scores": {
+              "accountability": 0.2555082848186297,
+              "fairness_nondiscrimination": 0.06897049310842414,
+              "human_agency_oversight": 0.04737523013385083,
+              "privacy_data_governance": 0.0700179131213614,
+              "safety_robustness": 0.2508334577300095,
+              "transparency_explainability": 0.04122008259939295
+            },
+            "framework_id": "nist_ai_rmf",
+            "risk_level": "medium",
+            "score": 0.729137603328795
+          }
+        ],
+        "generated_at": "2026-02-28T06:49:32.177491Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=edee47a4-383f-4c00-b3c3-4c8d9f993020",
+        "overall_score": 0.729137603328795,
+        "scoring_method": "topsis"
+      },
+      "pareto": {
+        "conflicts": [],
+        "metadata": {
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_2200ae10": 0.646041745627966,
+            "ps_2c1e6019": 0.6338967333532025,
+            "ps_4971ca17": 0.6316766514140691,
+            "ps_57aa8060": 0.6307339516188474,
+            "ps_7f9c902b": 0.627578163271093,
+            "ps_b0902331": 0.6339245356162689,
+            "ps_c0e18b1b": 0.637063713880298,
+            "ps_d5139631": 0.6337706213673886
+          },
+          "ai_system_id": "evidence_healthcare_diagnostic",
+          "ai_system_name": "Healthcare Diagnostic AI",
+          "deterministic_mode": true,
+          "framework_id": "nist_ai_rmf",
+          "n_gen": 80,
+          "n_solutions_returned": 8,
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "pop_size": 40,
+          "run_id": "83726deb-ba24-45c0-8691-e235198988ab",
+          "salience_vector": {
+            "accountability": 0.1875,
+            "fairness_nondiscrimination": 0.125,
+            "human_agency_oversight": 0.125,
+            "privacy_data_governance": 0.1875,
+            "safety_robustness": 0.25,
+            "transparency_explainability": 0.125
+          },
+          "seed": 42,
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "accountability": 0.75,
+            "fairness_nondiscrimination": 0.5,
+            "human_agency_oversight": 0.5,
+            "privacy_data_governance": 0.75,
+            "safety_robustness": 1.0,
+            "transparency_explainability": 0.5
+          }
+        },
+        "pareto_solutions": [
+          {
+            "objective_scores": {
+              "affected_community": 0.013082601751619625,
+              "developer": 0.07369103496802357,
+              "regulator": 0.046830998987722444
+            },
+            "rank": 1,
+            "solution_id": "ps_2c1e6019",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1713673716856588,
+                "fairness_nondiscrimination": 0.28742576076482296,
+                "human_agency_oversight": 0.16940147032003108,
+                "privacy_data_governance": 0.14982606350791333,
+                "safety_robustness": 0.10719674910961915,
+                "transparency_explainability": 0.11478258461195455
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.006197529038831074,
+              "developer": 0.07647495639397425,
+              "regulator": 0.052923105400102165
+            },
+            "rank": 2,
+            "solution_id": "ps_7f9c902b",
+            "weights": {
+              "consensus": {
+                "accountability": 0.16082374655026885,
+                "fairness_nondiscrimination": 0.28110970942057273,
+                "human_agency_oversight": 0.20394502219256824,
+                "privacy_data_governance": 0.15281056883890706,
+                "safety_robustness": 0.09833916884759795,
+                "transparency_explainability": 0.10297178415008512
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.008739662745590753,
+              "developer": 0.06876742408367427,
+              "regulator": 0.05900749934289039
+            },
+            "rank": 3,
+            "solution_id": "ps_d5139631",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14847819236678395,
+                "fairness_nondiscrimination": 0.27795665169561345,
+                "human_agency_oversight": 0.20399836070005722,
+                "privacy_data_governance": 0.14875868675949072,
+                "safety_robustness": 0.1189228031716397,
+                "transparency_explainability": 0.10188530530641492
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.017408587933831255,
+              "developer": 0.07851314718328375,
+              "regulator": 0.04096230546826212
+            },
+            "rank": 4,
+            "solution_id": "ps_4971ca17",
+            "weights": {
+              "consensus": {
+                "accountability": 0.170165753830593,
+                "fairness_nondiscrimination": 0.3014631773709426,
+                "human_agency_oversight": 0.1370422996787442,
+                "privacy_data_governance": 0.150959088823494,
+                "safety_robustness": 0.10279088150109497,
+                "transparency_explainability": 0.13757879879513124
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.019783177373345534,
+              "developer": 0.07133089023872367,
+              "regulator": 0.04597480408536348
+            },
+            "rank": 5,
+            "solution_id": "ps_b0902331",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1596920092747907,
+                "fairness_nondiscrimination": 0.23738248433069553,
+                "human_agency_oversight": 0.19962481737892213,
+                "privacy_data_governance": 0.14518968294217938,
+                "safety_robustness": 0.11540822512405258,
+                "transparency_explainability": 0.14270278094935981
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.012970483307201573,
+              "developer": 0.0670907383904299,
+              "regulator": 0.0573675574107607
+            },
+            "rank": 6,
+            "solution_id": "ps_c0e18b1b",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15213334787563476,
+                "fairness_nondiscrimination": 0.2601817806514918,
+                "human_agency_oversight": 0.20902028156280178,
+                "privacy_data_governance": 0.1524207473269792,
+                "safety_robustness": 0.12185038015928926,
+                "transparency_explainability": 0.10439346242380317
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.02136230945135404,
+              "developer": 0.07278594731661964,
+              "regulator": 0.04373454838710459
+            },
+            "rank": 7,
+            "solution_id": "ps_57aa8060",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1550384621588989,
+                "fairness_nondiscrimination": 0.23020625970579695,
+                "human_agency_oversight": 0.2009541772167342,
+                "privacy_data_governance": 0.14338563607175617,
+                "safety_robustness": 0.1122558541223673,
+                "transparency_explainability": 0.1581596107244464
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.03986699782142488,
+              "developer": 0.08528717677073949,
+              "regulator": 0.018661397535036473
+            },
+            "rank": 8,
+            "solution_id": "ps_2200ae10",
+            "weights": {
+              "consensus": {
+                "accountability": 0.2416432729930565,
+                "fairness_nondiscrimination": 0.23168071579725855,
+                "human_agency_oversight": 0.13900661997085345,
+                "privacy_data_governance": 0.14672541811069337,
+                "safety_robustness": 0.09789914570405726,
+                "transparency_explainability": 0.1430448274240809
+              }
+            }
+          }
+        ],
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework nist_ai_rmf."
+      },
+      "summary": {
+        "case_id": "healthcare_diagnostic",
+        "conflict_pairs": 3,
+        "framework_id": "nist_ai_rmf",
+        "mean_spearman_rho": 0.314286,
+        "overall_score": 0.729138,
+        "pareto_solutions": 8,
+        "top_consensus_dimension": "fairness_nondiscrimination"
+      }
+    },
+    {
+      "conflicts": {
+        "conflicts": [
+          {
+            "conflict_level": "high",
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "transparency_explainability"
+            ],
+            "spearman_rho": 0.14285714285714288,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator"
+          },
+          {
+            "conflict_level": "moderate",
+            "conflicting_dimensions": [
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ],
+            "spearman_rho": 0.48571428571428577,
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community"
+          },
+          {
+            "conflict_level": "moderate",
+            "conflicting_dimensions": [
+              "fairness_nondiscrimination",
+              "transparency_explainability"
+            ],
+            "spearman_rho": 0.3142857142857143,
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community"
+          }
+        ],
+        "metadata": {
+          "ai_system_id": "evidence_healthcare_diagnostic",
+          "ai_system_name": "Healthcare Diagnostic AI",
+          "correlation_matrix": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 0.48571428571428577,
+              "regulator": 0.3142857142857143
+            },
+            "developer": {
+              "affected_community": 0.48571428571428577,
+              "developer": 1.0,
+              "regulator": 0.14285714285714288
+            },
+            "regulator": {
+              "affected_community": 0.3142857142857143,
+              "developer": 0.14285714285714288,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": 0.48571428571428577,
+              "regulator": 0.3142857142857143
+            },
+            "developer": {
+              "affected_community": 0.48571428571428577,
+              "developer": 1.0,
+              "regulator": 0.14285714285714288
+            },
+            "regulator": {
+              "affected_community": 0.3142857142857143,
+              "developer": 0.14285714285714288,
+              "regulator": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "affected_community": {
+              "affected_community": 1.0,
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572
+            },
+            "developer": {
+              "affected_community": -0.3142857142857143,
+              "developer": 1.0,
+              "regulator": 0.08571428571428573
+            },
+            "regulator": {
+              "affected_community": 0.2571428571428572,
+              "developer": 0.08571428571428573,
+              "regulator": 1.0
+            }
+          },
+          "framework_id": "sg_mgaf",
+          "pairwise_rho_weights": {
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572,
+            "developer|regulator": 0.08571428571428573
+          },
+          "run_id": "148266b3-ce89-4a86-b438-f973a8aa34a4",
+          "scoring_method": "topsis",
+          "stakeholder_rankings": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "developer": [
+              "safety_robustness",
+              "privacy_data_governance",
+              "accountability",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "developer": [
+              "safety_robustness",
+              "privacy_data_governance",
+              "accountability",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ],
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ]
+          },
+          "stakeholder_scores": {
+            "affected_community": 0.562346969693954,
+            "developer": 0.7037037037037037,
+            "regulator": 0.6127956839379162
+          }
+        },
+        "pareto_solutions": [],
+        "summary": "Conflict analysis for framework 'sg_mgaf' indicates moderate overall stakeholder disagreement."
+      },
+      "evaluate": {
+        "ai_system_id": "evidence_healthcare_diagnostic",
+        "framework_scores": [
+          {
+            "dimension_scores": {
+              "accountability": 0.16879150853889943,
+              "fairness_nondiscrimination": 0.06749090765338393,
+              "human_agency_oversight": 0.09386859582542695,
+              "privacy_data_governance": 0.06968987191650854,
+              "safety_robustness": 0.1554198292220114,
+              "transparency_explainability": 0.10194299493991145
+            },
+            "framework_id": "sg_mgaf",
+            "risk_level": "medium",
+            "score": 0.6156426313910394
+          }
+        ],
+        "generated_at": "2026-02-28T06:49:32.470005Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=7d51ceca-74b1-433f-b0e9-e69ccdb67875",
+        "overall_score": 0.6156426313910394,
+        "scoring_method": "topsis"
+      },
+      "pareto": {
+        "conflicts": [],
+        "metadata": {
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_111d2960": 0.627578163271093,
+            "ps_71931953": 0.6316766514140691,
+            "ps_9ffa5b48": 0.6307339516188474,
+            "ps_b3d2059e": 0.646041745627966,
+            "ps_c5834021": 0.6339245356162689,
+            "ps_c77e38c1": 0.6337706213673886,
+            "ps_caf732c1": 0.637063713880298,
+            "ps_f49641e2": 0.6338967333532025
+          },
+          "ai_system_id": "evidence_healthcare_diagnostic",
+          "ai_system_name": "Healthcare Diagnostic AI",
+          "deterministic_mode": true,
+          "framework_id": "sg_mgaf",
+          "n_gen": 80,
+          "n_solutions_returned": 8,
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "pop_size": 40,
+          "run_id": "8fec7466-c622-43ea-a719-3094302b7dc8",
+          "salience_vector": {
+            "accountability": 0.1875,
+            "fairness_nondiscrimination": 0.125,
+            "human_agency_oversight": 0.125,
+            "privacy_data_governance": 0.1875,
+            "safety_robustness": 0.25,
+            "transparency_explainability": 0.125
+          },
+          "seed": 42,
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "accountability": 0.75,
+            "fairness_nondiscrimination": 0.5,
+            "human_agency_oversight": 0.5,
+            "privacy_data_governance": 0.75,
+            "safety_robustness": 1.0,
+            "transparency_explainability": 0.5
+          }
+        },
+        "pareto_solutions": [
+          {
+            "objective_scores": {
+              "affected_community": 0.013082601751619625,
+              "developer": 0.07369103496802357,
+              "regulator": 0.046830998987722444
+            },
+            "rank": 1,
+            "solution_id": "ps_f49641e2",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1713673716856588,
+                "fairness_nondiscrimination": 0.28742576076482296,
+                "human_agency_oversight": 0.16940147032003108,
+                "privacy_data_governance": 0.14982606350791333,
+                "safety_robustness": 0.10719674910961915,
+                "transparency_explainability": 0.11478258461195455
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.006197529038831074,
+              "developer": 0.07647495639397425,
+              "regulator": 0.052923105400102165
+            },
+            "rank": 2,
+            "solution_id": "ps_111d2960",
+            "weights": {
+              "consensus": {
+                "accountability": 0.16082374655026885,
+                "fairness_nondiscrimination": 0.28110970942057273,
+                "human_agency_oversight": 0.20394502219256824,
+                "privacy_data_governance": 0.15281056883890706,
+                "safety_robustness": 0.09833916884759795,
+                "transparency_explainability": 0.10297178415008512
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.008739662745590753,
+              "developer": 0.06876742408367427,
+              "regulator": 0.05900749934289039
+            },
+            "rank": 3,
+            "solution_id": "ps_c77e38c1",
+            "weights": {
+              "consensus": {
+                "accountability": 0.14847819236678395,
+                "fairness_nondiscrimination": 0.27795665169561345,
+                "human_agency_oversight": 0.20399836070005722,
+                "privacy_data_governance": 0.14875868675949072,
+                "safety_robustness": 0.1189228031716397,
+                "transparency_explainability": 0.10188530530641492
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.017408587933831255,
+              "developer": 0.07851314718328375,
+              "regulator": 0.04096230546826212
+            },
+            "rank": 4,
+            "solution_id": "ps_71931953",
+            "weights": {
+              "consensus": {
+                "accountability": 0.170165753830593,
+                "fairness_nondiscrimination": 0.3014631773709426,
+                "human_agency_oversight": 0.1370422996787442,
+                "privacy_data_governance": 0.150959088823494,
+                "safety_robustness": 0.10279088150109497,
+                "transparency_explainability": 0.13757879879513124
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.019783177373345534,
+              "developer": 0.07133089023872367,
+              "regulator": 0.04597480408536348
+            },
+            "rank": 5,
+            "solution_id": "ps_c5834021",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1596920092747907,
+                "fairness_nondiscrimination": 0.23738248433069553,
+                "human_agency_oversight": 0.19962481737892213,
+                "privacy_data_governance": 0.14518968294217938,
+                "safety_robustness": 0.11540822512405258,
+                "transparency_explainability": 0.14270278094935981
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.012970483307201573,
+              "developer": 0.0670907383904299,
+              "regulator": 0.0573675574107607
+            },
+            "rank": 6,
+            "solution_id": "ps_caf732c1",
+            "weights": {
+              "consensus": {
+                "accountability": 0.15213334787563476,
+                "fairness_nondiscrimination": 0.2601817806514918,
+                "human_agency_oversight": 0.20902028156280178,
+                "privacy_data_governance": 0.1524207473269792,
+                "safety_robustness": 0.12185038015928926,
+                "transparency_explainability": 0.10439346242380317
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.02136230945135404,
+              "developer": 0.07278594731661964,
+              "regulator": 0.04373454838710459
+            },
+            "rank": 7,
+            "solution_id": "ps_9ffa5b48",
+            "weights": {
+              "consensus": {
+                "accountability": 0.1550384621588989,
+                "fairness_nondiscrimination": 0.23020625970579695,
+                "human_agency_oversight": 0.2009541772167342,
+                "privacy_data_governance": 0.14338563607175617,
+                "safety_robustness": 0.1122558541223673,
+                "transparency_explainability": 0.1581596107244464
+              }
+            }
+          },
+          {
+            "objective_scores": {
+              "affected_community": 0.03986699782142488,
+              "developer": 0.08528717677073949,
+              "regulator": 0.018661397535036473
+            },
+            "rank": 8,
+            "solution_id": "ps_b3d2059e",
+            "weights": {
+              "consensus": {
+                "accountability": 0.2416432729930565,
+                "fairness_nondiscrimination": 0.23168071579725855,
+                "human_agency_oversight": 0.13900661997085345,
+                "privacy_data_governance": 0.14672541811069337,
+                "safety_robustness": 0.09789914570405726,
+                "transparency_explainability": 0.1430448274240809
+              }
+            }
+          }
+        ],
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework sg_mgaf."
+      },
+      "summary": {
+        "case_id": "healthcare_diagnostic",
+        "conflict_pairs": 3,
+        "framework_id": "sg_mgaf",
+        "mean_spearman_rho": 0.314286,
+        "overall_score": 0.615643,
+        "pareto_solutions": 8,
+        "top_consensus_dimension": "fairness_nondiscrimination"
+      }
+    }
+  ]
+}

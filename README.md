@@ -181,6 +181,12 @@ bash scripts/release_smoke.sh
 - Hiring Recommendation Algorithm.
 - Healthcare Diagnostic AI.
 
+## Requirements Traceability
+
+- Canonical requirement ledger: `docs/requirements_traceability.md`.
+- Regulatory mapping annex: `docs/regulatory_traceability.md`.
+- Reproducibility audit: `docs/reproducibility_audit.md`.
+
 ## Limitations and Scope Boundaries
 
 - No authentication or authorization layer is implemented in this release.
