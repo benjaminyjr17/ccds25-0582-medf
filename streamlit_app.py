@@ -58,6 +58,7 @@ LIKERT_MAX = 7.0
 UNICODE_MINUS = "\u2212"
 ENABLE_LIKERT_TRACK_TURQUOISE = True
 DEBUG_SHOW_SLIDER_LABELS = False
+DEBUG_SLIDER_FILL_PATCHER = False
 LIKERT_SLIDER_LABELS = [
     "Transparency and Explainability",
     "Fairness and Non-discrimination",
@@ -1108,135 +1109,134 @@ def _inject_advanced_slider_green_css() -> None:
     )
 
 
-def _render_slider_dom_probe(enabled: bool) -> None:
-    if not enabled:
-        return
-    st.markdown("#### Debug: Slider DOM Probe")
-    st.caption("Probe outlines detected filled-segment candidates in magenta and lists node metadata below.")
-    st.markdown(
-        '<div id="medf-slider-dom-probe-output" '
-        'style="font-size:0.8rem;line-height:1.35;border:1px dashed #7c3aed;'
-        'padding:0.5rem 0.65rem;border-radius:8px;background:rgba(124,58,237,0.08);">'
-        "Collecting slider DOM details…</div>",
-        unsafe_allow_html=True,
-    )
+def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
+    debug_container_id = "medf-slider-fill-patcher-debug"
+    if debug_enabled:
+        st.markdown(
+            f'<div id="{debug_container_id}" '
+            'style="font-size:0.8rem;line-height:1.35;border:1px dashed #64748b;'
+            'padding:0.45rem 0.6rem;border-radius:8px;background:rgba(100,116,139,0.1);">'
+            "Slider fill patcher debug: initializing...</div>",
+            unsafe_allow_html=True,
+        )
+    # Root cause: Streamlit/BaseWeb slider fill nodes can shift across rerenders and are not
+    # consistently targetable with static CSS selectors alone; apply a scoped runtime patcher.
     components.html(
-        """
+        f"""
 <script>
-(function () {
-  const parentDoc = window.parent && window.parent.document ? window.parent.document : document;
-  const output = parentDoc.getElementById("medf-slider-dom-probe-output");
-  if (!output) return;
+(function () {{
+  const parentWin = window.parent && window.parent.document ? window.parent : window;
+  const parentDoc = parentWin.document;
+  const DEBUG = {str(debug_enabled).lower()};
+  const DEBUG_ID = "{debug_container_id}";
+  const TURQ = "{BRAND_TURQUOISE_HEX}";
+  const GREEN = "{BRAND_GREEN_HEX}";
+  const LIKERT_LABELS = {json.dumps(LIKERT_SLIDER_LABELS)};
+  const ADV_LABELS = {json.dumps(ADVANCED_SLIDER_LABELS)};
 
-  const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => {
-    if (ch === "&") return "&amp;";
-    if (ch === "<") return "&lt;";
-    if (ch === ">") return "&gt;";
-    if (ch === '"') return "&quot;";
-    return "&#39;";
-  });
+  if (!parentWin.__medfSliderFillPatcherState) {{
+    parentWin.__medfSliderFillPatcherState = {{ initialized: false, observer: null, scheduled: false }};
+  }}
+  const state = parentWin.__medfSliderFillPatcherState;
+  const labelColor = new Map([
+    ...LIKERT_LABELS.map((label) => [label, TURQ]),
+    ...ADV_LABELS.map((label) => [label, GREEN]),
+  ]);
 
-  const cleanupOutlines = () => {
-    parentDoc.querySelectorAll('[data-medf-probe-outline="1"]').forEach((node) => {
-      node.style.outline = "";
-      node.style.outlineOffset = "";
-      node.removeAttribute("data-medf-probe-outline");
-    });
-  };
+  const dedupe = (nodes) => Array.from(new Set(nodes.filter(Boolean)));
 
-  const summarizeNode = (node) => {
-    if (!node) return "none";
-    const tag = (node.tagName || "").toLowerCase();
-    const role = node.getAttribute("role") || "";
-    const testid = node.getAttribute("data-testid") || "";
-    const baseweb = node.getAttribute("data-baseweb") || "";
-    const cls = (node.className && typeof node.className === "string")
-      ? node.className.trim().split(/\\s+/).slice(0, 2).join(".")
-      : "";
-    const style = (node.getAttribute("style") || "").replace(/\\s+/g, " ").trim().slice(0, 160);
-    return `${tag}${role ? `[role=${role}]` : ""}${testid ? `[data-testid=${testid}]` : ""}${baseweb ? `[data-baseweb=${baseweb}]` : ""}${cls ? `.${cls}` : ""} style="${style}"`;
-  };
+  const getFillCandidate = (sliderBase) => {{
+    const progressNodes = Array.from(sliderBase.querySelectorAll('[role="progressbar"]'));
+    if (progressNodes.length > 0) return progressNodes[0];
 
-  const findFillCandidate = (sliderRoot) => {
-    const base = sliderRoot.querySelector('[data-baseweb="slider"]');
-    if (!base) return { node: null, preferredSelector: "none", unique: false };
-    const progressNodes = Array.from(base.querySelectorAll('[role="progressbar"]'));
-    if (progressNodes.length) {
-      return {
-        node: progressNodes[0],
-        preferredSelector: '[data-baseweb="slider"] [role="progressbar"]',
-        unique: progressNodes.length === 1,
-      };
-    }
-    const widthNodes = Array.from(base.querySelectorAll('div[style*="width"]'));
-    if (widthNodes.length) {
-      return {
-        node: widthNodes[0],
-        preferredSelector: '[data-baseweb="slider"] div[style*="width"]:first-of-type',
-        unique: widthNodes.length === 1,
-      };
-    }
-    const transformNodes = Array.from(base.querySelectorAll('div[style*="transform"]'));
-    if (transformNodes.length) {
-      return {
-        node: transformNodes[0],
-        preferredSelector: '[data-baseweb="slider"] div[style*="transform"]:first-of-type',
-        unique: transformNodes.length === 1,
-      };
-    }
-    const nodes = Array.from(base.querySelectorAll("*"));
-    let best = null;
-    let bestScore = -1000;
-    for (const node of nodes) {
-      if (!(node instanceof HTMLElement)) continue;
-      const role = node.getAttribute("role") || "";
-      if (role === "slider") continue;
-      const style = node.getAttribute("style") || "";
-      let score = 0;
-      if (role === "progressbar") score += 8;
-      if (/width\\s*:\\s*[-+]?\\d+(?:\\.\\d+)?%/i.test(style)) score += 7;
-      if (/transform\\s*:/i.test(style) || /translateX|scaleX/i.test(style)) score += 5;
-      if (/background/i.test(style)) score += 2;
-      if (score > bestScore) {
-        bestScore = score;
-        best = node;
-      }
-    }
-    return {
-      node: best,
-      preferredSelector: "heuristic fallback",
-      unique: false,
-    };
-  };
+    const widthNodes = Array.from(sliderBase.querySelectorAll('div[style*="width"]'))
+      .filter((node) => node.getAttribute("role") !== "slider");
+    if (widthNodes.length > 0) return widthNodes[0];
 
-  const render = () => {
-    cleanupOutlines();
-    const sliders = Array.from(parentDoc.querySelectorAll('[data-testid="stSlider"]'));
-    if (!sliders.length) {
-      output.innerHTML = "No sliders detected.";
-      return;
-    }
-    const items = sliders.map((slider, idx) => {
-      const handle = slider.querySelector('[role="slider"][aria-label]');
-      const label = handle ? handle.getAttribute("aria-label") : `slider_${idx + 1}`;
-      const fillProbe = findFillCandidate(slider);
-      const candidate = fillProbe.node;
-      if (candidate) {
-        candidate.style.outline = "2px solid #ff00ff";
-        candidate.style.outlineOffset = "1px";
-        candidate.setAttribute("data-medf-probe-outline", "1");
-      }
-      return `<li><strong>${esc(label)}</strong><br>` +
-        `preferred fill selector: <code>${esc(fillProbe.preferredSelector)}</code> ` +
-        `(unique under slider root: <strong>${fillProbe.unique ? "true" : "false"}</strong>)<br>` +
-        `candidate node: <code>${esc(summarizeNode(candidate))}</code></li>`;
-    });
-    output.innerHTML = `<div style="margin-bottom:0.35rem;">Detected ${items.length} sliders.</div><ol style="margin:0;padding-left:1.1rem;">${items.join("")}</ol>`;
-  };
+    const transformNodes = Array.from(sliderBase.querySelectorAll('div[style*="transform"]'))
+      .filter((node) => node.getAttribute("role") !== "slider");
+    if (transformNodes.length > 0) return transformNodes[0];
 
-  setTimeout(render, 150);
-  setTimeout(render, 750);
-})();
+    return null;
+  }};
+
+  const applyColor = (element, color, property) => {{
+    if (!element) return;
+    element.style.setProperty(property, color, "important");
+  }};
+
+  const patchOneSlider = (handle) => {{
+    const label = handle.getAttribute("aria-label") || "";
+    if (!labelColor.has(label)) return {{ targeted: false, fillPatched: false }};
+    const color = labelColor.get(label);
+    const sliderBase = handle.closest('[data-baseweb="slider"]');
+    if (!sliderBase) return {{ targeted: true, fillPatched: false }};
+
+    const fillCandidate = getFillCandidate(sliderBase);
+    if (fillCandidate) {{
+      applyColor(fillCandidate, color, "background-color");
+      applyColor(fillCandidate, color, "border-color");
+    }}
+
+    applyColor(handle, color, "background-color");
+    applyColor(handle, color, "border-color");
+
+    const sliderRoot = handle.closest('[data-testid="stSlider"]') || sliderBase.closest('[data-testid="stSlider"]');
+    if (sliderRoot) {{
+      const valueCandidates = [
+        handle.nextElementSibling,
+        ...sliderRoot.querySelectorAll('[data-testid="stSliderThumbValue"]'),
+        ...sliderRoot.querySelectorAll('[class*="thumbValue"]'),
+      ];
+      dedupe(valueCandidates).forEach((node) => applyColor(node, color, "color"));
+    }}
+
+    return {{ targeted: true, fillPatched: !!fillCandidate }};
+  }};
+
+  const patchAll = () => {{
+    state.scheduled = false;
+    const handles = Array.from(parentDoc.querySelectorAll('[role="slider"][aria-label]'));
+    let targeted = 0;
+    let fillPatched = 0;
+
+    handles.forEach((handle) => {{
+      const result = patchOneSlider(handle);
+      if (result.targeted) targeted += 1;
+      if (result.fillPatched) fillPatched += 1;
+    }});
+
+    if (DEBUG) {{
+      const debugNode = parentDoc.getElementById(DEBUG_ID);
+      if (debugNode) {{
+        debugNode.textContent = `Slider fill patcher: targeted=${{targeted}}, fill_patched=${{fillPatched}}.`;
+      }}
+    }}
+  }};
+
+  const schedulePatch = () => {{
+    if (state.scheduled) return;
+    state.scheduled = true;
+    parentWin.requestAnimationFrame(patchAll);
+  }};
+
+  if (!state.initialized) {{
+    state.initialized = true;
+    state.observer = new parentWin.MutationObserver(schedulePatch);
+    state.observer.observe(parentDoc.body, {{
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["style", "class", "aria-valuenow"],
+    }});
+    parentDoc.addEventListener("input", schedulePatch, true);
+    parentDoc.addEventListener("pointerup", schedulePatch, true);
+  }}
+
+  schedulePatch();
+  parentWin.setTimeout(schedulePatch, 120);
+  parentWin.setTimeout(schedulePatch, 600);
+}})();
 </script>
 """,
         height=0,
@@ -1448,6 +1448,7 @@ def main() -> None:
     st.set_page_config(page_title="MEDF Governance Platform", layout="wide")
     tokens = _ui_tokens(_get_theme_base())
     inject_css(tokens)
+    _inject_slider_fill_color_patcher(DEBUG_SLIDER_FILL_PATCHER)
     # Root cause: the toggle was not key-bound and was mirrored manually, which created two
     # competing state paths and occasional one-rerun-late visibility updates.
     st.session_state.setdefault("conference_mode", False)
@@ -1580,7 +1581,6 @@ def main() -> None:
         pareto_n_gen_effective = pareto_n_gen
         generate_pareto_clicked = False
         case_screenshot_mode = False
-        debug_inspect_slider_dom = False
 
         framework_options = {
             f"{item.get('name', item.get('id', 'unknown'))} ({item.get('id', 'unknown')})": item
@@ -1849,12 +1849,6 @@ def main() -> None:
                             step=1,
                             key="pareto_search_depth",
                         )
-                debug_inspect_slider_dom = st.checkbox(
-                    "Debug: Inspect slider DOM",
-                    value=False,
-                    key="debug_inspect_slider_dom",
-                    help="Probe slider DOM candidates for filled-track styling.",
-                )
 
             pareto_n_solutions = _clamp_int(
                 int(st.session_state.get("pareto_options_to_show", pareto_n_solutions)),
@@ -2005,8 +1999,6 @@ def main() -> None:
                 f"Selected framework: {selected_framework_text} | "
                 "Fixed stakeholders: developer, regulator, affected_community"
             )
-
-    _render_slider_dom_probe(debug_inspect_slider_dom)
 
     if demo_active and stakeholder_id in DEMO_WEIGHTS:
         weights_for_request = {
