@@ -30,5 +30,10 @@
     "type": "deployment-inspired scenario",
     "citation": "Scenario synthesized for MEDF evaluation from public governance discussions on facial recognition policy and ethics.",
     "url": "https://www.nist.gov/itl/ai-risk-management-framework"
-  }
+  },
+  "assumptions": [
+    "Scores are analyst-assigned Likert estimates for a deployment-like scenario and are not direct measurements from a live police system.",
+    "The cited source is used for governance context; it is not evidence of one specific municipality implementation.",
+    "Risk framing prioritizes fairness and privacy concerns commonly discussed in public-sector facial recognition governance."
+  ]
 }

@@ -30,5 +30,10 @@
     "type": "deployment-inspired scenario",
     "citation": "Scenario synthesized for MEDF evaluation from algorithmic hiring governance guidance and common enterprise deployment patterns.",
     "url": "https://www.eeoc.gov/ai-and-algorithmic-fairness-initiative"
-  }
+  },
+  "assumptions": [
+    "Scores are analyst-assigned Likert estimates for a deployment-like enterprise hiring workflow and not outcomes from one named employer.",
+    "The cited source is used for fairness and governance context, not as proof of a single production model configuration.",
+    "Scenario assumes human recruiters retain final decision authority while the model is used for shortlisting support."
+  ]
 }

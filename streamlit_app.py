@@ -133,50 +133,6 @@ CASE_STUDY_FILES: tuple[str, ...] = (
 )
 
 
-def _default_case_studies() -> list[dict[str, Any]]:
-    return [
-        {
-            "id": "facial_recognition",
-            "name": "Facial Recognition (Law Enforcement)",
-            "description": "Deployment-like facial recognition assessment scenario.",
-            "dimension_scores": {
-                "transparency_explainability": 2.5,
-                "fairness_nondiscrimination": 1.0,
-                "safety_robustness": 5.5,
-                "privacy_data_governance": 1.0,
-                "human_agency_oversight": 2.5,
-                "accountability": 4.0,
-            },
-        },
-        {
-            "id": "hiring_algorithm",
-            "name": "Hiring Recommendation Algorithm",
-            "description": "Deployment-like algorithmic hiring assessment scenario.",
-            "dimension_scores": {
-                "transparency_explainability": 4.0,
-                "fairness_nondiscrimination": 2.5,
-                "safety_robustness": 4.0,
-                "privacy_data_governance": 4.0,
-                "human_agency_oversight": 5.5,
-                "accountability": 4.0,
-            },
-        },
-        {
-            "id": "healthcare_diagnostic",
-            "name": "Healthcare Diagnostic AI",
-            "description": "Deployment-like clinical decision-support assessment scenario.",
-            "dimension_scores": {
-                "transparency_explainability": 4.0,
-                "fairness_nondiscrimination": 4.0,
-                "safety_robustness": 7.0,
-                "privacy_data_governance": 5.5,
-                "human_agency_oversight": 4.0,
-                "accountability": 5.5,
-            },
-        },
-    ]
-
-
 def _validated_case_dimension_scores(raw_scores: Any, *, case_id: str) -> dict[str, float]:
     if not isinstance(raw_scores, dict):
         raise ValueError(f"Case '{case_id}' is missing a valid dimension_scores object.")
@@ -239,17 +195,19 @@ def _load_case_studies_from_files() -> list[dict[str, Any]]:
                 "dimension_scores": dim_scores,
                 "deployment_context": payload.get("deployment_context", {}),
                 "source_reference": payload.get("source_reference", {}),
+                "assumptions": payload.get("assumptions", ""),
             }
         )
 
     return cases
 
 
+CASE_STUDIES_LOAD_ERROR: str | None = None
 try:
     CASE_STUDIES = _load_case_studies_from_files()
-except Exception:
-    # Fallback keeps UI operable if local case files are unavailable.
-    CASE_STUDIES = _default_case_studies()
+except Exception as exc:
+    CASE_STUDIES = []
+    CASE_STUDIES_LOAD_ERROR = str(exc)
 
 
 def _get_theme_base():
@@ -2337,10 +2295,17 @@ def main() -> None:
         case_framework_ids = [framework_id] if framework_id else []
         case_stakeholder_ids = ["developer", "regulator", "affected_community"]
 
+        if not CASE_STUDIES:
+            st.error("No case studies were loaded from `case_studies/*.json`.")
+            if CASE_STUDIES_LOAD_ERROR:
+                st.caption(f"Case study load error: {CASE_STUDIES_LOAD_ERROR}")
+
         for case in CASE_STUDIES:
             case_id = str(case["id"])
             case_name = str(case["name"])
             case_description = str(case["description"])
+            case_source_reference = case.get("source_reference")
+            case_assumptions = case.get("assumptions")
             case_scores = {
                 dimension: float(case["dimension_scores"][dimension])
                 for dimension in UNIFIED_DIMENSIONS
@@ -2354,6 +2319,10 @@ def main() -> None:
                 expanded=(not case_screenshot_mode and not conference_mode),
             ):
                 st.write(case_description)
+                if not case_screenshot_mode and case_source_reference:
+                    st.caption(f"Source reference: {case_source_reference}")
+                if not case_screenshot_mode and case_assumptions:
+                    st.caption(f"Assumptions: {case_assumptions}")
                 if not case_screenshot_mode:
                     st.caption(
                         "Input dimension scores: "

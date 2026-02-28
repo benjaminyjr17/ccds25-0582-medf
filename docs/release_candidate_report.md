@@ -1,7 +1,7 @@
 # Release Candidate Stress Verification Report
 
 - Date/time (UTC): 2026-02-25 10:28:14 UTC
-- Repository: `/Users/benjaminoliveryick/ccds25-0582-medf`
+- Repository: `ccds25-0582-medf` (repo root)
 - Final outcome: **PASS**
 
 ## Commands Executed

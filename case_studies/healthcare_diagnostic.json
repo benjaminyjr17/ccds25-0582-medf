@@ -30,5 +30,10 @@
     "type": "deployment-inspired scenario",
     "citation": "Scenario synthesized for MEDF evaluation from healthcare AI governance guidance and diagnostic safety literature.",
     "url": "https://www.who.int/publications/i/item/9789240029200"
-  }
+  },
+  "assumptions": [
+    "Scores are analyst-assigned Likert estimates for a deployment-like clinical decision support workflow and not a benchmark from one hospital product.",
+    "The cited WHO publication is used as governance reference context, not as a direct metric source for this synthetic profile.",
+    "Scenario assumes clinicians remain accountable for final diagnosis and treatment decisions."
+  ]
 }
