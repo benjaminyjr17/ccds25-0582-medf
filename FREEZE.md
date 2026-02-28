@@ -2,9 +2,10 @@
 
 ## Tag Information
 
-- Tag name: fyp-freeze-v1.0.0.
-- Commit SHA: a2a94540d906a67ec92b85c2da15e434bc503b26.
-- Freeze date: 2026-02-25.
+- Tag name: v1.0.1-freeze.
+- Commit SHA: 9dd2461a014edaf168523dc976565f9c9ccc4bf3.
+- Freeze date: 2026-02-28.
+- Freeze rationale: presentation/provenance/UI rendering cleanup; no API or computation changes.
 
 This tag represents the finalized engineering state of the Multi-Stakeholder Ethical Decision Framework (MEDF) platform submitted for academic evaluation.
 
@@ -87,5 +88,5 @@ All optimization outputs remain reproducible when deterministic mode is enabled.
 
 - No further feature changes are permitted after this tag.
 - Only critical defect fixes are allowed.
-- Any post-freeze fixes require a new tag such as fyp-freeze-v1.0.1.
+- Any post-freeze fixes require a new tag such as v1.0.2-freeze.
 - The freeze state reflects the validated configuration presented for academic assessment.
