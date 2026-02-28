@@ -67,7 +67,7 @@ LIKERT_SLIDER_LABELS = [
 ]
 ADVANCED_SLIDER_LABELS = [
     "Pareto Solutions Displayed",
-    "Compute Budget (evaluations)",
+    "Compute Budget (Evaluations)",
     "Explore vs. Refine",
     "Search Breadth (Population)",
     "Search Depth (Generations)",
@@ -1000,23 +1000,26 @@ def _inject_likert_track_turquoise_css() -> bool:
     value_label_selectors: list[str] = []
     for label in LIKERT_SLIDER_LABELS:
         safe_label = label.replace('"', '\\"')
-        gated_prefix = f'div:has([aria-label="{safe_label}"])'
-        progress_selectors.append(
-            f'{gated_prefix} [data-baseweb="slider"] div[role="progressbar"]'
+        slider_scope = f'div:has([aria-label="{safe_label}"])[data-testid="stSlider"]'
+        progress_selectors.extend(
+            [
+                f'{slider_scope} [data-baseweb="slider"] div[role="progressbar"]',
+                f'{slider_scope} [data-baseweb="slider"] div[role="presentation"] > div',
+                f'{slider_scope} [data-baseweb="slider"] div[role="presentation"] > div > div',
+            ]
         )
-        thumb_selectors.append(
-            f'{gated_prefix} [data-baseweb="slider"] [role="slider"]'
-        )
+        thumb_selectors.append(f'{slider_scope} [data-baseweb="slider"] [role="slider"]')
         value_label_selectors.extend(
             [
-                f'{gated_prefix} [data-baseweb="slider"] [role="slider"] + div',
-                f'{gated_prefix} [data-baseweb="slider"] [data-testid="stSliderThumbValue"]',
-                f'{gated_prefix} [data-baseweb="slider"] [class*="thumbValue"]',
+                f'{slider_scope} [data-baseweb="slider"] [role="slider"] + div',
+                f'{slider_scope} [data-baseweb="slider"] [data-testid="stSliderThumbValue"]',
+                f'{slider_scope} [data-baseweb="slider"] [class*="thumbValue"]',
             ]
         )
     st.markdown(
         f"""
 <style>
+/* Thumb value-label selectors: [role="slider"] + div, [data-testid="stSliderThumbValue"], [class*="thumbValue"] */
 {", ".join(progress_selectors)} {{
     background-color: {BRAND_TURQUOISE_HEX} !important;
 }}
@@ -1042,23 +1045,26 @@ def _inject_advanced_slider_green_css() -> None:
     value_label_selectors: list[str] = []
     for label in ADVANCED_SLIDER_LABELS:
         safe_label = label.replace('"', '\\"')
-        gated_prefix = f'div:has([aria-label="{safe_label}"])'
-        progress_selectors.append(
-            f'{gated_prefix} [data-baseweb="slider"] div[role="progressbar"]'
+        slider_scope = f'div:has([aria-label="{safe_label}"])[data-testid="stSlider"]'
+        progress_selectors.extend(
+            [
+                f'{slider_scope} [data-baseweb="slider"] div[role="progressbar"]',
+                f'{slider_scope} [data-baseweb="slider"] div[role="presentation"] > div',
+                f'{slider_scope} [data-baseweb="slider"] div[role="presentation"] > div > div',
+            ]
         )
-        thumb_selectors.append(
-            f'{gated_prefix} [data-baseweb="slider"] [role="slider"]'
-        )
+        thumb_selectors.append(f'{slider_scope} [data-baseweb="slider"] [role="slider"]')
         value_label_selectors.extend(
             [
-                f'{gated_prefix} [data-baseweb="slider"] [role="slider"] + div',
-                f'{gated_prefix} [data-baseweb="slider"] [data-testid="stSliderThumbValue"]',
-                f'{gated_prefix} [data-baseweb="slider"] [class*="thumbValue"]',
+                f'{slider_scope} [data-baseweb="slider"] [role="slider"] + div',
+                f'{slider_scope} [data-baseweb="slider"] [data-testid="stSliderThumbValue"]',
+                f'{slider_scope} [data-baseweb="slider"] [class*="thumbValue"]',
             ]
         )
     st.markdown(
         f"""
 <style>
+/* Thumb value-label selectors: [role="slider"] + div, [data-testid="stSliderThumbValue"], [class*="thumbValue"] */
 {", ".join(progress_selectors)} {{
     background-color: {BRAND_GREEN_HEX} !important;
 }}
@@ -1238,7 +1244,7 @@ def _build_radar_chart(
     )
     figure.update_layout(
         title_text=title_text,
-        polar={"radialaxis": {"visible": True, "range": [0, radial_max]}},
+        polar={"radialaxis": {"visible": True, "range": [0, radial_max], "tickformat": ".1f"}},
         showlegend=False,
         height=460,
         margin={"l": 52, "r": 52, "t": 62, "b": 52},
@@ -1634,7 +1640,7 @@ def main() -> None:
                     )
                     if pareto_search_mode == "auto":
                         pareto_compute_budget = st.slider(
-                            "Compute Budget (evaluations)",
+                            "Compute Budget (Evaluations)",
                             min_value=2_000,
                             max_value=30_000,
                             value=_clamp_int(
@@ -1903,7 +1909,7 @@ def main() -> None:
                     st.metric("Overall Ethical Score", fmt_score(overall_score))
                 with label_col:
                     st.markdown(
-                        f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Conflict Posture {label}</span>",
+                        f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Conflict Posture: {label}</span>",
                         unsafe_allow_html=True,
                     )
 
@@ -1934,7 +1940,7 @@ def main() -> None:
                     )
                 )
                 fig.update_layout(
-                    polar={"radialaxis": {"visible": True, "range": [0, 1]}},
+                    polar={"radialaxis": {"visible": True, "range": [0, 1], "tickformat": ".1f"}},
                     showlegend=False,
                     height=460,
                     margin={"l": 52, "r": 52, "t": 56, "b": 52},
@@ -2442,7 +2448,7 @@ def main() -> None:
             )
         )
         radar_figure.update_layout(
-            polar={"radialaxis": {"visible": True, "range": [0, 1]}},
+            polar={"radialaxis": {"visible": True, "range": [0, 1], "tickformat": ".1f"}},
             showlegend=False,
             height=460,
             margin={"l": 52, "r": 52, "t": 56, "b": 52},
