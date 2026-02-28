@@ -15,6 +15,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
+import streamlit.components.v1 as components
 
 from plot_theme import BG, TEXT, apply_plot_theme as _shared_apply_plot_theme
 
@@ -415,6 +416,24 @@ div.stButton > button:hover {{
 
 .medf-page-nav [data-testid="stRadio"] label:has(input:checked) [data-testid="stMarkdownContainer"] p {{
     color: {BRAND_TURQUOISE_HEX};
+}}
+
+.medf-page-nav [data-testid="stRadio"] input[type="radio"] {{
+    accent-color: {BRAND_TURQUOISE_HEX} !important;
+}}
+
+.medf-page-nav [data-testid="stRadio"] label:has(input:checked) [role="radio"] {{
+    border-color: {BRAND_TURQUOISE_HEX} !important;
+    background-color: {BRAND_TURQUOISE_HEX} !important;
+}}
+
+.medf-page-nav [data-testid="stRadio"] label:has(input:checked) [aria-checked="true"] {{
+    border-color: {BRAND_TURQUOISE_HEX} !important;
+    background-color: {BRAND_TURQUOISE_HEX} !important;
+}}
+
+.medf-page-nav [data-testid="stRadio"] label:has(input:checked) [role="radio"]::after {{
+    background-color: {BRAND_TURQUOISE_HEX} !important;
 }}
 </style>
 """,
@@ -1000,20 +1019,24 @@ def _inject_likert_track_turquoise_css() -> bool:
     value_label_selectors: list[str] = []
     for label in LIKERT_SLIDER_LABELS:
         safe_label = label.replace('"', '\\"')
-        slider_scope = f'div:has([aria-label="{safe_label}"])[data-testid="stSlider"]'
+        gated_prefix = f'div:has([role="slider"][aria-label="{safe_label}"])'
+        slider_scope = (
+            f'{gated_prefix} [data-baseweb="slider"]:has([role="slider"][aria-label="{safe_label}"])'
+        )
         progress_selectors.extend(
             [
-                f'{slider_scope} [data-baseweb="slider"] div[role="progressbar"]',
-                f'{slider_scope} [data-baseweb="slider"] div[role="presentation"] > div',
-                f'{slider_scope} [data-baseweb="slider"] div[role="presentation"] > div > div',
+                f'{slider_scope} div[role="progressbar"]',
+                f'{slider_scope} > div > div:nth-child(2)',
+                f'{slider_scope} > div > div[style*="width"]',
+                f'{slider_scope} > div > div[style*="transform"]',
             ]
         )
-        thumb_selectors.append(f'{slider_scope} [data-baseweb="slider"] [role="slider"]')
+        thumb_selectors.append(f'{slider_scope} [role="slider"]')
         value_label_selectors.extend(
             [
-                f'{slider_scope} [data-baseweb="slider"] [role="slider"] + div',
-                f'{slider_scope} [data-baseweb="slider"] [data-testid="stSliderThumbValue"]',
-                f'{slider_scope} [data-baseweb="slider"] [class*="thumbValue"]',
+                f'{slider_scope} [role="slider"] + div',
+                f'{slider_scope} [data-testid="stSliderThumbValue"]',
+                f'{slider_scope} [class*="thumbValue"]',
             ]
         )
     st.markdown(
@@ -1045,20 +1068,24 @@ def _inject_advanced_slider_green_css() -> None:
     value_label_selectors: list[str] = []
     for label in ADVANCED_SLIDER_LABELS:
         safe_label = label.replace('"', '\\"')
-        slider_scope = f'div:has([aria-label="{safe_label}"])[data-testid="stSlider"]'
+        gated_prefix = f'div:has([role="slider"][aria-label="{safe_label}"])'
+        slider_scope = (
+            f'{gated_prefix} [data-baseweb="slider"]:has([role="slider"][aria-label="{safe_label}"])'
+        )
         progress_selectors.extend(
             [
-                f'{slider_scope} [data-baseweb="slider"] div[role="progressbar"]',
-                f'{slider_scope} [data-baseweb="slider"] div[role="presentation"] > div',
-                f'{slider_scope} [data-baseweb="slider"] div[role="presentation"] > div > div',
+                f'{slider_scope} div[role="progressbar"]',
+                f'{slider_scope} > div > div:nth-child(2)',
+                f'{slider_scope} > div > div[style*="width"]',
+                f'{slider_scope} > div > div[style*="transform"]',
             ]
         )
-        thumb_selectors.append(f'{slider_scope} [data-baseweb="slider"] [role="slider"]')
+        thumb_selectors.append(f'{slider_scope} [role="slider"]')
         value_label_selectors.extend(
             [
-                f'{slider_scope} [data-baseweb="slider"] [role="slider"] + div',
-                f'{slider_scope} [data-baseweb="slider"] [data-testid="stSliderThumbValue"]',
-                f'{slider_scope} [data-baseweb="slider"] [class*="thumbValue"]',
+                f'{slider_scope} [role="slider"] + div',
+                f'{slider_scope} [data-testid="stSliderThumbValue"]',
+                f'{slider_scope} [class*="thumbValue"]',
             ]
         )
     st.markdown(
@@ -1080,6 +1107,109 @@ def _inject_advanced_slider_green_css() -> None:
 </style>
 """,
         unsafe_allow_html=True,
+    )
+
+
+def _render_slider_dom_probe(enabled: bool) -> None:
+    if not enabled:
+        return
+    st.markdown("#### Debug: Slider DOM Probe")
+    st.caption("Probe outlines detected filled-segment candidates in magenta and lists node metadata below.")
+    st.markdown(
+        '<div id="medf-slider-dom-probe-output" '
+        'style="font-size:0.8rem;line-height:1.35;border:1px dashed #7c3aed;'
+        'padding:0.5rem 0.65rem;border-radius:8px;background:rgba(124,58,237,0.08);">'
+        "Collecting slider DOM details…</div>",
+        unsafe_allow_html=True,
+    )
+    components.html(
+        """
+<script>
+(function () {
+  const parentDoc = window.parent && window.parent.document ? window.parent.document : document;
+  const output = parentDoc.getElementById("medf-slider-dom-probe-output");
+  if (!output) return;
+
+  const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => {
+    if (ch === "&") return "&amp;";
+    if (ch === "<") return "&lt;";
+    if (ch === ">") return "&gt;";
+    if (ch === '"') return "&quot;";
+    return "&#39;";
+  });
+
+  const cleanupOutlines = () => {
+    parentDoc.querySelectorAll('[data-medf-probe-outline="1"]').forEach((node) => {
+      node.style.outline = "";
+      node.style.outlineOffset = "";
+      node.removeAttribute("data-medf-probe-outline");
+    });
+  };
+
+  const summarizeNode = (node) => {
+    if (!node) return "none";
+    const tag = (node.tagName || "").toLowerCase();
+    const role = node.getAttribute("role") || "";
+    const testid = node.getAttribute("data-testid") || "";
+    const baseweb = node.getAttribute("data-baseweb") || "";
+    const cls = (node.className && typeof node.className === "string")
+      ? node.className.trim().split(/\\s+/).slice(0, 2).join(".")
+      : "";
+    const style = (node.getAttribute("style") || "").replace(/\\s+/g, " ").trim().slice(0, 160);
+    return `${tag}${role ? `[role=${role}]` : ""}${testid ? `[data-testid=${testid}]` : ""}${baseweb ? `[data-baseweb=${baseweb}]` : ""}${cls ? `.${cls}` : ""} style="${style}"`;
+  };
+
+  const findFillCandidate = (sliderRoot) => {
+    const base = sliderRoot.querySelector('[data-baseweb="slider"]');
+    if (!base) return null;
+    const nodes = Array.from(base.querySelectorAll("*"));
+    let best = null;
+    let bestScore = -1000;
+    for (const node of nodes) {
+      if (!(node instanceof HTMLElement)) continue;
+      const role = node.getAttribute("role") || "";
+      if (role === "slider") continue;
+      const style = node.getAttribute("style") || "";
+      let score = 0;
+      if (role === "progressbar") score += 8;
+      if (/width\\s*:\\s*[-+]?\\d+(?:\\.\\d+)?%/i.test(style)) score += 7;
+      if (/transform\\s*:/i.test(style) || /translateX|scaleX/i.test(style)) score += 5;
+      if (/background/i.test(style)) score += 2;
+      if (score > bestScore) {
+        bestScore = score;
+        best = node;
+      }
+    }
+    return best;
+  };
+
+  const render = () => {
+    cleanupOutlines();
+    const sliders = Array.from(parentDoc.querySelectorAll('[data-testid="stSlider"]'));
+    if (!sliders.length) {
+      output.innerHTML = "No sliders detected.";
+      return;
+    }
+    const items = sliders.map((slider, idx) => {
+      const handle = slider.querySelector('[role="slider"][aria-label]');
+      const label = handle ? handle.getAttribute("aria-label") : `slider_${idx + 1}`;
+      const candidate = findFillCandidate(slider);
+      if (candidate) {
+        candidate.style.outline = "2px solid #ff00ff";
+        candidate.style.outlineOffset = "1px";
+        candidate.setAttribute("data-medf-probe-outline", "1");
+      }
+      return `<li><strong>${esc(label)}</strong><br><code>${esc(summarizeNode(candidate))}</code></li>`;
+    });
+    output.innerHTML = `<div style="margin-bottom:0.35rem;">Detected ${items.length} sliders.</div><ol style="margin:0;padding-left:1.1rem;">${items.join("")}</ol>`;
+  };
+
+  setTimeout(render, 150);
+  setTimeout(render, 750);
+})();
+</script>
+""",
+        height=0,
     )
 
 
@@ -1420,6 +1550,7 @@ def main() -> None:
         pareto_n_gen_effective = pareto_n_gen
         generate_pareto_clicked = False
         case_screenshot_mode = False
+        debug_inspect_slider_dom = False
 
         framework_options = {
             f"{item.get('name', item.get('id', 'unknown'))} ({item.get('id', 'unknown')})": item
@@ -1688,6 +1819,12 @@ def main() -> None:
                             step=1,
                             key="pareto_search_depth",
                         )
+                debug_inspect_slider_dom = st.checkbox(
+                    "Debug: Inspect slider DOM",
+                    value=False,
+                    key="debug_inspect_slider_dom",
+                    help="Probe slider DOM candidates for filled-track styling.",
+                )
 
             pareto_n_solutions = _clamp_int(
                 int(st.session_state.get("pareto_options_to_show", pareto_n_solutions)),
@@ -1838,6 +1975,8 @@ def main() -> None:
                 f"Selected framework: {selected_framework_text} | "
                 "Fixed stakeholders: developer, regulator, affected_community"
             )
+
+    _render_slider_dom_probe(debug_inspect_slider_dom)
 
     if demo_active and stakeholder_id in DEMO_WEIGHTS:
         weights_for_request = {
