@@ -920,7 +920,16 @@ def render_if_present(label: str, value: Any) -> None:
         return
 
     if label:
-        st.caption(f"{label}: {text}")
+        period_labels = {
+            "Framework",
+            "Stakeholder",
+            "Scoring Method",
+            "Framework Weighting Mode",
+        }
+        if label in period_labels:
+            st.caption(f"{label}: {text.rstrip('.')}.")
+        else:
+            st.caption(f"{label}: {text}")
     else:
         st.caption(text)
 
@@ -1529,7 +1538,7 @@ def main() -> None:
                             key="pareto_compute_budget",
                         )
                         pareto_explore_bias = st.slider(
-                            "Explore vs Refine",
+                            "Explore vs. Refine",
                             min_value=0,
                             max_value=100,
                             value=_clamp_int(
@@ -1655,6 +1664,25 @@ def main() -> None:
 
             with col_right:
                 st.subheader("Dimension Scores (Likert 1–7)")
+                st.markdown(
+                    f"""
+<style>
+.medf-likert-row {{ position: relative; margin-top: 2px; margin-bottom: -10px; }}
+.medf-likert-rail {{
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  overflow: hidden;
+}}
+.medf-likert-fill {{
+  height: 100%;
+  border-radius: 999px;
+  background: {BRAND_BLUE_HEX};
+}}
+</style>
+""",
+                    unsafe_allow_html=True,
+                )
                 if page in {"Conflict Detection", "Pareto Resolution"}:
                     preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
                     if preset_col_1.button("Preset: Baseline (3.5,3.0,5.5,4.5,3.5,5.0)"):
@@ -1672,12 +1700,25 @@ def main() -> None:
                 for dimension in UNIFIED_DIMENSIONS:
                     slider_col, badge_col = st.columns([0.86, 0.14])
                     with slider_col:
+                        current_value = float(st.session_state[f"score_{dimension}"])
+                        norm = (current_value - LIKERT_MIN) / (LIKERT_MAX - LIKERT_MIN)
+                        pct = int(round(max(0.0, min(1.0, norm)) * 100))
+                        st.markdown(
+                            f"""
+<div class="medf-likert-row">
+  <div class="medf-likert-rail">
+    <div class="medf-likert-fill" style="width: {pct}%;"></div>
+  </div>
+</div>
+""",
+                            unsafe_allow_html=True,
+                        )
                         dimension_scores[dimension] = float(
                             st.slider(
                                 DIMENSION_DISPLAY_NAMES[dimension],
                                 min_value=LIKERT_MIN,
                                 max_value=LIKERT_MAX,
-                                value=float(st.session_state[f"score_{dimension}"]),
+                                value=current_value,
                                 step=0.1,
                                 format="%.1f",
                                 key=f"score_{dimension}",
@@ -1852,12 +1893,12 @@ def main() -> None:
                 if conference_mode:
                     with st.expander("Supporting Analysis", expanded=False):
                         _render_evaluate_supporting_analysis()
-                    with st.expander("Technical Detail", expanded=False):
+                    with st.expander("Technical Details", expanded=False):
                         _render_evaluate_technical_detail()
                 else:
                     st.markdown("## Supporting Analysis")
                     _render_evaluate_supporting_analysis()
-                    st.markdown("## Technical Detail")
+                    st.markdown("## Technical Details")
                     _render_evaluate_technical_detail()
     elif page == "Conflict Detection":
         if detect_clicked:
@@ -2073,10 +2114,10 @@ def main() -> None:
 
             if technical_note:
                 if conference_mode:
-                    with st.expander("Technical Detail", expanded=False):
+                    with st.expander("Technical Details", expanded=False):
                         st.info(technical_note)
                 else:
-                    st.markdown("## Technical Detail")
+                    st.markdown("## Technical Details")
                     st.info(technical_note)
     elif page == "Pareto Resolution":
         if generate_pareto_clicked:
