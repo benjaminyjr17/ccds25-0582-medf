@@ -122,10 +122,10 @@ DEMO_WEIGHTS = {
     },
 }
 
-HARD_CAP_EVALS = 50_000
+HARD_CAP_EVALS = 30_000
 PARETO_PRESETS = {
-    "Standard": {"n_solutions": 8, "pop_size": 40, "n_gen": 80},
-    "Thorough": {"n_solutions": 12, "pop_size": 80, "n_gen": 160},
+    "Standard": {"n_solutions": 25, "pop_size": 80, "n_gen": 80},
+    "Thorough": {"n_solutions": 30, "pop_size": 120, "n_gen": 120},
 }
 
 CASE_STUDY_FILES: tuple[str, ...] = (
@@ -363,6 +363,37 @@ div.stButton > button {{
 div.stButton > button:hover {{
     border-color: #334155;
     background: #0b1220;
+}}
+
+.medf-page-nav [data-testid="stRadio"] > div {{
+    gap: 0.45rem;
+}}
+
+.medf-page-nav [data-testid="stRadio"] label {{
+    border: 1px solid rgba(56,189,248,0.35);
+    border-radius: 999px;
+    padding: 0.25rem 0.68rem;
+    background: rgba(56,189,248,0.08);
+}}
+
+.medf-page-nav [data-testid="stRadio"] label:hover {{
+    border-color: {BRAND_BLUE_HEX};
+    background: rgba(56,189,248,0.14);
+}}
+
+.medf-page-nav [data-testid="stRadio"] label [data-testid="stMarkdownContainer"] p {{
+    color: var(--medf-text);
+    font-weight: 600;
+}}
+
+.medf-page-nav [data-testid="stRadio"] label:has(input:checked) {{
+    border-color: {BRAND_BLUE_HEX};
+    background: rgba(56,189,248,0.2);
+    box-shadow: 0 0 0 1px rgba(56,189,248,0.45) inset;
+}}
+
+.medf-page-nav [data-testid="stRadio"] label:has(input:checked) [data-testid="stMarkdownContainer"] p {{
+    color: {BRAND_BLUE_HEX};
 }}
 </style>
 """,
@@ -912,6 +943,46 @@ def fmt_small(x: Any) -> str:
         return "N/A"
 
 
+def _round_to_multiple(value: float, multiple: int) -> int:
+    if multiple <= 0:
+        raise ValueError("multiple must be positive.")
+    return int(round(float(value) / multiple) * multiple)
+
+
+def _clamp_int(value: int, min_value: int, max_value: int) -> int:
+    return max(min_value, min(max_value, int(value)))
+
+
+def _normalize_pareto_mode(value: Any) -> str:
+    text = safe_str(value).strip().lower()
+    if text in {"auto", "automatic (recommended)", "auto (recommended)"}:
+        return "auto"
+    if text in {"manual", "manual (advanced)"}:
+        return "manual"
+    return "auto"
+
+
+def _derive_auto_pareto_search_params(budget: int, bias: int) -> tuple[int, int]:
+    explore_weight = float(bias) / 100.0
+    p_raw = 40 + (140 - 40) * explore_weight
+    population = _clamp_int(_round_to_multiple(p_raw, 5), 20, 150)
+
+    generations = math.floor(int(budget) / max(population, 1))
+    generations = _clamp_int(_round_to_multiple(generations, 5), 20, 200)
+
+    while population * generations > int(budget) and generations > 20:
+        generations -= 5
+
+    if generations == 200 and population * generations <= int(budget):
+        while population < 150 and (population + 5) * generations <= int(budget):
+            population += 5
+
+    while population * generations > int(budget) and generations > 20:
+        generations -= 5
+
+    return population, generations
+
+
 def _extract_framework_weighting_mode(notes: Any) -> str | None:
     if not isinstance(notes, str):
         return None
@@ -1114,6 +1185,7 @@ def main() -> None:
     if "last_conflict_result" not in st.session_state:
         st.session_state["last_conflict_result"] = None
 
+    st.markdown('<div class="medf-page-nav">', unsafe_allow_html=True)
     page = st.radio(
         "Page",
         ["Evaluate", "Conflict Detection", "Pareto Resolution", "Case Studies"],
@@ -1121,6 +1193,7 @@ def main() -> None:
         horizontal=True,
         label_visibility="collapsed",
     )
+    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown(f"# {page}")
 
     executive_kpis = _build_executive_kpis()
@@ -1220,8 +1293,8 @@ def main() -> None:
         selected_stakeholder: dict[str, Any] | None = None
         conflict_stakeholder_ids: list[str] = []
         pareto_stakeholder_ids: list[str] = []
-        pareto_n_solutions = 8
-        pareto_pop_size = 40
+        pareto_n_solutions = 25
+        pareto_pop_size = 80
         pareto_n_gen = 80
         pareto_n_gen_effective = pareto_n_gen
         generate_pareto_clicked = False
@@ -1400,52 +1473,149 @@ def main() -> None:
             pareto_n_gen = int(
                 st.session_state.get("pareto_search_depth", preset_values["n_gen"])
             )
+            pareto_search_mode = _normalize_pareto_mode(st.session_state.get("pareto_search_mode", "auto"))
+            st.session_state["pareto_search_mode"] = pareto_search_mode
+            pareto_search_mode_label = (
+                "Automatic (Recommended)"
+                if pareto_search_mode == "auto"
+                else "Manual (Advanced)"
+            )
+            pareto_compute_budget = int(st.session_state.get("pareto_compute_budget", 10_000))
+            pareto_explore_bias = int(st.session_state.get("pareto_explore_bias", 60))
+            pareto_n_gen_effective = pareto_n_gen
 
             with st.expander("Advanced Settings", expanded=False):
                 if conference_mode:
                     st.caption("Advanced settings are hidden while Conference Mode is enabled.")
                     st.caption(
                         "Current values in use: "
-                        f"options={pareto_n_solutions}, breadth={pareto_pop_size}, depth={pareto_n_gen}."
+                        f"options={pareto_n_solutions}, mode={pareto_search_mode_label}, "
+                        f"breadth={pareto_pop_size}, depth={pareto_n_gen}."
                     )
                 else:
                     pareto_n_solutions = st.slider(
-                        "Options to Show",
-                        min_value=1,
-                        max_value=43,
-                        value=int(st.session_state.get("pareto_options_to_show", pareto_n_solutions)),
+                        "Pareto Solutions Displayed",
+                        min_value=5,
+                        max_value=50,
+                        value=_clamp_int(
+                            int(st.session_state.get("pareto_options_to_show", pareto_n_solutions)),
+                            5,
+                            50,
+                        ),
                         step=1,
+                        help="Number of non-dominated trade-off solutions shown in the UI.",
                         key="pareto_options_to_show",
                     )
-                    pareto_pop_size = st.slider(
-                        "Search Breadth",
-                        min_value=10,
-                        max_value=250,
-                        value=int(st.session_state.get("pareto_search_breadth", pareto_pop_size)),
-                        step=1,
-                        key="pareto_search_breadth",
+                    pareto_search_mode = st.radio(
+                        "Search Mode",
+                        ["auto", "manual"],
+                        format_func=lambda mode: (
+                            "Automatic (Recommended)" if mode == "auto" else "Manual (Advanced)"
+                        ),
+                        horizontal=True,
+                        key="pareto_search_mode",
                     )
-                    pareto_n_gen = st.slider(
-                        "Search Depth",
-                        min_value=0,
-                        max_value=500,
-                        value=int(st.session_state.get("pareto_search_depth", pareto_n_gen)),
-                        step=1,
-                        key="pareto_search_depth",
-                    )
+                    if pareto_search_mode == "auto":
+                        pareto_compute_budget = st.slider(
+                            "Compute Budget (evaluations)",
+                            min_value=2_000,
+                            max_value=30_000,
+                            value=_clamp_int(
+                                int(st.session_state.get("pareto_compute_budget", pareto_compute_budget)),
+                                2_000,
+                                30_000,
+                            ),
+                            step=500,
+                            key="pareto_compute_budget",
+                        )
+                        pareto_explore_bias = st.slider(
+                            "Explore vs Refine",
+                            min_value=0,
+                            max_value=100,
+                            value=_clamp_int(
+                                int(st.session_state.get("pareto_explore_bias", pareto_explore_bias)),
+                                0,
+                                100,
+                            ),
+                            step=1,
+                            key="pareto_explore_bias",
+                        )
+                    else:
+                        pareto_pop_size = st.slider(
+                            "Search Breadth (Population)",
+                            min_value=20,
+                            max_value=150,
+                            value=_clamp_int(
+                                int(st.session_state.get("pareto_search_breadth", pareto_pop_size)),
+                                20,
+                                150,
+                            ),
+                            step=1,
+                            key="pareto_search_breadth",
+                        )
+                        pareto_n_gen = st.slider(
+                            "Search Depth (Generations)",
+                            min_value=20,
+                            max_value=200,
+                            value=_clamp_int(
+                                int(st.session_state.get("pareto_search_depth", pareto_n_gen)),
+                                20,
+                                200,
+                            ),
+                            step=1,
+                            key="pareto_search_depth",
+                        )
 
-            pareto_n_solutions = int(st.session_state.get("pareto_options_to_show", pareto_n_solutions))
-            pareto_pop_size = int(st.session_state.get("pareto_search_breadth", pareto_pop_size))
-            pareto_n_gen = int(st.session_state.get("pareto_search_depth", pareto_n_gen))
+            pareto_n_solutions = _clamp_int(
+                int(st.session_state.get("pareto_options_to_show", pareto_n_solutions)),
+                5,
+                50,
+            )
+            pareto_pop_size = _clamp_int(
+                int(st.session_state.get("pareto_search_breadth", pareto_pop_size)),
+                20,
+                150,
+            )
+            pareto_n_gen = _clamp_int(
+                int(st.session_state.get("pareto_search_depth", pareto_n_gen)),
+                20,
+                200,
+            )
+            pareto_search_mode = _normalize_pareto_mode(
+                st.session_state.get("pareto_search_mode", pareto_search_mode)
+            )
+            pareto_compute_budget = _clamp_int(
+                int(st.session_state.get("pareto_compute_budget", pareto_compute_budget)),
+                2_000,
+                30_000,
+            )
+            pareto_explore_bias = _clamp_int(
+                int(st.session_state.get("pareto_explore_bias", pareto_explore_bias)),
+                0,
+                100,
+            )
 
-            approx_evals = pareto_pop_size * (max(pareto_n_gen, 1) + 1)
-            pareto_n_gen_effective = pareto_n_gen
-            if approx_evals > HARD_CAP_EVALS:
-                pareto_n_gen_effective = max(0, math.floor(HARD_CAP_EVALS / pareto_pop_size) - 1)
-                st.warning("The selected search size is large; n_gen will be capped to keep the demo responsive.")
-                st.caption(
-                    f"Note: n_gen was capped to {pareto_n_gen_effective} to keep the demo responsive."
+            if pareto_search_mode == "auto":
+                pareto_pop_size, pareto_n_gen_effective = _derive_auto_pareto_search_params(
+                    pareto_compute_budget,
+                    pareto_explore_bias,
                 )
+                st.caption(f"Computed Population: {pareto_pop_size}.")
+                st.caption(f"Computed Generations: {pareto_n_gen_effective}.")
+                st.caption(f"Estimated evaluations = {pareto_pop_size * pareto_n_gen_effective}.")
+            else:
+                entered_pop_size = pareto_pop_size
+                entered_n_gen = pareto_n_gen
+                pareto_n_gen_effective = entered_n_gen
+                while entered_pop_size * pareto_n_gen_effective > HARD_CAP_EVALS and pareto_n_gen_effective > 20:
+                    pareto_n_gen_effective -= 5
+                if pareto_n_gen_effective != entered_n_gen:
+                    st.warning(
+                        "Manual search exceeded the evaluation cap; generations were adjusted to remain within limit."
+                    )
+                    st.caption(f"Entered: p={entered_pop_size}, g={entered_n_gen}.")
+                    st.caption(f"Effective: p={entered_pop_size}, g={pareto_n_gen_effective}.")
+                st.caption(f"Estimated evaluations = {entered_pop_size * pareto_n_gen_effective}.")
 
             if len(pareto_stakeholder_ids) < 2:
                 st.warning("Select at least 2 stakeholders to enable Pareto generation.")
@@ -1500,17 +1670,38 @@ def main() -> None:
                     if session_key not in st.session_state:
                         st.session_state[session_key] = float(default_scores[dimension])
                 for dimension in UNIFIED_DIMENSIONS:
-                    dimension_scores[dimension] = float(
-                        st.slider(
-                            DIMENSION_DISPLAY_NAMES[dimension],
-                            min_value=LIKERT_MIN,
-                            max_value=LIKERT_MAX,
-                            value=float(st.session_state[f"score_{dimension}"]),
-                            step=0.1,
-                            format="%.1f",
-                            key=f"score_{dimension}",
+                    slider_col, badge_col = st.columns([0.86, 0.14])
+                    with slider_col:
+                        dimension_scores[dimension] = float(
+                            st.slider(
+                                DIMENSION_DISPLAY_NAMES[dimension],
+                                min_value=LIKERT_MIN,
+                                max_value=LIKERT_MAX,
+                                value=float(st.session_state[f"score_{dimension}"]),
+                                step=0.1,
+                                format="%.1f",
+                                key=f"score_{dimension}",
+                            )
                         )
-                    )
+                    with badge_col:
+                        st.markdown(
+                            f"""
+<div style="
+  display:inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(56,189,248,0.15);
+  border: 1px solid rgba(56,189,248,0.55);
+  color: {BRAND_BLUE_HEX};
+  font-weight: 700;
+  text-align: center;
+  min-width: 56px;
+">
+  {dimension_scores[dimension]:.1f}
+</div>
+""",
+                            unsafe_allow_html=True,
+                        )
     else:
         if not case_screenshot_mode:
             selected_framework_text = framework_id or "N/A"
@@ -1895,6 +2086,10 @@ def main() -> None:
             if len(pareto_stakeholder_ids) < 2:
                 st.warning("Please select at least 2 stakeholders.")
                 return
+            st.caption(
+                "Pareto request parameters (effective): "
+                f"n_solutions={pareto_n_solutions}, pop_size={pareto_pop_size}, n_gen={pareto_n_gen_effective}."
+            )
 
             payload = {
                 "ai_system": {
@@ -2140,14 +2335,13 @@ def main() -> None:
 
         st.markdown("### Stakeholder Distance (Lower = Better Alignment)")
         distance_values = [float(selected_objectives.get(stakeholder_id, 0.0)) for stakeholder_id in stakeholder_ids]
-        distance_colors = [_distance_semantic(float(value))[1] for value in distance_values]
         bar_figure = go.Figure(
             data=[
                 go.Bar(
                     x=stakeholder_ids,
                     y=distance_values,
                     name="Distance",
-                    marker={"color": distance_colors},
+                    marker={"color": BRAND_BLUE_HEX},
                 )
             ]
         )
@@ -2787,12 +2981,7 @@ def main() -> None:
                                     for stakeholder_id in case_stakeholder_ids
                                 ],
                                 name="Distance",
-                                marker={
-                                    "color": [
-                                        _distance_semantic(float(rank_1_objectives.get(stakeholder_id, 0.0)))[1]
-                                        for stakeholder_id in case_stakeholder_ids
-                                    ]
-                                },
+                                marker={"color": BRAND_BLUE_HEX},
                             )
                         ]
                     )
