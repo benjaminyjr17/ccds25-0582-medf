@@ -3,7 +3,7 @@
 ## Tag Information
 
 - Tag name: v1.0.1-freeze.
-- Commit SHA: 9dd2461a014edaf168523dc976565f9c9ccc4bf3.
+- Commit SHA: 96b6a4b94b876bd8b96744688d96cf6708b40d19.
 - Freeze date: 2026-02-28.
 - Freeze rationale: presentation/provenance/UI rendering cleanup; no API or computation changes.
 
