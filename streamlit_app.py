@@ -31,6 +31,8 @@ SEM_SUCCESS_HEX = "#22C55E"
 SEM_WARNING_HEX = "#F59E0B"
 SEM_DANGER_HEX = "#EF4444"
 SEM_INFO_HEX = "#38BDF8"
+BRAND_TURQUOISE_HEX = "#27C4B7"
+BRAND_TURQUOISE_FILL_RGBA = "rgba(39, 196, 183, 0.18)"
 SEM_MUTED_HEX = "#9CA3AF"
 SEM_CARD_BG_HEX = "#0F172A"
 SEM_BORDER_HEX = "#1F2937"
@@ -51,6 +53,16 @@ DIMENSION_DISPLAY_NAMES = {
 LIKERT_MIN = 1.0
 LIKERT_MAX = 7.0
 UNICODE_MINUS = "\u2212"
+ENABLE_LIKERT_TRACK_TURQUOISE = True
+DEBUG_SHOW_SLIDER_LABELS = False
+LIKERT_SLIDER_LABELS = [
+    "Transparency and Explainability",
+    "Fairness and Non-discrimination",
+    "Safety and Robustness",
+    "Privacy and Data Governance",
+    "Human Agency and Oversight",
+    "Accountability",
+]
 
 
 def _flip_likert_profile(profile: dict[str, float]) -> dict[str, float]:
@@ -370,15 +382,15 @@ div.stButton > button:hover {{
 }}
 
 .medf-page-nav [data-testid="stRadio"] label {{
-    border: 1px solid rgba(56,189,248,0.35);
+    border: 1px solid rgba(39,196,183,0.35);
     border-radius: 999px;
     padding: 0.25rem 0.68rem;
-    background: rgba(56,189,248,0.08);
+    background: rgba(39,196,183,0.08);
 }}
 
 .medf-page-nav [data-testid="stRadio"] label:hover {{
-    border-color: {BRAND_BLUE_HEX};
-    background: rgba(56,189,248,0.14);
+    border-color: {BRAND_TURQUOISE_HEX};
+    background: rgba(39,196,183,0.14);
 }}
 
 .medf-page-nav [data-testid="stRadio"] label [data-testid="stMarkdownContainer"] p {{
@@ -387,13 +399,13 @@ div.stButton > button:hover {{
 }}
 
 .medf-page-nav [data-testid="stRadio"] label:has(input:checked) {{
-    border-color: {BRAND_BLUE_HEX};
-    background: rgba(56,189,248,0.2);
-    box-shadow: 0 0 0 1px rgba(56,189,248,0.45) inset;
+    border-color: {BRAND_TURQUOISE_HEX};
+    background: rgba(39,196,183,0.2);
+    box-shadow: 0 0 0 1px rgba(39,196,183,0.45) inset;
 }}
 
 .medf-page-nav [data-testid="stRadio"] label:has(input:checked) [data-testid="stMarkdownContainer"] p {{
-    color: {BRAND_BLUE_HEX};
+    color: {BRAND_TURQUOISE_HEX};
 }}
 </style>
 """,
@@ -495,7 +507,7 @@ def _conflict_semantic(level: str, rho: float | None) -> tuple[str, str]:
         if "low" in normalized:
             return "Low", SEM_SUCCESS_HEX
     if rho is None:
-        return "Unavailable", SEM_INFO_HEX
+        return "Unavailable", BRAND_TURQUOISE_HEX
     if rho <= -0.35:
         return "High", SEM_DANGER_HEX
     if rho < 0.15:
@@ -509,7 +521,7 @@ def _conflict_overview(conflict_result: Any) -> dict[str, str]:
     if not isinstance(conflict_result, dict):
         return {
             "value": default_value,
-            "color": SEM_INFO_HEX,
+            "color": BRAND_TURQUOISE_HEX,
             "note": default_note,
             "pair": "N/A",
         }
@@ -540,7 +552,7 @@ def _conflict_overview(conflict_result: Any) -> dict[str, str]:
     if worst is None:
         return {
             "value": default_value,
-            "color": SEM_INFO_HEX,
+            "color": BRAND_TURQUOISE_HEX,
             "note": default_note,
             "pair": "N/A",
         }
@@ -570,10 +582,10 @@ def _conflict_overview(conflict_result: Any) -> dict[str, str]:
 def _consensus_overview(pareto_result: Any) -> dict[str, str]:
     default_overview = {
         "primary_dimension": "N/A.",
-        "primary_dimension_color": SEM_INFO_HEX,
+        "primary_dimension_color": BRAND_TURQUOISE_HEX,
         "primary_dimension_note": "No Pareto solution is currently selected.",
         "divergence": "N/A.",
-        "divergence_color": SEM_INFO_HEX,
+        "divergence_color": BRAND_TURQUOISE_HEX,
         "divergence_note": "No stakeholder distance is currently available.",
     }
     if not isinstance(pareto_result, dict):
@@ -617,7 +629,7 @@ def _consensus_overview(pareto_result: Any) -> dict[str, str]:
         else {}
     )
     divergence = "N/A."
-    divergence_color = SEM_INFO_HEX
+    divergence_color = BRAND_TURQUOISE_HEX
     divergence_note = "No stakeholder distance is currently available."
     if objective_scores:
         stakeholder_id, max_distance = max(objective_scores.items(), key=lambda item: float(item[1]))
@@ -628,7 +640,7 @@ def _consensus_overview(pareto_result: Any) -> dict[str, str]:
 
     return {
         "primary_dimension": primary_dimension,
-        "primary_dimension_color": SEM_INFO_HEX,
+        "primary_dimension_color": BRAND_TURQUOISE_HEX,
         "primary_dimension_note": "Top consensus weight in the selected solution.",
         "divergence": divergence,
         "divergence_color": divergence_color,
@@ -642,7 +654,7 @@ def _build_executive_kpis() -> list[dict[str, str]]:
     pareto_result = st.session_state.get("pareto_result")
 
     score_value = "N/A."
-    score_color = SEM_INFO_HEX
+    score_color = BRAND_TURQUOISE_HEX
     score_note = "No evaluation score is currently available."
     if isinstance(evaluate_result, dict) and isinstance(evaluate_result.get("overall_score"), (int, float)):
         overall_score = float(evaluate_result["overall_score"])
@@ -709,7 +721,7 @@ def _render_kpi_strip(cards: list[dict[str, str]]) -> None:
         label = escape(safe_str(card.get("label", "")).upper())
         value = escape(safe_str(card.get("value", "N/A.")))
         note = escape(safe_str(card.get("note", "")))
-        color = escape(safe_str(card.get("color", SEM_INFO_HEX)))
+        color = escape(safe_str(card.get("color", BRAND_TURQUOISE_HEX)))
         columns[index].markdown(
             f"""
 <div class="medf-kpi-card" style="--kpi-accent:{color};">
@@ -971,6 +983,38 @@ def _normalize_pareto_mode(value: Any) -> str:
     return "auto"
 
 
+def _inject_likert_track_turquoise_css() -> bool:
+    if not ENABLE_LIKERT_TRACK_TURQUOISE:
+        return False
+    progress_selectors: list[str] = []
+    thumb_selectors: list[str] = []
+    for label in LIKERT_SLIDER_LABELS:
+        safe_label = label.replace('"', '\\"')
+        gated_prefix = f'div:has([aria-label="{safe_label}"])'
+        progress_selectors.append(
+            f'{gated_prefix} [data-baseweb="slider"] div[role="progressbar"]'
+        )
+        thumb_selectors.append(
+            f'{gated_prefix} [data-baseweb="slider"] [role="slider"]'
+        )
+    st.markdown(
+        f"""
+<style>
+{", ".join(progress_selectors)} {{
+    background-color: {BRAND_TURQUOISE_HEX} !important;
+}}
+
+{", ".join(thumb_selectors)} {{
+    background-color: {BRAND_TURQUOISE_HEX} !important;
+    border-color: {BRAND_TURQUOISE_HEX} !important;
+}}
+</style>
+""",
+        unsafe_allow_html=True,
+    )
+    return True
+
+
 def _derive_auto_pareto_search_params(budget: int, bias: int) -> tuple[int, int]:
     explore_weight = float(bias) / 100.0
     p_raw = 40 + (140 - 40) * explore_weight
@@ -1126,8 +1170,8 @@ def _build_radar_chart(
             theta=radar_labels_closed,
             fill="toself",
             name=title_text,
-            line={"color": BRAND_BLUE_HEX, "width": 2},
-            fillcolor=BRAND_BLUE_FILL_RGBA,
+            line={"color": BRAND_TURQUOISE_HEX, "width": 2},
+            fillcolor=BRAND_TURQUOISE_FILL_RGBA,
         )
     )
     figure.update_layout(
@@ -1365,7 +1409,7 @@ def main() -> None:
                     for dimension in UNIFIED_DIMENSIONS
                 }
 
-            override_weights = st.checkbox("Override stakeholder weights", value=False)
+            override_weights = st.checkbox("Override Stakeholder Weights", value=False)
             weights_for_request = dict(base_weights)
             if override_weights:
                 st.caption("Custom weights (auto-normalized before submission)")
@@ -1392,7 +1436,7 @@ def main() -> None:
                     st.error("Weight sum cannot be zero.")
                     weights_for_request = {}
             else:
-                st.caption(f"Using stakeholder default weights (sum: {sum(base_weights.values()):.4f})")
+                st.caption(f"Using stakeholder default weights (sum: {sum(base_weights.values()):.4f}).")
         elif page == "Conflict Detection":
             st.markdown("**Stakeholders**")
             if stakeholder_options:
@@ -1658,12 +1702,15 @@ def main() -> None:
         with input_card:
             col_left, col_right = st.columns([1, 1])
             with col_left:
-                ai_system_id = st.text_input("AI system id", value=ai_system_id)
-                ai_system_name = st.text_input("AI system name", value=ai_system_name)
-                ai_system_description = st.text_area("AI system description", value=ai_system_description)
+                ai_system_id = st.text_input("AI System ID", value=ai_system_id)
+                ai_system_name = st.text_input("AI System Name", value=ai_system_name)
+                ai_system_description = st.text_area("AI System Description", value=ai_system_description)
 
             with col_right:
                 st.subheader("Dimension Scores (Likert 1–7)")
+                likert_slider_css_enabled = _inject_likert_track_turquoise_css()
+                if DEBUG_SHOW_SLIDER_LABELS:
+                    st.caption(f"Likert slider CSS enabled: {likert_slider_css_enabled}")
                 st.markdown(
                     f"""
 <style>
@@ -1677,7 +1724,7 @@ def main() -> None:
 .medf-likert-fill {{
   height: 100%;
   border-radius: 999px;
-  background: {BRAND_BLUE_HEX};
+  background: {BRAND_TURQUOISE_HEX};
 }}
 </style>
 """,
@@ -1731,9 +1778,9 @@ def main() -> None:
   display:inline-block;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(56,189,248,0.15);
-  border: 1px solid rgba(56,189,248,0.55);
-  color: {BRAND_BLUE_HEX};
+  background: rgba(39,196,183,0.15);
+  border: 1px solid rgba(39,196,183,0.55);
+  color: {BRAND_TURQUOISE_HEX};
   font-weight: 700;
   text-align: center;
   min-width: 56px;
@@ -1823,7 +1870,7 @@ def main() -> None:
                     st.metric("Overall Ethical Score", fmt_score(overall_score))
                 with label_col:
                     st.markdown(
-                        f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Conflict posture: {label}</span>",
+                        f"<span style='color:{color};font-size:1.1rem;font-weight:600;'>Conflict Posture {label}</span>",
                         unsafe_allow_html=True,
                     )
 
@@ -1849,8 +1896,8 @@ def main() -> None:
                         theta=radar_labels_closed,
                         fill="toself",
                         name=framework_trace_name,
-                        line={"color": BRAND_BLUE_HEX, "width": 2},
-                        fillcolor=BRAND_BLUE_FILL_RGBA,
+                        line={"color": BRAND_TURQUOISE_HEX, "width": 2},
+                        fillcolor=BRAND_TURQUOISE_FILL_RGBA,
                     )
                 )
                 fig.update_layout(
@@ -2337,8 +2384,8 @@ def main() -> None:
         st.markdown("### Consensus Weights Radar")
         st.markdown(
             "Weights shown are derived from backend "
-            f"<code style='color:{BRAND_BLUE_HEX};'>/api/pareto</code> output "
-            f"(<code style='color:{BRAND_BLUE_HEX};'>pareto_solutions[*].weights.consensus</code>): "
+            f"<code style='color:{BRAND_TURQUOISE_HEX};'>/api/pareto</code> output "
+            f"(<code style='color:{BRAND_TURQUOISE_HEX};'>pareto_solutions[*].weights.consensus</code>): "
             "candidate consensus vectors are simplex-normalized and selected using salience-weighted "
             "distance objectives against stakeholder weight vectors.",
             unsafe_allow_html=True,
@@ -2357,8 +2404,8 @@ def main() -> None:
                 theta=radar_labels_closed,
                 fill="toself",
                 name=solution_trace_name,
-                line={"color": BRAND_BLUE_HEX, "width": 2},
-                fillcolor=BRAND_BLUE_FILL_RGBA,
+                line={"color": BRAND_TURQUOISE_HEX, "width": 2},
+                fillcolor=BRAND_TURQUOISE_FILL_RGBA,
             )
         )
         radar_figure.update_layout(
@@ -2376,13 +2423,14 @@ def main() -> None:
 
         st.markdown("### Stakeholder Distance (Lower = Better Alignment)")
         distance_values = [float(selected_objectives.get(stakeholder_id, 0.0)) for stakeholder_id in stakeholder_ids]
+        distance_colors = [_distance_semantic(float(value))[1] for value in distance_values]
         bar_figure = go.Figure(
             data=[
                 go.Bar(
                     x=stakeholder_ids,
                     y=distance_values,
                     name="Distance",
-                    marker={"color": BRAND_BLUE_HEX},
+                    marker={"color": distance_colors},
                 )
             ]
         )
@@ -3002,8 +3050,8 @@ def main() -> None:
                     )
                     st.markdown(
                         "Weights shown are derived from backend "
-                        f"<code style='color:{BRAND_BLUE_HEX};'>/api/pareto</code> output "
-                        f"(<code style='color:{BRAND_BLUE_HEX};'>pareto_solutions[*].weights.consensus</code>) "
+                        f"<code style='color:{BRAND_TURQUOISE_HEX};'>/api/pareto</code> output "
+                        f"(<code style='color:{BRAND_TURQUOISE_HEX};'>pareto_solutions[*].weights.consensus</code>) "
                         "and are displayed without UI-side reweighting.",
                         unsafe_allow_html=True,
                     )
@@ -3022,7 +3070,12 @@ def main() -> None:
                                     for stakeholder_id in case_stakeholder_ids
                                 ],
                                 name="Distance",
-                                marker={"color": BRAND_BLUE_HEX},
+                                marker={
+                                    "color": [
+                                        _distance_semantic(float(rank_1_objectives.get(stakeholder_id, 0.0)))[1]
+                                        for stakeholder_id in case_stakeholder_ids
+                                    ]
+                                },
                             )
                         ]
                     )
