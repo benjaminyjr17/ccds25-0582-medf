@@ -33,6 +33,8 @@ SEM_DANGER_HEX = "#EF4444"
 SEM_INFO_HEX = "#38BDF8"
 BRAND_TURQUOISE_HEX = "#27C4B7"
 BRAND_TURQUOISE_FILL_RGBA = "rgba(39, 196, 183, 0.18)"
+BRAND_GREEN_HEX = "#22C55E"
+BRAND_GREEN_FILL_RGBA = "rgba(34, 197, 94, 0.18)"
 SEM_MUTED_HEX = "#9CA3AF"
 SEM_CARD_BG_HEX = "#0F172A"
 SEM_BORDER_HEX = "#1F2937"
@@ -62,6 +64,13 @@ LIKERT_SLIDER_LABELS = [
     "Privacy and Data Governance",
     "Human Agency and Oversight",
     "Accountability",
+]
+ADVANCED_SLIDER_LABELS = [
+    "Pareto Solutions Displayed",
+    "Compute Budget (evaluations)",
+    "Explore vs. Refine",
+    "Search Breadth (Population)",
+    "Search Depth (Generations)",
 ]
 
 
@@ -988,6 +997,7 @@ def _inject_likert_track_turquoise_css() -> bool:
         return False
     progress_selectors: list[str] = []
     thumb_selectors: list[str] = []
+    value_label_selectors: list[str] = []
     for label in LIKERT_SLIDER_LABELS:
         safe_label = label.replace('"', '\\"')
         gated_prefix = f'div:has([aria-label="{safe_label}"])'
@@ -996,6 +1006,13 @@ def _inject_likert_track_turquoise_css() -> bool:
         )
         thumb_selectors.append(
             f'{gated_prefix} [data-baseweb="slider"] [role="slider"]'
+        )
+        value_label_selectors.extend(
+            [
+                f'{gated_prefix} [data-baseweb="slider"] [role="slider"] + div',
+                f'{gated_prefix} [data-baseweb="slider"] [data-testid="stSliderThumbValue"]',
+                f'{gated_prefix} [data-baseweb="slider"] [class*="thumbValue"]',
+            ]
         )
     st.markdown(
         f"""
@@ -1008,11 +1025,56 @@ def _inject_likert_track_turquoise_css() -> bool:
     background-color: {BRAND_TURQUOISE_HEX} !important;
     border-color: {BRAND_TURQUOISE_HEX} !important;
 }}
+
+{", ".join(value_label_selectors)} {{
+    color: {BRAND_TURQUOISE_HEX} !important;
+}}
 </style>
 """,
         unsafe_allow_html=True,
     )
     return True
+
+
+def _inject_advanced_slider_green_css() -> None:
+    progress_selectors: list[str] = []
+    thumb_selectors: list[str] = []
+    value_label_selectors: list[str] = []
+    for label in ADVANCED_SLIDER_LABELS:
+        safe_label = label.replace('"', '\\"')
+        gated_prefix = f'div:has([aria-label="{safe_label}"])'
+        progress_selectors.append(
+            f'{gated_prefix} [data-baseweb="slider"] div[role="progressbar"]'
+        )
+        thumb_selectors.append(
+            f'{gated_prefix} [data-baseweb="slider"] [role="slider"]'
+        )
+        value_label_selectors.extend(
+            [
+                f'{gated_prefix} [data-baseweb="slider"] [role="slider"] + div',
+                f'{gated_prefix} [data-baseweb="slider"] [data-testid="stSliderThumbValue"]',
+                f'{gated_prefix} [data-baseweb="slider"] [class*="thumbValue"]',
+            ]
+        )
+    st.markdown(
+        f"""
+<style>
+{", ".join(progress_selectors)} {{
+    background-color: {BRAND_GREEN_HEX} !important;
+}}
+
+{", ".join(thumb_selectors)} {{
+    background-color: {BRAND_GREEN_HEX} !important;
+    border-color: {BRAND_GREEN_HEX} !important;
+}}
+
+{", ".join(value_label_selectors)} {{
+    color: {BRAND_GREEN_HEX} !important;
+}}
+</style>
+""",
+        unsafe_allow_html=True,
+    )
 
 
 def _derive_auto_pareto_search_params(budget: int, bias: int) -> tuple[int, int]:
@@ -1505,8 +1567,9 @@ def main() -> None:
 
             st.markdown("**Presets**")
             pareto_preset = st.radio(
-                "Search profile",
+                "Search Profile",
                 list(PARETO_PRESETS.keys()),
+                format_func=lambda key: "Deep" if key == "Thorough" else key,
                 horizontal=True,
                 key="pareto_preset_choice",
             )
@@ -1515,7 +1578,7 @@ def main() -> None:
             if pareto_preset == "Standard":
                 st.caption("Standard balances runtime and coverage.")
             else:
-                st.caption("Thorough increases search depth for higher exploration.")
+                st.caption("Deep increases search depth for higher exploration.")
 
             pareto_n_solutions = int(
                 st.session_state.get("pareto_options_to_show", preset_values["n_solutions"])
@@ -1537,6 +1600,7 @@ def main() -> None:
             pareto_explore_bias = int(st.session_state.get("pareto_explore_bias", 60))
             pareto_n_gen_effective = pareto_n_gen
 
+            _inject_advanced_slider_green_css()
             with st.expander("Advanced Settings", expanded=False):
                 if conference_mode:
                     st.caption("Advanced settings are hidden while Conference Mode is enabled.")
@@ -1711,25 +1775,6 @@ def main() -> None:
                 likert_slider_css_enabled = _inject_likert_track_turquoise_css()
                 if DEBUG_SHOW_SLIDER_LABELS:
                     st.caption(f"Likert slider CSS enabled: {likert_slider_css_enabled}")
-                st.markdown(
-                    f"""
-<style>
-.medf-likert-row {{ position: relative; margin-top: 2px; margin-bottom: -10px; }}
-.medf-likert-rail {{
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.12);
-  overflow: hidden;
-}}
-.medf-likert-fill {{
-  height: 100%;
-  border-radius: 999px;
-  background: {BRAND_TURQUOISE_HEX};
-}}
-</style>
-""",
-                    unsafe_allow_html=True,
-                )
                 if page in {"Conflict Detection", "Pareto Resolution"}:
                     preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
                     if preset_col_1.button("Preset: Baseline (3.5,3.0,5.5,4.5,3.5,5.0)"):
@@ -1748,18 +1793,6 @@ def main() -> None:
                     slider_col, badge_col = st.columns([0.86, 0.14])
                     with slider_col:
                         current_value = float(st.session_state[f"score_{dimension}"])
-                        norm = (current_value - LIKERT_MIN) / (LIKERT_MAX - LIKERT_MIN)
-                        pct = int(round(max(0.0, min(1.0, norm)) * 100))
-                        st.markdown(
-                            f"""
-<div class="medf-likert-row">
-  <div class="medf-likert-rail">
-    <div class="medf-likert-fill" style="width: {pct}%;"></div>
-  </div>
-</div>
-""",
-                            unsafe_allow_html=True,
-                        )
                         dimension_scores[dimension] = float(
                             st.slider(
                                 DIMENSION_DISPLAY_NAMES[dimension],
@@ -2423,14 +2456,13 @@ def main() -> None:
 
         st.markdown("### Stakeholder Distance (Lower = Better Alignment)")
         distance_values = [float(selected_objectives.get(stakeholder_id, 0.0)) for stakeholder_id in stakeholder_ids]
-        distance_colors = [_distance_semantic(float(value))[1] for value in distance_values]
         bar_figure = go.Figure(
             data=[
                 go.Bar(
                     x=stakeholder_ids,
                     y=distance_values,
                     name="Distance",
-                    marker={"color": distance_colors},
+                    marker={"color": BRAND_TURQUOISE_HEX},
                 )
             ]
         )
@@ -3070,12 +3102,7 @@ def main() -> None:
                                     for stakeholder_id in case_stakeholder_ids
                                 ],
                                 name="Distance",
-                                marker={
-                                    "color": [
-                                        _distance_semantic(float(rank_1_objectives.get(stakeholder_id, 0.0)))[1]
-                                        for stakeholder_id in case_stakeholder_ids
-                                    ]
-                                },
+                                marker={"color": BRAND_TURQUOISE_HEX},
                             )
                         ]
                     )
