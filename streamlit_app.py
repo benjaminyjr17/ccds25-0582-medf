@@ -1276,15 +1276,12 @@ def _inject_slider_fill_color_patcher() -> None:
         const cs = hostWin.getComputedStyle(node);
         const bgColor = normalizeText(cs.backgroundColor);
         const bgImage = normalizeText(cs.backgroundImage);
-        const role = normalizeText(node.getAttribute("role"));
-        const hasPaint = (!isTransparentColor(bgColor)) || bgImage !== "none" || role === "progressbar";
         return {{
           node,
           width: rect.width,
           height: rect.height,
           bgColor,
           bgImage,
-          hasPaint,
         }};
       }})
       .filter((entry) => (
@@ -1292,7 +1289,6 @@ def _inject_slider_fill_color_patcher() -> None:
         && entry.height > 0
         && entry.width >= 80
         && entry.height <= 40
-        && entry.hasPaint
       ));
   }};
 
@@ -1377,7 +1373,6 @@ def _inject_slider_fill_color_patcher() -> None:
     const fullWidth = trackish.filter(
       (entry) => maxW > 0
         && entry.width >= maxW * 0.99
-        && (entry.bgImage !== "none" || !isTransparentColor(entry.bgColor))
     );
 
     const viewportWidth = Math.max(1, Number(hostWin.innerWidth) || 1);
@@ -1579,7 +1574,6 @@ def _inject_slider_fill_color_patcher() -> None:
     const maxW = Math.max(...trackish.map((entry) => entry.width));
     const fullWidth = trackish.filter(
       (entry) => entry.width >= maxW * 0.99
-        && (entry.bgImage !== "none" || !isTransparentColor(entry.bgColor))
     );
     if (fullWidth.length === 0) {{
       scheduleInvestigateReport(label, "post-patch:no-fullwidth");
