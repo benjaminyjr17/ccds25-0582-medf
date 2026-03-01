@@ -1292,7 +1292,7 @@ def _inject_slider_find_test(label: str) -> None:
 (function () {
   const parentWin = window.parent && window.parent.document ? window.parent : window;
   const parentDoc = parentWin.document || document;
-  const doc = parentDoc || document;
+  const docCtx = parentDoc || document;
   const panel = parentDoc.getElementById("medf-panel");
   if (!panel) return;
   const label = __LABEL_JSON__;
@@ -1343,22 +1343,43 @@ def _inject_slider_find_test(label: str) -> None:
     return chain;
   };
 
-  const clampX = (x) => {
-    const width = Math.max(2, (doc.documentElement && doc.documentElement.clientWidth) || parentWin.innerWidth || 2);
-    return Math.max(1, Math.min(width - 1, Math.round(x)));
-  };
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, Math.round(v)));
 
-  const clampY = (y) => {
-    const height = Math.max(2, (doc.documentElement && doc.documentElement.clientHeight) || parentWin.innerHeight || 2);
-    return Math.max(1, Math.min(height - 1, Math.round(y)));
+  const viewportWidth = Math.max(
+    2,
+    (docCtx.documentElement && docCtx.documentElement.clientWidth) || parentWin.innerWidth || 2
+  );
+  const viewportHeight = Math.max(
+    2,
+    (docCtx.documentElement && docCtx.documentElement.clientHeight) || parentWin.innerHeight || 2
+  );
+  const clampX = (x) => clamp(x, 1, viewportWidth - 1);
+  const clampY = (y) => clamp(y, 1, viewportHeight - 1);
+
+  const ensurePanel = (text, success) => {
+    panel.style.whiteSpace = "pre-wrap";
+    panel.style.pointerEvents = "none";
+    panel.textContent = text;
+    if (success) {
+      panel.style.background = "rgba(22,163,74,0.22)";
+      panel.style.borderColor = "#16a34a";
+      panel.style.color = "#dcfce7";
+    } else {
+      panel.style.background = "rgba(220,38,38,0.22)";
+      panel.style.borderColor = "#dc2626";
+      panel.style.color = "#fee2e2";
+    }
   };
 
   const patch = () => {
-    const allSliders = Array.from(doc.querySelectorAll('[role="slider"]'));
-    const nodes = doc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
+    const allSliders = Array.from(docCtx.querySelectorAll('[role="slider"]'));
+    const nodes = docCtx.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
     const smokeRunning = parentWin.__MEDF_JS_SMOKE__ === true;
     const isTargetLabel = label === "Fairness and Non-discrimination";
     const slider = nodes[0] || null;
+    const container = slider
+      ? (slider.closest('[data-baseweb="slider"]') || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]')))
+      : null;
 
     let text = "MEDF JS SMOKE PANEL: SCRIPT RAN";
     text += '\\nTotal [role="slider"] count: ' + allSliders.length;
@@ -1368,7 +1389,7 @@ def _inject_slider_find_test(label: str) -> None:
     }
 
     if (nodes.length === 0) {
-      const discovered = Array.from(parentDoc.querySelectorAll('[role="slider"][aria-label]'))
+      const discovered = Array.from(docCtx.querySelectorAll('[role="slider"][aria-label]'))
         .map((node) => node.getAttribute("aria-label") || "")
         .filter((value) => value.length > 0)
         .slice(0, 15);
@@ -1377,45 +1398,43 @@ def _inject_slider_find_test(label: str) -> None:
 
     if (!isTargetLabel) {
       text += '\\nHIT TEST RESULTS: skipped (non-target label)';
-      panel.style.whiteSpace = "pre-wrap";
-      panel.style.pointerEvents = "none";
-      panel.textContent = text;
-      panel.style.background = "rgba(22,163,74,0.22)";
-      panel.style.borderColor = "#16a34a";
-      panel.style.color = "#dcfce7";
+      ensurePanel(text, true);
       return;
     }
 
     if (!slider) {
       text += '\\nHIT TEST RESULTS: no target slider found';
-      panel.style.whiteSpace = "pre-wrap";
-      panel.style.pointerEvents = "none";
-      panel.textContent = text;
-      panel.style.background = "rgba(220,38,38,0.22)";
-      panel.style.borderColor = "#dc2626";
-      panel.style.color = "#fee2e2";
+      ensurePanel(text, false);
       return;
     }
 
-    const r = slider.getBoundingClientRect();
+    if (!container) {
+      text += '\\nFill root found: no (container not found)';
+      ensurePanel(text, false);
+      return;
+    }
+
+    const r = container.getBoundingClientRect();
     const x1 = clampX(r.left + 10);
     const x2 = clampX(r.left + r.width / 2);
     const x3 = clampX(r.right - 10);
-    const y1 = clampY(r.top + r.height / 2);
-    const y2 = clampY(r.top + r.height * 0.80);
-    const y3 = clampY(r.top + r.height * 0.20);
+    const yA = clampY(r.top + r.height * 0.5);
+    const yB = clampY(r.top + r.height * 0.75);
     const points = [
-      { x: x1, y: y1 },
-      { x: x2, y: y1 },
-      { x: x3, y: y1 },
-      { x: x2, y: y2 },
-      { x: x2, y: y3 },
+      { x: x1, y: yA },
+      { x: x2, y: yA },
+      { x: x3, y: yA },
+      { x: x1, y: yB },
+      { x: x2, y: yB },
+      { x: x3, y: yB },
     ];
 
     const lines = [];
     let bgAppliedAny = false;
+    text += `\\nContainer rect: left=${Math.round(r.left)}, top=${Math.round(r.top)}, width=${Math.round(r.width)}, height=${Math.round(r.height)}`;
+    text += `\\nSample coordinates: (${x1},${yA}), (${x2},${yA}), (${x3},${yA}), (${x1},${yB}), (${x2},${yB}), (${x3},${yB})`;
     points.forEach((point, index) => {
-      const hit = (doc.elementFromPoint && doc.elementFromPoint(point.x, point.y)) ||
+      const hit = (docCtx.elementFromPoint && docCtx.elementFromPoint(point.x, point.y)) ||
         (document.elementFromPoint && document.elementFromPoint(point.x, point.y));
       if (!hit || !(hit instanceof HTMLElement)) {
         lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): none`);
@@ -1445,18 +1464,7 @@ def _inject_slider_find_test(label: str) -> None:
     text += "\\nHIT TEST RESULTS:";
     text += "\\n" + lines.join("\\n");
 
-    panel.style.whiteSpace = "pre-wrap";
-    panel.style.pointerEvents = "none";
-    panel.textContent = text;
-    if (bgAppliedAny) {
-      panel.style.background = "rgba(22,163,74,0.22)";
-      panel.style.borderColor = "#16a34a";
-      panel.style.color = "#dcfce7";
-    } else {
-      panel.style.background = "rgba(220,38,38,0.22)";
-      panel.style.borderColor = "#dc2626";
-      panel.style.color = "#fee2e2";
-    }
+    ensurePanel(text, bgAppliedAny);
   };
 
   if (!parentWin.__MEDF_HITTEST_THROTTLE__) {
