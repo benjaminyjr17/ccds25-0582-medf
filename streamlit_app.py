@@ -57,8 +57,6 @@ LIKERT_MIN = 1.0
 LIKERT_MAX = 7.0
 UNICODE_MINUS = "\u2212"
 ENABLE_LIKERT_TRACK_TURQUOISE = True
-DEBUG_SHOW_SLIDER_LABELS = False
-DEBUG_SLIDER_FILL_PATCHER = False
 LIKERT_SLIDER_LABELS = [
     "Transparency and Explainability",
     "Fairness and Non-discrimination",
@@ -1012,7 +1010,7 @@ def _normalize_pareto_mode(value: Any) -> str:
     return "auto"
 
 
-def _inject_likert_track_turquoise_css() -> bool:
+def _inject_likert_thumb_value_turquoise_css(enable_progress_track: bool = True) -> bool:
     if not ENABLE_LIKERT_TRACK_TURQUOISE:
         return False
     progress_selectors: list[str] = []
@@ -1039,13 +1037,18 @@ def _inject_likert_track_turquoise_css() -> bool:
                 f'{slider_scope} [class*="thumbValue"]',
             ]
         )
+    progress_block = ""
+    if enable_progress_track:
+        progress_block = f"""
+{", ".join(progress_selectors)} {{
+    background-color: {BRAND_TURQUOISE_HEX} !important;
+}}
+"""
     st.markdown(
         f"""
 <style>
 /* Thumb value-label selectors: [role="slider"] + div, [data-testid="stSliderThumbValue"], [class*="thumbValue"] */
-{", ".join(progress_selectors)} {{
-    background-color: {BRAND_TURQUOISE_HEX} !important;
-}}
+{progress_block}
 
 {", ".join(thumb_selectors)} {{
     background-color: {BRAND_TURQUOISE_HEX} !important;
@@ -1060,6 +1063,10 @@ def _inject_likert_track_turquoise_css() -> bool:
         unsafe_allow_html=True,
     )
     return True
+
+
+def _inject_likert_track_turquoise_css() -> bool:
+    return _inject_likert_thumb_value_turquoise_css(enable_progress_track=True)
 
 
 def _inject_advanced_slider_green_css() -> None:
@@ -1109,35 +1116,16 @@ def _inject_advanced_slider_green_css() -> None:
     )
 
 
-def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
-    panel_html = ""
-    if debug_enabled:
-        panel_html = """
-<div id="medf-slider-fill-panel" style="
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  font-size: 13px;
-  line-height: 1.35;
-  border: 2px solid #0f766e;
-  border-radius: 8px;
-  padding: 10px;
-  background: rgba(15, 118, 110, 0.12);
-  color: #052e2b;
-  white-space: pre-wrap;
-">Likert fill patcher debug: initializing...</div>
-"""
+def _inject_slider_fill_color_patcher() -> None:
     # Root cause: Streamlit/BaseWeb slider fill nodes can shift across rerenders and are not
     # consistently targetable with static CSS selectors alone; apply a scoped runtime patcher.
     components.html(
         f"""
-<div id="medf-sentinel"></div>
-{panel_html}
+<div id='medf-sentinel'></div>
 <script>
 (function () {{
-  const DEBUG = {str(debug_enabled).lower()};
   const TURQ = "{BRAND_TURQUOISE_HEX}";
   const LIKERT_LABELS = {json.dumps(LIKERT_SLIDER_LABELS)};
-  const iframeDoc = document;
-  const debugPanel = DEBUG ? iframeDoc.getElementById("medf-slider-fill-panel") : null;
 
   let hostWin = window;
   let hostDoc = document;
@@ -1153,15 +1141,35 @@ def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
     hostDoc = document;
     hostAccess = false;
   }}
+  if (!hostAccess) return;
 
   if (!hostWin.__medfLikertFillPatchState) {{
     hostWin.__medfLikertFillPatchState = {{ wired: false, observer: null, pending: false, timer: null }};
   }}
   const state = hostWin.__medfLikertFillPatchState;
 
-  const writeDebug = (lines) => {{
-    if (!DEBUG || !debugPanel) return;
-    debugPanel.textContent = lines.join("\\n");
+  const normalizeText = (value) => String(value || "").trim().toLowerCase();
+
+  const isTransparentColor = (value) => {{
+    const normalized = normalizeText(value);
+    return (
+      !normalized
+      || normalized === "transparent"
+      || normalized === "rgba(0, 0, 0, 0)"
+      || normalized === "rgba(0,0,0,0)"
+    );
+  }};
+
+  const parseRgb = (value) => {{
+    const match = String(value || "").match(/rgba?\\(\\s*([\\d.]+)\\s*,\\s*([\\d.]+)\\s*,\\s*([\\d.]+)/i);
+    if (!match) return null;
+    return {{ r: Number(match[1]), g: Number(match[2]), b: Number(match[3]) }};
+  }};
+
+  const isGreenDominant = (value) => {{
+    const rgb = parseRgb(value);
+    if (!rgb) return false;
+    return rgb.g > rgb.r && rgb.g > rgb.b;
   }};
 
   const cssEscape = (value) => {{
@@ -1185,33 +1193,128 @@ def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
     return null;
   }};
 
-  const isTrackLike = (node) => {{
-    if (!node) return false;
-    const rect = node.getBoundingClientRect();
-    return rect.width > 0 && rect.height > 0 && rect.height <= 28;
+  const mostFrequentColor = (entries) => {{
+    const counts = new Map();
+    entries.forEach((entry) => {{
+      const key = normalizeText(entry.bgColor);
+      if (!key || isTransparentColor(key)) return;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }});
+    let bestKey = "";
+    let bestCount = -1;
+    counts.forEach((count, key) => {{
+      if (count > bestCount) {{
+        bestKey = key;
+        bestCount = count;
+      }}
+    }});
+    return bestKey || null;
   }};
 
   const selectFilled = (root) => {{
-    if (!root) return null;
-    const progressbars = Array.from(root.querySelectorAll('[role="progressbar"]')).filter(isTrackLike);
-    if (progressbars.length === 1) return progressbars[0];
+    if (!root) return {{ best: null, maxW: 0 }};
+    const trackish = Array.from(root.querySelectorAll("div"))
+      .map((node) => {{
+        const rect = node.getBoundingClientRect();
+        const cs = hostWin.getComputedStyle(node);
+        return {{
+          node,
+          width: rect.width,
+          height: rect.height,
+          bgColor: normalizeText(cs.backgroundColor),
+          bgImage: normalizeText(cs.backgroundImage),
+        }};
+      }})
+      .filter((entry) => entry.width > 0 && entry.height > 0 && entry.height <= 28 && entry.width >= 80);
 
-    const widthCandidates = Array.from(root.querySelectorAll('div[style*="width"]')).filter((node) => {{
-      const styleAttr = (node.getAttribute("style") || "").toLowerCase();
-      return styleAttr.includes("%") && isTrackLike(node);
+    if (trackish.length === 0) return {{ best: null, maxW: 0 }};
+
+    const maxW = Math.max(...trackish.map((entry) => entry.width));
+    const fullTrackish = trackish.filter((entry) => entry.width >= maxW * 0.99);
+    const unfilledBg = mostFrequentColor(fullTrackish);
+
+    const filledCandidates = trackish.filter((entry) => {{
+      if (entry.width >= maxW * 0.99) return false;
+      const hasPaint = (!isTransparentColor(entry.bgColor)) || (entry.bgImage !== "none");
+      if (!hasPaint) return false;
+      if (unfilledBg && entry.bgColor === unfilledBg) return false;
+      return true;
     }});
-    if (widthCandidates.length > 0) {{
-      widthCandidates.sort((a, b) => (a.offsetHeight - b.offsetHeight) || (b.offsetWidth - a.offsetWidth));
-      return widthCandidates[0];
+
+    if (filledCandidates.length === 0) {{
+      return {{ best: null, maxW }};
     }}
 
-    const transformCandidates = Array.from(root.querySelectorAll('div[style*="transform"]')).filter(isTrackLike);
-    if (transformCandidates.length > 0) {{
-      transformCandidates.sort((a, b) => (a.offsetHeight - b.offsetHeight) || (b.offsetWidth - a.offsetWidth));
-      return transformCandidates[0];
-    }}
+    const greenPreferred = filledCandidates.filter((entry) => isGreenDominant(entry.bgColor));
+    const pool = greenPreferred.length > 0 ? greenPreferred : filledCandidates;
+    pool.sort((a, b) => b.width - a.width);
+    return {{ best: pool[0].node, maxW }};
+  }};
 
-    return null;
+  const getAriaPercent = (handle) => {{
+    const v = parseFloat(handle.getAttribute("aria-valuenow"));
+    const vmin = parseFloat(handle.getAttribute("aria-valuemin"));
+    const vmax = parseFloat(handle.getAttribute("aria-valuemax"));
+    if (Number.isNaN(v) || Number.isNaN(vmin) || Number.isNaN(vmax) || vmax <= vmin) {{
+      return {{ ok: false, pct: null }};
+    }}
+    const rawPct = ((v - vmin) / (vmax - vmin)) * 100;
+    const pct = Math.max(0, Math.min(100, rawPct));
+    return {{ ok: true, pct }};
+  }};
+
+  const getFullTrackCandidate = (root, maxW) => {{
+    if (!root || !maxW || maxW <= 0) return null;
+    const trackish = Array.from(root.querySelectorAll("div"))
+      .map((node) => {{
+        const rect = node.getBoundingClientRect();
+        const cs = hostWin.getComputedStyle(node);
+        const bg = cs.backgroundColor || "transparent";
+        const bgImg = cs.backgroundImage || "none";
+        const opRaw = Number.parseFloat(cs.opacity || "1");
+        const op = Number.isNaN(opRaw) ? 1 : opRaw;
+        const pe = cs.pointerEvents || "auto";
+        let score = 0;
+        if (normalizeText(bgImg).includes("gradient")) score += 4;
+        if (normalizeText(bgImg) !== "none") score += 3;
+        if (!isTransparentColor(bg)) score += 2;
+        if (normalizeText(pe) !== "none") score += 2;
+        if (op >= 0.9) score += 1;
+        score += Math.max(0, (28 - rect.height) / 28);
+        return {{
+          node,
+          width: rect.width,
+          height: rect.height,
+          opacity: op,
+          score,
+        }};
+      }})
+      .filter((entry) => entry.width > 0 && entry.height > 0 && entry.height <= 28 && entry.width >= 80);
+
+    const ranked = trackish
+      .filter((entry) => entry.width >= maxW * 0.99 && entry.height >= 2 && entry.height <= 28)
+      .sort((a, b) => {{
+        if (b.score !== a.score) return b.score - a.score;
+        if (b.opacity !== a.opacity) return b.opacity - a.opacity;
+        return a.height - b.height;
+      }});
+    return ranked.length > 0 ? ranked[0].node : null;
+  }};
+
+  const patchGradientTrack = (track, pct) => {{
+    if (!track || typeof pct !== "number") return false;
+    const trackStyle = hostWin.getComputedStyle(track);
+    const trackBgBefore = trackStyle.backgroundColor || "transparent";
+    const unfilled = isTransparentColor(trackBgBefore) ? "rgba(255,255,255,0.22)" : trackBgBefore;
+    track.style.setProperty("background-image", "none", "important");
+    track.style.setProperty(
+      "background-image",
+      "linear-gradient(90deg, " + TURQ + " 0%, " + TURQ + " " + pct + "%, "
+      + unfilled + " " + pct + "%, " + unfilled + " 100%)",
+      "important"
+    );
+    track.style.setProperty("background-color", unfilled, "important");
+    return true;
   }};
 
   const patchFilled = (filled) => {{
@@ -1226,60 +1329,74 @@ def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
     return true;
   }};
 
-  const patchAll = () => {{
-    state.pending = false;
-    const lines = ["Likert fill patcher"];
-    let patched = 0;
-    let targeted = 0;
-    const misses = [];
-
-    if (!hostAccess) {{
-      lines.push("hostDoc access: FAILED");
-      writeDebug(lines);
-      return;
-    }}
-
-    lines.push("hostDoc access: OK");
-    LIKERT_LABELS.forEach((label) => {{
-      const escapedLabel = cssEscape(label);
-      const handles = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escapedLabel + '"]');
-      if (!handles || handles.length === 0) {{
-        misses.push(label + " (handle missing)");
-        return;
-      }}
-      targeted += 1;
-      const root = resolveRoot(handles[0]);
-      if (!root) {{
-        misses.push(label + " (root missing)");
-        return;
-      }}
-      const filled = selectFilled(root);
-      if (!filled) {{
-        misses.push(label + " (no filled node)");
-        return;
-      }}
-      if (patchFilled(filled)) patched += 1;
-    }});
-
-    lines.push(`targeted=${{targeted}}/${{LIKERT_LABELS.length}}`);
-    lines.push(`patched_filled=${{patched}}`);
-    if (misses.length > 0) {{
-      lines.push("skipped:");
-      misses.slice(0, 6).forEach((entry) => lines.push("- " + entry));
-    }}
-    writeDebug(lines);
-  }};
-
   const schedulePatch = () => {{
     if (state.pending) return;
     state.pending = true;
-    if (state.timer) {{
-      hostWin.clearTimeout(state.timer);
-    }}
+    if (state.timer) hostWin.clearTimeout(state.timer);
     state.timer = hostWin.setTimeout(patchAll, 180);
   }};
 
-  if (!state.wired && hostAccess) {{
+  const attachDragListeners = (handle, label) => {{
+    if (!handle || !label) return;
+    if (!hostWin.__MEDF_DRAG_TIMER__) hostWin.__MEDF_DRAG_TIMER__ = new Map();
+    if (!hostWin.__MEDF_DRAG_WIRED__) hostWin.__MEDF_DRAG_WIRED__ = new Set();
+    if (hostWin.__MEDF_DRAG_WIRED__.has(label)) return;
+    hostWin.__MEDF_DRAG_WIRED__.add(label);
+
+    const clearDragTimer = () => {{
+      const timerId = hostWin.__MEDF_DRAG_TIMER__.get(label);
+      if (!timerId) return;
+      hostWin.clearInterval(timerId);
+      hostWin.__MEDF_DRAG_TIMER__.delete(label);
+    }};
+
+    const startDragTimer = () => {{
+      clearDragTimer();
+      const timerId = hostWin.setInterval(() => patchAll(), 50);
+      hostWin.__MEDF_DRAG_TIMER__.set(label, timerId);
+    }};
+
+    handle.addEventListener("pointerdown", startDragTimer, true);
+    handle.addEventListener("pointermove", schedulePatch, true);
+    handle.addEventListener("pointerup", () => {{
+      clearDragTimer();
+      schedulePatch();
+    }}, true);
+    handle.addEventListener("pointercancel", () => {{
+      clearDragTimer();
+      schedulePatch();
+    }}, true);
+    handle.addEventListener("keydown", schedulePatch, true);
+  }};
+
+  const patchAll = () => {{
+    state.pending = false;
+    LIKERT_LABELS.forEach((label) => {{
+      const escapedLabel = cssEscape(label);
+      const handles = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escapedLabel + '"]');
+      if (!handles || handles.length === 0) return;
+      const handle = handles[0];
+      attachDragListeners(handle, label);
+      const root = resolveRoot(handle);
+      if (!root) return;
+
+      const selected = selectFilled(root);
+      if (selected.best) {{
+        const chosenRect = selected.best.getBoundingClientRect();
+        if (!(selected.maxW > 0 && chosenRect.width >= selected.maxW * 0.99)) {{
+          patchFilled(selected.best);
+          return;
+        }}
+      }}
+
+      const aria = getAriaPercent(handle);
+      const track = getFullTrackCandidate(root, selected.maxW);
+      if (!aria.ok || !track) return;
+      patchGradientTrack(track, aria.pct);
+    }});
+  }};
+
+  if (!state.wired) {{
     state.wired = true;
     state.observer = new hostWin.MutationObserver(schedulePatch);
     if (hostDoc.body) {{
@@ -1300,402 +1417,8 @@ def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
 }})();
 </script>
 """,
-        height=360 if debug_enabled else 1,
+        height=1,
     )
-
-
-# Diagnostic smoke tests: verify injected JS runs and whether slider DOM is queryable without DevTools.
-def _inject_js_smoke_test() -> None:
-    html = r"""
-<div id="medf-panel"
-     style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            border: 3px solid #ff2d2d;
-            padding: 12px;
-            background: #fff5f5;
-            color: #111;
-            white-space: pre-wrap;">
-MEDF JS SMOKE PANEL: HTML RENDERED
-</div>
-
-<div id="medf-noscript" style="margin-top:8px; font-weight:700; color:#b00000;">
-  <noscript>JS IS NOT EXECUTING (NOSCRIPT VISIBLE)</noscript>
-</div>
-
-<script>
-(function () {
-  const p = document.getElementById("medf-panel");
-  try {
-    if (!p) return;
-    p.textContent += "\nJS EXECUTED (sync)";
-    setTimeout(() => {
-      try {
-        p.textContent += "\nJS EXECUTED (timeout)";
-      } catch (e2) {
-        p.textContent += "\nERROR (timeout): " + (e2 && e2.message ? e2.message : String(e2));
-      }
-    }, 250);
-  } catch (e) {
-    if (p) {
-      p.textContent += "\nERROR: " + (e && e.message ? e.message : String(e));
-      p.textContent += "\nSTACK: " + (e && e.stack ? e.stack : "unavailable");
-    }
-  }
-})();
-</script>
-"""
-    components.html(html, height=300)
-
-
-def _inject_slider_find_test(label: str) -> None:
-    label_json = json.dumps(label)
-    html = r"""
-<div id="medf-find-panel" style="
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  font-size: 14px;
-  font-weight: 700;
-  border: 3px solid #7c3aed;
-  padding: 12px;
-  background: #eef2ff;
-  color: #111827;
-  white-space: pre-wrap;
-  line-height: 1.35;
-">FIND TEST: HTML RENDERED</div>
-<div><noscript>FIND TEST: NOSCRIPT VISIBLE</noscript></div>
-<script>
-(function () {
-  const iframeWin = window;
-  const iframeDoc = document;
-  const panel = iframeDoc.getElementById("medf-find-panel");
-  const label = __LABEL_JSON__;
-  let hostDoc = iframeDoc;
-  let hostWin = iframeWin;
-  let hostDocAccessible = false;
-
-  try {
-    if (iframeWin.parent && iframeWin.parent.document) {
-      hostDoc = iframeWin.parent.document;
-      hostWin = iframeWin.parent;
-      hostDocAccessible = true;
-    }
-  } catch (err) {
-    hostDoc = iframeDoc;
-    hostWin = iframeWin;
-    hostDocAccessible = false;
-  }
-
-  if (!panel) return;
-
-  const isElementNode = (node) => !!node && node.nodeType === 1 && typeof node.tagName === "string";
-
-  const formatClass = (value, maxLen) => {
-    if (!value || typeof value !== "string") return "none";
-    return value.trim().replace(/\s+/g, ".").slice(0, maxLen) || "none";
-  };
-
-  const styleSnippet = (el, maxLen) => {
-    if (!el || !el.getAttribute) return "none";
-    const raw = el.getAttribute("style") || "";
-    return raw.replace(/\s+/g, " ").trim().slice(0, maxLen) || "none";
-  };
-
-  const isTransparent = (color) => {
-    if (!color) return true;
-    const normalized = String(color).toLowerCase().trim();
-    return normalized === "transparent" || normalized === "rgba(0, 0, 0, 0)" || normalized === "rgba(0,0,0,0)";
-  };
-
-  const setPanel = (lines, success) => {
-    if (!panel) return;
-    panel.textContent = lines.join("\n");
-    if (success) {
-      panel.style.background = "rgba(22,163,74,0.18)";
-      panel.style.borderColor = "#16a34a";
-      panel.style.color = "#052e16";
-    } else {
-      panel.style.background = "rgba(220,38,38,0.18)";
-      panel.style.borderColor = "#dc2626";
-      panel.style.color = "#450a0a";
-    }
-  };
-
-  const resolveRoot = (slider) => {
-    if (!isElementNode(slider)) return null;
-    let root = slider.closest('[data-baseweb="slider"]')
-      || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]'));
-    if (root) return root;
-
-    root = (slider.closest("[data-baseweb]") && slider.closest("[data-baseweb]").querySelector('[data-baseweb="slider"]'))
-      || (slider.parentElement && slider.parentElement.querySelector('[data-baseweb="slider"]'));
-    if (root) return root;
-
-    let ancestor = slider;
-    for (let depth = 0; depth < 6 && ancestor; depth += 1) {
-      ancestor = ancestor.parentElement;
-      if (!ancestor) break;
-      const candidate = ancestor.querySelector('[data-baseweb="slider"]');
-      if (candidate) return candidate;
-    }
-    return null;
-  };
-
-  const collectCandidates = (root) => {
-    const bucket = [];
-    const seen = new Set();
-    const addNode = (node) => {
-      if (!isElementNode(node)) return;
-      if (seen.has(node)) return;
-      seen.add(node);
-      bucket.push(node);
-    };
-
-    root.querySelectorAll('[role="progressbar"]').forEach(addNode);
-    root.querySelectorAll('div[style*="width"]').forEach(addNode);
-    root.querySelectorAll('div[style*="transform"]').forEach(addNode);
-    root.querySelectorAll("div").forEach(addNode);
-
-    return bucket
-      .map((el) => {
-        const rect = el.getBoundingClientRect();
-        return { el, rect };
-      })
-      .filter((entry) => entry.rect.width > 0 && entry.rect.height > 0)
-      .filter((entry) => entry.el.offsetWidth >= 80)
-      .filter((entry) => {
-        const h = entry.el.offsetHeight;
-        return h >= 2 && h <= 28;
-      })
-      .slice(0, 15);
-  };
-
-  const clearPreviousOutlines = (root) => {
-    if (!root) return;
-    root.querySelectorAll("[data-medf-cand]").forEach((el) => {
-      if (!isElementNode(el)) return;
-      el.style.removeProperty("outline");
-      el.style.removeProperty("outline-offset");
-      el.removeAttribute("data-medf-cand");
-    });
-  };
-
-  const chooseBestCandidate = (candidates) => {
-    if (!Array.isArray(candidates) || candidates.length === 0) return { best: null, index: -1 };
-    const progressbars = candidates.filter((entry) => (entry.el.getAttribute("role") || "") === "progressbar");
-    if (progressbars.length === 1) {
-      return { best: progressbars[0], index: candidates.indexOf(progressbars[0]) };
-    }
-
-    const decorated = candidates
-      .map((entry, idx) => {
-        const cs = hostWin.getComputedStyle(entry.el);
-        const bgColor = cs.backgroundColor || "";
-        const bgImage = cs.backgroundImage || "";
-        const hasPaint = !isTransparent(bgColor) || (bgImage && bgImage !== "none");
-        return { entry, idx, hasPaint, width: entry.el.offsetWidth };
-      })
-      .filter((row) => row.hasPaint);
-
-    if (decorated.length > 0) {
-      decorated.sort((a, b) => b.width - a.width);
-      return { best: decorated[0].entry, index: decorated[0].idx };
-    }
-
-    return { best: candidates[0], index: 0 };
-  };
-
-  const patch = () => {
-    const lines = [];
-    lines.push(`=== PATCH RUN @ ${new Date().toISOString()} ===`);
-    lines.push("FIND TEST: HTML RENDERED");
-    lines.push("FIND TEST: JS EXECUTED (sync)");
-    if (iframeWin.__MEDF_FIND_TIMEOUT_SEEN__) {
-      lines.push("FIND TEST: JS EXECUTED (timeout)");
-    }
-    try {
-      const iframeSliders = Array.from(iframeDoc.querySelectorAll('[role="slider"]'));
-      lines.push(`iframeDoc slider count: ${iframeSliders.length}`);
-
-      if (!hostDocAccessible) {
-        lines.push("hostDoc access: FAILED (cross-origin?)");
-        lines.push("hostDoc slider count: N/A");
-        setPanel(lines, false);
-        return;
-      }
-
-      lines.push("hostDoc access: OK");
-      const allSliders = Array.from(hostDoc.querySelectorAll('[role="slider"]'));
-      const labeledSliders = Array.from(hostDoc.querySelectorAll('[role="slider"][aria-label]')).filter(
-        (el) => ((el.getAttribute("aria-label") || "").trim().length > 0)
-      );
-      lines.push(`hostDoc slider count: ${allSliders.length}`);
-
-      const labelCounts = new Map();
-      labeledSliders.forEach((el) => {
-        const key = (el.getAttribute("aria-label") || "").trim();
-        labelCounts.set(key, (labelCounts.get(key) || 0) + 1);
-      });
-      const uniqueLabels = Array.from(labelCounts.keys()).slice(0, 20);
-      const countLines = uniqueLabels.map((key) => `${key}:${labelCounts.get(key)}`);
-
-      lines.push(`Total [role=slider] count: ${allSliders.length}`);
-      lines.push(`Unique aria-labels (first 20): ${uniqueLabels.length ? uniqueLabels.join(" | ") : "none"}`);
-      lines.push(`Label counts (first 20): ${countLines.length ? countLines.join(" | ") : "none"}`);
-
-      const escaped = (iframeWin.CSS && typeof iframeWin.CSS.escape === "function")
-        ? iframeWin.CSS.escape(label)
-        : label.replace(/["\\]/g, "\\$&");
-      const nodes = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
-      const targetCount = nodes.length;
-      lines.push(`Target label: ${label}`);
-      lines.push(`Target present: ${targetCount >= 1 ? "true" : "false"} (count=${targetCount})`);
-
-      if (targetCount === 0) {
-        lines.push("Target not found in current DOM view");
-        const retryCount = Number(iframeWin.__MEDF_FIND_RETRY_COUNT__ || 0);
-        if (allSliders.length === 0 && retryCount < 5) {
-          iframeWin.__MEDF_FIND_RETRY_COUNT__ = retryCount + 1;
-          lines.push(`Retry scheduled: ${retryCount + 1}/5`);
-          iframeWin.setTimeout(schedulePatch, 250);
-        } else if (allSliders.length === 0) {
-          lines.push("Retry limit reached (5)");
-        }
-        setPanel(lines, false);
-        return;
-      }
-      iframeWin.__MEDF_FIND_RETRY_COUNT__ = 0;
-
-      const slider = nodes[0];
-      const root = resolveRoot(slider);
-      if (!root) {
-        lines.push("Root not found");
-        setPanel(lines, false);
-        return;
-      }
-      lines.push(`Root: ${root.tagName.toLowerCase()} data-baseweb=${root.getAttribute("data-baseweb") || "none"}`);
-
-      clearPreviousOutlines(root);
-      const candidates = collectCandidates(root);
-      if (candidates.length === 0) {
-        lines.push("No track-like candidates found after filtering");
-        setPanel(lines, false);
-        return;
-      }
-
-      candidates.forEach((entry, idx) => {
-        const el = entry.el;
-        el.style.setProperty("outline", "2px solid magenta", "important");
-        el.style.setProperty("outline-offset", "1px", "important");
-        el.setAttribute("data-medf-cand", String(idx + 1));
-
-        const cs = hostWin.getComputedStyle(el);
-        const bgColor = cs.backgroundColor || "none";
-        const bgImage = (cs.backgroundImage || "none").slice(0, 80);
-        const className = formatClass(el.className, 60);
-        const styleAttr = styleSnippet(el, 120);
-        lines.push(
-          `#${idx + 1} tag=${el.tagName.toLowerCase()} role=${el.getAttribute("role") || "none"} data-baseweb=${el.getAttribute("data-baseweb") || "none"} class=${className} style=${styleAttr} rect=${Math.round(entry.rect.width)}x${Math.round(entry.rect.height)} bg=${bgColor} bgImage=${bgImage}`
-        );
-      });
-
-      const picked = chooseBestCandidate(candidates);
-      if (!picked.best) {
-        lines.push("BEST patched: none");
-        setPanel(lines, false);
-        return;
-      }
-
-      const bestEl = picked.best.el;
-      bestEl.style.setProperty("background-image", "none", "important");
-      bestEl.style.setProperty("background", "#27C4B7", "important");
-      bestEl.style.setProperty("background-color", "#27C4B7", "important");
-      bestEl.style.setProperty("border-color", "#27C4B7", "important");
-      const bestBg = hostWin.getComputedStyle(bestEl).backgroundColor || "unknown";
-      lines.push(`BEST patched: index=${picked.index + 1}, computed bg=${bestBg}`);
-      setPanel(lines, true);
-    } catch (err) {
-      lines.push("ERROR: " + (err && err.message ? err.message : String(err)));
-      lines.push("STACK: " + (err && err.stack ? err.stack : "unavailable"));
-      setPanel(lines, false);
-    }
-  };
-
-  const schedulePatch = () => {
-    if (!iframeWin.__MEDF_FIND_THROTTLE__) {
-      iframeWin.__MEDF_FIND_THROTTLE__ = { pending: false, timer: null };
-    }
-    const throttle = iframeWin.__MEDF_FIND_THROTTLE__;
-    if (throttle.pending) return;
-    throttle.pending = true;
-    if (throttle.timer) {
-      iframeWin.clearTimeout(throttle.timer);
-    }
-    throttle.timer = iframeWin.setTimeout(() => {
-      throttle.pending = false;
-      patch();
-    }, 200);
-  };
-
-  try {
-    if (!panel) return;
-    patch();
-    setTimeout(() => {
-      try {
-        iframeWin.__MEDF_FIND_TIMEOUT_SEEN__ = true;
-        patch();
-      } catch (e2) {
-        const lines = [
-          "FIND TEST: HTML RENDERED",
-          "FIND TEST: JS EXECUTED (sync)",
-          "ERROR: " + (e2 && e2.message ? e2.message : String(e2)),
-          "STACK: " + (e2 && e2.stack ? e2.stack : "unavailable"),
-        ];
-        setPanel(lines, false);
-      }
-    }, 250);
-    setTimeout(() => {
-      try {
-        patch();
-      } catch (e3) {
-        const lines = [
-          "FIND TEST: HTML RENDERED",
-          "FIND TEST: JS EXECUTED (sync)",
-          "FIND TEST: JS EXECUTED (timeout)",
-          "ERROR: " + (e3 && e3.message ? e3.message : String(e3)),
-          "STACK: " + (e3 && e3.stack ? e3.stack : "unavailable"),
-        ];
-        setPanel(lines, false);
-      }
-    }, 500);
-
-    if (hostDocAccessible && !iframeWin.__MEDF_FIND_OBSERVER__) {
-      iframeWin.__MEDF_FIND_OBSERVER__ = true;
-      hostDoc.addEventListener("pointerup", schedulePatch, true);
-      if (hostWin.addEventListener) {
-        hostWin.addEventListener("pointerup", schedulePatch, true);
-      }
-      const Obs = hostWin.MutationObserver || MutationObserver;
-      const observer = new Obs(() => schedulePatch());
-      if (hostDoc.body) {
-        observer.observe(hostDoc.body, {
-          subtree: true,
-          childList: true,
-          attributes: true,
-        });
-      }
-    }
-  } catch (e) {
-    const lines = [
-      "FIND TEST: HTML RENDERED",
-      "ERROR: " + (e && e.message ? e.message : String(e)),
-      "STACK: " + (e && e.stack ? e.stack : "unavailable"),
-    ];
-    setPanel(lines, false);
-  }
-})();
-</script>
-"""
-    components.html(html.replace("__LABEL_JSON__", label_json), height=360)
 
 
 def _derive_auto_pareto_search_params(budget: int, bias: int) -> tuple[int, int]:
@@ -1995,8 +1718,6 @@ def main() -> None:
         st.markdown("- Only non-dominated solutions are retained on the Pareto frontier.")
 
     conference_mode = st.session_state["conference_mode"]
-    theme_custom_slider_fill_colors = True
-    debug_js_slider_smoke_tests = False
 
     with st.sidebar:
         st.header("Configuration")
@@ -2006,16 +1727,6 @@ def main() -> None:
             help="Prioritize executive visuals and preset controls.",
         )
         st.caption("Conference Mode prioritizes primary outputs.")
-        theme_custom_slider_fill_colors = st.checkbox(
-            "Theme: Custom slider fill colors",
-            value=True,
-            key="theme_custom_slider_fill_colors",
-        )
-        debug_js_slider_smoke_tests = st.checkbox(
-            "Debug: JS/Slider Smoke Tests",
-            value=False,
-            key="debug_js_slider_smoke_tests",
-        )
 
         st.markdown("**Backend URL**")
         backend_url = st.text_input("Backend URL", value="http://127.0.0.1:8000").rstrip("/")
@@ -2380,8 +2091,7 @@ def main() -> None:
             st.caption("Case Studies runs fixed scenarios through Evaluate → Conflicts → Pareto.")
 
     demo_active = bool(st.session_state.get("demo_mode"))
-    if theme_custom_slider_fill_colors:
-        _inject_slider_fill_color_patcher(debug_enabled=debug_js_slider_smoke_tests)
+    _inject_slider_fill_color_patcher()
     ai_system_id = "demo_facerec"
     ai_system_name = "Demo Facial Recognition System"
     ai_system_description = "MVP evaluation input"
@@ -2407,11 +2117,7 @@ def main() -> None:
 
             with col_right:
                 st.subheader("Dimension Scores (Likert 1–7)")
-                likert_slider_css_enabled = False
-                if not theme_custom_slider_fill_colors:
-                    likert_slider_css_enabled = _inject_likert_track_turquoise_css()
-                if DEBUG_SHOW_SLIDER_LABELS:
-                    st.caption(f"Likert slider CSS enabled: {likert_slider_css_enabled}")
+                _inject_likert_thumb_value_turquoise_css(enable_progress_track=False)
                 if page in {"Conflict Detection", "Pareto Resolution"}:
                     preset_col_1, preset_col_2, preset_col_3 = st.columns(3)
                     if preset_col_1.button("Preset: Baseline (3.5,3.0,5.5,4.5,3.5,5.0)"):
@@ -2475,13 +2181,6 @@ def main() -> None:
             dimension: float(DEMO_WEIGHTS[stakeholder_id][dimension])
             for dimension in UNIFIED_DIMENSIONS
         }
-
-    if debug_js_slider_smoke_tests:
-        st.info("Debug enabled: injecting JS smoke panel")
-        st.warning("DEBUG CHECKPOINT: calling _inject_js_smoke_test() now")
-        _inject_js_smoke_test()
-        st.warning("DEBUG CHECKPOINT: calling _inject_slider_find_test(...) now")
-        _inject_slider_find_test("Accountability")
 
     if page == "Evaluate":
         evaluate_clicked = st.button("Evaluate", type="primary")
