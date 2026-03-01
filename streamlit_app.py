@@ -1289,17 +1289,27 @@ MEDF JS SMOKE PANEL: HTML RENDERED
 
 def _inject_slider_find_test(label: str) -> None:
     label_json = json.dumps(label)
-    script = """
+    html = """
+<div id="medf-find-panel" style="
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  border: 3px solid #7c3aed;
+  padding: 12px;
+  background: #eef2ff;
+  color: #111827;
+  white-space: pre-wrap;
+  line-height: 1.35;
+">FIND TEST: HTML RENDERED</div>
+
 <script>
 (function () {
   const win = window;
-  const doc = document;
-  const panel = doc.getElementById("medf-panel");
+  const localDoc = document;
+  const panel = localDoc.getElementById("medf-find-panel");
   if (!panel) return;
   const label = __LABEL_JSON__;
-  const escaped = (win.CSS && typeof win.CSS.escape === "function")
-    ? win.CSS.escape(label)
-    : label.replace(/["\\\\]/g, "\\\\$&");
+  let timeoutMarkerSeen = false;
 
   const describeNode = (node) => {
     if (!node) return "none";
@@ -1346,92 +1356,128 @@ def _inject_slider_find_test(label: str) -> None:
 
   const clamp = (v, min, max) => Math.max(min, Math.min(max, Math.round(v)));
 
-  const viewportWidth = Math.max(
-    2,
-    (doc.documentElement && doc.documentElement.clientWidth) || win.innerWidth || 2
-  );
-  const viewportHeight = Math.max(
-    2,
-    (doc.documentElement && doc.documentElement.clientHeight) || win.innerHeight || 2
-  );
-  const clampX = (x) => clamp(x, 1, viewportWidth - 1);
-  const clampY = (y) => clamp(y, 1, viewportHeight - 1);
+  const baseLines = () => {
+    const lines = [];
+    lines.push("FIND TEST: HTML RENDERED");
+    lines.push("FIND TEST: JS EXECUTED (sync)");
+    if (timeoutMarkerSeen) {
+      lines.push("FIND TEST: JS EXECUTED (timeout)");
+    }
+    return lines;
+  };
 
-  const ensurePanel = (text, success) => {
-    panel.style.whiteSpace = "pre-wrap";
-    panel.style.pointerEvents = "none";
-    panel.textContent = text;
+  const setPanel = (lines, success) => {
+    panel.textContent = lines.join("\\n");
     if (success) {
-      panel.style.background = "rgba(22,163,74,0.22)";
+      panel.style.background = "rgba(22,163,74,0.18)";
       panel.style.borderColor = "#16a34a";
-      panel.style.color = "#dcfce7";
+      panel.style.color = "#052e16";
     } else {
-      panel.style.background = "rgba(220,38,38,0.22)";
+      panel.style.background = "rgba(220,38,38,0.18)";
       panel.style.borderColor = "#dc2626";
-      panel.style.color = "#fee2e2";
+      panel.style.color = "#450a0a";
     }
   };
 
-  const patch = () => {
-    let text = "MEDF JS SMOKE PANEL: SCRIPT RAN\\nPATCH() ENTERED";
+  const resolveQueryDoc = () => {
+    const candidates = [];
     try {
-      const allSliders = Array.from(doc.querySelectorAll('[role="slider"]'));
-      const labeledSliders = Array.from(doc.querySelectorAll('[role="slider"][aria-label]'));
-      const nodes = doc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
-      const targetCount = nodes.length;
-      const smokeRunning = win.__MEDF_JS_SMOKE__ === true;
-      const isTargetLabel = label === "Fairness and Non-discrimination";
-      const slider = nodes[0] || null;
-      const container = slider
-        ? (slider.closest('[data-baseweb="slider"]') || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]')))
-        : null;
+      if (win.top && win.top.document) {
+        candidates.push({ source: "top", doc: win.top.document });
+      }
+    } catch (err) {}
+    try {
+      if (win.parent && win.parent.document) {
+        candidates.push({ source: "parent", doc: win.parent.document });
+      }
+    } catch (err) {}
+    candidates.push({ source: "local", doc: localDoc });
+
+    const seen = new Set();
+    for (const candidate of candidates) {
+      if (!candidate || !candidate.doc || seen.has(candidate.doc)) continue;
+      seen.add(candidate.doc);
+      try {
+        candidate.doc.querySelector("body");
+        const sliderCount = candidate.doc.querySelectorAll('[role="slider"]').length;
+        if (candidate.source !== "local" && sliderCount === 0) {
+          continue;
+        }
+        return candidate;
+      } catch (err) {
+        continue;
+      }
+    }
+    return { source: "local", doc: localDoc };
+  };
+
+  const patch = () => {
+    const lines = [];
+    lines.push(`=== PATCH RUN @ ${new Date().toISOString()} ===`);
+    lines.push(...baseLines());
+    try {
+      const resolved = resolveQueryDoc();
+      const queryDoc = resolved.doc;
+      const queryWin = queryDoc.defaultView || win;
+      lines.push("Query doc source: " + resolved.source);
+
+      const allSliders = Array.from(queryDoc.querySelectorAll('[role="slider"]'));
+      const labeledSliders = Array.from(queryDoc.querySelectorAll('[role="slider"][aria-label]'))
+        .filter((node) => ((node.getAttribute("aria-label") || "").trim().length > 0));
 
       const labelCounts = new Map();
       labeledSliders.forEach((node) => {
         const ariaLabel = (node.getAttribute("aria-label") || "").trim();
-        if (!ariaLabel) return;
         labelCounts.set(ariaLabel, (labelCounts.get(ariaLabel) || 0) + 1);
       });
       const uniqueLabels = Array.from(labelCounts.keys()).slice(0, 25);
-      const labelCountEntries = uniqueLabels.map((ariaLabel) => `${ariaLabel}:${labelCounts.get(ariaLabel)}`);
+      const labelCountEntries = uniqueLabels.map((ariaLabel) => `${ariaLabel}: ${labelCounts.get(ariaLabel)}`);
 
-      text += '\\nTotal [role="slider"] count: ' + allSliders.length;
-      text += '\\nSliders found for "' + label + '": ' + targetCount;
-      text += '\\nTarget present: ' + (targetCount >= 1 ? "true" : "false");
-      text += '\\nCurrent slider labels (first 25 unique): ' + (uniqueLabels.length ? uniqueLabels.join(' | ') : 'none');
-      text += '\\nCurrent slider label counts (first 25): ' + (labelCountEntries.length ? labelCountEntries.join(' | ') : 'none');
-      if (!smokeRunning) {
-        text += " (SCRIPT NOT RUNNING)";
-      }
+      lines.push("Total [role=\"slider\"] count: " + allSliders.length);
+      lines.push("Current slider labels (first 25 unique): " + (uniqueLabels.length ? uniqueLabels.join(" | ") : "none"));
+      lines.push("Current slider label counts (first 25): " + (labelCountEntries.length ? labelCountEntries.join(" | ") : "none"));
 
-      if (!isTargetLabel) {
-        text += '\\nHIT TEST RESULTS: skipped (non-target label)';
-        ensurePanel(text, true);
+      const targetNodes = labeledSliders.filter(
+        (node) => (node.getAttribute("aria-label") || "") === label
+      );
+      const targetCount = targetNodes.length;
+      lines.push("Target label: " + label);
+      lines.push("Target present: " + (targetCount >= 1 ? "true" : "false"));
+
+      if (targetCount === 0) {
+        lines.push("Target not found in current DOM view");
+        setPanel(lines, false);
         return;
       }
 
-      if (targetCount === 0 || !slider) {
-        text += '\\nTarget not found in current DOM view';
-        text += '\\nHIT TEST RESULTS: no target slider found';
-        ensurePanel(text, false);
-        return;
-      }
-
+      const slider = targetNodes[0];
+      const container = slider.closest('[data-baseweb="slider"]') || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]'));
       if (!container) {
-        text += '\\nFill root found: no (container not found)';
-        ensurePanel(text, false);
+        lines.push("Fill root found: no (container not found)");
+        setPanel(lines, false);
         return;
       }
+
+      const viewportWidth = Math.max(
+        2,
+        (queryDoc.documentElement && queryDoc.documentElement.clientWidth) || queryWin.innerWidth || 2
+      );
+      const viewportHeight = Math.max(
+        2,
+        (queryDoc.documentElement && queryDoc.documentElement.clientHeight) || queryWin.innerHeight || 2
+      );
+      const clampX = (x) => clamp(x, 1, viewportWidth - 1);
+      const clampY = (y) => clamp(y, 1, viewportHeight - 1);
 
       const r = container.getBoundingClientRect();
-      const viewportInnerHeight = Math.max(1, win.innerHeight || viewportHeight);
+      const viewportInnerHeight = Math.max(1, queryWin.innerHeight || viewportHeight);
       const inViewport = !(r.bottom < 0 || r.top > viewportInnerHeight);
-      text += `\\nwindow.innerHeight: ${Math.round(viewportInnerHeight)}`;
-      text += `\\nContainer vertical bounds: top=${Math.round(r.top)}, bottom=${Math.round(r.bottom)}`;
-      text += `\\ninViewport: ${inViewport ? "true" : "false"}`;
+      lines.push(`window.innerHeight: ${Math.round(viewportInnerHeight)}`);
+      lines.push(`Container vertical bounds: top=${Math.round(r.top)}, bottom=${Math.round(r.bottom)}`);
+      lines.push(`inViewport: ${inViewport ? "true" : "false"}`);
       if (!inViewport) {
-        text += "\\nContainer not visible in viewport";
-        ensurePanel(text, false);
+        lines.push("Container not visible in viewport");
+        setPanel(lines, false);
         return;
       }
 
@@ -1449,14 +1495,14 @@ def _inject_slider_find_test(label: str) -> None:
         { x: x3, y: yB },
       ];
 
-      const lines = [];
+      const hitLines = [];
       let bgAppliedAny = false;
-      text += `\\nContainer rect: left=${Math.round(r.left)}, top=${Math.round(r.top)}, width=${Math.round(r.width)}, height=${Math.round(r.height)}`;
-      text += `\\nSample coordinates: (${x1},${yA}), (${x2},${yA}), (${x3},${yA}), (${x1},${yB}), (${x2},${yB}), (${x3},${yB})`;
+      lines.push(`Container rect: left=${Math.round(r.left)}, top=${Math.round(r.top)}, width=${Math.round(r.width)}, height=${Math.round(r.height)}`);
+      lines.push(`Sample coordinates: (${x1},${yA}), (${x2},${yA}), (${x3},${yA}), (${x1},${yB}), (${x2},${yB}), (${x3},${yB})`);
       points.forEach((point, index) => {
-        const hit = doc.elementFromPoint(point.x, point.y);
+        const hit = queryDoc.elementFromPoint(point.x, point.y);
         if (!hit || !(hit instanceof HTMLElement)) {
-          lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): none`);
+          hitLines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): none`);
           return;
         }
 
@@ -1470,26 +1516,25 @@ def _inject_slider_find_test(label: str) -> None:
         }
         bgAppliedAny = bgAppliedAny || hitBgApplied || parentBgApplied;
 
-        const hitBg = win.getComputedStyle(hit).backgroundColor || "unknown";
-        lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): ${describeNode(hit)}`);
-        lines.push("chain:");
+        const hitBg = queryWin.getComputedStyle(hit).backgroundColor || "unknown";
+        hitLines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): ${describeNode(hit)}`);
+        hitLines.push("chain:");
         chain.slice(0, 6).forEach((node) => {
-          lines.push(`- ${describeNode(node)}`);
+          hitLines.push(`- ${describeNode(node)}`);
         });
-        lines.push(`Patched bg applied to hit element? ${hitBgApplied ? "yes" : "no"}`);
-        lines.push(`Computed bg after patch: ${hitBg}`);
+        hitLines.push(`Patched bg applied to hit element? ${hitBgApplied ? "yes" : "no"}`);
+        hitLines.push(`Computed bg after patch: ${hitBg}`);
       });
+      lines.push("HIT TEST RESULTS:");
+      lines.push(...hitLines);
 
-      text += "\\nHIT TEST RESULTS:";
-      text += "\\n" + lines.join("\\n");
-
-      ensurePanel(text, bgAppliedAny);
+      setPanel(lines, bgAppliedAny);
     } catch (err) {
       const errorMessage = err && err.message ? err.message : String(err);
       const errorStack = err && err.stack ? err.stack : "unavailable";
-      text += "\\nERROR: " + errorMessage;
-      text += "\\nSTACK: " + errorStack;
-      ensurePanel(text, false);
+      lines.push("ERROR: " + errorMessage);
+      lines.push("STACK: " + errorStack);
+      setPanel(lines, false);
     }
   };
 
@@ -1512,21 +1557,32 @@ def _inject_slider_find_test(label: str) -> None:
 
   if (!win.__MEDF_HITTEST_OBSERVER__) {
     win.__MEDF_HITTEST_OBSERVER__ = true;
-    doc.addEventListener("pointerup", schedulePatch, true);
+    localDoc.addEventListener("pointerup", schedulePatch, true);
     const observer = new MutationObserver(() => schedulePatch());
-    observer.observe(doc.body, {
+    observer.observe(localDoc.body, {
       subtree: true,
       childList: true,
       attributes: true,
     });
   }
 
-  patch();
-  win.setTimeout(patch, 250);
+  try {
+    patch();
+    win.setTimeout(() => {
+      timeoutMarkerSeen = true;
+      patch();
+    }, 250);
+    win.setTimeout(patch, 700);
+  } catch (err) {
+    const lines = baseLines();
+    lines.push("ERROR: " + (err && err.message ? err.message : String(err)));
+    lines.push("STACK: " + (err && err.stack ? err.stack : "unavailable"));
+    setPanel(lines, false);
+  }
 })();
 </script>
 """
-    components.html(script.replace("__LABEL_JSON__", label_json), height=220)
+    components.html(html.replace("__LABEL_JSON__", label_json), height=360)
 
 
 def _derive_auto_pareto_search_params(budget: int, bias: int) -> tuple[int, int]:
@@ -2303,7 +2359,7 @@ def main() -> None:
         st.warning("DEBUG CHECKPOINT: calling _inject_js_smoke_test() now")
         _inject_js_smoke_test()
         st.warning("DEBUG CHECKPOINT: calling _inject_slider_find_test(...) now")
-        _inject_slider_find_test("Fairness and Non-discrimination")
+        _inject_slider_find_test("Accountability")
 
     if page == "Evaluate":
         evaluate_clicked = st.button("Evaluate", type="primary")
