@@ -1371,109 +1371,124 @@ def _inject_slider_find_test(label: str) -> None:
   };
 
   const patch = () => {
-    const allSliders = Array.from(doc.querySelectorAll('[role="slider"]'));
-    const nodes = doc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
-    const smokeRunning = win.__MEDF_JS_SMOKE__ === true;
-    const isTargetLabel = label === "Fairness and Non-discrimination";
-    const slider = nodes[0] || null;
-    const container = slider
-      ? (slider.closest('[data-baseweb="slider"]') || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]')))
-      : null;
-
     let text = "MEDF JS SMOKE PANEL: SCRIPT RAN";
-    text += '\\nTotal [role="slider"] count: ' + allSliders.length;
-    text += '\\nSliders found for "' + label + '": ' + nodes.length;
-    if (!smokeRunning) {
-      text += " (SCRIPT NOT RUNNING)";
-    }
+    try {
+      const allSliders = Array.from(doc.querySelectorAll('[role="slider"]'));
+      const labeledSliders = Array.from(doc.querySelectorAll('[role="slider"][aria-label]'));
+      const nodes = doc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
+      const targetCount = nodes.length;
+      const smokeRunning = win.__MEDF_JS_SMOKE__ === true;
+      const isTargetLabel = label === "Fairness and Non-discrimination";
+      const slider = nodes[0] || null;
+      const container = slider
+        ? (slider.closest('[data-baseweb="slider"]') || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]')))
+        : null;
 
-    if (nodes.length === 0) {
-      const discovered = Array.from(doc.querySelectorAll('[role="slider"][aria-label]'))
-        .map((node) => node.getAttribute("aria-label") || "")
-        .filter((value) => value.length > 0)
-        .slice(0, 15);
-      text += '\\nDiscovered aria-labels (first 15): ' + (discovered.length ? discovered.join(' | ') : 'none');
-    }
+      const labelCounts = new Map();
+      labeledSliders.forEach((node) => {
+        const ariaLabel = (node.getAttribute("aria-label") || "").trim();
+        if (!ariaLabel) return;
+        labelCounts.set(ariaLabel, (labelCounts.get(ariaLabel) || 0) + 1);
+      });
+      const uniqueLabels = Array.from(labelCounts.keys()).slice(0, 25);
+      const labelCountEntries = uniqueLabels.map((ariaLabel) => `${ariaLabel}:${labelCounts.get(ariaLabel)}`);
 
-    if (!isTargetLabel) {
-      text += '\\nHIT TEST RESULTS: skipped (non-target label)';
-      ensurePanel(text, true);
-      return;
-    }
+      text += '\\nTotal [role="slider"] count: ' + allSliders.length;
+      text += '\\nSliders found for "' + label + '": ' + targetCount;
+      text += '\\nTarget present: ' + (targetCount >= 1 ? "true" : "false");
+      text += '\\nCurrent slider labels (first 25 unique): ' + (uniqueLabels.length ? uniqueLabels.join(' | ') : 'none');
+      text += '\\nCurrent slider label counts (first 25): ' + (labelCountEntries.length ? labelCountEntries.join(' | ') : 'none');
+      if (!smokeRunning) {
+        text += " (SCRIPT NOT RUNNING)";
+      }
 
-    if (!slider) {
-      text += '\\nHIT TEST RESULTS: no target slider found';
-      ensurePanel(text, false);
-      return;
-    }
-
-    if (!container) {
-      text += '\\nFill root found: no (container not found)';
-      ensurePanel(text, false);
-      return;
-    }
-
-    const r = container.getBoundingClientRect();
-    const viewportInnerHeight = Math.max(1, win.innerHeight || viewportHeight);
-    const inViewport = !(r.bottom < 0 || r.top > viewportInnerHeight);
-    text += `\\nwindow.innerHeight: ${Math.round(viewportInnerHeight)}`;
-    text += `\\nContainer vertical bounds: top=${Math.round(r.top)}, bottom=${Math.round(r.bottom)}`;
-    text += `\\ninViewport: ${inViewport ? "true" : "false"}`;
-    if (!inViewport) {
-      text += "\\nContainer not visible in viewport";
-      ensurePanel(text, false);
-      return;
-    }
-
-    const x1 = clampX(r.left + 10);
-    const x2 = clampX(r.left + r.width / 2);
-    const x3 = clampX(r.right - 10);
-    const yA = clampY(r.top + r.height * 0.5);
-    const yB = clampY(r.top + r.height * 0.75);
-    const points = [
-      { x: x1, y: yA },
-      { x: x2, y: yA },
-      { x: x3, y: yA },
-      { x: x1, y: yB },
-      { x: x2, y: yB },
-      { x: x3, y: yB },
-    ];
-
-    const lines = [];
-    let bgAppliedAny = false;
-    text += `\\nContainer rect: left=${Math.round(r.left)}, top=${Math.round(r.top)}, width=${Math.round(r.width)}, height=${Math.round(r.height)}`;
-    text += `\\nSample coordinates: (${x1},${yA}), (${x2},${yA}), (${x3},${yA}), (${x1},${yB}), (${x2},${yB}), (${x3},${yB})`;
-    points.forEach((point, index) => {
-      const hit = doc.elementFromPoint(point.x, point.y);
-      if (!hit || !(hit instanceof HTMLElement)) {
-        lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): none`);
+      if (!isTargetLabel) {
+        text += '\\nHIT TEST RESULTS: skipped (non-target label)';
+        ensurePanel(text, true);
         return;
       }
 
-      const chain = buildChain(hit);
-      chain.forEach((node) => applyOutline(node));
-
-      const hitBgApplied = applyBackgroundProof(hit);
-      let parentBgApplied = false;
-      if (hit.parentElement && chain[1]) {
-        parentBgApplied = applyBackgroundProof(hit.parentElement);
+      if (targetCount === 0 || !slider) {
+        text += '\\nTarget not found in current DOM view';
+        text += '\\nHIT TEST RESULTS: no target slider found';
+        ensurePanel(text, false);
+        return;
       }
-      bgAppliedAny = bgAppliedAny || hitBgApplied || parentBgApplied;
 
-      const hitBg = win.getComputedStyle(hit).backgroundColor || "unknown";
-      lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): ${describeNode(hit)}`);
-      lines.push("chain:");
-      chain.slice(0, 6).forEach((node) => {
-        lines.push(`- ${describeNode(node)}`);
+      if (!container) {
+        text += '\\nFill root found: no (container not found)';
+        ensurePanel(text, false);
+        return;
+      }
+
+      const r = container.getBoundingClientRect();
+      const viewportInnerHeight = Math.max(1, win.innerHeight || viewportHeight);
+      const inViewport = !(r.bottom < 0 || r.top > viewportInnerHeight);
+      text += `\\nwindow.innerHeight: ${Math.round(viewportInnerHeight)}`;
+      text += `\\nContainer vertical bounds: top=${Math.round(r.top)}, bottom=${Math.round(r.bottom)}`;
+      text += `\\ninViewport: ${inViewport ? "true" : "false"}`;
+      if (!inViewport) {
+        text += "\\nContainer not visible in viewport";
+        ensurePanel(text, false);
+        return;
+      }
+
+      const x1 = clampX(r.left + 10);
+      const x2 = clampX(r.left + r.width / 2);
+      const x3 = clampX(r.right - 10);
+      const yA = clampY(r.top + r.height * 0.5);
+      const yB = clampY(r.top + r.height * 0.75);
+      const points = [
+        { x: x1, y: yA },
+        { x: x2, y: yA },
+        { x: x3, y: yA },
+        { x: x1, y: yB },
+        { x: x2, y: yB },
+        { x: x3, y: yB },
+      ];
+
+      const lines = [];
+      let bgAppliedAny = false;
+      text += `\\nContainer rect: left=${Math.round(r.left)}, top=${Math.round(r.top)}, width=${Math.round(r.width)}, height=${Math.round(r.height)}`;
+      text += `\\nSample coordinates: (${x1},${yA}), (${x2},${yA}), (${x3},${yA}), (${x1},${yB}), (${x2},${yB}), (${x3},${yB})`;
+      points.forEach((point, index) => {
+        const hit = doc.elementFromPoint(point.x, point.y);
+        if (!hit || !(hit instanceof HTMLElement)) {
+          lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): none`);
+          return;
+        }
+
+        const chain = buildChain(hit);
+        chain.forEach((node) => applyOutline(node));
+
+        const hitBgApplied = applyBackgroundProof(hit);
+        let parentBgApplied = false;
+        if (hit.parentElement && chain[1]) {
+          parentBgApplied = applyBackgroundProof(hit.parentElement);
+        }
+        bgAppliedAny = bgAppliedAny || hitBgApplied || parentBgApplied;
+
+        const hitBg = win.getComputedStyle(hit).backgroundColor || "unknown";
+        lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): ${describeNode(hit)}`);
+        lines.push("chain:");
+        chain.slice(0, 6).forEach((node) => {
+          lines.push(`- ${describeNode(node)}`);
+        });
+        lines.push(`Patched bg applied to hit element? ${hitBgApplied ? "yes" : "no"}`);
+        lines.push(`Computed bg after patch: ${hitBg}`);
       });
-      lines.push(`Patched bg applied to hit element? ${hitBgApplied ? "yes" : "no"}`);
-      lines.push(`Computed bg after patch: ${hitBg}`);
-    });
 
-    text += "\\nHIT TEST RESULTS:";
-    text += "\\n" + lines.join("\\n");
+      text += "\\nHIT TEST RESULTS:";
+      text += "\\n" + lines.join("\\n");
 
-    ensurePanel(text, bgAppliedAny);
+      ensurePanel(text, bgAppliedAny);
+    } catch (err) {
+      const errorMessage = err && err.message ? err.message : String(err);
+      const errorStack = err && err.stack ? err.stack : "unavailable";
+      text += "\\nERROR: " + errorMessage;
+      text += "\\nSTACK: " + errorStack;
+      ensurePanel(text, false);
+    }
   };
 
   if (!win.__MEDF_HITTEST_THROTTLE__) {
