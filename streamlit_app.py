@@ -1290,14 +1290,13 @@ def _inject_slider_find_test(label: str) -> None:
     script = """
 <script>
 (function () {
-  const parentWin = window.parent && window.parent.document ? window.parent : window;
-  const parentDoc = parentWin.document || document;
-  const docCtx = parentDoc || document;
-  const panel = parentDoc.getElementById("medf-panel");
+  const win = window;
+  const doc = document;
+  const panel = doc.getElementById("medf-panel");
   if (!panel) return;
   const label = __LABEL_JSON__;
-  const escaped = (parentWin.CSS && typeof parentWin.CSS.escape === "function")
-    ? parentWin.CSS.escape(label)
+  const escaped = (win.CSS && typeof win.CSS.escape === "function")
+    ? win.CSS.escape(label)
     : label.replace(/["\\\\]/g, "\\\\$&");
 
   const describeNode = (node) => {
@@ -1347,11 +1346,11 @@ def _inject_slider_find_test(label: str) -> None:
 
   const viewportWidth = Math.max(
     2,
-    (docCtx.documentElement && docCtx.documentElement.clientWidth) || parentWin.innerWidth || 2
+    (doc.documentElement && doc.documentElement.clientWidth) || win.innerWidth || 2
   );
   const viewportHeight = Math.max(
     2,
-    (docCtx.documentElement && docCtx.documentElement.clientHeight) || parentWin.innerHeight || 2
+    (doc.documentElement && doc.documentElement.clientHeight) || win.innerHeight || 2
   );
   const clampX = (x) => clamp(x, 1, viewportWidth - 1);
   const clampY = (y) => clamp(y, 1, viewportHeight - 1);
@@ -1372,9 +1371,9 @@ def _inject_slider_find_test(label: str) -> None:
   };
 
   const patch = () => {
-    const allSliders = Array.from(docCtx.querySelectorAll('[role="slider"]'));
-    const nodes = docCtx.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
-    const smokeRunning = parentWin.__MEDF_JS_SMOKE__ === true;
+    const allSliders = Array.from(doc.querySelectorAll('[role="slider"]'));
+    const nodes = doc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
+    const smokeRunning = win.__MEDF_JS_SMOKE__ === true;
     const isTargetLabel = label === "Fairness and Non-discrimination";
     const slider = nodes[0] || null;
     const container = slider
@@ -1389,7 +1388,7 @@ def _inject_slider_find_test(label: str) -> None:
     }
 
     if (nodes.length === 0) {
-      const discovered = Array.from(docCtx.querySelectorAll('[role="slider"][aria-label]'))
+      const discovered = Array.from(doc.querySelectorAll('[role="slider"][aria-label]'))
         .map((node) => node.getAttribute("aria-label") || "")
         .filter((value) => value.length > 0)
         .slice(0, 15);
@@ -1415,6 +1414,17 @@ def _inject_slider_find_test(label: str) -> None:
     }
 
     const r = container.getBoundingClientRect();
+    const viewportInnerHeight = Math.max(1, win.innerHeight || viewportHeight);
+    const inViewport = !(r.bottom < 0 || r.top > viewportInnerHeight);
+    text += `\\nwindow.innerHeight: ${Math.round(viewportInnerHeight)}`;
+    text += `\\nContainer vertical bounds: top=${Math.round(r.top)}, bottom=${Math.round(r.bottom)}`;
+    text += `\\ninViewport: ${inViewport ? "true" : "false"}`;
+    if (!inViewport) {
+      text += "\\nContainer not visible in viewport";
+      ensurePanel(text, false);
+      return;
+    }
+
     const x1 = clampX(r.left + 10);
     const x2 = clampX(r.left + r.width / 2);
     const x3 = clampX(r.right - 10);
@@ -1434,8 +1444,7 @@ def _inject_slider_find_test(label: str) -> None:
     text += `\\nContainer rect: left=${Math.round(r.left)}, top=${Math.round(r.top)}, width=${Math.round(r.width)}, height=${Math.round(r.height)}`;
     text += `\\nSample coordinates: (${x1},${yA}), (${x2},${yA}), (${x3},${yA}), (${x1},${yB}), (${x2},${yB}), (${x3},${yB})`;
     points.forEach((point, index) => {
-      const hit = (docCtx.elementFromPoint && docCtx.elementFromPoint(point.x, point.y)) ||
-        (document.elementFromPoint && document.elementFromPoint(point.x, point.y));
+      const hit = doc.elementFromPoint(point.x, point.y);
       if (!hit || !(hit instanceof HTMLElement)) {
         lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): none`);
         return;
@@ -1451,7 +1460,7 @@ def _inject_slider_find_test(label: str) -> None:
       }
       bgAppliedAny = bgAppliedAny || hitBgApplied || parentBgApplied;
 
-      const hitBg = parentWin.getComputedStyle(hit).backgroundColor || "unknown";
+      const hitBg = win.getComputedStyle(hit).backgroundColor || "unknown";
       lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): ${describeNode(hit)}`);
       lines.push("chain:");
       chain.slice(0, 6).forEach((node) => {
@@ -1467,28 +1476,28 @@ def _inject_slider_find_test(label: str) -> None:
     ensurePanel(text, bgAppliedAny);
   };
 
-  if (!parentWin.__MEDF_HITTEST_THROTTLE__) {
-    parentWin.__MEDF_HITTEST_THROTTLE__ = { pending: false, timer: null };
+  if (!win.__MEDF_HITTEST_THROTTLE__) {
+    win.__MEDF_HITTEST_THROTTLE__ = { pending: false, timer: null };
   }
-  const throttle = parentWin.__MEDF_HITTEST_THROTTLE__;
+  const throttle = win.__MEDF_HITTEST_THROTTLE__;
 
   const schedulePatch = () => {
     if (throttle.pending) return;
     throttle.pending = true;
     if (throttle.timer) {
-      parentWin.clearTimeout(throttle.timer);
+      win.clearTimeout(throttle.timer);
     }
-    throttle.timer = parentWin.setTimeout(() => {
+    throttle.timer = win.setTimeout(() => {
       throttle.pending = false;
       patch();
     }, 200);
   };
 
-  if (!parentWin.__MEDF_HITTEST_OBSERVER__) {
-    parentWin.__MEDF_HITTEST_OBSERVER__ = true;
-    parentDoc.addEventListener("pointerup", schedulePatch, true);
+  if (!win.__MEDF_HITTEST_OBSERVER__) {
+    win.__MEDF_HITTEST_OBSERVER__ = true;
+    doc.addEventListener("pointerup", schedulePatch, true);
     const observer = new MutationObserver(() => schedulePatch());
-    observer.observe(parentDoc.body, {
+    observer.observe(doc.body, {
       subtree: true,
       childList: true,
       attributes: true,
@@ -1496,7 +1505,7 @@ def _inject_slider_find_test(label: str) -> None:
   }
 
   patch();
-  parentWin.setTimeout(patch, 250);
+  win.setTimeout(patch, 250);
 })();
 </script>
 """
