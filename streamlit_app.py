@@ -1245,19 +1245,19 @@ def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
 
 # Diagnostic smoke tests: verify injected JS runs and whether slider DOM is queryable without DevTools.
 def _inject_js_smoke_test() -> None:
+    st.markdown("## DEBUG PANEL PLACEHOLDER (should appear above the JS panel)")
     st.markdown(
         """
 <div id="medf-panel" style="
-  padding: 18px 20px;
+  padding: 22px 24px;
   border-radius: 12px;
-  border: 2px solid #475569;
-  background: rgba(51,65,85,0.18);
+  border: 3px solid #f59e0b;
+  background: rgba(245,158,11,0.18);
   color: #f8fafc;
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 800;
   line-height: 1.45;
   margin: 0.5rem 0 0.75rem 0;
-  pointer-events: none;
 ">
   MEDF JS SMOKE PANEL: HTML RENDERED
 </div>
@@ -1268,20 +1268,28 @@ def _inject_js_smoke_test() -> None:
         """
 <script>
 (function () {
-  const parentWin = window.parent && window.parent.document ? window.parent : window;
-  const parentDoc = parentWin.document || document;
-  const panel = parentDoc.getElementById("medf-panel");
-  parentWin.__MEDF_JS_SMOKE__ = true;
-  if (!panel) return;
-  panel.textContent = "MEDF JS SMOKE PANEL: SCRIPT RAN";
-  panel.style.background = "rgba(22,163,74,0.22)";
-  panel.style.borderColor = "#16a34a";
-  panel.style.color = "#dcfce7";
-  panel.style.pointerEvents = "none";
+  const panel = document.getElementById("medf-panel");
+  try {
+    window.__MEDF_JS_SMOKE__ = true;
+    if (!panel) return;
+    panel.textContent = "MEDF JS SMOKE PANEL: SCRIPT RAN";
+    panel.style.background = "rgba(22,163,74,0.22)";
+    panel.style.borderColor = "#16a34a";
+    panel.style.color = "#dcfce7";
+  } catch (err) {
+    if (!panel) return;
+    const message = err && err.message ? err.message : String(err);
+    const stack = err && err.stack ? err.stack : "unavailable";
+    panel.textContent = "JS SMOKE ERROR: " + message + "\\nSTACK: " + stack;
+    panel.style.whiteSpace = "pre-wrap";
+    panel.style.background = "rgba(220,38,38,0.22)";
+    panel.style.borderColor = "#dc2626";
+    panel.style.color = "#fee2e2";
+  }
 })();
 </script>
 """,
-        height=220,
+        height=260,
     )
 
 
@@ -1371,7 +1379,7 @@ def _inject_slider_find_test(label: str) -> None:
   };
 
   const patch = () => {
-    let text = "MEDF JS SMOKE PANEL: SCRIPT RAN";
+    let text = "MEDF JS SMOKE PANEL: SCRIPT RAN\\nPATCH() ENTERED";
     try {
       const allSliders = Array.from(doc.querySelectorAll('[role="slider"]'));
       const labeledSliders = Array.from(doc.querySelectorAll('[role="slider"][aria-label]'));
@@ -2298,7 +2306,9 @@ def main() -> None:
 
     if debug_js_slider_smoke_tests:
         st.info("Debug enabled: injecting JS smoke panel")
+        st.warning("DEBUG CHECKPOINT: calling _inject_js_smoke_test() now")
         _inject_js_smoke_test()
+        st.warning("DEBUG CHECKPOINT: calling _inject_slider_find_test(...) now")
         _inject_slider_find_test("Fairness and Non-discrimination")
 
     if page == "Evaluate":
