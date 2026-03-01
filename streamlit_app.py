@@ -1288,8 +1288,8 @@ MEDF JS SMOKE PANEL: HTML RENDERED
 
 
 def _inject_slider_find_test(label: str) -> None:
-    label_json = json.dumps(label)
-    html = """
+    _ = label
+    html = r"""
 <div id="medf-find-panel" style="
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   font-size: 14px;
@@ -1301,288 +1301,31 @@ def _inject_slider_find_test(label: str) -> None:
   white-space: pre-wrap;
   line-height: 1.35;
 ">FIND TEST: HTML RENDERED</div>
-
+<div><noscript>FIND TEST: NOSCRIPT VISIBLE</noscript></div>
 <script>
 (function () {
-  const win = window;
-  const localDoc = document;
-  const panel = localDoc.getElementById("medf-find-panel");
-  if (!panel) return;
-  const label = __LABEL_JSON__;
-  let timeoutMarkerSeen = false;
-
-  const describeNode = (node) => {
-    if (!node) return "none";
-    const tag = (node.tagName || "").toLowerCase();
-    const role = node.getAttribute("role") || "";
-    const baseweb = node.getAttribute("data-baseweb") || "";
-    const cls = (node.className && typeof node.className === "string")
-      ? node.className.trim().replace(/\\s+/g, ".").slice(0, 60)
-      : "";
-    return `tag=${tag || "none"} role=${role || "none"} data-baseweb=${baseweb || "none"} class=${cls || "none"}`;
-  };
-
-  const isLargeContainer = (node) => {
-    if (!node || !(node instanceof HTMLElement)) return true;
-    return node.offsetWidth > 900 && node.offsetHeight > 250;
-  };
-
-  const applyOutline = (node) => {
-    if (!node || !(node instanceof HTMLElement)) return;
-    node.style.setProperty("outline", "3px solid magenta", "important");
-    node.style.setProperty("outline-offset", "1px", "important");
-  };
-
-  const applyBackgroundProof = (node) => {
-    if (!node || !(node instanceof HTMLElement) || isLargeContainer(node)) return false;
-    node.style.setProperty("background-image", "none", "important");
-    node.style.setProperty("background", "#27C4B7", "important");
-    node.style.setProperty("background-color", "#27C4B7", "important");
-    node.style.setProperty("border-color", "#27C4B7", "important");
-    return true;
-  };
-
-  const buildChain = (node) => {
-    const chain = [];
-    let current = node;
-    while (current && chain.length < 6) {
-      const tag = (current.tagName || "").toUpperCase();
-      if (tag === "BODY" || tag === "HTML") break;
-      chain.push(current);
-      current = current.parentElement;
-    }
-    return chain;
-  };
-
-  const clamp = (v, min, max) => Math.max(min, Math.min(max, Math.round(v)));
-
-  const baseLines = () => {
-    const lines = [];
-    lines.push("FIND TEST: HTML RENDERED");
-    lines.push("FIND TEST: JS EXECUTED (sync)");
-    if (timeoutMarkerSeen) {
-      lines.push("FIND TEST: JS EXECUTED (timeout)");
-    }
-    return lines;
-  };
-
-  const setPanel = (lines, success) => {
-    panel.textContent = lines.join("\\n");
-    if (success) {
-      panel.style.background = "rgba(22,163,74,0.18)";
-      panel.style.borderColor = "#16a34a";
-      panel.style.color = "#052e16";
-    } else {
-      panel.style.background = "rgba(220,38,38,0.18)";
-      panel.style.borderColor = "#dc2626";
-      panel.style.color = "#450a0a";
-    }
-  };
-
-  const resolveQueryDoc = () => {
-    const candidates = [];
-    try {
-      if (win.top && win.top.document) {
-        candidates.push({ source: "top", doc: win.top.document });
-      }
-    } catch (err) {}
-    try {
-      if (win.parent && win.parent.document) {
-        candidates.push({ source: "parent", doc: win.parent.document });
-      }
-    } catch (err) {}
-    candidates.push({ source: "local", doc: localDoc });
-
-    const seen = new Set();
-    for (const candidate of candidates) {
-      if (!candidate || !candidate.doc || seen.has(candidate.doc)) continue;
-      seen.add(candidate.doc);
-      try {
-        candidate.doc.querySelector("body");
-        const sliderCount = candidate.doc.querySelectorAll('[role="slider"]').length;
-        if (candidate.source !== "local" && sliderCount === 0) {
-          continue;
-        }
-        return candidate;
-      } catch (err) {
-        continue;
-      }
-    }
-    return { source: "local", doc: localDoc };
-  };
-
-  const patch = () => {
-    const lines = [];
-    lines.push(`=== PATCH RUN @ ${new Date().toISOString()} ===`);
-    lines.push(...baseLines());
-    try {
-      const resolved = resolveQueryDoc();
-      const queryDoc = resolved.doc;
-      const queryWin = queryDoc.defaultView || win;
-      lines.push("Query doc source: " + resolved.source);
-
-      const allSliders = Array.from(queryDoc.querySelectorAll('[role="slider"]'));
-      const labeledSliders = Array.from(queryDoc.querySelectorAll('[role="slider"][aria-label]'))
-        .filter((node) => ((node.getAttribute("aria-label") || "").trim().length > 0));
-
-      const labelCounts = new Map();
-      labeledSliders.forEach((node) => {
-        const ariaLabel = (node.getAttribute("aria-label") || "").trim();
-        labelCounts.set(ariaLabel, (labelCounts.get(ariaLabel) || 0) + 1);
-      });
-      const uniqueLabels = Array.from(labelCounts.keys()).slice(0, 25);
-      const labelCountEntries = uniqueLabels.map((ariaLabel) => `${ariaLabel}: ${labelCounts.get(ariaLabel)}`);
-
-      lines.push("Total [role=\"slider\"] count: " + allSliders.length);
-      lines.push("Current slider labels (first 25 unique): " + (uniqueLabels.length ? uniqueLabels.join(" | ") : "none"));
-      lines.push("Current slider label counts (first 25): " + (labelCountEntries.length ? labelCountEntries.join(" | ") : "none"));
-
-      const targetNodes = labeledSliders.filter(
-        (node) => (node.getAttribute("aria-label") || "") === label
-      );
-      const targetCount = targetNodes.length;
-      lines.push("Target label: " + label);
-      lines.push("Target present: " + (targetCount >= 1 ? "true" : "false"));
-
-      if (targetCount === 0) {
-        lines.push("Target not found in current DOM view");
-        setPanel(lines, false);
-        return;
-      }
-
-      const slider = targetNodes[0];
-      const container = slider.closest('[data-baseweb="slider"]') || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]'));
-      if (!container) {
-        lines.push("Fill root found: no (container not found)");
-        setPanel(lines, false);
-        return;
-      }
-
-      const viewportWidth = Math.max(
-        2,
-        (queryDoc.documentElement && queryDoc.documentElement.clientWidth) || queryWin.innerWidth || 2
-      );
-      const viewportHeight = Math.max(
-        2,
-        (queryDoc.documentElement && queryDoc.documentElement.clientHeight) || queryWin.innerHeight || 2
-      );
-      const clampX = (x) => clamp(x, 1, viewportWidth - 1);
-      const clampY = (y) => clamp(y, 1, viewportHeight - 1);
-
-      const r = container.getBoundingClientRect();
-      const viewportInnerHeight = Math.max(1, queryWin.innerHeight || viewportHeight);
-      const inViewport = !(r.bottom < 0 || r.top > viewportInnerHeight);
-      lines.push(`window.innerHeight: ${Math.round(viewportInnerHeight)}`);
-      lines.push(`Container vertical bounds: top=${Math.round(r.top)}, bottom=${Math.round(r.bottom)}`);
-      lines.push(`inViewport: ${inViewport ? "true" : "false"}`);
-      if (!inViewport) {
-        lines.push("Container not visible in viewport");
-        setPanel(lines, false);
-        return;
-      }
-
-      const x1 = clampX(r.left + 10);
-      const x2 = clampX(r.left + r.width / 2);
-      const x3 = clampX(r.right - 10);
-      const yA = clampY(r.top + r.height * 0.5);
-      const yB = clampY(r.top + r.height * 0.75);
-      const points = [
-        { x: x1, y: yA },
-        { x: x2, y: yA },
-        { x: x3, y: yA },
-        { x: x1, y: yB },
-        { x: x2, y: yB },
-        { x: x3, y: yB },
-      ];
-
-      const hitLines = [];
-      let bgAppliedAny = false;
-      lines.push(`Container rect: left=${Math.round(r.left)}, top=${Math.round(r.top)}, width=${Math.round(r.width)}, height=${Math.round(r.height)}`);
-      lines.push(`Sample coordinates: (${x1},${yA}), (${x2},${yA}), (${x3},${yA}), (${x1},${yB}), (${x2},${yB}), (${x3},${yB})`);
-      points.forEach((point, index) => {
-        const hit = queryDoc.elementFromPoint(point.x, point.y);
-        if (!hit || !(hit instanceof HTMLElement)) {
-          hitLines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): none`);
-          return;
-        }
-
-        const chain = buildChain(hit);
-        chain.forEach((node) => applyOutline(node));
-
-        const hitBgApplied = applyBackgroundProof(hit);
-        let parentBgApplied = false;
-        if (hit.parentElement && chain[1]) {
-          parentBgApplied = applyBackgroundProof(hit.parentElement);
-        }
-        bgAppliedAny = bgAppliedAny || hitBgApplied || parentBgApplied;
-
-        const hitBg = queryWin.getComputedStyle(hit).backgroundColor || "unknown";
-        hitLines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): ${describeNode(hit)}`);
-        hitLines.push("chain:");
-        chain.slice(0, 6).forEach((node) => {
-          hitLines.push(`- ${describeNode(node)}`);
-        });
-        hitLines.push(`Patched bg applied to hit element? ${hitBgApplied ? "yes" : "no"}`);
-        hitLines.push(`Computed bg after patch: ${hitBg}`);
-      });
-      lines.push("HIT TEST RESULTS:");
-      lines.push(...hitLines);
-
-      setPanel(lines, bgAppliedAny);
-    } catch (err) {
-      const errorMessage = err && err.message ? err.message : String(err);
-      const errorStack = err && err.stack ? err.stack : "unavailable";
-      lines.push("ERROR: " + errorMessage);
-      lines.push("STACK: " + errorStack);
-      setPanel(lines, false);
-    }
-  };
-
-  if (!win.__MEDF_HITTEST_THROTTLE__) {
-    win.__MEDF_HITTEST_THROTTLE__ = { pending: false, timer: null };
-  }
-  const throttle = win.__MEDF_HITTEST_THROTTLE__;
-
-  const schedulePatch = () => {
-    if (throttle.pending) return;
-    throttle.pending = true;
-    if (throttle.timer) {
-      win.clearTimeout(throttle.timer);
-    }
-    throttle.timer = win.setTimeout(() => {
-      throttle.pending = false;
-      patch();
-    }, 200);
-  };
-
-  if (!win.__MEDF_HITTEST_OBSERVER__) {
-    win.__MEDF_HITTEST_OBSERVER__ = true;
-    localDoc.addEventListener("pointerup", schedulePatch, true);
-    const observer = new MutationObserver(() => schedulePatch());
-    observer.observe(localDoc.body, {
-      subtree: true,
-      childList: true,
-      attributes: true,
-    });
-  }
-
+  const panel = document.getElementById("medf-find-panel");
   try {
-    patch();
-    win.setTimeout(() => {
-      timeoutMarkerSeen = true;
-      patch();
+    if (!panel) return;
+    panel.textContent += "\nFIND TEST: JS EXECUTED (sync)";
+    setTimeout(() => {
+      try {
+        panel.textContent += "\nFIND TEST: JS EXECUTED (timeout)";
+      } catch (e2) {
+        panel.textContent += "\nERROR: " + (e2 && e2.message ? e2.message : String(e2));
+        panel.textContent += "\nSTACK: " + (e2 && e2.stack ? e2.stack : "unavailable");
+      }
     }, 250);
-    win.setTimeout(patch, 700);
-  } catch (err) {
-    const lines = baseLines();
-    lines.push("ERROR: " + (err && err.message ? err.message : String(err)));
-    lines.push("STACK: " + (err && err.stack ? err.stack : "unavailable"));
-    setPanel(lines, false);
+  } catch (e) {
+    if (panel) {
+      panel.textContent += "\nERROR: " + (e && e.message ? e.message : String(e));
+      panel.textContent += "\nSTACK: " + (e && e.stack ? e.stack : "unavailable");
+    }
   }
 })();
 </script>
 """
-    components.html(html.replace("__LABEL_JSON__", label_json), height=360)
+    components.html(html, height=220)
 
 
 def _derive_auto_pareto_search_params(budget: int, bias: int) -> tuple[int, int]:
