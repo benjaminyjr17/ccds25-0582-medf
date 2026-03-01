@@ -1263,58 +1263,47 @@ def _inject_slider_fill_color_patcher() -> None:
     return {{ ok: true, pct }};
   }};
 
-  const getFullTrackCandidate = (root, maxW) => {{
-    if (!root || !maxW || maxW <= 0) return null;
-    const trackish = Array.from(root.querySelectorAll("div"))
+  const getFullTrackCandidates = (root, maxW) => {{
+    if (!root || !maxW || maxW <= 0) return [];
+    const fullWidth = Array.from(root.querySelectorAll("div"))
       .map((node) => {{
         const rect = node.getBoundingClientRect();
-        const cs = hostWin.getComputedStyle(node);
-        const bg = cs.backgroundColor || "transparent";
-        const bgImg = cs.backgroundImage || "none";
-        const opRaw = Number.parseFloat(cs.opacity || "1");
-        const op = Number.isNaN(opRaw) ? 1 : opRaw;
-        const pe = cs.pointerEvents || "auto";
-        let score = 0;
-        if (normalizeText(bgImg).includes("gradient")) score += 4;
-        if (normalizeText(bgImg) !== "none") score += 3;
-        if (!isTransparentColor(bg)) score += 2;
-        if (normalizeText(pe) !== "none") score += 2;
-        if (op >= 0.9) score += 1;
-        score += Math.max(0, (28 - rect.height) / 28);
         return {{
           node,
           width: rect.width,
           height: rect.height,
-          opacity: op,
-          score,
         }};
       }})
-      .filter((entry) => entry.width > 0 && entry.height > 0 && entry.height <= 28 && entry.width >= 80);
-
-    const ranked = trackish
-      .filter((entry) => entry.width >= maxW * 0.99 && entry.height >= 2 && entry.height <= 28)
-      .sort((a, b) => {{
-        if (b.score !== a.score) return b.score - a.score;
-        if (b.opacity !== a.opacity) return b.opacity - a.opacity;
-        return a.height - b.height;
-      }});
-    return ranked.length > 0 ? ranked[0].node : null;
+      .filter((entry) => (
+        entry.width > 0
+        && entry.height > 0
+        && entry.width >= 80
+        && entry.height >= 2
+        && entry.height <= 28
+        && entry.width >= maxW * 0.99
+      ))
+      .map((entry) => entry.node);
+    return fullWidth;
   }};
 
-  const patchGradientTrack = (track, pct) => {{
-    if (!track || typeof pct !== "number") return false;
-    const trackStyle = hostWin.getComputedStyle(track);
-    const trackBgBefore = trackStyle.backgroundColor || "transparent";
-    const unfilled = isTransparentColor(trackBgBefore) ? "rgba(255,255,255,0.22)" : trackBgBefore;
-    track.style.setProperty("background-image", "none", "important");
-    track.style.setProperty(
-      "background-image",
-      "linear-gradient(90deg, " + TURQ + " 0%, " + TURQ + " " + pct + "%, "
-      + unfilled + " " + pct + "%, " + unfilled + " 100%)",
-      "important"
-    );
-    track.style.setProperty("background-color", unfilled, "important");
-    return true;
+  const patchGradientTracks = (tracks, pct) => {{
+    if (!Array.isArray(tracks) || tracks.length === 0 || typeof pct !== "number") return false;
+    let patchedCount = 0;
+    tracks.forEach((track) => {{
+      if (!track) return;
+      const trackStyle = hostWin.getComputedStyle(track);
+      const trackBgBefore = trackStyle.backgroundColor || "transparent";
+      const unfilled = isTransparentColor(trackBgBefore) ? "rgba(255,255,255,0.22)" : trackBgBefore;
+      const gradient = "linear-gradient(90deg, " + TURQ + " 0%, " + TURQ + " " + pct + "%, "
+        + unfilled + " " + pct + "%, " + unfilled + " 100%)";
+      track.style.setProperty("background", "none", "important");
+      track.style.setProperty("background-image", "none", "important");
+      track.style.setProperty("background-color", unfilled, "important");
+      track.style.setProperty("background-image", gradient, "important");
+      track.style.setProperty("opacity", "1", "important");
+      patchedCount += 1;
+    }});
+    return patchedCount > 0;
   }};
 
   const patchFilled = (filled) => {{
@@ -1367,6 +1356,8 @@ def _inject_slider_fill_color_patcher() -> None:
       schedulePatch();
     }}, true);
     handle.addEventListener("keydown", schedulePatch, true);
+    handle.addEventListener("input", schedulePatch, true);
+    handle.addEventListener("change", schedulePatch, true);
   }};
 
   const patchAll = () => {{
@@ -1390,9 +1381,9 @@ def _inject_slider_fill_color_patcher() -> None:
       }}
 
       const aria = getAriaPercent(handle);
-      const track = getFullTrackCandidate(root, selected.maxW);
-      if (!aria.ok || !track) return;
-      patchGradientTrack(track, aria.pct);
+      const tracks = getFullTrackCandidates(root, selected.maxW);
+      if (!aria.ok || tracks.length === 0) return;
+      patchGradientTracks(tracks, aria.pct);
     }});
   }};
 
