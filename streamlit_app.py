@@ -845,6 +845,11 @@ def _apply_dimension_preset(preset: dict[str, float]) -> None:
         st.session_state[f"score_{dimension}"] = float(score)
 
 
+def _ensure_default(key: str, default: Any) -> None:
+    if key not in st.session_state:
+        st.session_state[key] = default
+
+
 class APICallError(Exception):
     def __init__(self, error_text: str, data: Any = None):
         super().__init__(error_text)
@@ -1119,18 +1124,63 @@ def _inject_advanced_slider_green_css() -> None:
 def _inject_slider_fill_color_patcher() -> None:
     st.markdown(
         """
-<style id="medf-likert-fill-vars-css">
-[data-medf-track="1"] {
-    background: none !important;
-    background-image: linear-gradient(
-      90deg,
-      var(--medf-fill-color, #27C4B7) 0%,
-      var(--medf-fill-color, #27C4B7) var(--medf-fill-pct, 0%),
-      var(--medf-unfilled, rgba(255,255,255,0.22)) var(--medf-fill-pct, 0%),
-      var(--medf-unfilled, rgba(255,255,255,0.22)) 100%
-    ) !important;
-    background-color: var(--medf-unfilled, rgba(255,255,255,0.22)) !important;
-    opacity: 1 !important;
+<style>
+
+/* ===== MEDF Plain Slider (Deterministic & Stable) ===== */
+
+/* Scope only MEDF Likert sliders */
+div[data-baseweb="slider"][data-medf-likert="1"]{
+  --_medf_fill: var(--medf-fill-color, #27C4B7);
+  --_medf_unfilled: var(--medf-unfilled, rgba(255,255,255,0.22));
+  --_medf_pct: var(--medf-fill-pct, 0%);
+}
+
+/* 1) Neutralize BaseWeb internal track containers only */
+div[data-baseweb="slider"][data-medf-likert="1"] div[aria-hidden="true"]{
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+div[data-baseweb="slider"][data-medf-likert="1"] div[aria-hidden="true"] > div{
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* 2) Ensure non-real medf-track nodes don't paint */
+div[data-baseweb="slider"][data-medf-likert="1"] div[data-medf-track="1"]{
+  background: transparent !important;
+}
+
+/* 3) Style ONLY the real visual track bar.
+   Match any medf-track node that has inline height styling. */
+div[data-baseweb="slider"][data-medf-likert="1"] div[data-medf-track="1"][style*="height:"]{
+  height: 6px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(
+    to right,
+    var(--_medf_fill) 0%,
+    var(--_medf_fill) var(--_medf_pct),
+    var(--_medf_unfilled) var(--_medf_pct),
+    var(--_medf_unfilled) 100%
+  ) !important;
+}
+
+/* 4) Thumb styling */
+div[data-baseweb="slider"][data-medf-likert="1"] div[role="slider"]{
+  background-color: var(--_medf_fill) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+div[data-baseweb="slider"][data-medf-likert="1"] div[role="slider"]:focus{
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 5) Keep it visually plain */
+div[data-baseweb="slider"][data-medf-likert="1"]{
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
 }
 </style>
 """,
@@ -2048,7 +2098,6 @@ def main() -> None:
             str(item.get("id", "")): label
             for label, item in stakeholder_options.items()
         }
-
         weights_for_request: dict[str, float] = {
             dimension: 1.0 / len(UNIFIED_DIMENSIONS)
             for dimension in UNIFIED_DIMENSIONS
@@ -2363,8 +2412,13 @@ def main() -> None:
         ai_system_id = "demo_hiring_screening_system"
         ai_system_name = str(DEMO_SCENARIO_NAME)
         ai_system_description = str(DEMO_SCENARIO_DESCRIPTION)
-        for dimension, value in DEMO_DIMENSION_SCORES.items():
-            st.session_state[f"score_{dimension}"] = float(value)
+        if not st.session_state.get("__demo_scores_applied__", False):
+            for dimension, value in DEMO_DIMENSION_SCORES.items():
+                st.session_state[f"score_{dimension}"] = float(value)
+            st.session_state["__demo_scores_applied__"] = True
+            st.rerun()
+    else:
+        st.session_state["__demo_scores_applied__"] = False
     dimension_scores: dict[str, float] = {
         dimension: float(value)
         for dimension, value in PRESET_BASELINE.items()
@@ -2392,28 +2446,26 @@ def main() -> None:
                         _apply_dimension_preset(PRESET_SAFETY_HEAVY)
 
                 default_scores = PRESET_BASELINE
-                for dimension in UNIFIED_DIMENSIONS:
-                    session_key = f"score_{dimension}"
-                    if session_key not in st.session_state:
-                        st.session_state[session_key] = float(default_scores[dimension])
-                for dimension in UNIFIED_DIMENSIONS:
-                    slider_col, badge_col = st.columns([0.86, 0.14])
-                    with slider_col:
-                        current_value = float(st.session_state[f"score_{dimension}"])
-                        dimension_scores[dimension] = float(
+                with st.form("likert_form", border=False):
+                    for dimension in UNIFIED_DIMENSIONS:
+                        session_key = f"score_{dimension}"
+                        _ensure_default(session_key, float(default_scores[dimension]))
+                        slider_col, badge_col = st.columns([0.86, 0.14])
+                        with slider_col:
                             st.slider(
                                 DIMENSION_DISPLAY_NAMES[dimension],
                                 min_value=LIKERT_MIN,
                                 max_value=LIKERT_MAX,
-                                value=current_value,
                                 step=0.1,
                                 format="%.1f",
-                                key=f"score_{dimension}",
+                                key=session_key,
                             )
-                        )
-                    with badge_col:
-                        st.markdown(
-                            f"""
+                        with badge_col:
+                            current_value = float(
+                                st.session_state.get(session_key, float(default_scores[dimension]))
+                            )
+                            st.markdown(
+                                f"""
 <div style="
   display:inline-block;
   padding: 4px 10px;
@@ -2425,11 +2477,14 @@ def main() -> None:
   text-align: center;
   min-width: 56px;
 ">
-  {dimension_scores[dimension]:.1f}
+  {current_value:.1f}
 </div>
 """,
-                            unsafe_allow_html=True,
-                        )
+                                unsafe_allow_html=True,
+                            )
+                    applied = st.form_submit_button("Apply Dimension Scores")
+                if applied:
+                    st.session_state["__likert_applied__"] = True
     else:
         if not case_screenshot_mode:
             selected_framework_text = framework_id or "N/A"
@@ -2439,6 +2494,10 @@ def main() -> None:
                 f"Selected framework: {selected_framework_text} | "
                 "Fixed stakeholders: developer, regulator, affected_community"
             )
+    dimension_scores = {
+        dimension: float(st.session_state.get(f"score_{dimension}", PRESET_BASELINE[dimension]))
+        for dimension in UNIFIED_DIMENSIONS
+    }
 
     if demo_active and stakeholder_id in DEMO_WEIGHTS:
         weights_for_request = {
