@@ -1263,27 +1263,39 @@ def _inject_slider_fill_color_patcher() -> None:
     return {{ ok: true, pct }};
   }};
 
-  const getFullTrackCandidates = (root, maxW) => {{
-    if (!root || !maxW || maxW <= 0) return [];
-    const fullWidth = Array.from(root.querySelectorAll("div"))
+  const getFullTrackCandidates = (root) => {{
+    if (!root) return [];
+    const nodeSet = new Set([
+      ...Array.from(root.querySelectorAll("div")),
+      ...Array.from(root.querySelectorAll('[role="progressbar"]')),
+    ]);
+    const trackish = Array.from(nodeSet)
       .map((node) => {{
         const rect = node.getBoundingClientRect();
+        const cs = hostWin.getComputedStyle(node);
+        const bgColor = normalizeText(cs.backgroundColor);
+        const bgImage = normalizeText(cs.backgroundImage);
+        const role = normalizeText(node.getAttribute("role"));
+        const hasPaint = (!isTransparentColor(bgColor)) || bgImage !== "none" || role === "progressbar";
         return {{
           node,
           width: rect.width,
           height: rect.height,
+          hasPaint,
         }};
       }})
       .filter((entry) => (
         entry.width > 0
         && entry.height > 0
         && entry.width >= 80
-        && entry.height >= 2
-        && entry.height <= 28
-        && entry.width >= maxW * 0.99
-      ))
+        && entry.height <= 40
+        && entry.hasPaint
+      ));
+    if (trackish.length === 0) return [];
+    const maxW = Math.max(...trackish.map((entry) => entry.width));
+    return trackish
+      .filter((entry) => entry.width >= maxW * 0.99)
       .map((entry) => entry.node);
-    return fullWidth;
   }};
 
   const patchGradientTracks = (tracks, pct) => {{
@@ -1318,11 +1330,128 @@ def _inject_slider_fill_color_patcher() -> None:
     return true;
   }};
 
-  const schedulePatch = () => {{
-    if (state.pending) return;
+  const resolveHandle = (label, handleHint = null) => {{
+    if (
+      handleHint
+      && handleHint.nodeType === 1
+      && typeof handleHint.getAttribute === "function"
+      && handleHint.getAttribute("aria-label") === label
+    ) {{
+      return handleHint;
+    }}
+    const escapedLabel = cssEscape(label);
+    const handles = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escapedLabel + '"]');
+    if (!handles || handles.length === 0) return null;
+    return handles[0];
+  }};
+
+  const raf = (cb) => {{
+    if (typeof hostWin.requestAnimationFrame === "function") {{
+      return hostWin.requestAnimationFrame(cb);
+    }}
+    return hostWin.setTimeout(cb, 16);
+  }};
+
+  const patchOneLabel = (label, handleHint = null) => {{
+    const handle = resolveHandle(label, handleHint);
+    if (!handle) return false;
+    attachDragListeners(handle, label);
+    const root = resolveRoot(handle);
+    if (!root) return false;
+
+    const selected = selectFilled(root);
+    if (selected.best) {{
+      const chosenRect = selected.best.getBoundingClientRect();
+      if (!(selected.maxW > 0 && chosenRect.width >= selected.maxW * 0.99)) {{
+        patchFilled(selected.best);
+        return true;
+      }}
+    }}
+
+    const aria = getAriaPercent(handle);
+    const tracks = getFullTrackCandidates(root);
+    if (!aria.ok || tracks.length === 0) return false;
+    return patchGradientTracks(tracks, aria.pct);
+  }};
+
+  const stabilizePatch = (label, handleHint = null) => {{
+    if (!label) return;
+    if (!hostWin.__MEDF_STABILIZE_STATE__) hostWin.__MEDF_STABILIZE_STATE__ = new Map();
+    const stabilizeState = hostWin.__MEDF_STABILIZE_STATE__;
+    const existing = stabilizeState.get(label);
+    if (existing && existing.active) {{
+      existing.remaining = 10;
+      if (handleHint && handleHint.nodeType === 1) {{
+        existing.handleHint = handleHint;
+      }}
+      return;
+    }}
+    const burst = {{
+      active: true,
+      remaining: 10,
+      handleHint: handleHint && handleHint.nodeType === 1 ? handleHint : null,
+      rafId: null,
+    }};
+    stabilizeState.set(label, burst);
+    const tick = () => {{
+      if (!burst.active) return;
+      patchOneLabel(label, burst.handleHint);
+      burst.handleHint = null;
+      burst.remaining -= 1;
+      if (burst.remaining > 0) {{
+        burst.rafId = raf(tick);
+      }} else {{
+        burst.active = false;
+        stabilizeState.delete(label);
+      }}
+    }};
+    burst.rafId = raf(tick);
+  }};
+
+  if (!state.pendingLabels) state.pendingLabels = new Set();
+  if (!state.labelHints) state.labelHints = new Map();
+  if (state.pendingAll !== true && state.pendingAll !== false) state.pendingAll = false;
+
+  const flushStabilizeQueue = () => {{
+    state.pending = false;
+    state.timer = null;
+    if (state.pendingAll) {{
+      state.pendingAll = false;
+      LIKERT_LABELS.forEach((label) => {{
+        const hint = state.labelHints.get(label) || null;
+        stabilizePatch(label, hint);
+      }});
+      state.pendingLabels.clear();
+      state.labelHints.clear();
+      return;
+    }}
+    const labels = Array.from(state.pendingLabels);
+    state.pendingLabels.clear();
+    labels.forEach((label) => {{
+      const hint = state.labelHints.get(label) || null;
+      stabilizePatch(label, hint);
+    }});
+    state.labelHints.clear();
+  }};
+
+  const queueStabilizeFlush = () => {{
     state.pending = true;
     if (state.timer) hostWin.clearTimeout(state.timer);
-    state.timer = hostWin.setTimeout(patchAll, 180);
+    state.timer = hostWin.setTimeout(flushStabilizeQueue, 180);
+  }};
+
+  const scheduleStabilizeAll = () => {{
+    state.pendingAll = true;
+    queueStabilizeFlush();
+  }};
+
+  const scheduleStabilizeLabel = (label, handleHint = null) => {{
+    if (!label) return;
+    state.pendingLabels.add(label);
+    if (handleHint && handleHint.nodeType === 1) {{
+      state.labelHints.set(label, handleHint);
+    }}
+    queueStabilizeFlush();
   }};
 
   const attachDragListeners = (handle, label) => {{
@@ -1341,55 +1470,40 @@ def _inject_slider_fill_color_patcher() -> None:
 
     const startDragTimer = () => {{
       clearDragTimer();
-      const timerId = hostWin.setInterval(() => patchAll(), 50);
+      stabilizePatch(label, handle);
+      const timerId = hostWin.setInterval(() => patchOneLabel(label, handle), 50);
       hostWin.__MEDF_DRAG_TIMER__.set(label, timerId);
     }};
 
     handle.addEventListener("pointerdown", startDragTimer, true);
-    handle.addEventListener("pointermove", schedulePatch, true);
+    handle.addEventListener("pointermove", () => scheduleStabilizeLabel(label, handle), true);
     handle.addEventListener("pointerup", () => {{
       clearDragTimer();
-      schedulePatch();
+      stabilizePatch(label, handle);
+      scheduleStabilizeLabel(label, handle);
     }}, true);
     handle.addEventListener("pointercancel", () => {{
       clearDragTimer();
-      schedulePatch();
+      stabilizePatch(label, handle);
+      scheduleStabilizeLabel(label, handle);
     }}, true);
-    handle.addEventListener("keydown", schedulePatch, true);
-    handle.addEventListener("input", schedulePatch, true);
-    handle.addEventListener("change", schedulePatch, true);
+    handle.addEventListener("keydown", () => {{
+      stabilizePatch(label, handle);
+      scheduleStabilizeLabel(label, handle);
+    }}, true);
+    handle.addEventListener("input", () => scheduleStabilizeLabel(label, handle), true);
+    handle.addEventListener("change", () => scheduleStabilizeLabel(label, handle), true);
   }};
 
   const patchAll = () => {{
-    state.pending = false;
     LIKERT_LABELS.forEach((label) => {{
-      const escapedLabel = cssEscape(label);
-      const handles = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escapedLabel + '"]');
-      if (!handles || handles.length === 0) return;
-      const handle = handles[0];
-      attachDragListeners(handle, label);
-      const root = resolveRoot(handle);
-      if (!root) return;
-
-      const selected = selectFilled(root);
-      if (selected.best) {{
-        const chosenRect = selected.best.getBoundingClientRect();
-        if (!(selected.maxW > 0 && chosenRect.width >= selected.maxW * 0.99)) {{
-          patchFilled(selected.best);
-          return;
-        }}
-      }}
-
-      const aria = getAriaPercent(handle);
-      const tracks = getFullTrackCandidates(root, selected.maxW);
-      if (!aria.ok || tracks.length === 0) return;
-      patchGradientTracks(tracks, aria.pct);
+      patchOneLabel(label);
     }});
   }};
 
   if (!state.wired) {{
     state.wired = true;
-    state.observer = new hostWin.MutationObserver(schedulePatch);
+    state.observer = new hostWin.MutationObserver(scheduleStabilizeAll);
     if (hostDoc.body) {{
       state.observer.observe(hostDoc.body, {{
         childList: true,
@@ -1398,13 +1512,13 @@ def _inject_slider_fill_color_patcher() -> None:
         attributeFilter: ["style", "class", "aria-valuenow"],
       }});
     }}
-    hostDoc.addEventListener("input", schedulePatch, true);
-    hostDoc.addEventListener("pointerup", schedulePatch, true);
+    hostDoc.addEventListener("input", scheduleStabilizeAll, true);
+    hostDoc.addEventListener("pointerup", scheduleStabilizeAll, true);
   }}
 
   patchAll();
-  hostWin.setTimeout(patchAll, 250);
-  hostWin.setTimeout(patchAll, 500);
+  hostWin.setTimeout(scheduleStabilizeAll, 250);
+  hostWin.setTimeout(scheduleStabilizeAll, 500);
 }})();
 </script>
 """,
