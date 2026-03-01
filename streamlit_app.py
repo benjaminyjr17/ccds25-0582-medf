@@ -1292,6 +1292,7 @@ def _inject_slider_find_test(label: str) -> None:
 (function () {
   const parentWin = window.parent && window.parent.document ? window.parent : window;
   const parentDoc = parentWin.document || document;
+  const doc = parentDoc || document;
   const panel = parentDoc.getElementById("medf-panel");
   if (!panel) return;
   const label = __LABEL_JSON__;
@@ -1303,29 +1304,61 @@ def _inject_slider_find_test(label: str) -> None:
     if (!node) return "none";
     const tag = (node.tagName || "").toLowerCase();
     const role = node.getAttribute("role") || "";
+    const baseweb = node.getAttribute("data-baseweb") || "";
     const cls = (node.className && typeof node.className === "string")
-      ? node.className.trim().split(/\\s+/).slice(0, 3).join(".")
+      ? node.className.trim().replace(/\\s+/g, ".").slice(0, 60)
       : "";
-    const style = (node.getAttribute("style") || "").replace(/\\s+/g, " ").trim().slice(0, 120);
-    return `${tag} role=${role || "none"} class=${cls || "none"} style=${style || "none"}`;
+    return `tag=${tag || "none"} role=${role || "none"} data-baseweb=${baseweb || "none"} class=${cls || "none"}`;
   };
 
-  const isVisibleBarLike = (node) => {
-    if (!node || !(node instanceof HTMLElement)) return false;
-    const cs = parentWin.getComputedStyle(node);
-    const bg = cs.backgroundColor || "";
-    const isTransparent = bg === "rgba(0, 0, 0, 0)" || bg === "transparent";
-    return !isTransparent && node.offsetWidth > 0 && node.offsetHeight > 0;
+  const isLargeContainer = (node) => {
+    if (!node || !(node instanceof HTMLElement)) return true;
+    return node.offsetWidth > 900 && node.offsetHeight > 250;
+  };
+
+  const applyOutline = (node) => {
+    if (!node || !(node instanceof HTMLElement)) return;
+    node.style.setProperty("outline", "3px solid magenta", "important");
+    node.style.setProperty("outline-offset", "1px", "important");
+  };
+
+  const applyBackgroundProof = (node) => {
+    if (!node || !(node instanceof HTMLElement) || isLargeContainer(node)) return false;
+    node.style.setProperty("background-image", "none", "important");
+    node.style.setProperty("background", "#27C4B7", "important");
+    node.style.setProperty("background-color", "#27C4B7", "important");
+    node.style.setProperty("border-color", "#27C4B7", "important");
+    return true;
+  };
+
+  const buildChain = (node) => {
+    const chain = [];
+    let current = node;
+    while (current && chain.length < 6) {
+      const tag = (current.tagName || "").toUpperCase();
+      if (tag === "BODY" || tag === "HTML") break;
+      chain.push(current);
+      current = current.parentElement;
+    }
+    return chain;
+  };
+
+  const clampX = (x) => {
+    const width = Math.max(2, (doc.documentElement && doc.documentElement.clientWidth) || parentWin.innerWidth || 2);
+    return Math.max(1, Math.min(width - 1, Math.round(x)));
+  };
+
+  const clampY = (y) => {
+    const height = Math.max(2, (doc.documentElement && doc.documentElement.clientHeight) || parentWin.innerHeight || 2);
+    return Math.max(1, Math.min(height - 1, Math.round(y)));
   };
 
   const patch = () => {
-    const allSliders = Array.from(parentDoc.querySelectorAll('[role="slider"]'));
-    const nodes = parentDoc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
+    const allSliders = Array.from(doc.querySelectorAll('[role="slider"]'));
+    const nodes = doc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
     const smokeRunning = parentWin.__MEDF_JS_SMOKE__ === true;
+    const isTargetLabel = label === "Fairness and Non-discrimination";
     const slider = nodes[0] || null;
-    const root = slider
-      ? (slider.closest('[data-baseweb="slider"]') || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]')))
-      : null;
 
     let text = "MEDF JS SMOKE PANEL: SCRIPT RAN";
     text += '\\nTotal [role="slider"] count: ' + allSliders.length;
@@ -1342,8 +1375,19 @@ def _inject_slider_find_test(label: str) -> None:
       text += '\\nDiscovered aria-labels (first 15): ' + (discovered.length ? discovered.join(' | ') : 'none');
     }
 
-    if (!root) {
-      text += '\\nFill root found: no (root not found)';
+    if (!isTargetLabel) {
+      text += '\\nHIT TEST RESULTS: skipped (non-target label)';
+      panel.style.whiteSpace = "pre-wrap";
+      panel.style.pointerEvents = "none";
+      panel.textContent = text;
+      panel.style.background = "rgba(22,163,74,0.22)";
+      panel.style.borderColor = "#16a34a";
+      panel.style.color = "#dcfce7";
+      return;
+    }
+
+    if (!slider) {
+      text += '\\nHIT TEST RESULTS: no target slider found';
       panel.style.whiteSpace = "pre-wrap";
       panel.style.pointerEvents = "none";
       panel.textContent = text;
@@ -1353,68 +1397,89 @@ def _inject_slider_find_test(label: str) -> None:
       return;
     }
 
-    const progressbars = Array.from(root.querySelectorAll('[role="progressbar"]'));
-    const widthNodes = Array.from(root.querySelectorAll('[style*="width"]'))
-      .filter((node) => {
-        const style = (node.getAttribute("style") || "").toLowerCase();
-        return node.getAttribute("role") !== "slider" && style.includes("%");
+    const r = slider.getBoundingClientRect();
+    const x1 = clampX(r.left + 10);
+    const x2 = clampX(r.left + r.width / 2);
+    const x3 = clampX(r.right - 10);
+    const y1 = clampY(r.top + r.height / 2);
+    const y2 = clampY(r.top + r.height * 0.80);
+    const y3 = clampY(r.top + r.height * 0.20);
+    const points = [
+      { x: x1, y: y1 },
+      { x: x2, y: y1 },
+      { x: x3, y: y1 },
+      { x: x2, y: y2 },
+      { x: x2, y: y3 },
+    ];
+
+    const lines = [];
+    let bgAppliedAny = false;
+    points.forEach((point, index) => {
+      const hit = (doc.elementFromPoint && doc.elementFromPoint(point.x, point.y)) ||
+        (document.elementFromPoint && document.elementFromPoint(point.x, point.y));
+      if (!hit || !(hit instanceof HTMLElement)) {
+        lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): none`);
+        return;
+      }
+
+      const chain = buildChain(hit);
+      chain.forEach((node) => applyOutline(node));
+
+      const hitBgApplied = applyBackgroundProof(hit);
+      let parentBgApplied = false;
+      if (hit.parentElement && chain[1]) {
+        parentBgApplied = applyBackgroundProof(hit.parentElement);
+      }
+      bgAppliedAny = bgAppliedAny || hitBgApplied || parentBgApplied;
+
+      const hitBg = parentWin.getComputedStyle(hit).backgroundColor || "unknown";
+      lines.push(`point ${index + 1} (x=${point.x}, y=${point.y}): ${describeNode(hit)}`);
+      lines.push("chain:");
+      chain.slice(0, 6).forEach((node) => {
+        lines.push(`- ${describeNode(node)}`);
       });
-    const transformNodes = Array.from(root.querySelectorAll('[style*="transform"]'))
-      .filter((node) => node.getAttribute("role") !== "slider");
-    const bars = Array.from(root.querySelectorAll("div"));
+      lines.push(`Patched bg applied to hit element? ${hitBgApplied ? "yes" : "no"}`);
+      lines.push(`Computed bg after patch: ${hitBg}`);
+    });
 
-    let best = null;
-    if (progressbars.length === 1) {
-      best = progressbars[0];
-    } else if (widthNodes.length === 1) {
-      best = widthNodes[0];
-    } else if (transformNodes.length === 1) {
-      best = transformNodes[0];
-    } else {
-      const union = [];
-      const seen = new Set();
-      [...progressbars, ...widthNodes, ...transformNodes, ...bars].forEach((node) => {
-        if (!node || seen.has(node)) return;
-        seen.add(node);
-        union.push(node);
-      });
-      best = union.find((node) => isVisibleBarLike(node)) || null;
-    }
-
-    text += '\\nFill root found: yes';
-    text += '\\nCandidate counts: progressbar=' + progressbars.length + ', width=' + widthNodes.length + ', transform=' + transformNodes.length;
-
-    if (!best) {
-      text += '\\nChosen: no fill candidate';
-      panel.style.whiteSpace = "pre-wrap";
-      panel.style.pointerEvents = "none";
-      panel.textContent = text;
-      panel.style.background = "rgba(220,38,38,0.22)";
-      panel.style.borderColor = "#dc2626";
-      panel.style.color = "#fee2e2";
-      return;
-    }
-
-    best.style.outline = "3px solid magenta";
-    best.style.backgroundColor = "#27C4B7";
-    best.style.borderColor = "#27C4B7";
-    const bg = parentWin.getComputedStyle(best).backgroundColor;
-    text += '\\nChosen: ' + describeNode(best);
-    text += '\\nChosen style attr (first 120 chars): ' + ((best.getAttribute("style") || "").replace(/\\s+/g, " ").trim().slice(0, 120) || "none");
-    text += '\\nComputed bg after apply: ' + bg;
+    text += "\\nHIT TEST RESULTS:";
+    text += "\\n" + lines.join("\\n");
 
     panel.style.whiteSpace = "pre-wrap";
     panel.style.pointerEvents = "none";
     panel.textContent = text;
-    panel.style.background = "rgba(22,163,74,0.22)";
-    panel.style.borderColor = "#16a34a";
-    panel.style.color = "#dcfce7";
+    if (bgAppliedAny) {
+      panel.style.background = "rgba(22,163,74,0.22)";
+      panel.style.borderColor = "#16a34a";
+      panel.style.color = "#dcfce7";
+    } else {
+      panel.style.background = "rgba(220,38,38,0.22)";
+      panel.style.borderColor = "#dc2626";
+      panel.style.color = "#fee2e2";
+    }
   };
 
-  if (!parentWin.__MEDF_FIND_TEST_OBSERVER__) {
-    parentWin.__MEDF_FIND_TEST_OBSERVER__ = true;
-    parentDoc.addEventListener("pointerup", () => patch(), true);
-    const observer = new MutationObserver(() => patch());
+  if (!parentWin.__MEDF_HITTEST_THROTTLE__) {
+    parentWin.__MEDF_HITTEST_THROTTLE__ = { pending: false, timer: null };
+  }
+  const throttle = parentWin.__MEDF_HITTEST_THROTTLE__;
+
+  const schedulePatch = () => {
+    if (throttle.pending) return;
+    throttle.pending = true;
+    if (throttle.timer) {
+      parentWin.clearTimeout(throttle.timer);
+    }
+    throttle.timer = parentWin.setTimeout(() => {
+      throttle.pending = false;
+      patch();
+    }, 200);
+  };
+
+  if (!parentWin.__MEDF_HITTEST_OBSERVER__) {
+    parentWin.__MEDF_HITTEST_OBSERVER__ = true;
+    parentDoc.addEventListener("pointerup", schedulePatch, true);
+    const observer = new MutationObserver(() => schedulePatch());
     observer.observe(parentDoc.body, {
       subtree: true,
       childList: true,
@@ -1423,7 +1488,7 @@ def _inject_slider_find_test(label: str) -> None:
   }
 
   patch();
-  parentWin.setTimeout(patch, 120);
+  parentWin.setTimeout(patch, 250);
 })();
 </script>
 """
