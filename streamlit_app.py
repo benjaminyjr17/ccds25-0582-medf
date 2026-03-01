@@ -1245,47 +1245,43 @@ def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
 
 # Diagnostic smoke tests: verify injected JS runs and whether slider DOM is queryable without DevTools.
 def _inject_js_smoke_test() -> None:
+    st.markdown(
+        """
+<div id="medf-panel" style="
+  padding: 18px 20px;
+  border-radius: 12px;
+  border: 2px solid #475569;
+  background: rgba(51,65,85,0.18);
+  color: #f8fafc;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.45;
+  margin: 0.5rem 0 0.75rem 0;
+  pointer-events: none;
+">
+  MEDF JS SMOKE PANEL: HTML RENDERED
+</div>
+""",
+        unsafe_allow_html=True,
+    )
     components.html(
         """
 <script>
 (function () {
   const parentWin = window.parent && window.parent.document ? window.parent : window;
-  const parentDoc = parentWin.document;
-  const BADGE_ID = "medf-js-smoke-badge";
-  let badge = parentDoc.getElementById(BADGE_ID);
-  if (!badge) {
-    badge = parentDoc.createElement("div");
-    badge.id = BADGE_ID;
-    badge.setAttribute("data-medf-smoke", "1");
-    badge.style.position = "fixed";
-    badge.style.top = "14px";
-    badge.style.right = "14px";
-    badge.style.zIndex = "10000";
-    badge.style.padding = "6px 10px";
-    badge.style.borderRadius = "999px";
-    badge.style.border = "1px solid #334155";
-    badge.style.background = "#334155";
-    badge.style.color = "#ecfeff";
-    badge.style.fontSize = "12px";
-    badge.style.fontWeight = "700";
-    badge.style.boxShadow = "0 4px 12px rgba(0,0,0,0.28)";
-    parentDoc.body.appendChild(badge);
-  }
-  badge.textContent = "JS SMOKE TEST: ACTIVE";
+  const parentDoc = parentWin.document || document;
+  const panel = parentDoc.getElementById("medf-panel");
   parentWin.__MEDF_JS_SMOKE__ = true;
-  badge.textContent = "JS SMOKE TEST: SCRIPT RAN";
-  badge.style.background = "#16a34a";
-  badge.style.borderColor = "#16a34a";
-  window.addEventListener("unload", () => {
-    const existing = parentDoc.getElementById(BADGE_ID);
-    if (existing && existing.getAttribute("data-medf-smoke") === "1") {
-      existing.remove();
-    }
-  });
+  if (!panel) return;
+  panel.textContent = "MEDF JS SMOKE PANEL: SCRIPT RAN";
+  panel.style.background = "rgba(22,163,74,0.22)";
+  panel.style.borderColor = "#16a34a";
+  panel.style.color = "#dcfce7";
+  panel.style.pointerEvents = "none";
 })();
 </script>
 """,
-        height=0,
+        height=220,
     )
 
 
@@ -1295,32 +1291,45 @@ def _inject_slider_find_test(label: str) -> None:
 <script>
 (function () {
   const parentWin = window.parent && window.parent.document ? window.parent : window;
-  const parentDoc = parentWin.document;
-  const BADGE_ID = "medf-js-smoke-badge";
-  const badge = parentDoc.getElementById(BADGE_ID);
-  if (!badge) return;
+  const parentDoc = parentWin.document || document;
+  const panel = parentDoc.getElementById("medf-panel");
+  if (!panel) return;
   const label = __LABEL_JSON__;
   const escaped = (parentWin.CSS && typeof parentWin.CSS.escape === "function")
     ? parentWin.CSS.escape(label)
     : label.replace(/["\\\\]/g, "\\\\$&");
+  const allSliders = Array.from(parentDoc.querySelectorAll('[role="slider"]'));
   const nodes = parentDoc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
   const smokeRunning = parentWin.__MEDF_JS_SMOKE__ === true;
-  let text = 'Sliders found for "' + label + '": ' + nodes.length;
+  let text = 'MEDF JS SMOKE PANEL: SCRIPT RAN';
+  text += '\\nTotal [role="slider"] count: ' + allSliders.length;
+  text += '\\nSliders found for "' + label + '": ' + nodes.length;
+  if (nodes.length === 0) {
+    const discovered = Array.from(parentDoc.querySelectorAll('[role="slider"][aria-label]'))
+      .map((node) => node.getAttribute("aria-label") || "")
+      .filter((value) => value.length > 0)
+      .slice(0, 15);
+    text += '\\nDiscovered aria-labels (first 15): ' + (discovered.length ? discovered.join(' | ') : 'none');
+  }
   if (!smokeRunning) {
     text += " (SCRIPT NOT RUNNING)";
   }
-  badge.textContent = text;
+  panel.style.whiteSpace = "pre-wrap";
+  panel.style.pointerEvents = "none";
+  panel.textContent = text;
   if (nodes.length > 0) {
-    badge.style.background = "#16a34a";
-    badge.style.borderColor = "#16a34a";
+    panel.style.background = "rgba(22,163,74,0.22)";
+    panel.style.borderColor = "#16a34a";
+    panel.style.color = "#dcfce7";
   } else {
-    badge.style.background = "#dc2626";
-    badge.style.borderColor = "#dc2626";
+    panel.style.background = "rgba(220,38,38,0.22)";
+    panel.style.borderColor = "#dc2626";
+    panel.style.color = "#fee2e2";
   }
 })();
 </script>
 """
-    components.html(script.replace("__LABEL_JSON__", label_json), height=0)
+    components.html(script.replace("__LABEL_JSON__", label_json), height=220)
 
 
 def _derive_auto_pareto_search_params(budget: int, bias: int) -> tuple[int, int]:
@@ -2093,6 +2102,7 @@ def main() -> None:
         }
 
     if debug_js_slider_smoke_tests:
+        st.info("Debug enabled: injecting JS smoke panel")
         _inject_js_smoke_test()
         _inject_slider_find_test("Fairness and Non-discrimination")
 
