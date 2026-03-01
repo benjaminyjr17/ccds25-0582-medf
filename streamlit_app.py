@@ -1298,34 +1298,132 @@ def _inject_slider_find_test(label: str) -> None:
   const escaped = (parentWin.CSS && typeof parentWin.CSS.escape === "function")
     ? parentWin.CSS.escape(label)
     : label.replace(/["\\\\]/g, "\\\\$&");
-  const allSliders = Array.from(parentDoc.querySelectorAll('[role="slider"]'));
-  const nodes = parentDoc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
-  const smokeRunning = parentWin.__MEDF_JS_SMOKE__ === true;
-  let text = 'MEDF JS SMOKE PANEL: SCRIPT RAN';
-  text += '\\nTotal [role="slider"] count: ' + allSliders.length;
-  text += '\\nSliders found for "' + label + '": ' + nodes.length;
-  if (nodes.length === 0) {
-    const discovered = Array.from(parentDoc.querySelectorAll('[role="slider"][aria-label]'))
-      .map((node) => node.getAttribute("aria-label") || "")
-      .filter((value) => value.length > 0)
-      .slice(0, 15);
-    text += '\\nDiscovered aria-labels (first 15): ' + (discovered.length ? discovered.join(' | ') : 'none');
-  }
-  if (!smokeRunning) {
-    text += " (SCRIPT NOT RUNNING)";
-  }
-  panel.style.whiteSpace = "pre-wrap";
-  panel.style.pointerEvents = "none";
-  panel.textContent = text;
-  if (nodes.length > 0) {
+
+  const describeNode = (node) => {
+    if (!node) return "none";
+    const tag = (node.tagName || "").toLowerCase();
+    const role = node.getAttribute("role") || "";
+    const cls = (node.className && typeof node.className === "string")
+      ? node.className.trim().split(/\\s+/).slice(0, 3).join(".")
+      : "";
+    const style = (node.getAttribute("style") || "").replace(/\\s+/g, " ").trim().slice(0, 120);
+    return `${tag} role=${role || "none"} class=${cls || "none"} style=${style || "none"}`;
+  };
+
+  const isVisibleBarLike = (node) => {
+    if (!node || !(node instanceof HTMLElement)) return false;
+    const cs = parentWin.getComputedStyle(node);
+    const bg = cs.backgroundColor || "";
+    const isTransparent = bg === "rgba(0, 0, 0, 0)" || bg === "transparent";
+    return !isTransparent && node.offsetWidth > 0 && node.offsetHeight > 0;
+  };
+
+  const patch = () => {
+    const allSliders = Array.from(parentDoc.querySelectorAll('[role="slider"]'));
+    const nodes = parentDoc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
+    const smokeRunning = parentWin.__MEDF_JS_SMOKE__ === true;
+    const slider = nodes[0] || null;
+    const root = slider
+      ? (slider.closest('[data-baseweb="slider"]') || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]')))
+      : null;
+
+    let text = "MEDF JS SMOKE PANEL: SCRIPT RAN";
+    text += '\\nTotal [role="slider"] count: ' + allSliders.length;
+    text += '\\nSliders found for "' + label + '": ' + nodes.length;
+    if (!smokeRunning) {
+      text += " (SCRIPT NOT RUNNING)";
+    }
+
+    if (nodes.length === 0) {
+      const discovered = Array.from(parentDoc.querySelectorAll('[role="slider"][aria-label]'))
+        .map((node) => node.getAttribute("aria-label") || "")
+        .filter((value) => value.length > 0)
+        .slice(0, 15);
+      text += '\\nDiscovered aria-labels (first 15): ' + (discovered.length ? discovered.join(' | ') : 'none');
+    }
+
+    if (!root) {
+      text += '\\nFill root found: no (root not found)';
+      panel.style.whiteSpace = "pre-wrap";
+      panel.style.pointerEvents = "none";
+      panel.textContent = text;
+      panel.style.background = "rgba(220,38,38,0.22)";
+      panel.style.borderColor = "#dc2626";
+      panel.style.color = "#fee2e2";
+      return;
+    }
+
+    const progressbars = Array.from(root.querySelectorAll('[role="progressbar"]'));
+    const widthNodes = Array.from(root.querySelectorAll('[style*="width"]'))
+      .filter((node) => {
+        const style = (node.getAttribute("style") || "").toLowerCase();
+        return node.getAttribute("role") !== "slider" && style.includes("%");
+      });
+    const transformNodes = Array.from(root.querySelectorAll('[style*="transform"]'))
+      .filter((node) => node.getAttribute("role") !== "slider");
+    const bars = Array.from(root.querySelectorAll("div"));
+
+    let best = null;
+    if (progressbars.length === 1) {
+      best = progressbars[0];
+    } else if (widthNodes.length === 1) {
+      best = widthNodes[0];
+    } else if (transformNodes.length === 1) {
+      best = transformNodes[0];
+    } else {
+      const union = [];
+      const seen = new Set();
+      [...progressbars, ...widthNodes, ...transformNodes, ...bars].forEach((node) => {
+        if (!node || seen.has(node)) return;
+        seen.add(node);
+        union.push(node);
+      });
+      best = union.find((node) => isVisibleBarLike(node)) || null;
+    }
+
+    text += '\\nFill root found: yes';
+    text += '\\nCandidate counts: progressbar=' + progressbars.length + ', width=' + widthNodes.length + ', transform=' + transformNodes.length;
+
+    if (!best) {
+      text += '\\nChosen: no fill candidate';
+      panel.style.whiteSpace = "pre-wrap";
+      panel.style.pointerEvents = "none";
+      panel.textContent = text;
+      panel.style.background = "rgba(220,38,38,0.22)";
+      panel.style.borderColor = "#dc2626";
+      panel.style.color = "#fee2e2";
+      return;
+    }
+
+    best.style.outline = "3px solid magenta";
+    best.style.backgroundColor = "#27C4B7";
+    best.style.borderColor = "#27C4B7";
+    const bg = parentWin.getComputedStyle(best).backgroundColor;
+    text += '\\nChosen: ' + describeNode(best);
+    text += '\\nChosen style attr (first 120 chars): ' + ((best.getAttribute("style") || "").replace(/\\s+/g, " ").trim().slice(0, 120) || "none");
+    text += '\\nComputed bg after apply: ' + bg;
+
+    panel.style.whiteSpace = "pre-wrap";
+    panel.style.pointerEvents = "none";
+    panel.textContent = text;
     panel.style.background = "rgba(22,163,74,0.22)";
     panel.style.borderColor = "#16a34a";
     panel.style.color = "#dcfce7";
-  } else {
-    panel.style.background = "rgba(220,38,38,0.22)";
-    panel.style.borderColor = "#dc2626";
-    panel.style.color = "#fee2e2";
+  };
+
+  if (!parentWin.__MEDF_FIND_TEST_OBSERVER__) {
+    parentWin.__MEDF_FIND_TEST_OBSERVER__ = true;
+    parentDoc.addEventListener("pointerup", () => patch(), true);
+    const observer = new MutationObserver(() => patch());
+    observer.observe(parentDoc.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+    });
   }
+
+  patch();
+  parentWin.setTimeout(patch, 120);
 })();
 </script>
 """
