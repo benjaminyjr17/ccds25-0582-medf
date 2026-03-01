@@ -1139,10 +1139,15 @@ def _inject_slider_fill_color_patcher() -> None:
     components.html(
         f"""
 <div id='medf-sentinel'></div>
+<pre id='medf-investigate-log' style='display:none; margin:6px 0 0 0; max-height:200px; overflow:auto; font:11px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; white-space:pre-wrap; border:1px solid rgba(39,196,183,0.35); padding:6px; background:rgba(6,10,14,0.82); color:#D5F3F1;'></pre>
 <script>
 (function () {{
   const TURQ = "{BRAND_TURQUOISE_HEX}";
   const LIKERT_LABELS = {json.dumps(LIKERT_SLIDER_LABELS)};
+  const INVESTIGATE = false;
+  const INVESTIGATE_LABEL = "Accountability";
+  const INVESTIGATE_THROTTLE_MS = 200;
+  const INVESTIGATE_MAX_LINES = 30;
 
   let hostWin = window;
   let hostDoc = document;
@@ -1164,8 +1169,47 @@ def _inject_slider_fill_color_patcher() -> None:
     hostWin.__medfLikertFillPatchState = {{ wired: false, observer: null, pending: false, timer: null }};
   }}
   const state = hostWin.__medfLikertFillPatchState;
+  if (!hostWin.__MEDF_INVEST_STATE__) {{
+    hostWin.__MEDF_INVEST_STATE__ = {{
+      wiredHandles: new Set(),
+      rootObservers: new Map(),
+      reportTimers: new Map(),
+      queuedReasons: new Map(),
+      queuedMutationMeta: new Map(),
+      queuedPaintAligned: new Map(),
+      lastSnapshots: new Map(),
+      logLines: [],
+    }};
+  }}
+  const investigateState = hostWin.__MEDF_INVEST_STATE__;
+  const investigatePanel = document.getElementById("medf-investigate-log");
+  if (INVESTIGATE && investigatePanel) {{
+    investigatePanel.style.display = "block";
+  }}
 
   const normalizeText = (value) => String(value || "").trim().toLowerCase();
+  const truncateText = (value, maxLen = 60) => {{
+    const text = String(value || "");
+    return text.length > maxLen ? text.slice(0, maxLen) + "..." : text;
+  }};
+  const summarizeElement = (node) => {{
+    if (!node || node.nodeType !== 1) return "none";
+    const tag = normalizeText(node.tagName || "node");
+    const cls = truncateText(normalizeText(node.className || ""), 36);
+    return cls ? `${{tag}}.${{cls}}` : tag;
+  }};
+  const logInvestigate = (line) => {{
+    if (!INVESTIGATE) return;
+    const text = String(line || "");
+    hostWin.console.log("[MEDF-INVEST] " + text);
+    investigateState.logLines.push(text);
+    while (investigateState.logLines.length > INVESTIGATE_MAX_LINES) {{
+      investigateState.logLines.shift();
+    }}
+    if (investigatePanel) {{
+      investigatePanel.textContent = investigateState.logLines.join("\\n");
+    }}
+  }};
 
   const isTransparentColor = (value) => {{
     const normalized = normalizeText(value);
@@ -1174,6 +1218,16 @@ def _inject_slider_fill_color_patcher() -> None:
       || normalized === "transparent"
       || normalized === "rgba(0, 0, 0, 0)"
       || normalized === "rgba(0,0,0,0)"
+    );
+  }};
+
+  const isRectSimilar = (a, b) => {{
+    if (!a || !b) return false;
+    return (
+      Math.abs(a.width - b.width) <= 2
+      && Math.abs(a.height - b.height) <= 2
+      && Math.abs(a.left - b.left) <= 2
+      && Math.abs(a.top - b.top) <= 2
     );
   }};
 
@@ -1260,6 +1314,170 @@ def _inject_slider_fill_color_patcher() -> None:
     return best || null;
   }};
 
+  const mergeMutationMeta = (current, next) => {{
+    const base = current || {{ added: 0, removed: 0, attributes: 0 }};
+    if (!next) return base;
+    return {{
+      added: base.added + (Number(next.added) || 0),
+      removed: base.removed + (Number(next.removed) || 0),
+      attributes: base.attributes + (Number(next.attributes) || 0),
+    }};
+  }};
+
+  const scheduleInvestigateReport = (label, reason, mutationMeta = null, alignToPaint = false) => {{
+    if (!INVESTIGATE || label !== INVESTIGATE_LABEL) return;
+    const reasons = investigateState.queuedReasons.get(label) || [];
+    reasons.push(String(reason || "event"));
+    investigateState.queuedReasons.set(label, reasons.slice(-6));
+    if (mutationMeta) {{
+      const merged = mergeMutationMeta(investigateState.queuedMutationMeta.get(label), mutationMeta);
+      investigateState.queuedMutationMeta.set(label, merged);
+      investigateState.queuedPaintAligned.set(label, true);
+    }} else if (alignToPaint) {{
+      investigateState.queuedPaintAligned.set(label, true);
+    }}
+    if (investigateState.reportTimers.has(label)) return;
+    const timerId = hostWin.setTimeout(() => {{
+      investigateState.reportTimers.delete(label);
+      const reasonList = investigateState.queuedReasons.get(label) || [];
+      investigateState.queuedReasons.delete(label);
+      const combinedReason = reasonList.length > 0 ? reasonList.join("+") : "event";
+      const mutationPayload = investigateState.queuedMutationMeta.get(label) || null;
+      investigateState.queuedMutationMeta.delete(label);
+      const paintAligned = investigateState.queuedPaintAligned.get(label) === true;
+      investigateState.queuedPaintAligned.delete(label);
+      const runReport = () => collectLayerReport(label, combinedReason, mutationPayload);
+      if (paintAligned && typeof hostWin.requestAnimationFrame === "function") {{
+        hostWin.requestAnimationFrame(runReport);
+      }} else {{
+        runReport();
+      }}
+    }}, INVESTIGATE_THROTTLE_MS);
+    investigateState.reportTimers.set(label, timerId);
+  }};
+
+  const collectLayerReport = (label, reason, mutationMeta = null) => {{
+    if (!INVESTIGATE || label !== INVESTIGATE_LABEL) return;
+    const escapedLabel = cssEscape(label);
+    const handles = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escapedLabel + '"]');
+    if (!handles || handles.length === 0) {{
+      logInvestigate(`t=${{(hostWin.performance?.now?.() ?? Date.now()).toFixed(1)}}ms reason=${{reason}} label=${{label}} handle=missing`);
+      return;
+    }}
+    const handle = handles[0];
+    const root = resolveRoot(handle);
+    if (!root) {{
+      logInvestigate(`t=${{(hostWin.performance?.now?.() ?? Date.now()).toFixed(1)}}ms reason=${{reason}} label=${{label}} root=missing`);
+      return;
+    }}
+    const aria = getAriaPercent(handle);
+    const ariaNow = handle.getAttribute("aria-valuenow") || "n/a";
+    const trackish = collectTrackish(root);
+    const maxW = trackish.length > 0 ? Math.max(...trackish.map((entry) => entry.width)) : 0;
+    const fullWidth = trackish.filter(
+      (entry) => maxW > 0
+        && entry.width >= maxW * 0.99
+        && (entry.bgImage !== "none" || !isTransparentColor(entry.bgColor))
+    );
+
+    const viewportWidth = Math.max(1, Number(hostWin.innerWidth) || 1);
+    const viewportHeight = Math.max(1, Number(hostWin.innerHeight) || 1);
+    const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
+
+    const signatures = new Set();
+    const candidateLines = fullWidth.map((entry, index) => {{
+      const rect = entry.node.getBoundingClientRect();
+      const cs = hostWin.getComputedStyle(entry.node);
+      const zIndex = normalizeText(cs.zIndex || "auto");
+      const marker = entry.node.getAttribute("data-medf-track") === "1";
+      const bgImageShort = truncateText(normalizeText(cs.backgroundImage), 40);
+      const bgColorShort = truncateText(normalizeText(cs.backgroundColor), 28);
+      const parentSummary = summarizeElement(entry.node.parentElement);
+      signatures.add(
+        `${{summarizeElement(entry.node)}}|${{Math.round(rect.width)}}x${{Math.round(rect.height)}}|z:${{zIndex}}|p:${{parentSummary}}`
+      );
+
+      const yMid = clamp(rect.top + rect.height * 0.5, 1, viewportHeight - 1);
+      const x25 = clamp(rect.left + rect.width * 0.25, 1, viewportWidth - 1);
+      const x50 = clamp(rect.left + rect.width * 0.50, 1, viewportWidth - 1);
+      const x75 = clamp(rect.left + rect.width * 0.75, 1, viewportWidth - 1);
+
+      const hitClassify = (xPos) => {{
+        const hit = hostDoc.elementFromPoint(xPos, yMid);
+        if (!hit) return "none";
+        if (hit === entry.node) return "self";
+        if (entry.node.contains(hit)) return "desc";
+        return "other";
+      }};
+
+      return (
+        `#${{index + 1}} rect=${{Math.round(rect.left)}},${{Math.round(rect.top)}},${{Math.round(rect.width)}}x${{Math.round(rect.height)}} `
+        + `marker=${{marker ? "y" : "n"}} bg=${{bgColorShort}} bgImg=${{bgImageShort !== "none" ? "yes" : "none"}} `
+        + `z=${{zIndex || "auto"}} pe=${{truncateText(normalizeText(cs.pointerEvents || "auto"), 12)}} `
+        + `op=${{truncateText(cs.opacity || "1", 6)}} hit=${{hitClassify(x25)}}/${{hitClassify(x50)}}/${{hitClassify(x75)}}`
+      );
+    }});
+
+    let topHitSummary = "none";
+    let topHitMarked = "n";
+    if (fullWidth.length > 0) {{
+      const anchor = fullWidth.reduce((best, entry) => (entry.width > best.width ? entry : best), fullWidth[0]);
+      const rect = anchor.node.getBoundingClientRect();
+      const x = clamp(rect.left + rect.width * 0.5, 1, viewportWidth - 1);
+      const y = clamp(rect.top + rect.height * 0.5, 1, viewportHeight - 1);
+      const topHit = hostDoc.elementFromPoint(x, y);
+      topHitSummary = summarizeElement(topHit);
+      topHitMarked = topHit && typeof topHit.closest === "function" && topHit.closest('[data-medf-track="1"]') ? "y" : "n";
+    }}
+
+    const previousSignatures = investigateState.lastSnapshots.get(label) || new Set();
+    let newSignatureCount = 0;
+    signatures.forEach((sig) => {{
+      if (!previousSignatures.has(sig)) newSignatureCount += 1;
+    }});
+    investigateState.lastSnapshots.set(label, signatures);
+    const prevFullWidth = previousSignatures.size;
+    const mutationText = mutationMeta
+      ? ` mut=+${{mutationMeta.added}}/-${{mutationMeta.removed}}/~${{mutationMeta.attributes}}`
+      : "";
+    const now = (hostWin.performance?.now?.() ?? Date.now()).toFixed(1);
+    const pctText = aria.ok ? aria.pct.toFixed(2) : "n/a";
+    logInvestigate(
+      `t=${{now}}ms reason=${{reason}} label=${{label}} aria=${{ariaNow}} pct=${{pctText}} `
+      + `trackish=${{trackish.length}} fullWidth=${{fullWidth.length}} delta=${{fullWidth.length - prevFullWidth}} `
+      + `newSig=${{newSignatureCount}} topHit=${{topHitSummary}} topMarked=${{topHitMarked}}${{mutationText}}`
+    );
+    candidateLines.forEach((line) => logInvestigate(line));
+  }};
+
+  const ensureInvestigateRootObserver = (label, root) => {{
+    if (!INVESTIGATE || label !== INVESTIGATE_LABEL) return;
+    const existing = investigateState.rootObservers.get(label);
+    if (existing && existing.root === root) return;
+    if (existing && existing.observer) {{
+      existing.observer.disconnect();
+      investigateState.rootObservers.delete(label);
+    }}
+    if (!root) return;
+    const observer = new hostWin.MutationObserver((mutations) => {{
+      let added = 0;
+      let removed = 0;
+      let attributes = 0;
+      mutations.forEach((mutation) => {{
+        added += mutation.addedNodes ? mutation.addedNodes.length : 0;
+        removed += mutation.removedNodes ? mutation.removedNodes.length : 0;
+        if (mutation.type === "attributes") attributes += 1;
+      }});
+      scheduleInvestigateReport(label, "root-mutation", {{ added, removed, attributes }}, true);
+    }});
+    observer.observe(root, {{
+      childList: true,
+      subtree: true,
+      attributes: true,
+    }});
+    investigateState.rootObservers.set(label, {{ root, observer }});
+  }};
+
   const attachDragListeners = (handle, label) => {{
     if (!handle || !label) return;
     if (!hostWin.__MEDF_DRAG_TIMER__) hostWin.__MEDF_DRAG_TIMER__ = new Map();
@@ -1277,48 +1495,96 @@ def _inject_slider_fill_color_patcher() -> None:
     const startDragTimer = () => {{
       clearDragTimer();
       patchAll();
+      if (INVESTIGATE && label === INVESTIGATE_LABEL) {{
+        scheduleInvestigateReport(label, "event:pointerdown");
+      }}
       const timerId = hostWin.setInterval(() => patchAll(), 50);
       hostWin.__MEDF_DRAG_TIMER__.set(label, timerId);
     }};
 
     handle.addEventListener("pointerdown", startDragTimer, true);
-    handle.addEventListener("pointermove", schedulePatch, true);
+    handle.addEventListener("pointermove", () => {{
+      schedulePatch();
+      if (INVESTIGATE && label === INVESTIGATE_LABEL) {{
+        scheduleInvestigateReport(label, "event:pointermove");
+      }}
+    }}, true);
     handle.addEventListener("pointerup", () => {{
       clearDragTimer();
       schedulePatch();
+      if (INVESTIGATE && label === INVESTIGATE_LABEL) {{
+        scheduleInvestigateReport(label, "event:pointerup");
+      }}
     }}, true);
     handle.addEventListener("pointercancel", () => {{
       clearDragTimer();
       schedulePatch();
+      if (INVESTIGATE && label === INVESTIGATE_LABEL) {{
+        scheduleInvestigateReport(label, "event:pointercancel");
+      }}
     }}, true);
-    handle.addEventListener("keydown", schedulePatch, true);
-    handle.addEventListener("input", schedulePatch, true);
-    handle.addEventListener("change", schedulePatch, true);
+    handle.addEventListener("keydown", () => {{
+      schedulePatch();
+      if (INVESTIGATE && label === INVESTIGATE_LABEL) {{
+        scheduleInvestigateReport(label, "event:keydown");
+      }}
+    }}, true);
+    handle.addEventListener("input", () => {{
+      schedulePatch();
+      if (INVESTIGATE && label === INVESTIGATE_LABEL) {{
+        scheduleInvestigateReport(label, "event:input");
+      }}
+    }}, true);
+    handle.addEventListener("change", () => {{
+      schedulePatch();
+      if (INVESTIGATE && label === INVESTIGATE_LABEL) {{
+        scheduleInvestigateReport(label, "event:change");
+      }}
+    }}, true);
+    if (INVESTIGATE && label === INVESTIGATE_LABEL) {{
+      investigateState.wiredHandles.add(label);
+    }}
   }};
 
   const patchOneLabel = (label) => {{
     const escapedLabel = cssEscape(label);
     const handles = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escapedLabel + '"]');
-    if (!handles || handles.length === 0) return false;
+    if (!handles || handles.length === 0) {{
+      scheduleInvestigateReport(label, "post-patch:no-handle");
+      return false;
+    }}
     const handle = handles[0];
     attachDragListeners(handle, label);
     const root = resolveRoot(handle);
-    if (!root) return false;
+    if (!root) {{
+      scheduleInvestigateReport(label, "post-patch:no-root");
+      return false;
+    }}
+    ensureInvestigateRootObserver(label, root);
     const aria = getAriaPercent(handle);
-    if (!aria.ok) return false;
+    if (!aria.ok) {{
+      scheduleInvestigateReport(label, "post-patch:no-aria");
+      return false;
+    }}
 
     root.querySelectorAll('[data-medf-track]').forEach((node) => {{
       node.removeAttribute("data-medf-track");
     }});
 
     const trackish = collectTrackish(root);
-    if (trackish.length === 0) return false;
+    if (trackish.length === 0) {{
+      scheduleInvestigateReport(label, "post-patch:no-trackish");
+      return false;
+    }}
     const maxW = Math.max(...trackish.map((entry) => entry.width));
     const fullWidth = trackish.filter(
       (entry) => entry.width >= maxW * 0.99
         && (entry.bgImage !== "none" || !isTransparentColor(entry.bgColor))
     );
-    if (fullWidth.length === 0) return false;
+    if (fullWidth.length === 0) {{
+      scheduleInvestigateReport(label, "post-patch:no-fullwidth");
+      return false;
+    }}
 
     const fullWidthColors = fullWidth.map((entry) => entry.bgColor);
     const allColors = trackish.map((entry) => entry.bgColor);
@@ -1328,9 +1594,59 @@ def _inject_slider_fill_color_patcher() -> None:
     fullWidth.forEach((entry) => {{
       entry.node.setAttribute("data-medf-track", "1");
     }});
+
+    const anchor = (fullWidth.length > 0 ? fullWidth : trackish).reduce(
+      (best, entry) => (entry.width > best.width ? entry : best),
+      (fullWidth.length > 0 ? fullWidth : trackish)[0]
+    );
+    if (anchor && anchor.node) {{
+      const anchorRect = anchor.node.getBoundingClientRect();
+      const viewportWidth = Math.max(2, Number(hostWin.innerWidth) || 2);
+      const viewportHeight = Math.max(2, Number(hostWin.innerHeight) || 2);
+      const clamp = (value, minValue, maxValue) => Math.max(minValue, Math.min(maxValue, value));
+      const x = clamp(anchorRect.left + anchorRect.width * 0.5, 1, viewportWidth - 1);
+      const y = clamp(anchorRect.top + anchorRect.height * 0.5, 1, viewportHeight - 1);
+      const hit = hostDoc.elementFromPoint(x, y);
+      let promoted = null;
+      let cur = hit;
+      while (cur && cur !== root && cur.nodeType === 1) {{
+        const curRect = cur.getBoundingClientRect();
+        if (curRect.width >= maxW * 0.95 && curRect.height > 0 && curRect.height <= 40) {{
+          promoted = cur;
+          break;
+        }}
+        cur = cur.parentElement;
+      }}
+      if (promoted) {{
+        const toMark = [promoted];
+        const promotedRect = promoted.getBoundingClientRect();
+        const child = promoted.firstElementChild;
+        if (child && child.nodeType === 1) {{
+          const childRect = child.getBoundingClientRect();
+          if (isRectSimilar(promotedRect, childRect)) {{
+            toMark.push(child);
+          }}
+        }}
+        const parent = promoted.parentElement;
+        if (parent && parent.nodeType === 1 && root.contains(parent)) {{
+          const parentRect = parent.getBoundingClientRect();
+          if (isRectSimilar(promotedRect, parentRect)) {{
+            toMark.push(parent);
+          }}
+        }}
+        const dedup = new Set();
+        toMark.forEach((node) => {{
+          if (!node || dedup.size >= 3 || dedup.has(node)) return;
+          dedup.add(node);
+          node.setAttribute("data-medf-track", "1");
+        }});
+      }}
+    }}
+
     root.style.setProperty("--medf-fill-pct", aria.pct + "%");
     root.style.setProperty("--medf-fill-color", TURQ);
     root.style.setProperty("--medf-unfilled", unfilled);
+    scheduleInvestigateReport(label, "post-patch");
     return true;
   }};
 
