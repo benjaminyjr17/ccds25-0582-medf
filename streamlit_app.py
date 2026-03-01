@@ -1288,7 +1288,7 @@ MEDF JS SMOKE PANEL: HTML RENDERED
 
 
 def _inject_slider_find_test(label: str) -> None:
-    _ = label
+    label_json = json.dumps(label)
     html = r"""
 <div id="medf-find-panel" style="
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
@@ -1304,28 +1304,337 @@ def _inject_slider_find_test(label: str) -> None:
 <div><noscript>FIND TEST: NOSCRIPT VISIBLE</noscript></div>
 <script>
 (function () {
-  const panel = document.getElementById("medf-find-panel");
+  const iframeWin = window;
+  const iframeDoc = document;
+  const panel = iframeDoc.getElementById("medf-find-panel");
+  const label = __LABEL_JSON__;
+  let hostDoc = iframeDoc;
+  let hostWin = iframeWin;
+  let hostDocAccessible = false;
+
+  try {
+    if (iframeWin.parent && iframeWin.parent.document) {
+      hostDoc = iframeWin.parent.document;
+      hostWin = iframeWin.parent;
+      hostDocAccessible = true;
+    }
+  } catch (err) {
+    hostDoc = iframeDoc;
+    hostWin = iframeWin;
+    hostDocAccessible = false;
+  }
+
+  if (!panel) return;
+
+  const isElementNode = (node) => !!node && node.nodeType === 1 && typeof node.tagName === "string";
+
+  const formatClass = (value, maxLen) => {
+    if (!value || typeof value !== "string") return "none";
+    return value.trim().replace(/\s+/g, ".").slice(0, maxLen) || "none";
+  };
+
+  const styleSnippet = (el, maxLen) => {
+    if (!el || !el.getAttribute) return "none";
+    const raw = el.getAttribute("style") || "";
+    return raw.replace(/\s+/g, " ").trim().slice(0, maxLen) || "none";
+  };
+
+  const isTransparent = (color) => {
+    if (!color) return true;
+    const normalized = String(color).toLowerCase().trim();
+    return normalized === "transparent" || normalized === "rgba(0, 0, 0, 0)" || normalized === "rgba(0,0,0,0)";
+  };
+
+  const setPanel = (lines, success) => {
+    if (!panel) return;
+    panel.textContent = lines.join("\n");
+    if (success) {
+      panel.style.background = "rgba(22,163,74,0.18)";
+      panel.style.borderColor = "#16a34a";
+      panel.style.color = "#052e16";
+    } else {
+      panel.style.background = "rgba(220,38,38,0.18)";
+      panel.style.borderColor = "#dc2626";
+      panel.style.color = "#450a0a";
+    }
+  };
+
+  const resolveRoot = (slider) => {
+    if (!isElementNode(slider)) return null;
+    let root = slider.closest('[data-baseweb="slider"]')
+      || (slider.parentElement && slider.parentElement.closest('[data-baseweb="slider"]'));
+    if (root) return root;
+
+    root = (slider.closest("[data-baseweb]") && slider.closest("[data-baseweb]").querySelector('[data-baseweb="slider"]'))
+      || (slider.parentElement && slider.parentElement.querySelector('[data-baseweb="slider"]'));
+    if (root) return root;
+
+    let ancestor = slider;
+    for (let depth = 0; depth < 6 && ancestor; depth += 1) {
+      ancestor = ancestor.parentElement;
+      if (!ancestor) break;
+      const candidate = ancestor.querySelector('[data-baseweb="slider"]');
+      if (candidate) return candidate;
+    }
+    return null;
+  };
+
+  const collectCandidates = (root) => {
+    const bucket = [];
+    const seen = new Set();
+    const addNode = (node) => {
+      if (!isElementNode(node)) return;
+      if (seen.has(node)) return;
+      seen.add(node);
+      bucket.push(node);
+    };
+
+    root.querySelectorAll('[role="progressbar"]').forEach(addNode);
+    root.querySelectorAll('div[style*="width"]').forEach(addNode);
+    root.querySelectorAll('div[style*="transform"]').forEach(addNode);
+    root.querySelectorAll("div").forEach(addNode);
+
+    return bucket
+      .map((el) => {
+        const rect = el.getBoundingClientRect();
+        return { el, rect };
+      })
+      .filter((entry) => entry.rect.width > 0 && entry.rect.height > 0)
+      .filter((entry) => entry.el.offsetWidth >= 80)
+      .filter((entry) => {
+        const h = entry.el.offsetHeight;
+        return h >= 2 && h <= 28;
+      })
+      .slice(0, 15);
+  };
+
+  const clearPreviousOutlines = (root) => {
+    if (!root) return;
+    root.querySelectorAll("[data-medf-cand]").forEach((el) => {
+      if (!isElementNode(el)) return;
+      el.style.removeProperty("outline");
+      el.style.removeProperty("outline-offset");
+      el.removeAttribute("data-medf-cand");
+    });
+  };
+
+  const chooseBestCandidate = (candidates) => {
+    if (!Array.isArray(candidates) || candidates.length === 0) return { best: null, index: -1 };
+    const progressbars = candidates.filter((entry) => (entry.el.getAttribute("role") || "") === "progressbar");
+    if (progressbars.length === 1) {
+      return { best: progressbars[0], index: candidates.indexOf(progressbars[0]) };
+    }
+
+    const decorated = candidates
+      .map((entry, idx) => {
+        const cs = hostWin.getComputedStyle(entry.el);
+        const bgColor = cs.backgroundColor || "";
+        const bgImage = cs.backgroundImage || "";
+        const hasPaint = !isTransparent(bgColor) || (bgImage && bgImage !== "none");
+        return { entry, idx, hasPaint, width: entry.el.offsetWidth };
+      })
+      .filter((row) => row.hasPaint);
+
+    if (decorated.length > 0) {
+      decorated.sort((a, b) => b.width - a.width);
+      return { best: decorated[0].entry, index: decorated[0].idx };
+    }
+
+    return { best: candidates[0], index: 0 };
+  };
+
+  const patch = () => {
+    const lines = [];
+    lines.push(`=== PATCH RUN @ ${new Date().toISOString()} ===`);
+    lines.push("FIND TEST: HTML RENDERED");
+    lines.push("FIND TEST: JS EXECUTED (sync)");
+    if (iframeWin.__MEDF_FIND_TIMEOUT_SEEN__) {
+      lines.push("FIND TEST: JS EXECUTED (timeout)");
+    }
+    try {
+      const iframeSliders = Array.from(iframeDoc.querySelectorAll('[role="slider"]'));
+      lines.push(`iframeDoc slider count: ${iframeSliders.length}`);
+
+      if (!hostDocAccessible) {
+        lines.push("hostDoc access: FAILED (cross-origin?)");
+        lines.push("hostDoc slider count: N/A");
+        setPanel(lines, false);
+        return;
+      }
+
+      lines.push("hostDoc access: OK");
+      const allSliders = Array.from(hostDoc.querySelectorAll('[role="slider"]'));
+      const labeledSliders = Array.from(hostDoc.querySelectorAll('[role="slider"][aria-label]')).filter(
+        (el) => ((el.getAttribute("aria-label") || "").trim().length > 0)
+      );
+      lines.push(`hostDoc slider count: ${allSliders.length}`);
+
+      const labelCounts = new Map();
+      labeledSliders.forEach((el) => {
+        const key = (el.getAttribute("aria-label") || "").trim();
+        labelCounts.set(key, (labelCounts.get(key) || 0) + 1);
+      });
+      const uniqueLabels = Array.from(labelCounts.keys()).slice(0, 20);
+      const countLines = uniqueLabels.map((key) => `${key}:${labelCounts.get(key)}`);
+
+      lines.push(`Total [role=slider] count: ${allSliders.length}`);
+      lines.push(`Unique aria-labels (first 20): ${uniqueLabels.length ? uniqueLabels.join(" | ") : "none"}`);
+      lines.push(`Label counts (first 20): ${countLines.length ? countLines.join(" | ") : "none"}`);
+
+      const escaped = (iframeWin.CSS && typeof iframeWin.CSS.escape === "function")
+        ? iframeWin.CSS.escape(label)
+        : label.replace(/["\\]/g, "\\$&");
+      const nodes = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
+      const targetCount = nodes.length;
+      lines.push(`Target label: ${label}`);
+      lines.push(`Target present: ${targetCount >= 1 ? "true" : "false"} (count=${targetCount})`);
+
+      if (targetCount === 0) {
+        lines.push("Target not found in current DOM view");
+        const retryCount = Number(iframeWin.__MEDF_FIND_RETRY_COUNT__ || 0);
+        if (allSliders.length === 0 && retryCount < 5) {
+          iframeWin.__MEDF_FIND_RETRY_COUNT__ = retryCount + 1;
+          lines.push(`Retry scheduled: ${retryCount + 1}/5`);
+          iframeWin.setTimeout(schedulePatch, 250);
+        } else if (allSliders.length === 0) {
+          lines.push("Retry limit reached (5)");
+        }
+        setPanel(lines, false);
+        return;
+      }
+      iframeWin.__MEDF_FIND_RETRY_COUNT__ = 0;
+
+      const slider = nodes[0];
+      const root = resolveRoot(slider);
+      if (!root) {
+        lines.push("Root not found");
+        setPanel(lines, false);
+        return;
+      }
+      lines.push(`Root: ${root.tagName.toLowerCase()} data-baseweb=${root.getAttribute("data-baseweb") || "none"}`);
+
+      clearPreviousOutlines(root);
+      const candidates = collectCandidates(root);
+      if (candidates.length === 0) {
+        lines.push("No track-like candidates found after filtering");
+        setPanel(lines, false);
+        return;
+      }
+
+      candidates.forEach((entry, idx) => {
+        const el = entry.el;
+        el.style.setProperty("outline", "2px solid magenta", "important");
+        el.style.setProperty("outline-offset", "1px", "important");
+        el.setAttribute("data-medf-cand", String(idx + 1));
+
+        const cs = hostWin.getComputedStyle(el);
+        const bgColor = cs.backgroundColor || "none";
+        const bgImage = (cs.backgroundImage || "none").slice(0, 80);
+        const className = formatClass(el.className, 60);
+        const styleAttr = styleSnippet(el, 120);
+        lines.push(
+          `#${idx + 1} tag=${el.tagName.toLowerCase()} role=${el.getAttribute("role") || "none"} data-baseweb=${el.getAttribute("data-baseweb") || "none"} class=${className} style=${styleAttr} rect=${Math.round(entry.rect.width)}x${Math.round(entry.rect.height)} bg=${bgColor} bgImage=${bgImage}`
+        );
+      });
+
+      const picked = chooseBestCandidate(candidates);
+      if (!picked.best) {
+        lines.push("BEST patched: none");
+        setPanel(lines, false);
+        return;
+      }
+
+      const bestEl = picked.best.el;
+      bestEl.style.setProperty("background-image", "none", "important");
+      bestEl.style.setProperty("background", "#27C4B7", "important");
+      bestEl.style.setProperty("background-color", "#27C4B7", "important");
+      bestEl.style.setProperty("border-color", "#27C4B7", "important");
+      const bestBg = hostWin.getComputedStyle(bestEl).backgroundColor || "unknown";
+      lines.push(`BEST patched: index=${picked.index + 1}, computed bg=${bestBg}`);
+      setPanel(lines, true);
+    } catch (err) {
+      lines.push("ERROR: " + (err && err.message ? err.message : String(err)));
+      lines.push("STACK: " + (err && err.stack ? err.stack : "unavailable"));
+      setPanel(lines, false);
+    }
+  };
+
+  const schedulePatch = () => {
+    if (!iframeWin.__MEDF_FIND_THROTTLE__) {
+      iframeWin.__MEDF_FIND_THROTTLE__ = { pending: false, timer: null };
+    }
+    const throttle = iframeWin.__MEDF_FIND_THROTTLE__;
+    if (throttle.pending) return;
+    throttle.pending = true;
+    if (throttle.timer) {
+      iframeWin.clearTimeout(throttle.timer);
+    }
+    throttle.timer = iframeWin.setTimeout(() => {
+      throttle.pending = false;
+      patch();
+    }, 200);
+  };
+
   try {
     if (!panel) return;
-    panel.textContent += "\nFIND TEST: JS EXECUTED (sync)";
+    patch();
     setTimeout(() => {
       try {
-        panel.textContent += "\nFIND TEST: JS EXECUTED (timeout)";
+        iframeWin.__MEDF_FIND_TIMEOUT_SEEN__ = true;
+        patch();
       } catch (e2) {
-        panel.textContent += "\nERROR: " + (e2 && e2.message ? e2.message : String(e2));
-        panel.textContent += "\nSTACK: " + (e2 && e2.stack ? e2.stack : "unavailable");
+        const lines = [
+          "FIND TEST: HTML RENDERED",
+          "FIND TEST: JS EXECUTED (sync)",
+          "ERROR: " + (e2 && e2.message ? e2.message : String(e2)),
+          "STACK: " + (e2 && e2.stack ? e2.stack : "unavailable"),
+        ];
+        setPanel(lines, false);
       }
     }, 250);
-  } catch (e) {
-    if (panel) {
-      panel.textContent += "\nERROR: " + (e && e.message ? e.message : String(e));
-      panel.textContent += "\nSTACK: " + (e && e.stack ? e.stack : "unavailable");
+    setTimeout(() => {
+      try {
+        patch();
+      } catch (e3) {
+        const lines = [
+          "FIND TEST: HTML RENDERED",
+          "FIND TEST: JS EXECUTED (sync)",
+          "FIND TEST: JS EXECUTED (timeout)",
+          "ERROR: " + (e3 && e3.message ? e3.message : String(e3)),
+          "STACK: " + (e3 && e3.stack ? e3.stack : "unavailable"),
+        ];
+        setPanel(lines, false);
+      }
+    }, 500);
+
+    if (hostDocAccessible && !iframeWin.__MEDF_FIND_OBSERVER__) {
+      iframeWin.__MEDF_FIND_OBSERVER__ = true;
+      hostDoc.addEventListener("pointerup", schedulePatch, true);
+      if (hostWin.addEventListener) {
+        hostWin.addEventListener("pointerup", schedulePatch, true);
+      }
+      const Obs = hostWin.MutationObserver || MutationObserver;
+      const observer = new Obs(() => schedulePatch());
+      if (hostDoc.body) {
+        observer.observe(hostDoc.body, {
+          subtree: true,
+          childList: true,
+          attributes: true,
+        });
+      }
     }
+  } catch (e) {
+    const lines = [
+      "FIND TEST: HTML RENDERED",
+      "ERROR: " + (e && e.message ? e.message : String(e)),
+      "STACK: " + (e && e.stack ? e.stack : "unavailable"),
+    ];
+    setPanel(lines, false);
   }
 })();
 </script>
 """
-    components.html(html, height=220)
+    components.html(html.replace("__LABEL_JSON__", label_json), height=360)
 
 
 def _derive_auto_pareto_search_params(budget: int, bias: int) -> tuple[int, int]:
