@@ -1117,8 +1117,25 @@ def _inject_advanced_slider_green_css() -> None:
 
 
 def _inject_slider_fill_color_patcher() -> None:
-    # Root cause: Streamlit/BaseWeb slider fill nodes can shift across rerenders and are not
-    # consistently targetable with static CSS selectors alone; apply a scoped runtime patcher.
+    st.markdown(
+        """
+<style id="medf-likert-fill-vars-css">
+[data-medf-track="1"] {
+    background: none !important;
+    background-image: linear-gradient(
+      90deg,
+      var(--medf-fill-color, #27C4B7) 0%,
+      var(--medf-fill-color, #27C4B7) var(--medf-fill-pct, 0%),
+      var(--medf-unfilled, rgba(255,255,255,0.22)) var(--medf-fill-pct, 0%),
+      var(--medf-unfilled, rgba(255,255,255,0.22)) 100%
+    ) !important;
+    background-color: var(--medf-unfilled, rgba(255,255,255,0.22)) !important;
+    opacity: 1 !important;
+}
+</style>
+""",
+        unsafe_allow_html=True,
+    )
     components.html(
         f"""
 <div id='medf-sentinel'></div>
@@ -1160,18 +1177,6 @@ def _inject_slider_fill_color_patcher() -> None:
     );
   }};
 
-  const parseRgb = (value) => {{
-    const match = String(value || "").match(/rgba?\\(\\s*([\\d.]+)\\s*,\\s*([\\d.]+)\\s*,\\s*([\\d.]+)/i);
-    if (!match) return null;
-    return {{ r: Number(match[1]), g: Number(match[2]), b: Number(match[3]) }};
-  }};
-
-  const isGreenDominant = (value) => {{
-    const rgb = parseRgb(value);
-    if (!rgb) return false;
-    return rgb.g > rgb.r && rgb.g > rgb.b;
-  }};
-
   const cssEscape = (value) => {{
     const text = String(value ?? "");
     if (hostWin.CSS && typeof hostWin.CSS.escape === "function") return hostWin.CSS.escape(text);
@@ -1193,64 +1198,6 @@ def _inject_slider_fill_color_patcher() -> None:
     return null;
   }};
 
-  const mostFrequentColor = (entries) => {{
-    const counts = new Map();
-    entries.forEach((entry) => {{
-      const key = normalizeText(entry.bgColor);
-      if (!key || isTransparentColor(key)) return;
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }});
-    let bestKey = "";
-    let bestCount = -1;
-    counts.forEach((count, key) => {{
-      if (count > bestCount) {{
-        bestKey = key;
-        bestCount = count;
-      }}
-    }});
-    return bestKey || null;
-  }};
-
-  const selectFilled = (root) => {{
-    if (!root) return {{ best: null, maxW: 0 }};
-    const trackish = Array.from(root.querySelectorAll("div"))
-      .map((node) => {{
-        const rect = node.getBoundingClientRect();
-        const cs = hostWin.getComputedStyle(node);
-        return {{
-          node,
-          width: rect.width,
-          height: rect.height,
-          bgColor: normalizeText(cs.backgroundColor),
-          bgImage: normalizeText(cs.backgroundImage),
-        }};
-      }})
-      .filter((entry) => entry.width > 0 && entry.height > 0 && entry.height <= 28 && entry.width >= 80);
-
-    if (trackish.length === 0) return {{ best: null, maxW: 0 }};
-
-    const maxW = Math.max(...trackish.map((entry) => entry.width));
-    const fullTrackish = trackish.filter((entry) => entry.width >= maxW * 0.99);
-    const unfilledBg = mostFrequentColor(fullTrackish);
-
-    const filledCandidates = trackish.filter((entry) => {{
-      if (entry.width >= maxW * 0.99) return false;
-      const hasPaint = (!isTransparentColor(entry.bgColor)) || (entry.bgImage !== "none");
-      if (!hasPaint) return false;
-      if (unfilledBg && entry.bgColor === unfilledBg) return false;
-      return true;
-    }});
-
-    if (filledCandidates.length === 0) {{
-      return {{ best: null, maxW }};
-    }}
-
-    const greenPreferred = filledCandidates.filter((entry) => isGreenDominant(entry.bgColor));
-    const pool = greenPreferred.length > 0 ? greenPreferred : filledCandidates;
-    pool.sort((a, b) => b.width - a.width);
-    return {{ best: pool[0].node, maxW }};
-  }};
-
   const getAriaPercent = (handle) => {{
     const v = parseFloat(handle.getAttribute("aria-valuenow"));
     const vmin = parseFloat(handle.getAttribute("aria-valuemin"));
@@ -1263,13 +1210,13 @@ def _inject_slider_fill_color_patcher() -> None:
     return {{ ok: true, pct }};
   }};
 
-  const getFullTrackCandidates = (root) => {{
+  const collectTrackish = (root) => {{
     if (!root) return [];
     const nodeSet = new Set([
       ...Array.from(root.querySelectorAll("div")),
       ...Array.from(root.querySelectorAll('[role="progressbar"]')),
     ]);
-    const trackish = Array.from(nodeSet)
+    return Array.from(nodeSet)
       .map((node) => {{
         const rect = node.getBoundingClientRect();
         const cs = hostWin.getComputedStyle(node);
@@ -1281,6 +1228,8 @@ def _inject_slider_fill_color_patcher() -> None:
           node,
           width: rect.width,
           height: rect.height,
+          bgColor,
+          bgImage,
           hasPaint,
         }};
       }})
@@ -1291,167 +1240,24 @@ def _inject_slider_fill_color_patcher() -> None:
         && entry.height <= 40
         && entry.hasPaint
       ));
-    if (trackish.length === 0) return [];
-    const maxW = Math.max(...trackish.map((entry) => entry.width));
-    return trackish
-      .filter((entry) => entry.width >= maxW * 0.99)
-      .map((entry) => entry.node);
   }};
 
-  const patchGradientTracks = (tracks, pct) => {{
-    if (!Array.isArray(tracks) || tracks.length === 0 || typeof pct !== "number") return false;
-    let patchedCount = 0;
-    tracks.forEach((track) => {{
-      if (!track) return;
-      const trackStyle = hostWin.getComputedStyle(track);
-      const trackBgBefore = trackStyle.backgroundColor || "transparent";
-      const unfilled = isTransparentColor(trackBgBefore) ? "rgba(255,255,255,0.22)" : trackBgBefore;
-      const gradient = "linear-gradient(90deg, " + TURQ + " 0%, " + TURQ + " " + pct + "%, "
-        + unfilled + " " + pct + "%, " + unfilled + " 100%)";
-      track.style.setProperty("background", "none", "important");
-      track.style.setProperty("background-image", "none", "important");
-      track.style.setProperty("background-color", unfilled, "important");
-      track.style.setProperty("background-image", gradient, "important");
-      track.style.setProperty("opacity", "1", "important");
-      patchedCount += 1;
+  const mostFrequentColor = (colors) => {{
+    const counts = new Map();
+    colors.forEach((value) => {{
+      const key = normalizeText(value);
+      if (!key || isTransparentColor(key)) return;
+      counts.set(key, (counts.get(key) || 0) + 1);
     }});
-    return patchedCount > 0;
-  }};
-
-  const patchFilled = (filled) => {{
-    if (!filled) return false;
-    filled.style.removeProperty("outline");
-    filled.style.removeProperty("outline-offset");
-    filled.style.setProperty("background-image", "none", "important");
-    filled.style.setProperty("background-color", TURQ, "important");
-    filled.style.setProperty("background", TURQ, "important");
-    filled.style.setProperty("border-color", TURQ, "important");
-    filled.style.setProperty("opacity", "1", "important");
-    return true;
-  }};
-
-  const resolveHandle = (label, handleHint = null) => {{
-    if (
-      handleHint
-      && handleHint.nodeType === 1
-      && typeof handleHint.getAttribute === "function"
-      && handleHint.getAttribute("aria-label") === label
-    ) {{
-      return handleHint;
-    }}
-    const escapedLabel = cssEscape(label);
-    const handles = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escapedLabel + '"]');
-    if (!handles || handles.length === 0) return null;
-    return handles[0];
-  }};
-
-  const raf = (cb) => {{
-    if (typeof hostWin.requestAnimationFrame === "function") {{
-      return hostWin.requestAnimationFrame(cb);
-    }}
-    return hostWin.setTimeout(cb, 16);
-  }};
-
-  const patchOneLabel = (label, handleHint = null) => {{
-    const handle = resolveHandle(label, handleHint);
-    if (!handle) return false;
-    attachDragListeners(handle, label);
-    const root = resolveRoot(handle);
-    if (!root) return false;
-
-    const selected = selectFilled(root);
-    if (selected.best) {{
-      const chosenRect = selected.best.getBoundingClientRect();
-      if (!(selected.maxW > 0 && chosenRect.width >= selected.maxW * 0.99)) {{
-        patchFilled(selected.best);
-        return true;
+    let best = "";
+    let bestCount = -1;
+    counts.forEach((count, key) => {{
+      if (count > bestCount) {{
+        best = key;
+        bestCount = count;
       }}
-    }}
-
-    const aria = getAriaPercent(handle);
-    const tracks = getFullTrackCandidates(root);
-    if (!aria.ok || tracks.length === 0) return false;
-    return patchGradientTracks(tracks, aria.pct);
-  }};
-
-  const stabilizePatch = (label, handleHint = null) => {{
-    if (!label) return;
-    if (!hostWin.__MEDF_STABILIZE_STATE__) hostWin.__MEDF_STABILIZE_STATE__ = new Map();
-    const stabilizeState = hostWin.__MEDF_STABILIZE_STATE__;
-    const existing = stabilizeState.get(label);
-    if (existing && existing.active) {{
-      existing.remaining = 10;
-      if (handleHint && handleHint.nodeType === 1) {{
-        existing.handleHint = handleHint;
-      }}
-      return;
-    }}
-    const burst = {{
-      active: true,
-      remaining: 10,
-      handleHint: handleHint && handleHint.nodeType === 1 ? handleHint : null,
-      rafId: null,
-    }};
-    stabilizeState.set(label, burst);
-    const tick = () => {{
-      if (!burst.active) return;
-      patchOneLabel(label, burst.handleHint);
-      burst.handleHint = null;
-      burst.remaining -= 1;
-      if (burst.remaining > 0) {{
-        burst.rafId = raf(tick);
-      }} else {{
-        burst.active = false;
-        stabilizeState.delete(label);
-      }}
-    }};
-    burst.rafId = raf(tick);
-  }};
-
-  if (!state.pendingLabels) state.pendingLabels = new Set();
-  if (!state.labelHints) state.labelHints = new Map();
-  if (state.pendingAll !== true && state.pendingAll !== false) state.pendingAll = false;
-
-  const flushStabilizeQueue = () => {{
-    state.pending = false;
-    state.timer = null;
-    if (state.pendingAll) {{
-      state.pendingAll = false;
-      LIKERT_LABELS.forEach((label) => {{
-        const hint = state.labelHints.get(label) || null;
-        stabilizePatch(label, hint);
-      }});
-      state.pendingLabels.clear();
-      state.labelHints.clear();
-      return;
-    }}
-    const labels = Array.from(state.pendingLabels);
-    state.pendingLabels.clear();
-    labels.forEach((label) => {{
-      const hint = state.labelHints.get(label) || null;
-      stabilizePatch(label, hint);
     }});
-    state.labelHints.clear();
-  }};
-
-  const queueStabilizeFlush = () => {{
-    state.pending = true;
-    if (state.timer) hostWin.clearTimeout(state.timer);
-    state.timer = hostWin.setTimeout(flushStabilizeQueue, 180);
-  }};
-
-  const scheduleStabilizeAll = () => {{
-    state.pendingAll = true;
-    queueStabilizeFlush();
-  }};
-
-  const scheduleStabilizeLabel = (label, handleHint = null) => {{
-    if (!label) return;
-    state.pendingLabels.add(label);
-    if (handleHint && handleHint.nodeType === 1) {{
-      state.labelHints.set(label, handleHint);
-    }}
-    queueStabilizeFlush();
+    return best || null;
   }};
 
   const attachDragListeners = (handle, label) => {{
@@ -1470,40 +1276,83 @@ def _inject_slider_fill_color_patcher() -> None:
 
     const startDragTimer = () => {{
       clearDragTimer();
-      stabilizePatch(label, handle);
-      const timerId = hostWin.setInterval(() => patchOneLabel(label, handle), 50);
+      patchAll();
+      const timerId = hostWin.setInterval(() => patchAll(), 50);
       hostWin.__MEDF_DRAG_TIMER__.set(label, timerId);
     }};
 
     handle.addEventListener("pointerdown", startDragTimer, true);
-    handle.addEventListener("pointermove", () => scheduleStabilizeLabel(label, handle), true);
+    handle.addEventListener("pointermove", schedulePatch, true);
     handle.addEventListener("pointerup", () => {{
       clearDragTimer();
-      stabilizePatch(label, handle);
-      scheduleStabilizeLabel(label, handle);
+      schedulePatch();
     }}, true);
     handle.addEventListener("pointercancel", () => {{
       clearDragTimer();
-      stabilizePatch(label, handle);
-      scheduleStabilizeLabel(label, handle);
+      schedulePatch();
     }}, true);
-    handle.addEventListener("keydown", () => {{
-      stabilizePatch(label, handle);
-      scheduleStabilizeLabel(label, handle);
-    }}, true);
-    handle.addEventListener("input", () => scheduleStabilizeLabel(label, handle), true);
-    handle.addEventListener("change", () => scheduleStabilizeLabel(label, handle), true);
+    handle.addEventListener("keydown", schedulePatch, true);
+    handle.addEventListener("input", schedulePatch, true);
+    handle.addEventListener("change", schedulePatch, true);
   }};
 
-  const patchAll = () => {{
+  const patchOneLabel = (label) => {{
+    const escapedLabel = cssEscape(label);
+    const handles = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escapedLabel + '"]');
+    if (!handles || handles.length === 0) return false;
+    const handle = handles[0];
+    attachDragListeners(handle, label);
+    const root = resolveRoot(handle);
+    if (!root) return false;
+    const aria = getAriaPercent(handle);
+    if (!aria.ok) return false;
+
+    root.querySelectorAll('[data-medf-track]').forEach((node) => {{
+      node.removeAttribute("data-medf-track");
+    }});
+
+    const trackish = collectTrackish(root);
+    if (trackish.length === 0) return false;
+    const maxW = Math.max(...trackish.map((entry) => entry.width));
+    const fullWidth = trackish.filter(
+      (entry) => entry.width >= maxW * 0.99
+        && (entry.bgImage !== "none" || !isTransparentColor(entry.bgColor))
+    );
+    if (fullWidth.length === 0) return false;
+
+    const fullWidthColors = fullWidth.map((entry) => entry.bgColor);
+    const allColors = trackish.map((entry) => entry.bgColor);
+    const unfilled = mostFrequentColor(fullWidthColors) || mostFrequentColor(allColors) || "rgba(255,255,255,0.22)";
+
+    root.setAttribute("data-medf-likert", "1");
+    fullWidth.forEach((entry) => {{
+      entry.node.setAttribute("data-medf-track", "1");
+    }});
+    root.style.setProperty("--medf-fill-pct", aria.pct + "%");
+    root.style.setProperty("--medf-fill-color", TURQ);
+    root.style.setProperty("--medf-unfilled", unfilled);
+    return true;
+  }};
+
+  function patchAll() {{
     LIKERT_LABELS.forEach((label) => {{
       patchOneLabel(label);
     }});
-  }};
+  }}
+
+  function schedulePatch() {{
+    state.pending = true;
+    if (state.timer) hostWin.clearTimeout(state.timer);
+    state.timer = hostWin.setTimeout(() => {{
+      state.pending = false;
+      state.timer = null;
+      patchAll();
+    }}, 180);
+  }}
 
   if (!state.wired) {{
     state.wired = true;
-    state.observer = new hostWin.MutationObserver(scheduleStabilizeAll);
+    state.observer = new hostWin.MutationObserver(schedulePatch);
     if (hostDoc.body) {{
       state.observer.observe(hostDoc.body, {{
         childList: true,
@@ -1512,13 +1361,13 @@ def _inject_slider_fill_color_patcher() -> None:
         attributeFilter: ["style", "class", "aria-valuenow"],
       }});
     }}
-    hostDoc.addEventListener("input", scheduleStabilizeAll, true);
-    hostDoc.addEventListener("pointerup", scheduleStabilizeAll, true);
+    hostDoc.addEventListener("input", schedulePatch, true);
+    hostDoc.addEventListener("pointerup", schedulePatch, true);
   }}
 
   patchAll();
-  hostWin.setTimeout(scheduleStabilizeAll, 250);
-  hostWin.setTimeout(scheduleStabilizeAll, 500);
+  hostWin.setTimeout(patchAll, 250);
+  hostWin.setTimeout(patchAll, 500);
 }})();
 </script>
 """,
