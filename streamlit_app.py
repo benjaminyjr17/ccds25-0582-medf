@@ -1245,52 +1245,46 @@ def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
 
 # Diagnostic smoke tests: verify injected JS runs and whether slider DOM is queryable without DevTools.
 def _inject_js_smoke_test() -> None:
-    st.markdown("## DEBUG PANEL PLACEHOLDER (should appear above the JS panel)")
-    st.markdown(
-        """
-<div id="medf-panel" style="
-  padding: 22px 24px;
-  border-radius: 12px;
-  border: 3px solid #f59e0b;
-  background: rgba(245,158,11,0.18);
-  color: #f8fafc;
-  font-size: 1.25rem;
-  font-weight: 800;
-  line-height: 1.45;
-  margin: 0.5rem 0 0.75rem 0;
-">
-  MEDF JS SMOKE PANEL: HTML RENDERED
+    html = r"""
+<div id="medf-panel"
+     style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            border: 3px solid #ff2d2d;
+            padding: 12px;
+            background: #fff5f5;
+            color: #111;
+            white-space: pre-wrap;">
+MEDF JS SMOKE PANEL: HTML RENDERED
 </div>
-""",
-        unsafe_allow_html=True,
-    )
-    components.html(
-        """
+
+<div id="medf-noscript" style="margin-top:8px; font-weight:700; color:#b00000;">
+  <noscript>JS IS NOT EXECUTING (NOSCRIPT VISIBLE)</noscript>
+</div>
+
 <script>
 (function () {
-  const panel = document.getElementById("medf-panel");
+  const p = document.getElementById("medf-panel");
   try {
-    window.__MEDF_JS_SMOKE__ = true;
-    if (!panel) return;
-    panel.textContent = "MEDF JS SMOKE PANEL: SCRIPT RAN";
-    panel.style.background = "rgba(22,163,74,0.22)";
-    panel.style.borderColor = "#16a34a";
-    panel.style.color = "#dcfce7";
-  } catch (err) {
-    if (!panel) return;
-    const message = err && err.message ? err.message : String(err);
-    const stack = err && err.stack ? err.stack : "unavailable";
-    panel.textContent = "JS SMOKE ERROR: " + message + "\\nSTACK: " + stack;
-    panel.style.whiteSpace = "pre-wrap";
-    panel.style.background = "rgba(220,38,38,0.22)";
-    panel.style.borderColor = "#dc2626";
-    panel.style.color = "#fee2e2";
+    if (!p) return;
+    p.textContent += "\nJS EXECUTED (sync)";
+    setTimeout(() => {
+      try {
+        p.textContent += "\nJS EXECUTED (timeout)";
+      } catch (e2) {
+        p.textContent += "\nERROR (timeout): " + (e2 && e2.message ? e2.message : String(e2));
+      }
+    }, 250);
+  } catch (e) {
+    if (p) {
+      p.textContent += "\nERROR: " + (e && e.message ? e.message : String(e));
+      p.textContent += "\nSTACK: " + (e && e.stack ? e.stack : "unavailable");
+    }
   }
 })();
 </script>
-""",
-        height=260,
-    )
+"""
+    components.html(html, height=300)
 
 
 def _inject_slider_find_test(label: str) -> None:
