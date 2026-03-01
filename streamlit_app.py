@@ -1243,6 +1243,86 @@ def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
     )
 
 
+# Diagnostic smoke tests: verify injected JS runs and whether slider DOM is queryable without DevTools.
+def _inject_js_smoke_test() -> None:
+    components.html(
+        """
+<script>
+(function () {
+  const parentWin = window.parent && window.parent.document ? window.parent : window;
+  const parentDoc = parentWin.document;
+  const BADGE_ID = "medf-js-smoke-badge";
+  let badge = parentDoc.getElementById(BADGE_ID);
+  if (!badge) {
+    badge = parentDoc.createElement("div");
+    badge.id = BADGE_ID;
+    badge.setAttribute("data-medf-smoke", "1");
+    badge.style.position = "fixed";
+    badge.style.top = "14px";
+    badge.style.right = "14px";
+    badge.style.zIndex = "10000";
+    badge.style.padding = "6px 10px";
+    badge.style.borderRadius = "999px";
+    badge.style.border = "1px solid #334155";
+    badge.style.background = "#334155";
+    badge.style.color = "#ecfeff";
+    badge.style.fontSize = "12px";
+    badge.style.fontWeight = "700";
+    badge.style.boxShadow = "0 4px 12px rgba(0,0,0,0.28)";
+    parentDoc.body.appendChild(badge);
+  }
+  badge.textContent = "JS SMOKE TEST: ACTIVE";
+  parentWin.__MEDF_JS_SMOKE__ = true;
+  badge.textContent = "JS SMOKE TEST: SCRIPT RAN";
+  badge.style.background = "#16a34a";
+  badge.style.borderColor = "#16a34a";
+  window.addEventListener("unload", () => {
+    const existing = parentDoc.getElementById(BADGE_ID);
+    if (existing && existing.getAttribute("data-medf-smoke") === "1") {
+      existing.remove();
+    }
+  });
+})();
+</script>
+""",
+        height=0,
+    )
+
+
+def _inject_slider_find_test(label: str) -> None:
+    label_json = json.dumps(label)
+    script = """
+<script>
+(function () {
+  const parentWin = window.parent && window.parent.document ? window.parent : window;
+  const parentDoc = parentWin.document;
+  const BADGE_ID = "medf-js-smoke-badge";
+  const badge = parentDoc.getElementById(BADGE_ID);
+  if (!badge) return;
+  const label = __LABEL_JSON__;
+  const escaped = (parentWin.CSS && typeof parentWin.CSS.escape === "function")
+    ? parentWin.CSS.escape(label)
+    : label.replace(/["\\\\]/g, "\\\\$&");
+  const nodes = parentDoc.querySelectorAll('[role="slider"][aria-label="' + escaped + '"]');
+  const smokeRunning = parentWin.__MEDF_JS_SMOKE__ === true;
+  let text = 'Sliders found for "' + label + '": ' + nodes.length;
+  if (!smokeRunning) {
+    text += " (SCRIPT NOT RUNNING)";
+  }
+  badge.textContent = text;
+  if (nodes.length > 0) {
+    badge.style.background = "#16a34a";
+    badge.style.borderColor = "#16a34a";
+  } else {
+    badge.style.background = "#dc2626";
+    badge.style.borderColor = "#dc2626";
+  }
+})();
+</script>
+"""
+    components.html(script.replace("__LABEL_JSON__", label_json), height=0)
+
+
 def _derive_auto_pareto_search_params(budget: int, bias: int) -> tuple[int, int]:
     explore_weight = float(bias) / 100.0
     p_raw = 40 + (140 - 40) * explore_weight
@@ -1541,6 +1621,7 @@ def main() -> None:
         st.markdown("- Only non-dominated solutions are retained on the Pareto frontier.")
 
     conference_mode = st.session_state["conference_mode"]
+    debug_js_slider_smoke_tests = False
 
     with st.sidebar:
         st.header("Configuration")
@@ -1550,6 +1631,11 @@ def main() -> None:
             help="Prioritize executive visuals and preset controls.",
         )
         st.caption("Conference Mode prioritizes primary outputs.")
+        debug_js_slider_smoke_tests = st.checkbox(
+            "Debug: JS/Slider Smoke Tests",
+            value=False,
+            key="debug_js_slider_smoke_tests",
+        )
 
         st.markdown("**Backend URL**")
         backend_url = st.text_input("Backend URL", value="http://127.0.0.1:8000").rstrip("/")
@@ -2005,6 +2091,10 @@ def main() -> None:
             dimension: float(DEMO_WEIGHTS[stakeholder_id][dimension])
             for dimension in UNIFIED_DIMENSIONS
         }
+
+    if debug_js_slider_smoke_tests:
+        _inject_js_smoke_test()
+        _inject_slider_find_test("Fairness and Non-discrimination")
 
     if page == "Evaluate":
         evaluate_clicked = st.button("Evaluate", type="primary")
