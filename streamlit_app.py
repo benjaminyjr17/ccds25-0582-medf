@@ -1110,136 +1110,197 @@ def _inject_advanced_slider_green_css() -> None:
 
 
 def _inject_slider_fill_color_patcher(debug_enabled: bool = False) -> None:
-    debug_container_id = "medf-slider-fill-patcher-debug"
+    panel_html = ""
     if debug_enabled:
-        st.markdown(
-            f'<div id="{debug_container_id}" '
-            'style="font-size:0.8rem;line-height:1.35;border:1px dashed #64748b;'
-            'padding:0.45rem 0.6rem;border-radius:8px;background:rgba(100,116,139,0.1);">'
-            "Slider fill patcher debug: initializing...</div>",
-            unsafe_allow_html=True,
-        )
+        panel_html = """
+<div id="medf-slider-fill-panel" style="
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.35;
+  border: 2px solid #0f766e;
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(15, 118, 110, 0.12);
+  color: #052e2b;
+  white-space: pre-wrap;
+">Likert fill patcher debug: initializing...</div>
+"""
     # Root cause: Streamlit/BaseWeb slider fill nodes can shift across rerenders and are not
     # consistently targetable with static CSS selectors alone; apply a scoped runtime patcher.
     components.html(
         f"""
+<div id="medf-sentinel"></div>
+{panel_html}
 <script>
 (function () {{
-  const parentWin = window.parent && window.parent.document ? window.parent : window;
-  const parentDoc = parentWin.document;
   const DEBUG = {str(debug_enabled).lower()};
-  const DEBUG_ID = "{debug_container_id}";
   const TURQ = "{BRAND_TURQUOISE_HEX}";
-  const GREEN = "{BRAND_GREEN_HEX}";
   const LIKERT_LABELS = {json.dumps(LIKERT_SLIDER_LABELS)};
-  const ADV_LABELS = {json.dumps(ADVANCED_SLIDER_LABELS)};
+  const iframeDoc = document;
+  const debugPanel = DEBUG ? iframeDoc.getElementById("medf-slider-fill-panel") : null;
 
-  if (!parentWin.__medfSliderFillPatcherState) {{
-    parentWin.__medfSliderFillPatcherState = {{ initialized: false, observer: null, scheduled: false }};
+  let hostWin = window;
+  let hostDoc = document;
+  let hostAccess = false;
+  try {{
+    if (window.parent && window.parent.document) {{
+      hostWin = window.parent;
+      hostDoc = window.parent.document;
+      hostAccess = true;
+    }}
+  }} catch (err) {{
+    hostWin = window;
+    hostDoc = document;
+    hostAccess = false;
   }}
-  const state = parentWin.__medfSliderFillPatcherState;
-  const labelColor = new Map([
-    ...LIKERT_LABELS.map((label) => [label, TURQ]),
-    ...ADV_LABELS.map((label) => [label, GREEN]),
-  ]);
 
-  const dedupe = (nodes) => Array.from(new Set(nodes.filter(Boolean)));
+  if (!hostWin.__medfLikertFillPatchState) {{
+    hostWin.__medfLikertFillPatchState = {{ wired: false, observer: null, pending: false, timer: null }};
+  }}
+  const state = hostWin.__medfLikertFillPatchState;
 
-  const getFillCandidate = (sliderBase) => {{
-    const progressNodes = Array.from(sliderBase.querySelectorAll('[role="progressbar"]'));
-    if (progressNodes.length > 0) return progressNodes[0];
+  const writeDebug = (lines) => {{
+    if (!DEBUG || !debugPanel) return;
+    debugPanel.textContent = lines.join("\\n");
+  }};
 
-    const widthNodes = Array.from(sliderBase.querySelectorAll('div[style*="width"]'))
-      .filter((node) => node.getAttribute("role") !== "slider");
-    if (widthNodes.length > 0) return widthNodes[0];
+  const cssEscape = (value) => {{
+    const text = String(value ?? "");
+    if (hostWin.CSS && typeof hostWin.CSS.escape === "function") return hostWin.CSS.escape(text);
+    return text.replace(/["\\\\]/g, "\\\\$&");
+  }};
 
-    const transformNodes = Array.from(sliderBase.querySelectorAll('div[style*="transform"]'))
-      .filter((node) => node.getAttribute("role") !== "slider");
-    if (transformNodes.length > 0) return transformNodes[0];
+  const resolveRoot = (handle) => {{
+    if (!handle) return null;
+    let root = handle.closest('[data-baseweb="slider"]')
+      || (handle.parentElement && handle.parentElement.closest('[data-baseweb="slider"]'));
+    if (root) return root;
+    let ancestor = handle;
+    for (let depth = 0; depth < 6 && ancestor; depth += 1) {{
+      ancestor = ancestor.parentElement;
+      if (!ancestor) break;
+      const candidate = ancestor.querySelector('[data-baseweb="slider"]');
+      if (candidate) return candidate;
+    }}
+    return null;
+  }};
+
+  const isTrackLike = (node) => {{
+    if (!node) return false;
+    const rect = node.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 && rect.height <= 28;
+  }};
+
+  const selectFilled = (root) => {{
+    if (!root) return null;
+    const progressbars = Array.from(root.querySelectorAll('[role="progressbar"]')).filter(isTrackLike);
+    if (progressbars.length === 1) return progressbars[0];
+
+    const widthCandidates = Array.from(root.querySelectorAll('div[style*="width"]')).filter((node) => {{
+      const styleAttr = (node.getAttribute("style") || "").toLowerCase();
+      return styleAttr.includes("%") && isTrackLike(node);
+    }});
+    if (widthCandidates.length > 0) {{
+      widthCandidates.sort((a, b) => (a.offsetHeight - b.offsetHeight) || (b.offsetWidth - a.offsetWidth));
+      return widthCandidates[0];
+    }}
+
+    const transformCandidates = Array.from(root.querySelectorAll('div[style*="transform"]')).filter(isTrackLike);
+    if (transformCandidates.length > 0) {{
+      transformCandidates.sort((a, b) => (a.offsetHeight - b.offsetHeight) || (b.offsetWidth - a.offsetWidth));
+      return transformCandidates[0];
+    }}
 
     return null;
   }};
 
-  const applyColor = (element, color, property) => {{
-    if (!element) return;
-    element.style.setProperty(property, color, "important");
-  }};
-
-  const patchOneSlider = (handle) => {{
-    const label = handle.getAttribute("aria-label") || "";
-    if (!labelColor.has(label)) return {{ targeted: false, fillPatched: false }};
-    const color = labelColor.get(label);
-    const sliderBase = handle.closest('[data-baseweb="slider"]');
-    if (!sliderBase) return {{ targeted: true, fillPatched: false }};
-
-    const fillCandidate = getFillCandidate(sliderBase);
-    if (fillCandidate) {{
-      applyColor(fillCandidate, color, "background-color");
-      applyColor(fillCandidate, color, "border-color");
-    }}
-
-    applyColor(handle, color, "background-color");
-    applyColor(handle, color, "border-color");
-
-    const sliderRoot = handle.closest('[data-testid="stSlider"]') || sliderBase.closest('[data-testid="stSlider"]');
-    if (sliderRoot) {{
-      const valueCandidates = [
-        handle.nextElementSibling,
-        ...sliderRoot.querySelectorAll('[data-testid="stSliderThumbValue"]'),
-        ...sliderRoot.querySelectorAll('[class*="thumbValue"]'),
-      ];
-      dedupe(valueCandidates).forEach((node) => applyColor(node, color, "color"));
-    }}
-
-    return {{ targeted: true, fillPatched: !!fillCandidate }};
+  const patchFilled = (filled) => {{
+    if (!filled) return false;
+    filled.style.removeProperty("outline");
+    filled.style.removeProperty("outline-offset");
+    filled.style.setProperty("background-image", "none", "important");
+    filled.style.setProperty("background-color", TURQ, "important");
+    filled.style.setProperty("background", TURQ, "important");
+    filled.style.setProperty("border-color", TURQ, "important");
+    filled.style.setProperty("opacity", "1", "important");
+    return true;
   }};
 
   const patchAll = () => {{
-    state.scheduled = false;
-    const handles = Array.from(parentDoc.querySelectorAll('[role="slider"][aria-label]'));
+    state.pending = false;
+    const lines = ["Likert fill patcher"];
+    let patched = 0;
     let targeted = 0;
-    let fillPatched = 0;
+    const misses = [];
 
-    handles.forEach((handle) => {{
-      const result = patchOneSlider(handle);
-      if (result.targeted) targeted += 1;
-      if (result.fillPatched) fillPatched += 1;
+    if (!hostAccess) {{
+      lines.push("hostDoc access: FAILED");
+      writeDebug(lines);
+      return;
+    }}
+
+    lines.push("hostDoc access: OK");
+    LIKERT_LABELS.forEach((label) => {{
+      const escapedLabel = cssEscape(label);
+      const handles = hostDoc.querySelectorAll('[role="slider"][aria-label="' + escapedLabel + '"]');
+      if (!handles || handles.length === 0) {{
+        misses.push(label + " (handle missing)");
+        return;
+      }}
+      targeted += 1;
+      const root = resolveRoot(handles[0]);
+      if (!root) {{
+        misses.push(label + " (root missing)");
+        return;
+      }}
+      const filled = selectFilled(root);
+      if (!filled) {{
+        misses.push(label + " (no filled node)");
+        return;
+      }}
+      if (patchFilled(filled)) patched += 1;
     }});
 
-    if (DEBUG) {{
-      const debugNode = parentDoc.getElementById(DEBUG_ID);
-      if (debugNode) {{
-        debugNode.textContent = `Slider fill patcher: targeted=${{targeted}}, fill_patched=${{fillPatched}}.`;
-      }}
+    lines.push(`targeted=${{targeted}}/${{LIKERT_LABELS.length}}`);
+    lines.push(`patched_filled=${{patched}}`);
+    if (misses.length > 0) {{
+      lines.push("skipped:");
+      misses.slice(0, 6).forEach((entry) => lines.push("- " + entry));
     }}
+    writeDebug(lines);
   }};
 
   const schedulePatch = () => {{
-    if (state.scheduled) return;
-    state.scheduled = true;
-    parentWin.requestAnimationFrame(patchAll);
+    if (state.pending) return;
+    state.pending = true;
+    if (state.timer) {{
+      hostWin.clearTimeout(state.timer);
+    }}
+    state.timer = hostWin.setTimeout(patchAll, 180);
   }};
 
-  if (!state.initialized) {{
-    state.initialized = true;
-    state.observer = new parentWin.MutationObserver(schedulePatch);
-    state.observer.observe(parentDoc.body, {{
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["style", "class", "aria-valuenow"],
-    }});
-    parentDoc.addEventListener("input", schedulePatch, true);
-    parentDoc.addEventListener("pointerup", schedulePatch, true);
+  if (!state.wired && hostAccess) {{
+    state.wired = true;
+    state.observer = new hostWin.MutationObserver(schedulePatch);
+    if (hostDoc.body) {{
+      state.observer.observe(hostDoc.body, {{
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["style", "class", "aria-valuenow"],
+      }});
+    }}
+    hostDoc.addEventListener("input", schedulePatch, true);
+    hostDoc.addEventListener("pointerup", schedulePatch, true);
   }}
 
-  schedulePatch();
-  parentWin.setTimeout(schedulePatch, 120);
-  parentWin.setTimeout(schedulePatch, 600);
+  patchAll();
+  hostWin.setTimeout(patchAll, 250);
+  hostWin.setTimeout(patchAll, 500);
 }})();
 </script>
 """,
-        height=0,
+        height=360 if debug_enabled else 1,
     )
 
 
@@ -1842,7 +1903,6 @@ def main() -> None:
     st.set_page_config(page_title="MEDF Governance Platform", layout="wide")
     tokens = _ui_tokens(_get_theme_base())
     inject_css(tokens)
-    _inject_slider_fill_color_patcher(DEBUG_SLIDER_FILL_PATCHER)
     # Root cause: the toggle was not key-bound and was mirrored manually, which created two
     # competing state paths and occasional one-rerun-late visibility updates.
     st.session_state.setdefault("conference_mode", False)
@@ -1935,6 +1995,7 @@ def main() -> None:
         st.markdown("- Only non-dominated solutions are retained on the Pareto frontier.")
 
     conference_mode = st.session_state["conference_mode"]
+    theme_custom_slider_fill_colors = True
     debug_js_slider_smoke_tests = False
 
     with st.sidebar:
@@ -1945,6 +2006,11 @@ def main() -> None:
             help="Prioritize executive visuals and preset controls.",
         )
         st.caption("Conference Mode prioritizes primary outputs.")
+        theme_custom_slider_fill_colors = st.checkbox(
+            "Theme: Custom slider fill colors",
+            value=True,
+            key="theme_custom_slider_fill_colors",
+        )
         debug_js_slider_smoke_tests = st.checkbox(
             "Debug: JS/Slider Smoke Tests",
             value=False,
@@ -2314,6 +2380,8 @@ def main() -> None:
             st.caption("Case Studies runs fixed scenarios through Evaluate → Conflicts → Pareto.")
 
     demo_active = bool(st.session_state.get("demo_mode"))
+    if theme_custom_slider_fill_colors:
+        _inject_slider_fill_color_patcher(debug_enabled=debug_js_slider_smoke_tests)
     ai_system_id = "demo_facerec"
     ai_system_name = "Demo Facial Recognition System"
     ai_system_description = "MVP evaluation input"
@@ -2339,7 +2407,9 @@ def main() -> None:
 
             with col_right:
                 st.subheader("Dimension Scores (Likert 1–7)")
-                likert_slider_css_enabled = _inject_likert_track_turquoise_css()
+                likert_slider_css_enabled = False
+                if not theme_custom_slider_fill_colors:
+                    likert_slider_css_enabled = _inject_likert_track_turquoise_css()
                 if DEBUG_SHOW_SLIDER_LABELS:
                     st.caption(f"Likert slider CSS enabled: {likert_slider_css_enabled}")
                 if page in {"Conflict Detection", "Pareto Resolution"}:
