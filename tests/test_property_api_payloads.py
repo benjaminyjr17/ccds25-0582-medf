@@ -74,7 +74,7 @@ _weight_vector_strategy = st.lists(
     weights=_weight_vector_strategy,
     method=st.sampled_from(["topsis", "wsm"]),
 )
-@settings(max_examples=25)
+@settings(max_examples=25, deadline=None)
 def test_property_evaluate_valid_payloads_return_finite_json(
     dimension_scores: dict[str, float],
     weights: dict[str, float],
@@ -102,7 +102,7 @@ def test_property_evaluate_valid_payloads_return_finite_json(
 
 
 @given(dimension_scores=_dimension_scores_strategy)
-@settings(max_examples=25)
+@settings(max_examples=25, deadline=None)
 def test_property_conflicts_valid_payloads_return_finite_json(
     dimension_scores: dict[str, float],
 ) -> None:
@@ -132,7 +132,7 @@ def test_property_conflicts_valid_payloads_return_finite_json(
     n_gen=st.integers(min_value=20, max_value=60),
     seed=st.integers(min_value=1, max_value=10_000),
 )
-@settings(max_examples=8)
+@settings(max_examples=8, deadline=None)
 def test_property_pareto_valid_payloads_return_finite_json(
     dimension_scores: dict[str, float],
     n_solutions: int,

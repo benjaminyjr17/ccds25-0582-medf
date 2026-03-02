@@ -1,69 +1,36 @@
-# Engineering Freeze Notice — FYP Release Line
+# MEDF Engineering Freeze — v1.1.0-freeze
 
-## Active Freeze Successor (Post-Remediation)
+**Date:** 2026-03-02
+**Project:** CCDS25-0582 — Multi-stakeholder Ethical Decision Framework for AI Systems
+**Status:** Feature-frozen. No further code changes permitted.
 
-- Target tag name: `v1.1.0-freeze`.
-- Baseline commit SHA for freeze preparation: `e274fc7146f1de1db4c46c8490479dcf1d0454d1`.
-- Freeze preparation date: `2026-03-02`.
-- Freeze rationale: strict requirement remediation for RQ-03 (typed harm output), RQ-05 (real-deployment provenance manifests), and RQ-06 (committed raw-data-to-results statistics runner).
+## Scope of v1.1.0-freeze
 
-This release line supersedes prior freeze constraints that prohibited feature additions in `v1.0.1-freeze`.
+This release includes all functionality developed for the MEDF platform:
 
-## Historical Freeze Record
+- Three regulatory frameworks (EU AI Act ALTAI, NIST AI RMF, Singapore MGAF)
+- Six ethical dimensions with 1–7 Likert scoring
+- Stakeholder conflict detection with pairwise alignment
+- Multi-objective Pareto resolution (NSGA-II)
+- Three embedded case studies with evidence manifests
+- Interactive Streamlit dashboard
+- Full audit logging and evidence pack generation
+- Research statistics pipeline
 
-- Prior tag name: `v1.0.1-freeze`.
-- Prior commit SHA: `96b6a4b94b876bd8b96744688d96cf6708b40d19`.
-- Prior freeze date: `2026-02-28`.
+## Changes Since v1.0.1
 
-## Scope of the v1.1.0 Successor
+- UI string standardization: 46+ edits across three batches (Title Case, en dashes, terminology precision, formal case study identifiers, correct abbreviations)
+- Computational Budget slider: range widened to 500–50,000 with step precision of 1
+- HARD_CAP_EVALS raised to 50,000 (symmetric with auto mode)
+- Repo cleanup: removed dead dashboard module, development artifacts, runtime telemetry data
+- README rewritten for dual audience (FYP examiner + open-source)
 
-- FastAPI backend with evaluation, conflict, and Pareto workflows.
-- Typed harm-taxonomy output in `/api/conflicts`.
-- Real-deployment case-study manifests with licensing-safe provenance policy.
-- Deterministic research statistics pipeline from committed raw CSV inputs.
-- Streamlit evidence rendering that surfaces deployment manifest and per-dimension rationale.
-- Contract-lock and OpenAPI fingerprint updated to the new freeze baseline.
+## Test Results
 
-## Execution Instructions (Local)
+- All tests passing (54+ tests)
+- Categories: unit, integration, property-based, stress, end-to-end
+- CI: GitHub Actions workflow at `.github/workflows/test.yml`
 
-### Backend
+## Post-Freeze Policy
 
-- Activate environment: `source .venv/bin/activate`
-- Start backend: `python -m uvicorn app.main:app --reload --port 8000`
-
-### Frontend
-
-- Activate environment: `source .venv/bin/activate`
-- Start interface: `python -m streamlit run streamlit_app.py`
-
-## Reproducibility Commands
-
-```bash
-./.venv/bin/python -m pytest -q --strict-markers
-./.venv/bin/python -m pytest -q --strict-markers -m "not extreme and not property and not soak"
-MEDF_EXTREME=1 ./.venv/bin/python -m pytest -q --strict-markers -m "extreme or property or soak"
-MEDF_EXTREME=1 ./.venv/bin/python -m pytest -q --strict-markers --cov=app --cov-branch --cov-report=term-missing:skip-covered --cov-report=json:coverage.json --cov-fail-under=88
-bash scripts/freeze_extreme_gate.sh
-bash scripts/release_smoke.sh
-./.venv/bin/python scripts/generate_evidence_pack.py
-./.venv/bin/python scripts/run_research_statistics.py --seed 42 --n-boot 2000
-```
-
-## Mandatory Pre-Freeze Sequence
-
-1. Fast gate pass:
-   - `pytest -q --strict-markers -m "not extreme and not property and not soak"`.
-2. Heavy gate pass:
-   - `MEDF_EXTREME=1 pytest -q --strict-markers -m "extreme or property or soak"`.
-3. Coverage gate pass:
-   - `MEDF_EXTREME=1 pytest -q --strict-markers --cov=app --cov-branch --cov-report=term-missing:skip-covered --cov-report=json:coverage.json --cov-fail-under=88`.
-4. Release smoke pass:
-   - `bash scripts/release_smoke.sh`.
-5. Working tree cleanliness:
-   - `git status --porcelain` must be empty before tagging freeze.
-
-## Freeze Policy
-
-- API path/schema changes are permitted only with version bump and updated lock hash.
-- `v1.1.0-freeze` becomes the governing baseline after tag creation.
-- Post-`v1.1.0-freeze` changes are limited to critical defect fixes under a new tag.
+No code changes are permitted after this tag. Only documentation updates to the FYP report are allowed. If a critical bug is discovered, it must be documented in the report rather than fixed in code.
