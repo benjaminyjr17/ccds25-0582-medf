@@ -31,7 +31,7 @@ UNIFIED_DIMENSIONS = [
 SEM_SUCCESS_HEX = "#22C55E"
 SEM_WARNING_HEX = "#F59E0B"
 SEM_DANGER_HEX = "#EF4444"
-SEM_INFO_HEX = "#38BDF8"
+SEM_INFO_HEX = "#27C4B7"
 BRAND_TURQUOISE_HEX = "#27C4B7"
 BRAND_TURQUOISE_FILL_RGBA = "rgba(39, 196, 183, 0.18)"
 INFO_BANNER_BG_RGBA = "rgba(39, 196, 183, 0.10)"
@@ -43,7 +43,7 @@ SEM_BORDER_HEX = "#1F2937"
 PARCOORDS_TICKFONT_HEX = "#E6E6E6"
 
 BRAND_BLUE_HEX = SEM_INFO_HEX
-BRAND_BLUE_FILL_RGBA = "rgba(56, 189, 248, 0.22)"
+BRAND_BLUE_FILL_RGBA = "rgba(39, 196, 183, 0.22)"
 INLINE_CODE_BADGE_STYLE = f"color:{BRAND_TURQUOISE_HEX};"
 
 DIMENSION_DISPLAY_NAMES = {
@@ -470,12 +470,12 @@ div.stButton > button:hover {{
 
 /* Force slider progress fill (works for current Streamlit DOM) */
 div[data-baseweb="slider"] div[style*="transform"] {{
-    background-color: #27C4B7 !important;
+    background-color: {BRAND_TURQUOISE_HEX} !important;
 }}
 
 /* Force slider thumb */
 div[data-baseweb="slider"] div[role="slider"] {{
-    background-color: #27C4B7 !important;
+    background-color: {BRAND_TURQUOISE_HEX} !important;
     border: none !important;
     box-shadow: none !important;
 }}
@@ -1218,7 +1218,7 @@ def _inject_slider_fill_color_patcher() -> None:
 
 /* Scope only MEDF Likert sliders */
 div[data-baseweb="slider"][data-medf-likert="1"]{
-  --_medf_fill: var(--medf-fill-color, #27C4B7);
+  --_medf_fill: var(--medf-fill-color, {BRAND_TURQUOISE_HEX});
   --_medf_unfilled: var(--medf-unfilled, rgba(255,255,255,0.22));
   --_medf_pct: var(--medf-fill-pct, 0%);
 }
