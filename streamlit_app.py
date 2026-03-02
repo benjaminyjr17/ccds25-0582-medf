@@ -2348,7 +2348,7 @@ def main() -> None:
             _sync_pareto_controls_from_preset(pareto_preset)
             preset_values = PARETO_PRESETS.get(pareto_preset, PARETO_PRESETS["Standard"])
             if pareto_preset == "Standard":
-                st.caption("Standard balances runtime and coverage.")
+                st.caption("Standard Search balances computational cost and solution-space coverage.")
             else:
                 st.caption("Deep Search increases search depth to enhance exploration of the decision space.")
 
