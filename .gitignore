@@ -61,3 +61,11 @@ logs/
 .mypy_cache/
 .ruff_cache/
 .ipynb_checkpoints/
+
+# --- Local data (not for version control) ---
+data/
+
+# --- Temporary patch / backup artifacts ---
+patch_ui_strings.py
+*.patched
+*.pre_*
