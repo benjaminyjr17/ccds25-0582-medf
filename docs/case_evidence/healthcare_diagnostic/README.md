@@ -15,19 +15,21 @@ Deployment type: `real_deployment`
 - Title: NHS and technology leaders agree groundbreaking partnership to improve safety and save lives
 - Publisher: Royal Free London NHS Foundation Trust
 - Primary URL: https://www.royalfree.nhs.uk/news/nhs-and-technology-leaders-agree-groundbreaking-partnership-improve-safety-and-save-lives
+- Archived URL: https://deepmind.google/blog/royal-free-london-publishes-findings-of-legal-audit-in-use-of-streams
 - Durable resolver: `doi_or_stable_id=RFL-NEWS-2016-11-16-DEEPMIND-PARTNERSHIP`
 
 2. `royal_free_dpa_statement_2017`
 - Title: Statement re DeepMind data processing agreement during testing phase of Streams app
 - Publisher: Royal Free London NHS Foundation Trust
 - Primary URL: https://www.royalfree.nhs.uk/news/statement-re-deepmind-data-processing-agreement-during-testing-phase-streams-app
+- Archived URL: https://deepmind.google/blog/royal-free-london-publishes-findings-of-legal-audit-in-use-of-streams
 - Durable resolver: `doi_or_stable_id=RFL-NEWS-2017-11-16-STREAMS-DPA-STATEMENT`
 
 3. `deepmind_legal_audit_streams_2017`
 - Title: Royal Free London publishes findings of legal audit in use of Streams
 - Publisher: Google DeepMind
 - Primary URL: https://deepmind.google/blog/royal-free-london-publishes-findings-of-legal-audit-in-use-of-streams
-- Archived URL: https://deepmind.google/discover/blog/royal-free-london-publishes-findings-of-legal-audit-in-use-of-streams/
+- Archived URL: https://www.royalfree.nhs.uk/news/statement-re-deepmind-data-processing-agreement-during-testing-phase-streams-app
 - Durable resolver: `doi_or_stable_id=DEEPMIND-BLOG-2017-11-16-LEGAL-AUDIT-STREAMS`
 
 ## Integrity

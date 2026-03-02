@@ -12,24 +12,24 @@ Deployment type: `real_deployment`
 ## Sources
 
 1. `eeoc_itutorgroup_suit_2022`
-- Title: EEOC Sues iTutorGroup, Inc. for Age Discrimination
+- Title: iTutorGroup to Pay $365,000 to Settle EEOC Discriminatory Hiring Suit - Original Complaint
 - Publisher: U.S. Equal Employment Opportunity Commission
 - Primary URL: https://www.eeoc.gov/newsroom/itutorgroup-pay-365000-settle-eeoc-discriminatory-hiring-suit
-- Archived URL: https://clearinghouse.net/case/44258/
+- Archived URL: https://www.workforcebulletin.com/assets/htmldocuments/blog/8/2023/08/2023.08.09-EEOC-v.-iTutorGroup-Joint-Notice-of-Settlement-22-cv-02565-PKC-PK.pdf
 - Durable resolver: `doi_or_stable_id=EDNY-1:22-cv-02565-PKC-PK`
 
 2. `eeoc_itutorgroup_settlement_2023`
-- Title: EEOC Settles First AI Discrimination Lawsuit
+- Title: iTutorGroup to Pay $365,000 to Settle EEOC Discriminatory Hiring Suit - Settlement
 - Publisher: U.S. Equal Employment Opportunity Commission
 - Primary URL: https://www.eeoc.gov/newsroom/itutorgroup-pay-365000-settle-eeoc-discriminatory-hiring-suit
-- Archived URL: https://clearinghouse.net/case/44258/
+- Archived URL: https://www.workforcebulletin.com/assets/htmldocuments/blog/8/2023/08/2023.08.09-EEOC-v.-iTutorGroup-Joint-Notice-of-Settlement-22-cv-02565-PKC-PK.pdf
 - Durable resolver: `doi_or_stable_id=EDNY-1:22-cv-02565-PKC-PK`
 
 3. `courtlistener_itutorgroup_1_22_cv_02565`
-- Title: Equal Employment Opportunity Commission v. iTutorGroup, Inc. (1:22-cv-02565)
-- Publisher: CourtListener
-- Primary URL: https://www.courtlistener.com/docket/63288748/equal-employment-opportunity-commission-v-itutorgroup-inc/
-- Archived URL: https://clearinghouse.net/case/44258/
+- Title: Joint Notice of Settlement and Consent Decree - EEOC v. iTutorGroup, Inc.
+- Publisher: U.S. District Court, Eastern District of New York
+- Primary URL: https://www.workforcebulletin.com/assets/htmldocuments/blog/8/2023/08/2023.08.09-EEOC-v.-iTutorGroup-Joint-Notice-of-Settlement-22-cv-02565-PKC-PK.pdf
+- Archived URL: https://www.eeoc.gov/newsroom/itutorgroup-pay-365000-settle-eeoc-discriminatory-hiring-suit
 - Durable resolver: `doi_or_stable_id=EDNY-1:22-cv-02565-PKC-PK`
 
 ## Integrity
