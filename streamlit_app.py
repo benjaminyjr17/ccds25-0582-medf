@@ -69,7 +69,7 @@ LIKERT_SLIDER_LABELS = [
 ]
 ADVANCED_SLIDER_LABELS = [
     "Pareto Solutions Displayed",
-    "Compute Budget (Evaluations)",
+    "Computational Budget (Evaluations)",
     "Explore vs. Refine",
     "Search Breadth (Population)",
     "Search Depth (Generations)",
@@ -643,10 +643,10 @@ def _conflict_overview(conflict_result: Any) -> dict[str, str]:
     rho_value = float(rho_raw) if isinstance(rho_raw, (int, float)) else None
     semantic_label, semantic_color = _conflict_semantic(level, rho_value)
     pair = (
-        f"{safe_str(worst.get('stakeholder_a_id')).strip()} vs "
+        f"{safe_str(worst.get('stakeholder_a_id')).strip()} vs. "
         f"{safe_str(worst.get('stakeholder_b_id')).strip()}"
     ).strip()
-    pair_value = pair if pair and pair != "vs" else "N/A"
+    pair_value = pair if pair and pair != "vs." else "N/A"
     value = semantic_label.upper()
     if rho_value is not None:
         value = f"{value} ({fmt_small(rho_value)})."
@@ -655,7 +655,7 @@ def _conflict_overview(conflict_result: Any) -> dict[str, str]:
     return {
         "value": value,
         "color": semantic_color,
-        "note": f"Worst pairwise alignment: {pair_value}.",
+        "note": f"Worst Pairwise Alignment: {pair_value}.",
         "pair": pair_value,
     }
 
@@ -717,7 +717,7 @@ def _consensus_overview(pareto_result: Any) -> dict[str, str]:
         distance_label, distance_color = _distance_semantic(float(max_distance))
         divergence = f"{stakeholder_id}: {fmt_small(max_distance)}."
         divergence_color = distance_color
-        divergence_note = f"Highest distance classification: {distance_label.lower()}."
+        divergence_note = f"Highest Distance Classification: {distance_label}."
 
     return {
         "primary_dimension": primary_dimension,
@@ -2269,7 +2269,7 @@ def main() -> None:
                     st.error("Weight sum cannot be zero.")
                     weights_for_request = {}
             else:
-                st.caption(f"Using stakeholder default weights (sum: {sum(base_weights.values()):.4f}).")
+                st.caption(f"Using stakeholder default weights (Sum: {sum(base_weights.values()):.4f}).")
         elif page == "Conflict Detection":
             st.markdown("**Stakeholders**")
             if stakeholder_options:
@@ -2377,7 +2377,7 @@ def main() -> None:
                     st.caption("Advanced settings are hidden while Conference Mode is enabled.")
                     st.caption(
                         "Current values in use: "
-                        f"options = {pareto_n_solutions}, mode = {pareto_search_mode_label}, "
+                        f"solutions = {pareto_n_solutions}, mode = {pareto_search_mode_label}, "
                         f"breadth = {pareto_pop_size}, depth = {pareto_n_gen}."
                     )
                 else:
@@ -2405,7 +2405,7 @@ def main() -> None:
                     )
                     if pareto_search_mode == "auto":
                         pareto_compute_budget = st.slider(
-                            "Compute Budget (Evaluations)",
+                            "Computational Budget (Evaluations)",
                             min_value=2_000,
                             max_value=30_000,
                             value=_clamp_int(
@@ -3407,7 +3407,7 @@ def main() -> None:
                     )
                 )
                 scatter_figure.update_layout(
-                    title=f"Tradeoff: {stakeholder_a} vs {stakeholder_b}",
+                    title=f"Tradeoff: {stakeholder_a} vs. {stakeholder_b}",
                     xaxis_title=f"{stakeholder_a} distance",
                     yaxis_title=f"{stakeholder_b} distance",
                     margin={"l": 48, "r": 48, "t": 56, "b": 48},
@@ -3494,7 +3494,7 @@ def main() -> None:
         def _render_pareto_technical_detail() -> None:
             st.caption(
                 "Search Parameters: "
-                f"options = {pareto_n_solutions}, breadth = {pareto_pop_size}, depth = {pareto_n_gen_effective}."
+                f"solutions = {pareto_n_solutions}, breadth = {pareto_pop_size}, depth = {pareto_n_gen_effective}."
             )
             st.caption(f"Stakeholders in Scope: {', '.join(stakeholder_ids)}.")
 
@@ -3547,9 +3547,9 @@ def main() -> None:
 
                     st.markdown("**Deployment Evidence Manifest**")
                     st.markdown(
-                        "Deployment type: "
+                        "Deployment Type: "
                         f"{_inline_code_badge(deployment_type or 'unknown')} | "
-                        "Sources listed: "
+                        "Sources Listed: "
                         f"{_inline_code_badge(len(manifest_sources))}",
                         unsafe_allow_html=True,
                     )
@@ -4297,7 +4297,7 @@ def main() -> None:
                     continue
                 conflict_candidates.append(
                     {
-                        "pair": f"{stakeholder_a} vs {stakeholder_b}",
+                        "pair": f"{stakeholder_a} vs. {stakeholder_b}",
                         "level": str(conflict.get("conflict_level", "N/A")),
                         "rho": float(rho),
                     }
