@@ -1,0 +1,84 @@
+name: extreme-tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  extreme:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -m pip check
+      - run: >
+          MEDF_EXTREME=1 pytest -q --strict-markers
+          --cov=app
+          --cov-branch
+          --cov-report=term-missing:skip-covered
+          --cov-report=json:coverage.json
+          --cov-fail-under=88
+      - name: Enforce module coverage thresholds
+        run: |
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import PurePosixPath
+
+          thresholds = {
+              "app/routers/evaluate.py": 95.0,
+              "app/routers/conflicts.py": 95.0,
+              "app/routers/pareto.py": 93.0,
+              "app/scoring_engine.py": 97.0,
+              "app/framework_registry.py": 92.0,
+              "app/harm_assessment.py": 95.0,
+              "app/database.py": 90.0,
+              "app/conflict_detection.py": 90.0,
+          }
+
+          with open("coverage.json", "r", encoding="utf-8") as handle:
+              payload = json.load(handle)
+
+          files = payload.get("files", {})
+          normalized = {
+              str(PurePosixPath(path.replace("\\", "/"))): data
+              for path, data in files.items()
+          }
+
+          failures = []
+
+          def find_file_summary(target: str):
+              for path, data in normalized.items():
+                  if path.endswith(target):
+                      return data.get("summary", {})
+              return None
+
+          for target, minimum in thresholds.items():
+              summary = find_file_summary(target)
+              if summary is None:
+                  failures.append(f"Missing coverage entry for {target}")
+                  continue
+              percent = float(summary.get("percent_covered", 0.0))
+              if percent < minimum:
+                  failures.append(
+                      f"{target}: {percent:.2f}% < required {minimum:.2f}%"
+                  )
+              else:
+                  print(f"PASS {target}: {percent:.2f}% >= {minimum:.2f}%")
+
+          if failures:
+              print("Coverage threshold failures:")
+              for item in failures:
+                  print(f"- {item}")
+              sys.exit(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-json
+          path: coverage.json

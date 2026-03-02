@@ -166,10 +166,33 @@ python -m streamlit run streamlit_app.py
 
 ## Testing Instructions
 
-Run the complete test suite.
+Run the fast CI-equivalent gate.
 
 ```bash
-pytest -q
+pytest -q --strict-markers -m "not extreme and not property and not soak"
+```
+
+Run the heavy extreme/property/soak gate.
+
+```bash
+MEDF_EXTREME=1 pytest -q --strict-markers -m "extreme or property or soak"
+```
+
+Run the heavy coverage gate (matches nightly/dispatch workflow).
+
+```bash
+MEDF_EXTREME=1 pytest -q --strict-markers \
+  --cov=app \
+  --cov-branch \
+  --cov-report=term-missing:skip-covered \
+  --cov-report=json:coverage.json \
+  --cov-fail-under=88
+```
+
+Run the complete freeze hardening gate.
+
+```bash
+bash scripts/freeze_extreme_gate.sh
 ```
 
 Run release smoke and stress validation.

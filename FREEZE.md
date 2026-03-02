@@ -40,10 +40,27 @@ This release line supersedes prior freeze constraints that prohibited feature ad
 
 ```bash
 ./.venv/bin/python -m pytest -q --strict-markers
+./.venv/bin/python -m pytest -q --strict-markers -m "not extreme and not property and not soak"
+MEDF_EXTREME=1 ./.venv/bin/python -m pytest -q --strict-markers -m "extreme or property or soak"
+MEDF_EXTREME=1 ./.venv/bin/python -m pytest -q --strict-markers --cov=app --cov-branch --cov-report=term-missing:skip-covered --cov-report=json:coverage.json --cov-fail-under=88
+bash scripts/freeze_extreme_gate.sh
 bash scripts/release_smoke.sh
 ./.venv/bin/python scripts/generate_evidence_pack.py
 ./.venv/bin/python scripts/run_research_statistics.py --seed 42 --n-boot 2000
 ```
+
+## Mandatory Pre-Freeze Sequence
+
+1. Fast gate pass:
+   - `pytest -q --strict-markers -m "not extreme and not property and not soak"`.
+2. Heavy gate pass:
+   - `MEDF_EXTREME=1 pytest -q --strict-markers -m "extreme or property or soak"`.
+3. Coverage gate pass:
+   - `MEDF_EXTREME=1 pytest -q --strict-markers --cov=app --cov-branch --cov-report=term-missing:skip-covered --cov-report=json:coverage.json --cov-fail-under=88`.
+4. Release smoke pass:
+   - `bash scripts/release_smoke.sh`.
+5. Working tree cleanliness:
+   - `git status --porcelain` must be empty before tagging freeze.
 
 ## Freeze Policy
 
