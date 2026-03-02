@@ -34,6 +34,7 @@ SEM_DANGER_HEX = "#EF4444"
 SEM_INFO_HEX = "#38BDF8"
 BRAND_TURQUOISE_HEX = "#27C4B7"
 BRAND_TURQUOISE_FILL_RGBA = "rgba(39, 196, 183, 0.18)"
+INFO_BANNER_BG_RGBA = "rgba(39, 196, 183, 0.10)"
 BRAND_GREEN_HEX = "#27C4B7"
 BRAND_GREEN_FILL_RGBA = "rgba(34, 197, 94, 0.18)"
 SEM_MUTED_HEX = "#9CA3AF"
@@ -255,7 +256,8 @@ def _ui_tokens(theme_base: str) -> dict[str, str]:
         "SUCCESS": SEM_SUCCESS_HEX,
         "WARNING": SEM_WARNING_HEX,
         "DANGER": SEM_DANGER_HEX,
-        "INFO": SEM_INFO_HEX,
+        "INFO": BRAND_TURQUOISE_HEX,
+        "INFO_BG": INFO_BANNER_BG_RGBA,
         "BORDER": SEM_BORDER_HEX,
     }
 
@@ -270,6 +272,7 @@ def inject_css(tokens: dict[str, str]) -> None:
     --medf-muted: {tokens["MUTED"]};
     --medf-border: {tokens["BORDER"]};
     --medf-info: {tokens["INFO"]};
+    --medf-info-bg: {tokens["INFO_BG"]};
 }}
 
 html, body, [data-testid="stAppViewContainer"] {{
@@ -366,6 +369,35 @@ h1, h2, h3, h4 {{
     font-size: 0.76rem;
     line-height: 1.24;
     margin-top: 0.18rem;
+}}
+
+.medf-info-banner {{
+    color: var(--medf-info);
+    background: var(--medf-info-bg);
+    border: 1px solid var(--medf-info);
+    border-radius: 10px;
+    padding: 0.62rem 0.8rem;
+    margin: 0.2rem 0 0.48rem 0;
+}}
+
+.medf-info-banner p,
+.medf-info-banner ul,
+.medf-info-banner li,
+.medf-info-banner strong {{
+    color: var(--medf-info);
+}}
+
+.medf-info-banner p {{
+    margin: 0;
+}}
+
+.medf-info-banner ul {{
+    margin: 0.32rem 0 0 1.1rem;
+    padding: 0;
+}}
+
+.medf-info-banner li {{
+    margin: 0.14rem 0;
 }}
 
 [data-testid="stVerticalBlockBorderWrapper"] {{
@@ -954,8 +986,43 @@ def _inline_code_badge(text: Any) -> str:
     return f"<code style='{INLINE_CODE_BADGE_STYLE}'>{escape(safe_str(text))}</code>"
 
 
+def _banner_inline_html(text: str) -> str:
+    escaped = escape(text)
+    return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", escaped)
+
+
 def _render_operational_banner(message: Any) -> None:
-    st.info(safe_str(message))
+    raw_text = safe_str(message).strip()
+    if not raw_text:
+        return
+
+    lines = [line.strip() for line in raw_text.splitlines() if line.strip()]
+    if not lines:
+        lines = [raw_text]
+
+    fragments: list[str] = []
+    list_items: list[str] = []
+
+    def _flush_list_items() -> None:
+        nonlocal list_items
+        if not list_items:
+            return
+        items_html = "".join(f"<li>{item}</li>" for item in list_items)
+        fragments.append(f"<ul>{items_html}</ul>")
+        list_items = []
+
+    for line in lines:
+        if line.startswith("- "):
+            item = line[2:].strip()
+            if item:
+                list_items.append(_banner_inline_html(item))
+            continue
+        _flush_list_items()
+        fragments.append(f"<p>{_banner_inline_html(line)}</p>")
+
+    _flush_list_items()
+    html_body = "".join(fragments) if fragments else f"<p>{_banner_inline_html(raw_text)}</p>"
+    st.markdown(f"<div class='medf-info-banner'>{html_body}</div>", unsafe_allow_html=True)
 
 
 _DISPLAY_MINUS_PATTERN = re.compile(r"(?<!\w)-(?=\d)")
