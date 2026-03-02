@@ -145,7 +145,7 @@ DEMO_WEIGHTS = {
     },
 }
 
-HARD_CAP_EVALS = 30_000
+HARD_CAP_EVALS = 50_000
 PARETO_PRESETS = {
     "Standard": {"n_solutions": 25, "pop_size": 80, "n_gen": 80},
     "Thorough": {"n_solutions": 30, "pop_size": 120, "n_gen": 120},
@@ -156,6 +156,7 @@ CASE_STUDY_FILES: tuple[str, ...] = (
     "hiring_algorithm.json",
     "healthcare_diagnostic.json",
 )
+ROMAN_NUMERALS = ("Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ")
 
 
 def _validated_case_dimension_scores(raw_scores: Any, *, case_id: str) -> dict[str, float]:
@@ -2406,12 +2407,12 @@ def main() -> None:
                     if pareto_search_mode == "auto":
                         pareto_compute_budget = st.slider(
                             "Computational Budget (Evaluations)",
-                            min_value=2_000,
-                            max_value=30_000,
+                            min_value=500,
+                            max_value=50_000,
                             value=_clamp_int(
                                 int(st.session_state.get("pareto_compute_budget", pareto_compute_budget)),
-                                2_000,
-                                30_000,
+                                500,
+                                50_000,
                             ),
                             step=500,
                             key="pareto_compute_budget",
@@ -2474,8 +2475,8 @@ def main() -> None:
             )
             pareto_compute_budget = _clamp_int(
                 int(st.session_state.get("pareto_compute_budget", pareto_compute_budget)),
-                2_000,
-                30_000,
+                500,
+                50_000,
             )
             pareto_explore_bias = _clamp_int(
                 int(st.session_state.get("pareto_explore_bias", pareto_explore_bias)),
@@ -2707,8 +2708,8 @@ def main() -> None:
             if framework_label:
                 selected_framework_text = f"{framework_label} [{framework_id}]"
             st.caption(
-                f"Selected framework: {selected_framework_text} | "
-                "Fixed stakeholders: developer, regulator, affected_community"
+                f"Selected Framework: {selected_framework_text} | "
+                "Fixed Stakeholders: developer, regulator, affected_community"
             )
     dimension_scores = {
         dimension: float(st.session_state.get(f"score_{dimension}", PRESET_BASELINE[dimension]))
@@ -3517,7 +3518,7 @@ def main() -> None:
             if CASE_STUDIES_LOAD_ERROR:
                 st.caption(f"Case study load error: {CASE_STUDIES_LOAD_ERROR}")
 
-        for case in CASE_STUDIES:
+        for case_index, case in enumerate(CASE_STUDIES):
             case_id = str(case["id"])
             case_name = str(case["name"])
             case_description = str(case["description"])
@@ -3531,8 +3532,9 @@ def main() -> None:
             case_result_key = f"case_result_{case_id}_{framework_key}"
             case_export_key = f"case_export_{case_id}_{framework_key}"
 
+            case_roman = ROMAN_NUMERALS[case_index] if case_index < len(ROMAN_NUMERALS) else str(case_index + 1)
             with st.expander(
-                f"Case: {case_name}",
+                f"Case Study {case_roman}: {case_name}",
                 expanded=(not case_screenshot_mode and not conference_mode),
             ):
                 st.write(case_description)

@@ -137,7 +137,7 @@
   },
   "assumptions": [
     "Scores synthesize deployed workflow evidence and enforcement records into the MEDF Likert scale.",
-    "This case evaluates governance properties of real hiring automation use, not proprietary model internals.",
+    "This case study evaluates governance properties of real hiring automation use, not proprietary model internals.",
     "The evidence set is curated for reproducible pre-deployment governance comparison."
   ]
 }

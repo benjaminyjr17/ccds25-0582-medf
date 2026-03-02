@@ -139,6 +139,6 @@
   "assumptions": [
     "Scores convert documented deployment and governance evidence into MEDF's Likert representation.",
     "Evidence is interpreted for governance evaluation rather than clinical efficacy benchmarking.",
-    "The case is treated as a real hospital deployment with durable source provenance metadata."
+    "This case study is treated as a real hospital deployment with durable source provenance metadata."
   ]
 }
