@@ -145,6 +145,18 @@ def generate() -> None:
             if not isinstance(raw_scores, dict):
                 raise RuntimeError(f"Case '{case_id}' missing dimension_scores.")
             score_map = {dimension: float(raw_scores[dimension]) for dimension in UNIFIED_DIMENSIONS}
+            evidence_manifest = case.get("evidence_manifest")
+            if not isinstance(evidence_manifest, dict):
+                raise RuntimeError(f"Case '{case_id}' missing evidence_manifest.")
+            deployment_type = str(evidence_manifest.get("deployment_type", "")).strip()
+            raw_sources = evidence_manifest.get("sources")
+            if not isinstance(raw_sources, list):
+                raise RuntimeError(f"Case '{case_id}' evidence_manifest.sources must be a list.")
+            source_ids = [
+                str(source.get("source_id", "")).strip()
+                for source in raw_sources
+                if isinstance(source, dict) and str(source.get("source_id", "")).strip()
+            ]
 
             for framework_id in framework_ids:
                 evaluate_payload = {
@@ -207,6 +219,8 @@ def generate() -> None:
                 row = {
                     "case_id": case_id,
                     "framework_id": framework_id,
+                    "deployment_type": deployment_type,
+                    "source_count": len(source_ids),
                     "overall_score": round(overall_score, 6),
                     "conflict_pairs": conflict_count,
                     "mean_spearman_rho": round(rho_mean, 6),
@@ -217,6 +231,10 @@ def generate() -> None:
                 bundle["rows"].append(
                     {
                         "summary": row,
+                        "provenance": {
+                            "deployment_type": deployment_type,
+                            "source_ids": source_ids,
+                        },
                         "evaluate": evaluate_json,
                         "conflicts": conflicts_json,
                         "pareto": pareto_json,
@@ -229,6 +247,8 @@ def generate() -> None:
             fieldnames=[
                 "case_id",
                 "framework_id",
+                "deployment_type",
+                "source_count",
                 "overall_score",
                 "conflict_pairs",
                 "mean_spearman_rho",

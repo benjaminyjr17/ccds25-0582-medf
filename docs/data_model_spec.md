@@ -36,7 +36,7 @@ Default seeded stakeholders:
 
 ### ConflictRequest / ConflictReport
 - Input: `ai_system`, selected framework, stakeholder ids, optional weight overrides
-- Output: pairwise conflict list, Spearman rho, conflict levels, correlation matrices
+- Output: pairwise conflict list, Spearman rho, conflict levels, correlation matrices, typed `harm_assessment` payload
 
 ### ParetoRequest / ConflictReport(pareto payload)
 - Input: `ai_system`, selected framework, stakeholder ids, optimization controls (`n_solutions`, `pop_size`, `n_gen`, `seed`, deterministic mode)

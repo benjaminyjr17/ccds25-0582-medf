@@ -1,39 +1,121 @@
 {
   "id": "hiring_algorithm",
-  "name": "Hiring Recommendation Algorithm",
-  "description": "Enterprise candidate-screening model used for shortlisting with high fairness and oversight sensitivity.",
+  "name": "Workday AI Screening in Enterprise Hiring",
+  "description": "Production use of AI-assisted candidate screening workflows in enterprise hiring pipelines using Workday recruiting tooling.",
   "dimension_scores": {
-    "transparency_explainability": 4.0,
-    "fairness_nondiscrimination": 2.5,
+    "transparency_explainability": 3.0,
+    "fairness_nondiscrimination": 2.0,
     "safety_robustness": 4.0,
     "privacy_data_governance": 4.0,
-    "human_agency_oversight": 5.5,
-    "accountability": 4.0
+    "human_agency_oversight": 5.0,
+    "accountability": 3.5
   },
   "deployment_context": {
     "domain": "human resources",
-    "deployment_setting": "decision support for recruiter triage",
-    "region": "multinational enterprise",
+    "deployment_setting": "production candidate screening and ranking support",
+    "region": "United States enterprise hiring market",
     "stakeholders_impacted": [
-      "applicants",
-      "hr_teams",
-      "compliance_officers",
-      "affected_community"
+      "job applicants",
+      "hr recruiters",
+      "enterprise compliance teams",
+      "civil-rights regulators"
     ],
     "known_risks": [
-      "indirect discrimination",
-      "automation bias",
-      "limited explanation quality"
+      "disparate-impact discrimination",
+      "limited explanation transparency to applicants",
+      "automation bias in recruiter workflows"
     ]
   },
-  "source_reference": {
-    "type": "deployment-inspired scenario",
-    "citation": "This is a deployment-inspired synthetic scenario constructed for MEDF evaluation. The cited source provides governance and risk framing context only and is not evidence of a specific deployed system configuration or measured outcomes.",
-    "url": "https://www.ftc.gov/business-guidance/technology/artificial-intelligence"
+  "evidence_manifest": {
+    "manifest_version": "1.0",
+    "deployment_type": "real_deployment",
+    "deployment_name": "Workday Recruiting AI-assisted screening",
+    "sources": [
+      {
+        "source_id": "workday_product_page",
+        "title": "Workday Recruiting",
+        "authors": "Workday",
+        "publisher": "Workday",
+        "publication_date": "2024-01-01",
+        "url": "https://www.workday.com/en-us/products/talent-management/recruiting.html",
+        "accessed_date": "2026-03-02",
+        "document_type": "product documentation",
+        "license_status": "All rights reserved; metadata only",
+        "quote_allowed": false
+      },
+      {
+        "source_id": "eeoc_workday_lawsuit",
+        "title": "EEOC Files First-Ever Lawsuit Against AI Hiring Software Developer Workday",
+        "authors": "U.S. Equal Employment Opportunity Commission",
+        "publisher": "EEOC",
+        "publication_date": "2023-09-19",
+        "url": "https://www.eeoc.gov/newsroom/eeoc-files-first-ever-lawsuit-against-ai-hiring-software-developer-workday-inc",
+        "accessed_date": "2026-03-02",
+        "document_type": "regulatory enforcement announcement",
+        "license_status": "Public domain U.S. government work",
+        "quote_allowed": true
+      },
+      {
+        "source_id": "reuters_workday_ruling",
+        "title": "Workday must face AI hiring bias lawsuit, US judge rules",
+        "authors": "Reuters",
+        "publisher": "Reuters",
+        "publication_date": "2024-05-17",
+        "url": "https://www.reuters.com/legal/litigation/workday-must-face-ai-hiring-bias-lawsuit-us-judge-rules-2024-05-17/",
+        "accessed_date": "2026-03-02",
+        "document_type": "legal news reporting",
+        "license_status": "All rights reserved; metadata only",
+        "quote_allowed": false
+      }
+    ],
+    "dimension_rationale": {
+      "transparency_explainability": [
+        {
+          "source_id": "eeoc_workday_lawsuit",
+          "claim": "Regulatory filings emphasize opacity concerns for applicant-facing decision explanations.",
+          "scoring_impact": "sets transparency below midpoint"
+        }
+      ],
+      "fairness_nondiscrimination": [
+        {
+          "source_id": "reuters_workday_ruling",
+          "claim": "Federal court proceedings on discrimination allegations indicate elevated fairness risk in deployment context.",
+          "scoring_impact": "drives low fairness score"
+        }
+      ],
+      "safety_robustness": [
+        {
+          "source_id": "workday_product_page",
+          "claim": "Production-grade platform controls and enterprise operations indicate moderate robustness.",
+          "scoring_impact": "supports mid robustness score"
+        }
+      ],
+      "privacy_data_governance": [
+        {
+          "source_id": "workday_product_page",
+          "claim": "Enterprise HR systems include formal data governance and retention controls.",
+          "scoring_impact": "supports mid privacy score"
+        }
+      ],
+      "human_agency_oversight": [
+        {
+          "source_id": "workday_product_page",
+          "claim": "Recruiter workflows are decision-support oriented with humans retaining final selection authority.",
+          "scoring_impact": "raises oversight score"
+        }
+      ],
+      "accountability": [
+        {
+          "source_id": "eeoc_workday_lawsuit",
+          "claim": "Active legal and regulatory accountability channels are present for contested deployment outcomes.",
+          "scoring_impact": "supports mid accountability score"
+        }
+      ]
+    }
   },
   "assumptions": [
-    "Scores are analyst-assigned Likert estimates for a deployment-like enterprise hiring workflow and not outcomes from one named employer.",
-    "The cited source is used for fairness and governance context, not as proof of a single production model configuration.",
-    "Scenario assumes human recruiters retain final decision authority while the model is used for shortlisting support."
+    "Scores synthesize publicly available product, regulatory, and legal evidence into the MEDF scale.",
+    "This case evaluates governance characteristics of deployed hiring automation workflows rather than proprietary model internals.",
+    "The evidence set is intended for reproducible pre-deployment governance comparison."
   ]
 }

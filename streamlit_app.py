@@ -34,7 +34,7 @@ SEM_DANGER_HEX = "#EF4444"
 SEM_INFO_HEX = "#38BDF8"
 BRAND_TURQUOISE_HEX = "#27C4B7"
 BRAND_TURQUOISE_FILL_RGBA = "rgba(39, 196, 183, 0.18)"
-BRAND_GREEN_HEX = "#22C55E"
+BRAND_GREEN_HEX = "#27C4B7"
 BRAND_GREEN_FILL_RGBA = "rgba(34, 197, 94, 0.18)"
 SEM_MUTED_HEX = "#9CA3AF"
 SEM_CARD_BG_HEX = "#0F172A"
@@ -217,8 +217,8 @@ def _load_case_studies_from_files() -> list[dict[str, Any]]:
                 "description": description,
                 "dimension_scores": dim_scores,
                 "deployment_context": payload.get("deployment_context", {}),
-                "source_reference": payload.get("source_reference", {}),
-                "assumptions": payload.get("assumptions", ""),
+                "evidence_manifest": payload.get("evidence_manifest", {}),
+                "assumptions": payload.get("assumptions", []),
             }
         )
 
@@ -433,6 +433,18 @@ div.stButton > button:hover {{
 
 .medf-page-nav [data-testid="stRadio"] label:has(input:checked) [role="radio"]::after {{
     background-color: {BRAND_TURQUOISE_HEX} !important;
+}}
+
+/* Force slider progress fill (works for current Streamlit DOM) */
+div[data-baseweb="slider"] div[style*="transform"] {{
+    background-color: #27C4B7 !important;
+}}
+
+/* Force slider thumb */
+div[data-baseweb="slider"] div[role="slider"] {{
+    background-color: #27C4B7 !important;
+    border: none !important;
+    box-shadow: none !important;
 }}
 </style>
 """,
@@ -1192,6 +1204,7 @@ div[data-baseweb="slider"][data-medf-likert="1"]{
 <pre id='medf-investigate-log' style='display:none; margin:6px 0 0 0; max-height:200px; overflow:auto; font:11px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace; white-space:pre-wrap; border:1px solid rgba(39,196,183,0.35); padding:6px; background:rgba(6,10,14,0.82); color:#D5F3F1;'></pre>
 <script>
 (function () {{
+  return;
   const TURQ = "{BRAND_TURQUOISE_HEX}";
   const LIKERT_LABELS = {json.dumps(LIKERT_SLIDER_LABELS)};
   const INVESTIGATE = false;
@@ -2446,6 +2459,7 @@ def main() -> None:
                         _apply_dimension_preset(PRESET_SAFETY_HEAVY)
 
                 default_scores = PRESET_BASELINE
+                st.markdown('<div id="medf-likert-scope">', unsafe_allow_html=True)
                 with st.form("likert_form", border=False):
                     for dimension in UNIFIED_DIMENSIONS:
                         session_key = f"score_{dimension}"
@@ -2466,7 +2480,7 @@ def main() -> None:
                             )
                             st.markdown(
                                 f"""
-<div style="
+<div data-medf-pill="1" data-medf-key="{session_key}" style="
   display:inline-block;
   padding: 4px 10px;
   border-radius: 999px;
@@ -2485,6 +2499,107 @@ def main() -> None:
                     applied = st.form_submit_button("Apply Dimension Scores")
                 if applied:
                     st.session_state["__likert_applied__"] = True
+                st.markdown("</div>", unsafe_allow_html=True)
+                likert_keys = [f"score_{dimension}" for dimension in UNIFIED_DIMENSIONS]
+                components.html(
+                    f"""
+<script>
+(function () {{
+  let hostWin = window;
+  let hostDoc = document;
+  let hostAccess = false;
+  try {{
+    if (window.parent && window.parent.document) {{
+      hostWin = window.parent;
+      hostDoc = window.parent.document;
+      hostAccess = true;
+    }}
+  }} catch (e) {{
+    hostWin = window;
+    hostDoc = document;
+    hostAccess = false;
+  }}
+  if (!hostAccess) return;
+
+  if (hostWin.__medfLikertSyncV4Installed) return;
+  hostWin.__medfLikertSyncV4Installed = true;
+
+  const TURQ = "{BRAND_TURQUOISE_HEX}";
+  const UNFILLED = "rgba(255,255,255,0.22)";
+  const KEYS = {json.dumps(likert_keys)};
+
+  function clamp(x,a,b){{ return Math.max(a, Math.min(b, x)); }}
+
+  function getTrackFromSliderRoot(sliderRoot) {{
+    if (!sliderRoot) return null;
+    let t = sliderRoot.querySelector('div[data-medf-track="1"][style*="height:"]');
+    if (t) return t;
+    const ts = sliderRoot.querySelectorAll('div[data-medf-track="1"]');
+    if (ts && ts.length) return ts[ts.length - 1];
+    return null;
+  }}
+
+  function paintOne(thumb, sessionKey) {{
+    if (!thumb) return;
+
+    const ariaNow = thumb.getAttribute("aria-valuenow");
+    if (!ariaNow) return;
+    const v = parseFloat(ariaNow);
+    if (Number.isNaN(v)) return;
+
+    const pct = clamp(((v - 1.0) / 6.0) * 100.0, 0, 100);
+    const sliderRoot = thumb.closest('div[data-baseweb="slider"]');
+    const track = getTrackFromSliderRoot(sliderRoot);
+    const p = pct.toFixed(2);
+
+    if (track) {{
+      const grad = `linear-gradient(to right, ${{TURQ}} 0%, ${{TURQ}} ${{p}}%, ${{UNFILLED}} ${{p}}%, ${{UNFILLED}} 100%)`;
+      track.style.setProperty("background", grad, "important");
+      track.style.setProperty("border-radius", "999px", "important");
+      track.style.setProperty("height", "6px", "important");
+    }}
+
+    thumb.style.setProperty("background-color", TURQ, "important");
+    thumb.style.setProperty("box-shadow", "none", "important");
+    thumb.style.setProperty("border", "none", "important");
+
+    if (sessionKey) {{
+      const pill = hostDoc.querySelector(`[data-medf-pill="1"][data-medf-key="${{sessionKey}}"]`);
+      if (pill) pill.textContent = v.toFixed(1);
+    }}
+  }}
+
+  function bindAll() {{
+    const scope = hostDoc.querySelector("#medf-likert-scope");
+    if (!scope) return;
+    const thumbs = hostDoc.querySelectorAll(
+      '#medf-likert-scope div[data-baseweb="slider"][data-medf-likert="1"] div[role="slider"]'
+    );
+    thumbs.forEach((t, idx) => {{
+      const key = (idx < KEYS.length) ? KEYS[idx] : null;
+      paintOne(t, key);
+
+      if (!t.__medfBoundV4) {{
+        t.__medfBoundV4 = true;
+        const h = () => paintOne(t, key);
+        t.addEventListener("pointerdown", h, {{ passive: true }});
+        t.addEventListener("pointermove", h, {{ passive: true }});
+        t.addEventListener("pointerup", h, {{ passive: true }});
+        t.addEventListener("keydown", h, {{ passive: true }});
+        t.addEventListener("keyup", h, {{ passive: true }});
+      }}
+    }});
+  }}
+
+  const obs = new MutationObserver(() => hostWin.requestAnimationFrame(bindAll));
+  obs.observe(hostDoc.body, {{childList:true, subtree:true}});
+
+  bindAll();
+}})();
+</script>
+""",
+                    height=0,
+                )
     else:
         if not case_screenshot_mode:
             selected_framework_text = framework_id or "N/A"
@@ -3305,7 +3420,7 @@ def main() -> None:
             case_id = str(case["id"])
             case_name = str(case["name"])
             case_description = str(case["description"])
-            case_source_reference = case.get("source_reference")
+            case_evidence_manifest = case.get("evidence_manifest")
             case_assumptions = case.get("assumptions")
             case_scores = {
                 dimension: float(case["dimension_scores"][dimension])
@@ -3321,41 +3436,62 @@ def main() -> None:
             ):
                 st.write(case_description)
                 if not case_screenshot_mode:
-                    source_citation = ""
-                    source_url = ""
-                    framing_sentence = (
-                        "This is a deployment-inspired synthetic scenario constructed for MEDF evaluation."
+                    manifest_sources: list[dict[str, Any]] = []
+                    deployment_type = "unknown"
+                    if isinstance(case_evidence_manifest, dict):
+                        deployment_type = str(case_evidence_manifest.get("deployment_type", "unknown")).strip().lower()
+                        raw_sources = case_evidence_manifest.get("sources")
+                        if isinstance(raw_sources, list):
+                            manifest_sources = [item for item in raw_sources if isinstance(item, dict)]
+
+                    st.markdown("**Deployment Evidence Manifest**")
+                    st.write(
+                        f"Deployment type: `{deployment_type or 'unknown'}` | "
+                        f"Sources listed: `{len(manifest_sources)}`"
                     )
-                    if isinstance(case_source_reference, dict):
-                        source_citation = str(case_source_reference.get("citation", "")).strip()
-                        source_url = str(case_source_reference.get("url", "")).strip()
-                    elif isinstance(case_source_reference, str):
-                        source_citation = case_source_reference.strip()
-
-                    source_citation_display = source_citation
-                    methodological_framing = ""
-                    if framing_sentence in source_citation:
-                        methodological_framing = framing_sentence
-                        source_citation_display = source_citation.replace(framing_sentence, "", 1).strip()
-                        if source_citation_display.startswith("."):
-                            source_citation_display = source_citation_display[1:].strip()
-                    elif "deployment-inspired synthetic scenario" in source_citation.lower():
-                        methodological_framing = source_citation
-                        source_citation_display = ""
-
-                    if source_citation or source_url:
-                        st.markdown("**Source Reference**")
-                        if source_citation_display:
-                            st.write(source_citation_display)
-                        if source_url:
-                            st.markdown(f"[{source_url}]({source_url})")
-                    st.divider()
-
-                    st.markdown("**Methodological Framing**")
-                    if methodological_framing:
-                        st.write(methodological_framing)
+                    if manifest_sources:
+                        source_rows: list[dict[str, str]] = []
+                        for source in manifest_sources:
+                            source_id = str(source.get("source_id", "")).strip()
+                            title = str(source.get("title", "")).strip()
+                            publisher = str(source.get("publisher", "")).strip()
+                            publication_date = str(source.get("publication_date", "")).strip()
+                            url = str(source.get("url", "")).strip()
+                            source_rows.append(
+                                {
+                                    "source_id": source_id,
+                                    "title": title,
+                                    "publisher": publisher,
+                                    "publication_date": publication_date,
+                                    "url": url,
+                                }
+                            )
+                        st.dataframe(source_rows, width="stretch", hide_index=True)
                     else:
-                        st.write(framing_sentence)
+                        st.info("No sources were found in the evidence manifest.")
+
+                    if isinstance(case_evidence_manifest, dict):
+                        raw_rationale = case_evidence_manifest.get("dimension_rationale")
+                        if isinstance(raw_rationale, dict):
+                            rationale_rows: list[dict[str, str]] = []
+                            for dimension in UNIFIED_DIMENSIONS:
+                                entries = raw_rationale.get(dimension)
+                                if not isinstance(entries, list):
+                                    continue
+                                for entry in entries:
+                                    if not isinstance(entry, dict):
+                                        continue
+                                    rationale_rows.append(
+                                        {
+                                            "dimension": DIMENSION_DISPLAY_NAMES.get(dimension, dimension),
+                                            "source_id": str(entry.get("source_id", "")).strip(),
+                                            "claim": str(entry.get("claim", "")).strip(),
+                                            "scoring_impact": str(entry.get("scoring_impact", "")).strip(),
+                                        }
+                                    )
+                            if rationale_rows:
+                                st.markdown("**Scoring Rationale by Dimension**")
+                                st.dataframe(rationale_rows, width="stretch", hide_index=True)
                     st.divider()
 
                     st.markdown("**Assumptions**")
@@ -3796,6 +3932,7 @@ def main() -> None:
                         "case_id": case_id,
                         "case_name": case_name,
                         "dimension_scores": case_scores,
+                        "evidence_manifest": case_evidence_manifest,
                         "evaluate": evaluate_result,
                         "conflicts": conflicts_result,
                         "pareto": pareto_result,

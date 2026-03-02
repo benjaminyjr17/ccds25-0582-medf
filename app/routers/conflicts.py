@@ -25,6 +25,7 @@ except Exception:  # pragma: no cover - fallback for environments without scipy
 
 from app.database import get_db
 from app.framework_registry import get_framework, get_stakeholder
+from app.harm_assessment import build_harm_assessment
 from app.models import (
     ConflictLevel,
     ConflictReport,
@@ -253,6 +254,7 @@ def analyze_conflicts(
         for stakeholder_id in payload.stakeholder_ids
     }
     pairwise_rho_weights: dict[str, float] = {}
+    resolved_weight_vectors: dict[str, dict[str, float]] = {}
 
     for stakeholder_id in payload.stakeholder_ids:
         stakeholder = get_stakeholder(stakeholder_id, db)
@@ -267,6 +269,7 @@ def analyze_conflicts(
             requested_weights if requested_weights is not None else stakeholder.weights,
             stakeholder_id,
         )
+        resolved_weight_vectors[stakeholder_id] = stakeholder_weights
         weight_vector = np.asarray(
             [stakeholder_weights[dimension] for dimension in UNIFIED_DIMENSIONS],
             dtype=float,
@@ -370,6 +373,18 @@ def analyze_conflicts(
 
     mean_rho = float(np.mean([conflict.spearman_rho for conflict in conflicts])) if conflicts else 1.0
     overall_conflict = _conflict_level_from_rho(mean_rho).value
+    framework_weights = {
+        dimension.name: float(dimension.weight_default)
+        for dimension in framework.dimensions
+    }
+    harm_assessment = build_harm_assessment(
+        dimension_scores={
+            dimension: float(decision_vector[index])
+            for index, dimension in enumerate(UNIFIED_DIMENSIONS)
+        },
+        stakeholder_weights=resolved_weight_vectors,
+        framework_weights=framework_weights,
+    )
 
     result = ConflictReport(
         summary=(
@@ -393,6 +408,7 @@ def analyze_conflicts(
             "stakeholder_scores": stakeholder_scores,
             "run_id": run_id,
         },
+        harm_assessment=harm_assessment,
     )
 
     write_audit_record(

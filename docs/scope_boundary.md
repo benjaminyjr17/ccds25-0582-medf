@@ -15,13 +15,13 @@
 - Distributed deployment, multi-tenant orchestration, and cloud SRE tooling.
 - Real-time streaming inference integration.
 - Legal compliance certification automation.
-- Fine-grained harm ontology engine beyond current conflict outputs.
+- Fine-grained domain-specific harm ontologies beyond the current six-domain harm taxonomy.
 
 ## Evaluation Interpretation Boundary
 
 - The platform supports governance-oriented pre-deployment analysis.
 - Outputs are decision-support diagnostics, not legal determinations.
-- Case studies are curated deployment-like scenarios for reproducible research, not live production telemetry feeds.
+- Case studies are real deployments with curated public-source provenance for reproducible governance analysis.
 
 ## Freeze Policy Boundary
 

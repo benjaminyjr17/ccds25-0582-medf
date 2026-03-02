@@ -17,6 +17,7 @@ This audit captures controls and commands required to reproduce MEDF outputs for
 ./.venv/bin/python -m pytest -q --strict-markers
 bash scripts/release_smoke.sh
 ./.venv/bin/python scripts/generate_evidence_pack.py
+./.venv/bin/python scripts/run_research_statistics.py --seed 42 --n-boot 2000
 ```
 
 ## Replay Evidence
@@ -24,6 +25,7 @@ bash scripts/release_smoke.sh
 - Backend audit records: `data/audit_logs/audit.jsonl` (runtime artifact, ignored by git).
 - UI run records and exported bundles: `data/ui_runs/*` and Streamlit bundle ZIP export.
 - Deterministic repeatability checks: `tests/test_api_pareto.py`, `tests/test_release_candidate_stress.py`.
+- Research statistics outputs: `docs/research/statistical_results.json`, `docs/research/statistical_summary.md`.
 
 ## Known Sources of Variation
 
@@ -33,6 +35,7 @@ bash scripts/release_smoke.sh
 ## Auditor Checklist
 
 - `pytest` status: all tests pass.
-- API contract lock and schema hash pass unchanged.
+- API contract lock and schema hash pass at the current freeze baseline.
 - Smoke runner returns `RESULT: PASS`.
 - Evidence pack files are generated under `docs/evidence/` with expected case/framework coverage.
+- Research statistics runner generates committed outputs from `research/data/raw/*`.

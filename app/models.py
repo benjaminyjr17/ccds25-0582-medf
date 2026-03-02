@@ -65,6 +65,13 @@ class RiskLevel(str, Enum):
     CRITICAL = "critical"
 
 
+class HarmSeverity(str, Enum):
+    LOW = "low"
+    MODERATE = "moderate"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
 class ScoringMethod(str, Enum):
     TOPSIS = "topsis"
     WSM = "wsm"
@@ -440,6 +447,52 @@ class StakeholderConflict(BaseModel):
         return value
 
 
+class HarmDomainScore(BaseModel):
+    domain_id: str
+    unified_dimension: str
+    score: float = Field(..., ge=0.0, le=1.0)
+    severity: HarmSeverity
+    evidence_note: Optional[str] = None
+
+    @field_validator("unified_dimension")
+    @classmethod
+    def validate_unified_dimension(cls, value: str) -> str:
+        normalized = str(value).strip().lower()
+        if normalized not in UNIFIED_DIMENSIONS:
+            raise ValueError(f"Unknown unified_dimension '{value}'.")
+        return normalized
+
+
+class HarmAssessment(BaseModel):
+    overall_score: float = Field(..., ge=0.0, le=1.0)
+    overall_severity: HarmSeverity
+    domain_scores: List[HarmDomainScore] = Field(default_factory=list)
+    top_risk_domains: List[str] = Field(default_factory=list)
+    model_version: str
+
+    @field_validator("domain_scores")
+    @classmethod
+    def validate_domain_scores(cls, value: List[HarmDomainScore]) -> List[HarmDomainScore]:
+        if len(value) != len(UNIFIED_DIMENSIONS):
+            raise ValueError(
+                f"domain_scores must include exactly {len(UNIFIED_DIMENSIONS)} entries."
+            )
+        seen = {item.unified_dimension for item in value}
+        if seen != set(UNIFIED_DIMENSIONS):
+            raise ValueError("domain_scores must include all unified dimensions exactly once.")
+        return value
+
+    @field_validator("top_risk_domains")
+    @classmethod
+    def validate_top_risk_domains(cls, value: List[str]) -> List[str]:
+        cleaned = [str(item).strip().lower() for item in value if str(item).strip()]
+        deduped = list(dict.fromkeys(cleaned))
+        for dimension in deduped:
+            if dimension not in UNIFIED_DIMENSIONS:
+                raise ValueError(f"Unknown top_risk_domain '{dimension}'.")
+        return deduped
+
+
 class ParetoSolution(BaseModel):
     solution_id: str
     weights: Dict[str, Dict[str, float]]
@@ -463,6 +516,7 @@ class ConflictReport(BaseModel):
     conflicts: List[StakeholderConflict] = Field(default_factory=list)
     pareto_solutions: List[ParetoSolution] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
+    harm_assessment: Optional[HarmAssessment] = None
 
 
 class CompareResult(BaseModel):

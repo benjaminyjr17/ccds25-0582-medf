@@ -16,7 +16,7 @@ def test_health_endpoint_shape() -> None:
     payload = response.json()
 
     assert payload["status"] == "healthy"
-    assert payload["version"] == "1.0.0"
+    assert payload["version"] == "1.1.0"
     assert isinstance(payload["frameworks_loaded"], int)
     assert isinstance(payload["stakeholder_profiles_loaded"], int)
     assert payload["frameworks_loaded"] >= 3

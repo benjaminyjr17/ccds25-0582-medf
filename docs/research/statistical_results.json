@@ -1,0 +1,65 @@
+{
+  "cliffs_delta": {
+    "delta": 1.0,
+    "magnitude": "large",
+    "n_baseline": 15,
+    "n_medf": 15
+  },
+  "cvi": {
+    "i_cvi_by_item": {
+      "i1": 1.0,
+      "i2": 0.8,
+      "i3": 1.0,
+      "i4": 0.8,
+      "i5": 1.0,
+      "i6": 0.8
+    },
+    "n_items": 6,
+    "s_cvi_ave": 0.9
+  },
+  "friedman": {
+    "n_participants": 12,
+    "p_value": 6.144212353328207e-06,
+    "statistic": 24.0
+  },
+  "krippendorff": {
+    "alpha_ordinal": 0.7370129870129869,
+    "bootstrap_ci_95": [
+      0.4705705173635717,
+      0.8273443314314065
+    ],
+    "n_bootstrap": 2000,
+    "seed": 42
+  },
+  "metadata": {
+    "n_bootstrap": 2000,
+    "seed": 42
+  },
+  "sus": {
+    "max": 90.0,
+    "mean": 81.875,
+    "median": 82.5,
+    "min": 70.0,
+    "n_participants": 12,
+    "participant_scores": {
+      "p1": 80.0,
+      "p10": 85.0,
+      "p11": 87.5,
+      "p12": 77.5,
+      "p2": 85.0,
+      "p3": 82.5,
+      "p4": 70.0,
+      "p5": 82.5,
+      "p6": 87.5,
+      "p7": 75.0,
+      "p8": 90.0,
+      "p9": 80.0
+    },
+    "std_dev": 5.752963663112336
+  },
+  "wilcoxon": {
+    "n_pairs": 12,
+    "p_value": 0.00048828125,
+    "statistic": 0.0
+  }
+}

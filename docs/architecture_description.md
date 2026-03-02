@@ -31,7 +31,7 @@ Core backend components:
 2. Request validation: Pydantic schema checks + route-level constraints.
 3. Domain execution:
    - `/api/evaluate`: framework-weighted stakeholder scoring.
-   - `/api/conflicts`: pairwise conflict metrics and metadata.
+   - `/api/conflicts`: pairwise conflict metrics, metadata, and typed harm-assessment output.
    - `/api/pareto`: deterministic consensus optimization.
 4. Audit write: run metadata and payload snapshots to JSONL.
 5. Streamlit layer renders outputs and allows bundle export.

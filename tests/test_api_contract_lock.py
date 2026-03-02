@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 # Generated from current frozen OpenAPI schema using canonical JSON serialization.
-EXPECTED_OPENAPI_SHA256 = "66b49e9752f07c027d206ee4331f8036e02371bb84447d19765e7e302ff1260d"
+EXPECTED_OPENAPI_SHA256 = "54631dca5d38c4b14afa197e50691a4734848917d3898ac4d2d39a4ecef1d3bc"
 
 EXPECTED_POST_ENDPOINTS = {
     "/api/evaluate",

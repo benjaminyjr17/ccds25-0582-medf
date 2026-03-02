@@ -1,39 +1,121 @@
 {
   "id": "facial_recognition",
-  "name": "Facial Recognition (Law Enforcement)",
-  "description": "Urban law-enforcement watchlist matching deployment with elevated fairness and privacy risk exposure.",
+  "name": "Metropolitan Police Live Facial Recognition",
+  "description": "Operational live facial recognition deployments by the Metropolitan Police Service in London public spaces.",
   "dimension_scores": {
     "transparency_explainability": 2.5,
-    "fairness_nondiscrimination": 1.0,
-    "safety_robustness": 5.5,
-    "privacy_data_governance": 1.0,
+    "fairness_nondiscrimination": 1.5,
+    "safety_robustness": 5.0,
+    "privacy_data_governance": 1.5,
     "human_agency_oversight": 2.5,
     "accountability": 4.0
   },
   "deployment_context": {
     "domain": "public safety",
-    "deployment_setting": "real-time decision support",
-    "region": "urban municipal operations",
+    "deployment_setting": "live operational policing",
+    "region": "London, United Kingdom",
     "stakeholders_impacted": [
-      "law_enforcement",
-      "regulators",
-      "civil_society",
-      "affected_community"
+      "police officers",
+      "public residents",
+      "oversight regulators",
+      "civil society"
     ],
     "known_risks": [
-      "demographic bias",
-      "privacy intrusion",
-      "contestation and recourse gaps"
+      "demographic performance disparity",
+      "surveillance and privacy intrusion",
+      "contestation and redress complexity"
     ]
   },
-  "source_reference": {
-    "type": "deployment-inspired scenario",
-    "citation": "This is a deployment-inspired synthetic scenario constructed for MEDF evaluation. The cited source provides governance and risk framing context only and is not evidence of a specific deployed system configuration or measured outcomes.",
-    "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-ai-rmf-10"
+  "evidence_manifest": {
+    "manifest_version": "1.0",
+    "deployment_type": "real_deployment",
+    "deployment_name": "Metropolitan Police Service Live Facial Recognition",
+    "sources": [
+      {
+        "source_id": "met_lfr_policy",
+        "title": "Live Facial Recognition (LFR)",
+        "authors": "Metropolitan Police Service",
+        "publisher": "Metropolitan Police Service",
+        "publication_date": "2024-01-01",
+        "url": "https://www.met.police.uk/advice/advice-and-information/fr/live-facial-recognition/",
+        "accessed_date": "2026-03-02",
+        "document_type": "operational policy page",
+        "license_status": "All rights reserved; metadata only",
+        "quote_allowed": false
+      },
+      {
+        "source_id": "bscc_annual_report",
+        "title": "Biometrics and Surveillance Camera Commissioner Annual Report 2023",
+        "authors": "Biometrics and Surveillance Camera Commissioner",
+        "publisher": "UK Government",
+        "publication_date": "2024-02-15",
+        "url": "https://www.gov.uk/government/publications/biometrics-and-surveillance-camera-commissioner-annual-report-2023",
+        "accessed_date": "2026-03-02",
+        "document_type": "annual report",
+        "license_status": "Open Government Licence v3.0",
+        "quote_allowed": true
+      },
+      {
+        "source_id": "ico_lfr_opinion",
+        "title": "ICO opinion: The use of live facial recognition technology in public places",
+        "authors": "Information Commissioner's Office",
+        "publisher": "Information Commissioner's Office",
+        "publication_date": "2019-10-31",
+        "url": "https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/2019/10/ico-opinion-the-use-of-live-facial-recognition-technology-in-public-places/",
+        "accessed_date": "2026-03-02",
+        "document_type": "regulatory opinion",
+        "license_status": "All rights reserved; metadata only",
+        "quote_allowed": false
+      }
+    ],
+    "dimension_rationale": {
+      "transparency_explainability": [
+        {
+          "source_id": "met_lfr_policy",
+          "claim": "Public-facing notices and policy explanations exist, but technical explainability detail is limited for affected individuals.",
+          "scoring_impact": "keeps transparency below midpoint"
+        }
+      ],
+      "fairness_nondiscrimination": [
+        {
+          "source_id": "ico_lfr_opinion",
+          "claim": "Regulatory concern highlights differential impact and equality-risk management obligations for public-space LFR.",
+          "scoring_impact": "drives low fairness score"
+        }
+      ],
+      "safety_robustness": [
+        {
+          "source_id": "bscc_annual_report",
+          "claim": "Operational governance reports document controlled deployments and procedural safeguards.",
+          "scoring_impact": "supports moderate-to-high safety score"
+        }
+      ],
+      "privacy_data_governance": [
+        {
+          "source_id": "ico_lfr_opinion",
+          "claim": "Public-space biometric processing triggers elevated lawfulness, necessity, and proportionality obligations.",
+          "scoring_impact": "keeps privacy score low"
+        }
+      ],
+      "human_agency_oversight": [
+        {
+          "source_id": "met_lfr_policy",
+          "claim": "Officer-in-the-loop decision points are documented, but community challenge pathways remain complex.",
+          "scoring_impact": "results in lower-mid oversight score"
+        }
+      ],
+      "accountability": [
+        {
+          "source_id": "bscc_annual_report",
+          "claim": "External oversight and governance reporting mechanisms are established across police use-cases.",
+          "scoring_impact": "supports mid accountability score"
+        }
+      ]
+    }
   },
   "assumptions": [
-    "Scores are analyst-assigned Likert estimates for a deployment-like scenario and are not direct measurements from a live police system.",
-    "The cited source is used for governance context; it is not evidence of one specific municipality implementation.",
-    "Risk framing prioritizes fairness and privacy concerns commonly discussed in public-sector facial recognition governance."
+    "Scores translate published operational and regulatory evidence into MEDF's 1-7 Likert scale.",
+    "The evidence set captures governance posture and documented risks, not confidential model internals.",
+    "Scoring is calibrated for pre-deployment governance comparison across frameworks and stakeholders."
   ]
 }

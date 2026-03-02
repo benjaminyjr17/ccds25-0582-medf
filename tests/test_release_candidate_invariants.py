@@ -193,6 +193,44 @@ def pareto_is_nondominated(points: list[dict], keys: list[str]) -> bool:
     return True
 
 
+def assert_harm_assessment_bounds(conflict_json: Any, context: str) -> None:
+    assert isinstance(conflict_json, Mapping), (
+        f"{context}: expected object payload. response_snippet={_snippet(conflict_json)}"
+    )
+    harm_assessment = conflict_json.get("harm_assessment")
+    assert isinstance(harm_assessment, Mapping), (
+        f"{context}: missing harm_assessment payload. response_snippet={_snippet(conflict_json)}"
+    )
+    overall = float(harm_assessment.get("overall_score", -1.0))
+    assert math.isfinite(overall) and 0.0 <= overall <= 1.0, (
+        f"{context}: invalid harm overall_score={overall}. "
+        f"response_snippet={_snippet(conflict_json)}"
+    )
+    domain_scores = harm_assessment.get("domain_scores")
+    assert isinstance(domain_scores, list) and domain_scores, (
+        f"{context}: harm domain_scores missing. response_snippet={_snippet(conflict_json)}"
+    )
+    seen: set[str] = set()
+    for item in domain_scores:
+        assert isinstance(item, Mapping), (
+            f"{context}: invalid harm domain entry. response_snippet={_snippet(conflict_json)}"
+        )
+        dimension = str(item.get("unified_dimension", ""))
+        seen.add(dimension)
+        assert dimension in DIMENSIONS, (
+            f"{context}: unknown harm dimension '{dimension}'. "
+            f"response_snippet={_snippet(conflict_json)}"
+        )
+        score = float(item.get("score", -1.0))
+        assert math.isfinite(score) and 0.0 <= score <= 1.0, (
+            f"{context}: harm score out of bounds for '{dimension}' value={score}. "
+            f"response_snippet={_snippet(conflict_json)}"
+        )
+    assert seen == set(DIMENSIONS), (
+        f"{context}: harm dimensions incomplete. seen={sorted(seen)} expected={sorted(DIMENSIONS)}"
+    )
+
+
 def test_release_candidate_base_endpoints_have_valid_json() -> None:
     endpoints = ["/api/frameworks", "/api/stakeholders", "/api/health"]
     RNG.shuffle(endpoints)
@@ -225,3 +263,39 @@ def test_release_candidate_base_endpoints_have_valid_json() -> None:
                     f"endpoint={endpoint} expected default stakeholders or non-empty ids. "
                     f"ids={sorted(ids)} payload={_snippet(payload)}"
                 )
+
+
+def test_release_candidate_conflicts_endpoint_harm_payload_is_valid() -> None:
+    payload = {
+        "ai_system": {
+            "id": "release_candidate_conflicts_harm",
+            "name": "Release Candidate Conflicts Harm",
+            "description": "Invariant validation for harm output payload",
+            "context": {
+                "dimension_scores": {
+                    "transparency_explainability": 2.5,
+                    "fairness_nondiscrimination": 1.0,
+                    "safety_robustness": 5.5,
+                    "privacy_data_governance": 1.0,
+                    "human_agency_oversight": 2.5,
+                    "accountability": 4.0,
+                }
+            },
+        },
+        "framework_ids": ["eu_altai"],
+        "stakeholder_ids": ["developer", "regulator", "affected_community"],
+    }
+
+    with TestClient(app) as client:
+        response = client.post("/api/conflicts", json=payload)
+
+    assert response.status_code == 200, (
+        f"endpoint=/api/conflicts expected=200 got={response.status_code} body={response.text}"
+    )
+    conflict_json = response.json()
+    assert_json_no_nan_inf(conflict_json, context="endpoint=/api/conflicts")
+    assert_rho_bounds(conflict_json, context="endpoint=/api/conflicts")
+    assert_harm_assessment_bounds(
+        conflict_json,
+        context="endpoint=/api/conflicts",
+    )

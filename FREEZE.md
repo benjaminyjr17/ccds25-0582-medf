@@ -1,92 +1,52 @@
-# Engineering Freeze Notice — FYP Release
+# Engineering Freeze Notice — FYP Release Line
 
-## Tag Information
+## Active Freeze Successor (Post-Remediation)
 
-- Tag name: v1.0.1-freeze.
-- Commit SHA: 96b6a4b94b876bd8b96744688d96cf6708b40d19.
-- Freeze date: 2026-02-28.
-- Freeze rationale: presentation/provenance/UI rendering cleanup; no API or computation changes.
+- Target tag name: `v1.1.0-freeze`.
+- Baseline commit SHA for freeze preparation: `e274fc7146f1de1db4c46c8490479dcf1d0454d1`.
+- Freeze preparation date: `2026-03-02`.
+- Freeze rationale: strict requirement remediation for RQ-03 (typed harm output), RQ-05 (real-deployment provenance manifests), and RQ-06 (committed raw-data-to-results statistics runner).
 
-This tag represents the finalized engineering state of the Multi-Stakeholder Ethical Decision Framework (MEDF) platform submitted for academic evaluation.
+This release line supersedes prior freeze constraints that prohibited feature additions in `v1.0.1-freeze`.
 
-## Scope of Implementation
+## Historical Freeze Record
 
-The frozen release includes the following components.
+- Prior tag name: `v1.0.1-freeze`.
+- Prior commit SHA: `96b6a4b94b876bd8b96744688d96cf6708b40d19`.
+- Prior freeze date: `2026-02-28`.
 
-- A FastAPI backend supporting multi-framework ethical evaluation, stakeholder conflict detection, and Pareto-based consensus optimization.
-- A unified ethical dimension space derived from registered framework definitions.
-- Strict stakeholder weight validation with normalization and constraint enforcement.
-- Deterministic mode enabling reproducible Pareto optimization runs.
-- NSGA-II multi-objective optimization for consensus weight generation.
-- Conflict detection using pairwise stakeholder ranking agreement metrics.
-- Comprehensive audit logging of API requests and responses for traceability.
-- An institutional-grade Streamlit interface with structured KPI strip and governance-oriented layout.
-- A visibility-only Conference Mode for presentation contexts.
-- UI contract assertions ensuring presentation-layer integrity without altering backend logic.
-- A complete pytest suite with all tests passing at freeze time.
-- A release smoke and stress runner validating backend stability and UI robustness under high-load configurations.
+## Scope of the v1.1.0 Successor
 
-## Execution Instructions (Local Environment)
+- FastAPI backend with evaluation, conflict, and Pareto workflows.
+- Typed harm-taxonomy output in `/api/conflicts`.
+- Real-deployment case-study manifests with licensing-safe provenance policy.
+- Deterministic research statistics pipeline from committed raw CSV inputs.
+- Streamlit evidence rendering that surfaces deployment manifest and per-dimension rationale.
+- Contract-lock and OpenAPI fingerprint updated to the new freeze baseline.
 
-### Backend Execution
+## Execution Instructions (Local)
 
-- Navigate to the project root directory.
-- Activate the virtual environment using source .venv/bin/activate.
-- Start the backend with python -m uvicorn app.main:app --reload --port 8000.
+### Backend
 
-### Frontend Execution
+- Activate environment: `source .venv/bin/activate`
+- Start backend: `python -m uvicorn app.main:app --reload --port 8000`
 
-- Activate the virtual environment using source .venv/bin/activate.
-- Launch the dashboard with python -m streamlit run streamlit_app.py.
+### Frontend
 
-## Release Smoke and Stress Validation
+- Activate environment: `source .venv/bin/activate`
+- Start interface: `python -m streamlit run streamlit_app.py`
 
-To execute the full pre-freeze validation suite.
+## Reproducibility Commands
 
-- Run bash scripts/release_smoke.sh.
-
-This script performs the following.
-
-- Full syntax compilation checks.
-- Complete pytest execution.
-- Deterministic API stress testing.
-- High-parameter Pareto evaluation.
-- Headless Streamlit smoke validation.
-- Verification of clean repository state.
-
-## Determinism and Stress Profile
-
-The system has been validated under the following stress parameters.
-
-- Pareto optimization with n_solutions=50.
-- Pareto optimization with pop_size=256.
-- Pareto optimization with n_gen=300.
-- Deterministic mode enabled with fixed seed values.
-- Stable performance observed across repeated runs.
-- No flaky behavior detected.
-
-All optimization outputs remain reproducible when deterministic mode is enabled.
-
-## Methodological Clarifications
-
-- Pareto consensus weights are solver-derived compromise weight vectors.
-- Consensus weights are simplex-normalized and non-negative.
-- Optimization minimizes salience-weighted distance to stakeholder weight vectors.
-- Framework selection defines the ethical dimension semantics and evaluation context.
-- Framework priors do not directly constrain Pareto optimization in this release.
-- Consensus weights represent stakeholder tradeoff balancing rather than framework-imposed weighting.
-
-## Known Limitations
-
-- The platform is designed for research and evaluation purposes and is not production-hardened.
-- No authentication or access-control layer is implemented.
-- Deployment configuration targets localhost execution.
-- Pareto optimization may require several seconds under maximum parameter settings.
-- Framework normative priors are not embedded directly into the Pareto objective function.
+```bash
+./.venv/bin/python -m pytest -q --strict-markers
+bash scripts/release_smoke.sh
+./.venv/bin/python scripts/generate_evidence_pack.py
+./.venv/bin/python scripts/run_research_statistics.py --seed 42 --n-boot 2000
+```
 
 ## Freeze Policy
 
-- No further feature changes are permitted after this tag.
-- Only critical defect fixes are allowed.
-- Any post-freeze fixes require a new tag such as v1.0.2-freeze.
-- The freeze state reflects the validated configuration presented for academic assessment.
+- API path/schema changes are permitted only with version bump and updated lock hash.
+- `v1.1.0-freeze` becomes the governing baseline after tag creation.
+- Post-`v1.1.0-freeze` changes are limited to critical defect fixes under a new tag.

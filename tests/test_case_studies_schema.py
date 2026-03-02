@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -26,13 +27,79 @@ def _assert_non_empty_assumptions(path: Path, assumptions: Any) -> None:
     ), f"{path} assumptions list entries must be non-empty strings."
 
 
-def _assert_source_reference(path: Path, source_reference: Any) -> None:
-    assert isinstance(source_reference, dict), f"{path} source_reference must be an object."
-    citation = str(source_reference.get("citation", "")).strip()
-    url = str(source_reference.get("url", "")).strip()
-    assert citation, f"{path} source_reference.citation must be non-empty."
-    assert url, f"{path} source_reference.url must be non-empty."
-    assert url.startswith("https://"), f"{path} source_reference.url must start with https://"
+def _assert_evidence_manifest(path: Path, evidence_manifest: Any) -> None:
+    assert isinstance(evidence_manifest, dict), f"{path} evidence_manifest must be an object."
+    assert str(evidence_manifest.get("manifest_version", "")).strip(), (
+        f"{path} evidence_manifest.manifest_version must be non-empty."
+    )
+    deployment_type = str(evidence_manifest.get("deployment_type", "")).strip()
+    assert deployment_type == "real_deployment", (
+        f"{path} evidence_manifest.deployment_type must be 'real_deployment'."
+    )
+
+    sources = evidence_manifest.get("sources")
+    assert isinstance(sources, list), f"{path} evidence_manifest.sources must be a list."
+    assert len(sources) >= 3, f"{path} evidence_manifest.sources must include at least 3 entries."
+
+    source_ids: set[str] = set()
+    for source in sources:
+        assert isinstance(source, dict), f"{path} source entry must be an object."
+        for required in (
+            "source_id",
+            "title",
+            "authors",
+            "publisher",
+            "publication_date",
+            "url",
+            "accessed_date",
+            "document_type",
+            "license_status",
+            "quote_allowed",
+        ):
+            assert required in source, f"{path} source missing required field '{required}'."
+        source_id = str(source.get("source_id", "")).strip()
+        assert source_id, f"{path} source_id must be non-empty."
+        assert source_id not in source_ids, f"{path} duplicate source_id '{source_id}'."
+        source_ids.add(source_id)
+
+        url = str(source.get("url", "")).strip()
+        assert url.startswith("https://"), f"{path} source url must start with https://"
+        assert isinstance(source.get("quote_allowed"), bool), (
+            f"{path} source quote_allowed must be boolean."
+        )
+        local_hash = source.get("local_artifact_sha256")
+        if local_hash is not None:
+            value = str(local_hash).strip().lower()
+            assert re.fullmatch(r"[a-f0-9]{64}", value), (
+                f"{path} local_artifact_sha256 must be a 64-char lowercase hex digest."
+            )
+
+    dimension_rationale = evidence_manifest.get("dimension_rationale")
+    assert isinstance(dimension_rationale, dict), (
+        f"{path} evidence_manifest.dimension_rationale must be an object."
+    )
+    assert set(dimension_rationale.keys()) == set(UNIFIED_DIMENSIONS), (
+        f"{path} dimension_rationale keys mismatch. got={sorted(dimension_rationale.keys())}"
+    )
+    for dimension in UNIFIED_DIMENSIONS:
+        entries = dimension_rationale.get(dimension)
+        assert isinstance(entries, list) and entries, (
+            f"{path} dimension_rationale['{dimension}'] must be a non-empty list."
+        )
+        for entry in entries:
+            assert isinstance(entry, dict), (
+                f"{path} rationale entry for '{dimension}' must be an object."
+            )
+            source_id = str(entry.get("source_id", "")).strip()
+            assert source_id in source_ids, (
+                f"{path} rationale for '{dimension}' references unknown source_id '{source_id}'."
+            )
+            claim = str(entry.get("claim", "")).strip()
+            scoring_impact = str(entry.get("scoring_impact", "")).strip()
+            assert claim, f"{path} rationale for '{dimension}' must include non-empty claim."
+            assert scoring_impact, (
+                f"{path} rationale for '{dimension}' must include non-empty scoring_impact."
+            )
 
 
 def test_case_study_files_are_present_and_schema_valid() -> None:
@@ -50,7 +117,7 @@ def test_case_study_files_are_present_and_schema_valid() -> None:
             "description",
             "dimension_scores",
             "deployment_context",
-            "source_reference",
+            "evidence_manifest",
             "assumptions",
         ):
             assert required in payload, f"{path} missing required field '{required}'."
@@ -67,7 +134,7 @@ def test_case_study_files_are_present_and_schema_valid() -> None:
                 f"{path} score for {dim} out of range [{LIKERT_MIN}, {LIKERT_MAX}]"
             )
 
-        _assert_source_reference(path, payload["source_reference"])
+        _assert_evidence_manifest(path, payload["evidence_manifest"])
         _assert_non_empty_assumptions(path, payload["assumptions"])
 
 

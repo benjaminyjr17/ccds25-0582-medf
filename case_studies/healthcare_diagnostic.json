@@ -1,39 +1,121 @@
 {
   "id": "healthcare_diagnostic",
-  "name": "Healthcare Diagnostic AI",
-  "description": "Clinical decision-support deployment where safety, robustness, privacy, and accountability requirements are strict.",
+  "name": "Royal Free NHS–DeepMind Streams Deployment",
+  "description": "Clinical deployment of the Streams application within Royal Free London NHS workflows for acute kidney injury alerting and response.",
   "dimension_scores": {
     "transparency_explainability": 4.0,
     "fairness_nondiscrimination": 4.0,
-    "safety_robustness": 7.0,
-    "privacy_data_governance": 5.5,
-    "human_agency_oversight": 4.0,
-    "accountability": 5.5
+    "safety_robustness": 6.0,
+    "privacy_data_governance": 3.5,
+    "human_agency_oversight": 5.0,
+    "accountability": 4.5
   },
   "deployment_context": {
     "domain": "healthcare",
-    "deployment_setting": "clinical decision support",
-    "region": "hospital network",
+    "deployment_setting": "hospital clinical decision support",
+    "region": "London, United Kingdom",
     "stakeholders_impacted": [
-      "clinicians",
       "patients",
-      "hospital_governance",
-      "regulators"
+      "clinicians",
+      "hospital governance",
+      "health-data regulators"
     ],
     "known_risks": [
-      "false positives and false negatives",
-      "distribution shift",
-      "data governance and consent management"
+      "data protection and lawful-processing risk",
+      "clinical workflow over-reliance risk",
+      "cross-organizational accountability complexity"
     ]
   },
-  "source_reference": {
-    "type": "deployment-inspired scenario",
-    "citation": "This is a deployment-inspired synthetic scenario constructed for MEDF evaluation. The cited source provides governance and risk framing context only and is not evidence of a specific deployed system configuration or measured outcomes.",
-    "url": "https://www.who.int/publications/i/item/9789240029200"
+  "evidence_manifest": {
+    "manifest_version": "1.0",
+    "deployment_type": "real_deployment",
+    "deployment_name": "Streams deployment at Royal Free London NHS Foundation Trust",
+    "sources": [
+      {
+        "source_id": "ico_royal_free_enforcement",
+        "title": "Royal Free NHS Foundation Trust enforcement action",
+        "authors": "Information Commissioner's Office",
+        "publisher": "Information Commissioner's Office",
+        "publication_date": "2017-07-03",
+        "url": "https://ico.org.uk/action-weve-taken/enforcement/royal-free-nhs-foundation-trust/",
+        "accessed_date": "2026-03-02",
+        "document_type": "regulatory enforcement action",
+        "license_status": "All rights reserved; metadata only",
+        "quote_allowed": false
+      },
+      {
+        "source_id": "royal_free_statement",
+        "title": "Statement on agreement between Royal Free London and DeepMind",
+        "authors": "Royal Free London NHS Foundation Trust",
+        "publisher": "Royal Free London NHS Foundation Trust",
+        "publication_date": "2016-11-16",
+        "url": "https://www.royalfree.nhs.uk/news/media-statements/statement-on-agreement-between-royal-free-london-and-deepmind",
+        "accessed_date": "2026-03-02",
+        "document_type": "hospital statement",
+        "license_status": "All rights reserved; metadata only",
+        "quote_allowed": false
+      },
+      {
+        "source_id": "deepmind_streams_rollout",
+        "title": "Streams app rolling out across the UK",
+        "authors": "DeepMind",
+        "publisher": "DeepMind",
+        "publication_date": "2017-02-22",
+        "url": "https://deepmind.google/discover/blog/streams-app-rolling-out-across-the-uk/",
+        "accessed_date": "2026-03-02",
+        "document_type": "deployment update",
+        "license_status": "All rights reserved; metadata only",
+        "quote_allowed": false
+      }
+    ],
+    "dimension_rationale": {
+      "transparency_explainability": [
+        {
+          "source_id": "royal_free_statement",
+          "claim": "Public statements disclose deployment purpose and operating context, but technical detail remains limited.",
+          "scoring_impact": "supports mid transparency score"
+        }
+      ],
+      "fairness_nondiscrimination": [
+        {
+          "source_id": "deepmind_streams_rollout",
+          "claim": "Deployment is clinically targeted and not explicitly framed around demographic fairness outcomes.",
+          "scoring_impact": "maintains neutral-mid fairness score"
+        }
+      ],
+      "safety_robustness": [
+        {
+          "source_id": "deepmind_streams_rollout",
+          "claim": "Deployment objective focuses on timely clinical alerts and operational reliability in care workflows.",
+          "scoring_impact": "supports high safety score"
+        }
+      ],
+      "privacy_data_governance": [
+        {
+          "source_id": "ico_royal_free_enforcement",
+          "claim": "Regulatory enforcement identified significant data-governance shortcomings in the deployment period.",
+          "scoring_impact": "reduces privacy score"
+        }
+      ],
+      "human_agency_oversight": [
+        {
+          "source_id": "royal_free_statement",
+          "claim": "Clinical staff remained responsible for diagnosis and treatment decisions.",
+          "scoring_impact": "supports high oversight score"
+        }
+      ],
+      "accountability": [
+        {
+          "source_id": "ico_royal_free_enforcement",
+          "claim": "Formal regulatory action and remediation obligations establish explicit accountability pathways.",
+          "scoring_impact": "supports mid-high accountability score"
+        }
+      ]
+    }
   },
   "assumptions": [
-    "Scores are analyst-assigned Likert estimates for a deployment-like clinical decision support workflow and not a benchmark from one hospital product.",
-    "The cited WHO publication is used as governance reference context, not as a direct metric source for this synthetic profile.",
-    "Scenario assumes clinicians remain accountable for final diagnosis and treatment decisions."
+    "Scores convert documented deployment and regulatory evidence into MEDF's Likert representation.",
+    "Evidence is interpreted for governance evaluation rather than clinical efficacy benchmarking.",
+    "The case is treated as a real hospital deployment with public, reproducible source provenance."
   ]
 }

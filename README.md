@@ -2,8 +2,8 @@
 **NTU CCDS Final Year Project (CCDS25-0582).**
 Author: Benjamin Oliver Yick.
 Supervisor: Dr. Zhang Jiehuang.
-Engineering freeze tag: `fyp-freeze-v1.0.0`.
-Historical: fyp-freeze-v1.0.0 (superseded by v1.0.1-freeze).
+Engineering freeze successor: `v1.1.0-freeze` (post-remediation release line).
+Historical: `v1.0.1-freeze` and earlier `fyp-freeze-v1.0.0`.
 
 ---
 
@@ -82,8 +82,8 @@ minimize sum_i s_i |w_i - w_k|.
 
 ## Engineering Freeze and Governance Stability
 
-- Freeze tag: `fyp-freeze-v1.0.0`.
-- Historical: fyp-freeze-v1.0.0 (superseded by v1.0.1-freeze).
+- Freeze successor target: `v1.1.0-freeze`.
+- Historical: `v1.0.1-freeze` and earlier `fyp-freeze-v1.0.0`.
 - Repository state at freeze validation: clean and traceable.
 - Feature development policy: no post-freeze feature additions.
 - Hotfix policy: only critical defect remediation under a new release tag.
@@ -108,6 +108,7 @@ Validation includes the following statistical and methodological checks.
 - Wilcoxon signed-rank test.
 - Friedman test.
 - Cliff’s Delta effect size.
+- Reproducible outputs are generated via `scripts/run_research_statistics.py` into `docs/research/`.
 
 ## Installation
 
@@ -177,11 +178,17 @@ Run release smoke and stress validation.
 bash scripts/release_smoke.sh
 ```
 
+Run the reproducible research statistics pipeline.
+
+```bash
+python scripts/run_research_statistics.py --seed 42 --n-boot 2000
+```
+
 ## Case Studies
 
-- Facial Recognition for Law Enforcement.
-- Hiring Recommendation Algorithm.
-- Healthcare Diagnostic AI.
+- Metropolitan Police live facial recognition deployments.
+- Workday AI-assisted enterprise hiring deployments.
+- Royal Free NHS–DeepMind Streams clinical deployment.
 
 ## Requirements Traceability
 

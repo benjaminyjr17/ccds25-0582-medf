@@ -52,6 +52,32 @@ def test_conflicts_endpoint_returns_pairwise_spearman_results() -> None:
     assert "correlation_matrix_weights" in metadata
     assert "stakeholder_rankings_weights" in metadata
 
+    harm_assessment = body.get("harm_assessment")
+    assert isinstance(harm_assessment, dict)
+    assert harm_assessment.get("model_version") == "harm_taxonomy_v1"
+    overall_score = float(harm_assessment.get("overall_score", -1.0))
+    assert 0.0 <= overall_score <= 1.0
+    assert harm_assessment.get("overall_severity") in {"low", "moderate", "high", "critical"}
+
+    domain_scores = harm_assessment.get("domain_scores")
+    assert isinstance(domain_scores, list)
+    assert len(domain_scores) == len(UNIFIED_DIMENSIONS)
+    seen_dimensions: set[str] = set()
+    for item in domain_scores:
+        assert isinstance(item, dict)
+        unified_dimension = str(item.get("unified_dimension", ""))
+        seen_dimensions.add(unified_dimension)
+        assert unified_dimension in UNIFIED_DIMENSIONS
+        score = float(item.get("score", -1.0))
+        assert 0.0 <= score <= 1.0
+        assert item.get("severity") in {"low", "moderate", "high", "critical"}
+    assert seen_dimensions == set(UNIFIED_DIMENSIONS)
+
+    top_risk_domains = harm_assessment.get("top_risk_domains")
+    assert isinstance(top_risk_domains, list)
+    assert top_risk_domains
+    assert set(top_risk_domains).issubset(set(UNIFIED_DIMENSIONS))
+
     stakeholder_ids = payload["stakeholder_ids"]
     expected_dimensions = set(UNIFIED_DIMENSIONS)
 
