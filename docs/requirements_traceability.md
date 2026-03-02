@@ -17,5 +17,6 @@ Source document: `CCDS25-0582.pdf` project brief (NTU WIS export, accessed 2026-
 ## Notes
 
 - RQ-05 evidence artifacts are licensing-safe by default: manifests, bibliographic metadata, and optional short excerpts only when `quote_allowed=true`.
+- RQ-05 source durability rule: every source must include at least one durable resolver (`archived_url`, `doi_or_stable_id`, or `local_snapshot_path`); `primary_url` alone is invalid.
 - This project is a software-only FYP (`Category: Software Only`, `Type: Design & Implementation`) per the official project record.
 - No additional rubric document was provided in-repo; this ledger tracks only requirements explicitly present in the official project PDF and executable evidence in this repository.

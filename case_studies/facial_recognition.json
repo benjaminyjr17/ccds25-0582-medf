@@ -27,95 +27,116 @@
     ]
   },
   "evidence_manifest": {
-    "manifest_version": "1.0",
+    "manifest_version": "2.0",
     "deployment_type": "real_deployment",
     "deployment_name": "Metropolitan Police Service Live Facial Recognition",
     "sources": [
       {
-        "source_id": "met_lfr_policy",
-        "title": "Live Facial Recognition (LFR)",
-        "authors": "Metropolitan Police Service",
+        "source_id": "met_lfr_overview_foi",
+        "title": "Live Facial Recognition - Overview and how to submit a Subject Access Request",
         "publisher": "Metropolitan Police Service",
-        "publication_date": "2024-01-01",
-        "url": "https://www.met.police.uk/advice/advice-and-information/fr/live-facial-recognition/",
-        "accessed_date": "2026-03-02",
-        "document_type": "operational policy page",
-        "license_status": "All rights reserved; metadata only",
-        "quote_allowed": false
+        "published_at": "2025-09-17",
+        "retrieved_at": "2026-03-02",
+        "primary_url": "https://www.met.police.uk/foi-ai/metropolitan-police/disclosure-2025/july-2025/live-facial-recognition---overview-and-how-to-submit-a-subject-access-request",
+        "archived_url": null,
+        "doi_or_stable_id": "MET-FOI-2025-07-LFR-OVERVIEW",
+        "license": "All rights reserved; metadata only",
+        "quote_allowed": false,
+        "excerpt": null,
+        "sha256": null
       },
       {
-        "source_id": "bscc_annual_report",
-        "title": "Biometrics and Surveillance Camera Commissioner Annual Report 2023",
-        "authors": "Biometrics and Surveillance Camera Commissioner",
-        "publisher": "UK Government",
-        "publication_date": "2024-02-15",
-        "url": "https://www.gov.uk/government/publications/biometrics-and-surveillance-camera-commissioner-annual-report-2023",
-        "accessed_date": "2026-03-02",
-        "document_type": "annual report",
-        "license_status": "Open Government Licence v3.0",
-        "quote_allowed": true
+        "source_id": "met_lfr_policy_document",
+        "title": "Live Facial Recognition Policy Document",
+        "publisher": "Metropolitan Police Service",
+        "published_at": "2025-09-17",
+        "retrieved_at": "2026-03-02",
+        "primary_url": "https://www.met.police.uk/SysSiteAssets/media/downloads/force-content/met/advice/lfr/other-lfr-documents/live-facial-recognition-policy-document.pdf",
+        "archived_url": null,
+        "doi_or_stable_id": "MET-LFR-POLICY-DOCUMENT-2025",
+        "license": "All rights reserved; metadata only",
+        "quote_allowed": false,
+        "excerpt": null,
+        "sha256": null
       },
       {
-        "source_id": "ico_lfr_opinion",
-        "title": "ICO opinion: The use of live facial recognition technology in public places",
-        "authors": "Information Commissioner's Office",
-        "publisher": "Information Commissioner's Office",
-        "publication_date": "2019-10-31",
-        "url": "https://ico.org.uk/about-the-ico/media-centre/news-and-blogs/2019/10/ico-opinion-the-use-of-live-facial-recognition-technology-in-public-places/",
-        "accessed_date": "2026-03-02",
-        "document_type": "regulatory opinion",
-        "license_status": "All rights reserved; metadata only",
-        "quote_allowed": false
+        "source_id": "met_lfr_deployment_record_2026",
+        "title": "Live Facial Recognition - Deployment Record 2026 to date",
+        "publisher": "Metropolitan Police Service",
+        "published_at": "2026-01-01",
+        "retrieved_at": "2026-03-02",
+        "primary_url": "https://www.met.police.uk/SysSiteAssets/media/downloads/force-content/met/advice/lfr/deployment-records/live-facial-recognition---deployment-record-2026-to-date.pdf",
+        "archived_url": null,
+        "doi_or_stable_id": "MET-LFR-DEPLOYMENT-RECORD-2026",
+        "license": "All rights reserved; metadata only",
+        "quote_allowed": false,
+        "excerpt": null,
+        "sha256": null
       }
     ],
     "dimension_rationale": {
       "transparency_explainability": [
         {
-          "source_id": "met_lfr_policy",
-          "claim": "Public-facing notices and policy explanations exist, but technical explainability detail is limited for affected individuals.",
+          "source_ids": [
+            "met_lfr_overview_foi",
+            "met_lfr_policy_document"
+          ],
+          "claim": "Public-facing materials describe live facial recognition operations, but affected individuals still receive limited technical model-level explainability.",
           "scoring_impact": "keeps transparency below midpoint"
         }
       ],
       "fairness_nondiscrimination": [
         {
-          "source_id": "ico_lfr_opinion",
-          "claim": "Regulatory concern highlights differential impact and equality-risk management obligations for public-space LFR.",
-          "scoring_impact": "drives low fairness score"
+          "source_ids": [
+            "met_lfr_policy_document"
+          ],
+          "claim": "The policy requires protected-characteristic monitoring and proportionality tests, indicating fairness risk management is present but high-stakes.",
+          "scoring_impact": "drives a low fairness score under strict governance expectations"
         }
       ],
       "safety_robustness": [
         {
-          "source_id": "bscc_annual_report",
-          "claim": "Operational governance reports document controlled deployments and procedural safeguards.",
+          "source_ids": [
+            "met_lfr_deployment_record_2026"
+          ],
+          "claim": "Deployment records document repeated operational use with tracked outcomes and controls, supporting moderate-to-high operational robustness.",
           "scoring_impact": "supports moderate-to-high safety score"
         }
       ],
       "privacy_data_governance": [
         {
-          "source_id": "ico_lfr_opinion",
-          "claim": "Public-space biometric processing triggers elevated lawfulness, necessity, and proportionality obligations.",
+          "source_ids": [
+            "met_lfr_policy_document",
+            "met_lfr_overview_foi"
+          ],
+          "claim": "Public-space biometric surveillance and data rights handling remain high-sensitivity governance areas despite published process controls.",
           "scoring_impact": "keeps privacy score low"
         }
       ],
       "human_agency_oversight": [
         {
-          "source_id": "met_lfr_policy",
-          "claim": "Officer-in-the-loop decision points are documented, but community challenge pathways remain complex.",
+          "source_ids": [
+            "met_lfr_policy_document"
+          ],
+          "claim": "Officer-in-the-loop intervention is defined, but challenge pathways and practical contestability remain complex for the public.",
           "scoring_impact": "results in lower-mid oversight score"
         }
       ],
       "accountability": [
         {
-          "source_id": "bscc_annual_report",
-          "claim": "External oversight and governance reporting mechanisms are established across police use-cases.",
+          "source_ids": [
+            "met_lfr_overview_foi",
+            "met_lfr_deployment_record_2026"
+          ],
+          "claim": "Operational reporting, subject access guidance, and deployment logs create a documented accountability trail.",
           "scoring_impact": "supports mid accountability score"
         }
       ]
     }
   },
   "assumptions": [
-    "Scores translate published operational and regulatory evidence into MEDF's 1-7 Likert scale.",
-    "The evidence set captures governance posture and documented risks, not confidential model internals.",
+    "Scores translate published operational and governance evidence into MEDF's 1-7 Likert scale.",
+    "The evidence set captures real deployment practice and reporting, not confidential model internals.",
     "Scoring is calibrated for pre-deployment governance comparison across frameworks and stakeholders."
   ]
 }

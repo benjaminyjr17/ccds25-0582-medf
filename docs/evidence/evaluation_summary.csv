@@ -2,9 +2,9 @@ case_id,framework_id,deployment_type,source_count,overall_score,conflict_pairs,m
 facial_recognition,eu_altai,real_deployment,3,0.337908,3,0.92381,8,fairness_nondiscrimination
 facial_recognition,nist_ai_rmf,real_deployment,3,0.463713,3,0.92381,8,fairness_nondiscrimination
 facial_recognition,sg_mgaf,real_deployment,3,0.358185,3,0.92381,8,fairness_nondiscrimination
-hiring_algorithm,eu_altai,real_deployment,3,0.437511,3,0.314286,8,fairness_nondiscrimination
-hiring_algorithm,nist_ai_rmf,real_deployment,3,0.426274,3,0.314286,8,fairness_nondiscrimination
-hiring_algorithm,sg_mgaf,real_deployment,3,0.431288,3,0.314286,8,fairness_nondiscrimination
+hiring_algorithm,eu_altai,real_deployment,3,0.302155,3,0.619048,8,fairness_nondiscrimination
+hiring_algorithm,nist_ai_rmf,real_deployment,3,0.415464,3,0.619048,8,fairness_nondiscrimination
+hiring_algorithm,sg_mgaf,real_deployment,3,0.325351,3,0.619048,8,fairness_nondiscrimination
 healthcare_diagnostic,eu_altai,real_deployment,3,0.584113,3,0.12381,8,fairness_nondiscrimination
 healthcare_diagnostic,nist_ai_rmf,real_deployment,3,0.625817,3,0.12381,8,fairness_nondiscrimination
 healthcare_diagnostic,sg_mgaf,real_deployment,3,0.590991,3,0.12381,8,fairness_nondiscrimination

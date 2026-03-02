@@ -14,7 +14,7 @@ def test_topsis_developer_facial_recognition_reference() -> None:
         "accountability": 0.15,
     }
 
-    # Facial recognition synthetic hand-verification profile (Likert 1-7 scale).
+    # Facial recognition reference hand-verification profile (Likert 1-7 scale).
     dimension_scores = {
         "transparency_explainability": 2.5,
         "fairness_nondiscrimination": 2.5,

@@ -157,7 +157,7 @@
             "affected_community|regulator": 0.2571428571428572,
             "developer|regulator": 0.08571428571428573
           },
-          "run_id": "ac9ae5c3-33c5-4578-85ec-7dd48e4998ac",
+          "run_id": "6ef2abf6-48de-4cc3-8943-9fe357c4ab4e",
           "scoring_method": "topsis",
           "stakeholder_rankings": {
             "affected_community": [
@@ -263,8 +263,8 @@
             "score": 0.3379083353264458
           }
         ],
-        "generated_at": "2026-03-02T01:19:53.773546Z",
-        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=cd694cd0-98df-4920-ad8d-4a88e28ead1f",
+        "generated_at": "2026-03-02T01:47:49.579745Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=223169df-a410-4455-8761-23cb9903d9be",
         "overall_score": 0.3379083353264458,
         "scoring_method": "topsis"
       },
@@ -274,14 +274,14 @@
         "metadata": {
           "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
           "ablation_utility_by_solution": {
-            "ps_2521dbcd": 0.25828366094746935,
-            "ps_4aeb0efd": 0.27093429184741985,
-            "ps_5482f9b2": 0.27287269112186036,
-            "ps_92810bfb": 0.254156485112849,
-            "ps_e760df92": 0.2714443701105217,
-            "ps_f9b0ae13": 0.25033096940592137,
-            "ps_fdc28900": 0.25452807917742365,
-            "ps_fff8cc48": 0.2503279432672114
+            "ps_10dceb93": 0.27093429184741985,
+            "ps_1a263200": 0.254156485112849,
+            "ps_247b56cb": 0.2503279432672114,
+            "ps_86e6bc7f": 0.25828366094746935,
+            "ps_8c757e47": 0.25033096940592137,
+            "ps_9e83b551": 0.2714443701105217,
+            "ps_ab828c54": 0.25452807917742365,
+            "ps_f547df4a": 0.27287269112186036
           },
           "ai_system_id": "evidence_facial_recognition",
           "ai_system_name": "Metropolitan Police Live Facial Recognition",
@@ -291,7 +291,7 @@
           "n_solutions_returned": 8,
           "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
           "pop_size": 40,
-          "run_id": "fad1d1e6-2412-488d-acd1-f511884d4342",
+          "run_id": "1dd1b7ce-fff0-4202-b149-d94bac8181a1",
           "salience_vector": {
             "accountability": 0.27272727272727276,
             "fairness_nondiscrimination": 0.045454545454545456,
@@ -323,7 +323,7 @@
               "regulator": 0.048079683057410685
             },
             "rank": 1,
-            "solution_id": "ps_fff8cc48",
+            "solution_id": "ps_247b56cb",
             "weights": {
               "consensus": {
                 "accountability": 0.15850515125348524,
@@ -342,7 +342,7 @@
               "regulator": 0.058766861700954194
             },
             "rank": 2,
-            "solution_id": "ps_92810bfb",
+            "solution_id": "ps_1a263200",
             "weights": {
               "consensus": {
                 "accountability": 0.15028767222272105,
@@ -361,7 +361,7 @@
               "regulator": 0.04632129675960462
             },
             "rank": 3,
-            "solution_id": "ps_f9b0ae13",
+            "solution_id": "ps_8c757e47",
             "weights": {
               "consensus": {
                 "accountability": 0.15996777793888414,
@@ -380,7 +380,7 @@
               "regulator": 0.0595953830741965
             },
             "rank": 4,
-            "solution_id": "ps_2521dbcd",
+            "solution_id": "ps_86e6bc7f",
             "weights": {
               "consensus": {
                 "accountability": 0.1475973906702457,
@@ -399,7 +399,7 @@
               "regulator": 0.04174981305353314
             },
             "rank": 5,
-            "solution_id": "ps_e760df92",
+            "solution_id": "ps_9e83b551",
             "weights": {
               "consensus": {
                 "accountability": 0.18732735244973064,
@@ -418,7 +418,7 @@
               "regulator": 0.05473397030643769
             },
             "rank": 6,
-            "solution_id": "ps_4aeb0efd",
+            "solution_id": "ps_10dceb93",
             "weights": {
               "consensus": {
                 "accountability": 0.1734317012258758,
@@ -437,7 +437,7 @@
               "regulator": 0.036129295994820405
             },
             "rank": 7,
-            "solution_id": "ps_5482f9b2",
+            "solution_id": "ps_f547df4a",
             "weights": {
               "consensus": {
                 "accountability": 0.19682199607922482,
@@ -456,7 +456,7 @@
               "regulator": 0.038926599795533194
             },
             "rank": 8,
-            "solution_id": "ps_fdc28900",
+            "solution_id": "ps_ab828c54",
             "weights": {
               "consensus": {
                 "accountability": 0.14955766634445464,
@@ -474,9 +474,9 @@
       "provenance": {
         "deployment_type": "real_deployment",
         "source_ids": [
-          "met_lfr_policy",
-          "bscc_annual_report",
-          "ico_lfr_opinion"
+          "met_lfr_overview_foi",
+          "met_lfr_policy_document",
+          "met_lfr_deployment_record_2026"
         ]
       },
       "summary": {
@@ -638,7 +638,7 @@
             "affected_community|regulator": 0.2571428571428572,
             "developer|regulator": 0.08571428571428573
           },
-          "run_id": "e4b939a3-e95d-4abf-aa06-f23c8da2abfa",
+          "run_id": "37223098-e0b9-42be-9da3-2a64498cc525",
           "scoring_method": "topsis",
           "stakeholder_rankings": {
             "affected_community": [
@@ -744,8 +744,8 @@
             "score": 0.4637125740039189
           }
         ],
-        "generated_at": "2026-03-02T01:19:54.068134Z",
-        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=7fab65b1-485a-4e8f-bd2a-9f57e78b5156",
+        "generated_at": "2026-03-02T01:47:49.862446Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=0e3c51e8-eda4-4290-a92b-71a158a9c155",
         "overall_score": 0.4637125740039189,
         "scoring_method": "topsis"
       },
@@ -755,14 +755,14 @@
         "metadata": {
           "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
           "ablation_utility_by_solution": {
-            "ps_04104ab5": 0.25828366094746935,
-            "ps_2d62fa47": 0.25033096940592137,
-            "ps_3cf86b74": 0.2714443701105217,
-            "ps_41965d5a": 0.254156485112849,
-            "ps_54ba2ca9": 0.25452807917742365,
-            "ps_8b0138b2": 0.27093429184741985,
-            "ps_c84e88ed": 0.27287269112186036,
-            "ps_cdda8ce9": 0.2503279432672114
+            "ps_2191188d": 0.25452807917742365,
+            "ps_2558c37e": 0.254156485112849,
+            "ps_273a78b1": 0.25828366094746935,
+            "ps_4354f944": 0.2503279432672114,
+            "ps_6f3d4187": 0.27287269112186036,
+            "ps_d046f162": 0.2714443701105217,
+            "ps_f85fe821": 0.27093429184741985,
+            "ps_fc9266cc": 0.25033096940592137
           },
           "ai_system_id": "evidence_facial_recognition",
           "ai_system_name": "Metropolitan Police Live Facial Recognition",
@@ -772,7 +772,7 @@
           "n_solutions_returned": 8,
           "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
           "pop_size": 40,
-          "run_id": "c2251203-958a-4c5f-a7ab-5947151e1f4d",
+          "run_id": "32b72c57-ffb9-4dfb-8eea-f001a9996316",
           "salience_vector": {
             "accountability": 0.27272727272727276,
             "fairness_nondiscrimination": 0.045454545454545456,
@@ -804,7 +804,7 @@
               "regulator": 0.048079683057410685
             },
             "rank": 1,
-            "solution_id": "ps_cdda8ce9",
+            "solution_id": "ps_4354f944",
             "weights": {
               "consensus": {
                 "accountability": 0.15850515125348524,
@@ -823,7 +823,7 @@
               "regulator": 0.058766861700954194
             },
             "rank": 2,
-            "solution_id": "ps_41965d5a",
+            "solution_id": "ps_2558c37e",
             "weights": {
               "consensus": {
                 "accountability": 0.15028767222272105,
@@ -842,7 +842,7 @@
               "regulator": 0.04632129675960462
             },
             "rank": 3,
-            "solution_id": "ps_2d62fa47",
+            "solution_id": "ps_fc9266cc",
             "weights": {
               "consensus": {
                 "accountability": 0.15996777793888414,
@@ -861,7 +861,7 @@
               "regulator": 0.0595953830741965
             },
             "rank": 4,
-            "solution_id": "ps_04104ab5",
+            "solution_id": "ps_273a78b1",
             "weights": {
               "consensus": {
                 "accountability": 0.1475973906702457,
@@ -880,7 +880,7 @@
               "regulator": 0.04174981305353314
             },
             "rank": 5,
-            "solution_id": "ps_3cf86b74",
+            "solution_id": "ps_d046f162",
             "weights": {
               "consensus": {
                 "accountability": 0.18732735244973064,
@@ -899,7 +899,7 @@
               "regulator": 0.05473397030643769
             },
             "rank": 6,
-            "solution_id": "ps_8b0138b2",
+            "solution_id": "ps_f85fe821",
             "weights": {
               "consensus": {
                 "accountability": 0.1734317012258758,
@@ -918,7 +918,7 @@
               "regulator": 0.036129295994820405
             },
             "rank": 7,
-            "solution_id": "ps_c84e88ed",
+            "solution_id": "ps_6f3d4187",
             "weights": {
               "consensus": {
                 "accountability": 0.19682199607922482,
@@ -937,7 +937,7 @@
               "regulator": 0.038926599795533194
             },
             "rank": 8,
-            "solution_id": "ps_54ba2ca9",
+            "solution_id": "ps_2191188d",
             "weights": {
               "consensus": {
                 "accountability": 0.14955766634445464,
@@ -955,9 +955,9 @@
       "provenance": {
         "deployment_type": "real_deployment",
         "source_ids": [
-          "met_lfr_policy",
-          "bscc_annual_report",
-          "ico_lfr_opinion"
+          "met_lfr_overview_foi",
+          "met_lfr_policy_document",
+          "met_lfr_deployment_record_2026"
         ]
       },
       "summary": {
@@ -1119,7 +1119,7 @@
             "affected_community|regulator": 0.2571428571428572,
             "developer|regulator": 0.08571428571428573
           },
-          "run_id": "6cc6b1b8-6162-470f-bff4-c4b134630cd9",
+          "run_id": "61825d39-38ff-4253-a24d-0ce8d0f1b62c",
           "scoring_method": "topsis",
           "stakeholder_rankings": {
             "affected_community": [
@@ -1225,8 +1225,8 @@
             "score": 0.35818487237637103
           }
         ],
-        "generated_at": "2026-03-02T01:19:54.334959Z",
-        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=b60de32d-4f03-4c50-b177-3a43b75734d0",
+        "generated_at": "2026-03-02T01:47:50.176888Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=aec24dc1-714e-488d-bb13-2a7bf4bd960e",
         "overall_score": 0.35818487237637103,
         "scoring_method": "topsis"
       },
@@ -1236,14 +1236,14 @@
         "metadata": {
           "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
           "ablation_utility_by_solution": {
-            "ps_2696cde9": 0.27093429184741985,
-            "ps_2c6e61a9": 0.25033096940592137,
-            "ps_382046d9": 0.2714443701105217,
-            "ps_3cdec9a8": 0.27287269112186036,
-            "ps_438441b0": 0.254156485112849,
-            "ps_60c2b8e8": 0.25828366094746935,
-            "ps_62be6b80": 0.2503279432672114,
-            "ps_b479f34e": 0.25452807917742365
+            "ps_0ab1f930": 0.27093429184741985,
+            "ps_a0c1a556": 0.27287269112186036,
+            "ps_ae056036": 0.2714443701105217,
+            "ps_bb0278f0": 0.254156485112849,
+            "ps_e3152436": 0.25033096940592137,
+            "ps_e56c9ac4": 0.25828366094746935,
+            "ps_f2a6710e": 0.25452807917742365,
+            "ps_f61465d7": 0.2503279432672114
           },
           "ai_system_id": "evidence_facial_recognition",
           "ai_system_name": "Metropolitan Police Live Facial Recognition",
@@ -1253,7 +1253,7 @@
           "n_solutions_returned": 8,
           "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
           "pop_size": 40,
-          "run_id": "07dbd971-a3ef-4109-b323-cff8922c863e",
+          "run_id": "f61446f6-49ae-4ec9-a497-d1d8440fc045",
           "salience_vector": {
             "accountability": 0.27272727272727276,
             "fairness_nondiscrimination": 0.045454545454545456,
@@ -1285,7 +1285,7 @@
               "regulator": 0.048079683057410685
             },
             "rank": 1,
-            "solution_id": "ps_62be6b80",
+            "solution_id": "ps_f61465d7",
             "weights": {
               "consensus": {
                 "accountability": 0.15850515125348524,
@@ -1304,7 +1304,7 @@
               "regulator": 0.058766861700954194
             },
             "rank": 2,
-            "solution_id": "ps_438441b0",
+            "solution_id": "ps_bb0278f0",
             "weights": {
               "consensus": {
                 "accountability": 0.15028767222272105,
@@ -1323,7 +1323,7 @@
               "regulator": 0.04632129675960462
             },
             "rank": 3,
-            "solution_id": "ps_2c6e61a9",
+            "solution_id": "ps_e3152436",
             "weights": {
               "consensus": {
                 "accountability": 0.15996777793888414,
@@ -1342,7 +1342,7 @@
               "regulator": 0.0595953830741965
             },
             "rank": 4,
-            "solution_id": "ps_60c2b8e8",
+            "solution_id": "ps_e56c9ac4",
             "weights": {
               "consensus": {
                 "accountability": 0.1475973906702457,
@@ -1361,7 +1361,7 @@
               "regulator": 0.04174981305353314
             },
             "rank": 5,
-            "solution_id": "ps_382046d9",
+            "solution_id": "ps_ae056036",
             "weights": {
               "consensus": {
                 "accountability": 0.18732735244973064,
@@ -1380,7 +1380,7 @@
               "regulator": 0.05473397030643769
             },
             "rank": 6,
-            "solution_id": "ps_2696cde9",
+            "solution_id": "ps_0ab1f930",
             "weights": {
               "consensus": {
                 "accountability": 0.1734317012258758,
@@ -1399,7 +1399,7 @@
               "regulator": 0.036129295994820405
             },
             "rank": 7,
-            "solution_id": "ps_3cdec9a8",
+            "solution_id": "ps_a0c1a556",
             "weights": {
               "consensus": {
                 "accountability": 0.19682199607922482,
@@ -1418,7 +1418,7 @@
               "regulator": 0.038926599795533194
             },
             "rank": 8,
-            "solution_id": "ps_b479f34e",
+            "solution_id": "ps_f2a6710e",
             "weights": {
               "consensus": {
                 "accountability": 0.14955766634445464,
@@ -1436,9 +1436,9 @@
       "provenance": {
         "deployment_type": "real_deployment",
         "source_ids": [
-          "met_lfr_policy",
-          "bscc_annual_report",
-          "ico_lfr_opinion"
+          "met_lfr_overview_foi",
+          "met_lfr_policy_document",
+          "met_lfr_deployment_record_2026"
         ]
       },
       "summary": {
@@ -1457,32 +1457,32 @@
       "conflicts": {
         "conflicts": [
           {
-            "conflict_level": "high",
+            "conflict_level": "moderate",
             "conflicting_dimensions": [
               "safety_robustness",
-              "accountability"
+              "transparency_explainability"
             ],
-            "spearman_rho": 0.028571428571428574,
+            "spearman_rho": 0.5428571428571429,
             "stakeholder_a_id": "developer",
             "stakeholder_b_id": "regulator"
           },
           {
-            "conflict_level": "moderate",
+            "conflict_level": "low",
             "conflicting_dimensions": [
               "safety_robustness",
               "accountability"
             ],
-            "spearman_rho": 0.6,
+            "spearman_rho": 0.7714285714285715,
             "stakeholder_a_id": "developer",
             "stakeholder_b_id": "affected_community"
           },
           {
             "conflict_level": "moderate",
             "conflicting_dimensions": [
-              "human_agency_oversight",
-              "transparency_explainability"
+              "transparency_explainability",
+              "human_agency_oversight"
             ],
-            "spearman_rho": 0.3142857142857143,
+            "spearman_rho": 0.5428571428571429,
             "stakeholder_a_id": "regulator",
             "stakeholder_b_id": "affected_community"
           }
@@ -1492,88 +1492,88 @@
             {
               "domain_id": "opacity_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.4866666666666667,
-              "severity": "moderate",
+              "score": 0.5449999999999999,
+              "severity": "high",
               "unified_dimension": "transparency_explainability"
             },
             {
               "domain_id": "discrimination_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.6133333333333334,
+              "score": 0.6716666666666666,
               "severity": "high",
               "unified_dimension": "fairness_nondiscrimination"
             },
             {
               "domain_id": "safety_failure_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.38999999999999996,
-              "severity": "moderate",
+              "score": 0.5066666666666667,
+              "severity": "high",
               "unified_dimension": "safety_robustness"
             },
             {
               "domain_id": "privacy_intrusion_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.35,
+              "score": 0.4666666666666667,
               "severity": "moderate",
               "unified_dimension": "privacy_data_governance"
             },
             {
               "domain_id": "autonomy_oversight_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.25333333333333335,
-              "severity": "moderate",
+              "score": 0.6033333333333334,
+              "severity": "high",
               "unified_dimension": "human_agency_oversight"
             },
             {
               "domain_id": "accountability_redress_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.4283333333333333,
+              "score": 0.31166666666666665,
               "severity": "moderate",
               "unified_dimension": "accountability"
             }
           ],
           "model_version": "harm_taxonomy_v1",
-          "overall_score": 0.4056333333333334,
-          "overall_severity": "moderate",
+          "overall_score": 0.5164666666666667,
+          "overall_severity": "high",
           "top_risk_domains": [
             "fairness_nondiscrimination",
-            "transparency_explainability"
+            "human_agency_oversight"
           ]
         },
         "metadata": {
           "ai_system_id": "evidence_hiring_algorithm",
-          "ai_system_name": "Workday AI Screening in Enterprise Hiring",
+          "ai_system_name": "iTutorGroup Automated Hiring Screening",
           "correlation_matrix": {
             "affected_community": {
               "affected_community": 1.0,
-              "developer": 0.6,
-              "regulator": 0.3142857142857143
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429
             },
             "developer": {
-              "affected_community": 0.6,
+              "affected_community": 0.7714285714285715,
               "developer": 1.0,
-              "regulator": 0.028571428571428574
+              "regulator": 0.5428571428571429
             },
             "regulator": {
-              "affected_community": 0.3142857142857143,
-              "developer": 0.028571428571428574,
+              "affected_community": 0.5428571428571429,
+              "developer": 0.5428571428571429,
               "regulator": 1.0
             }
           },
           "correlation_matrix_contrib": {
             "affected_community": {
               "affected_community": 1.0,
-              "developer": 0.6,
-              "regulator": 0.3142857142857143
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429
             },
             "developer": {
-              "affected_community": 0.6,
+              "affected_community": 0.7714285714285715,
               "developer": 1.0,
-              "regulator": 0.028571428571428574
+              "regulator": 0.5428571428571429
             },
             "regulator": {
-              "affected_community": 0.3142857142857143,
-              "developer": 0.028571428571428574,
+              "affected_community": 0.5428571428571429,
+              "developer": 0.5428571428571429,
               "regulator": 1.0
             }
           },
@@ -1600,58 +1600,58 @@
             "affected_community|regulator": 0.2571428571428572,
             "developer|regulator": 0.08571428571428573
           },
-          "run_id": "e1ca6f3d-7e21-49dc-b191-802392a07e27",
+          "run_id": "4ccb8b59-128a-41a1-b25e-4b9a531232e4",
           "scoring_method": "topsis",
           "stakeholder_rankings": {
             "affected_community": [
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination",
-              "transparency_explainability"
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
             ],
             "developer": [
               "safety_robustness",
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "transparency_explainability",
+              "human_agency_oversight",
               "fairness_nondiscrimination"
             ],
             "regulator": [
               "accountability",
-              "privacy_data_governance",
               "transparency_explainability",
-              "human_agency_oversight",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination"
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
             ]
           },
           "stakeholder_rankings_contrib": {
             "affected_community": [
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination",
-              "transparency_explainability"
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
             ],
             "developer": [
               "safety_robustness",
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "transparency_explainability",
+              "human_agency_oversight",
               "fairness_nondiscrimination"
             ],
             "regulator": [
               "accountability",
-              "privacy_data_governance",
               "transparency_explainability",
-              "human_agency_oversight",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination"
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
             ]
           },
           "stakeholder_rankings_weights": {
@@ -1681,9 +1681,9 @@
             ]
           },
           "stakeholder_scores": {
-            "affected_community": 0.3598543672601424,
-            "developer": 0.4533505228007353,
-            "regulator": 0.3714967874555914
+            "affected_community": 0.231977938159084,
+            "developer": 0.31427739762078555,
+            "regulator": 0.3407536839563278
           }
         },
         "pareto_solutions": [],
@@ -1694,21 +1694,21 @@
         "framework_scores": [
           {
             "dimension_scores": {
-              "accountability": 0.06382115082319847,
-              "fairness_nondiscrimination": 0.030021924381566967,
-              "human_agency_oversight": 0.1092817811606593,
-              "privacy_data_governance": 0.10313249772482831,
-              "safety_robustness": 0.11094909131022308,
-              "transparency_explainability": 0.024870613974610007
+              "accountability": 0.08934961115247786,
+              "fairness_nondiscrimination": 0.015010962190783484,
+              "human_agency_oversight": 0.027320445290164825,
+              "privacy_data_governance": 0.06875499848321887,
+              "safety_robustness": 0.07396606087348206,
+              "transparency_explainability": 0.018652960480957506
             },
             "framework_id": "eu_altai",
-            "risk_level": "high",
-            "score": 0.4375112879110236
+            "risk_level": "critical",
+            "score": 0.3021545378107828
           }
         ],
-        "generated_at": "2026-03-02T01:19:54.606352Z",
-        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=85353d39-e90f-4766-b50d-ab382d7d8274",
-        "overall_score": 0.4375112879110236,
+        "generated_at": "2026-03-02T01:47:50.453005Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=48086979-dfc2-446a-897f-5eb17b5544b9",
+        "overall_score": 0.3021545378107828,
         "scoring_method": "topsis"
       },
       "pareto": {
@@ -1717,31 +1717,31 @@
         "metadata": {
           "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
           "ablation_utility_by_solution": {
-            "ps_45874045": 0.40477044528154565,
-            "ps_7c5b7dfa": 0.4053475921624558,
-            "ps_9a4317a5": 0.39191659068039103,
-            "ps_9fc5afbb": 0.4070960846664658,
-            "ps_adc44a8d": 0.3849464368644322,
-            "ps_ed331937": 0.3877341611360249,
-            "ps_fd1adef0": 0.38752627848987625,
-            "ps_ff324b23": 0.38890187825281575
+            "ps_0270f66a": 0.2641259820896041,
+            "ps_156899bb": 0.2644643822492398,
+            "ps_164c88f9": 0.26968480608728723,
+            "ps_2003e480": 0.2578022041429782,
+            "ps_57877237": 0.26241824316410034,
+            "ps_654a2af4": 0.2814517013544625,
+            "ps_b262e378": 0.26944900877755756,
+            "ps_cd610327": 0.25931375178032445
           },
           "ai_system_id": "evidence_hiring_algorithm",
-          "ai_system_name": "Workday AI Screening in Enterprise Hiring",
+          "ai_system_name": "iTutorGroup Automated Hiring Screening",
           "deterministic_mode": true,
           "framework_id": "eu_altai",
           "n_gen": 80,
           "n_solutions_returned": 8,
           "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
           "pop_size": 40,
-          "run_id": "3f68e529-c132-42c0-b437-3369545f6401",
+          "run_id": "3778ff58-a0b1-4617-b768-130435b7096d",
           "salience_vector": {
-            "accountability": 0.16129032258064518,
-            "fairness_nondiscrimination": 0.06451612903225806,
-            "human_agency_oversight": 0.25806451612903225,
-            "privacy_data_governance": 0.19354838709677422,
-            "safety_robustness": 0.19354838709677422,
-            "transparency_explainability": 0.12903225806451613
+            "accountability": 0.33333333333333337,
+            "fairness_nondiscrimination": 0.047619047619047616,
+            "human_agency_oversight": 0.09523809523809523,
+            "privacy_data_governance": 0.19047619047619047,
+            "safety_robustness": 0.19047619047619047,
+            "transparency_explainability": 0.14285714285714285
           },
           "seed": 42,
           "stakeholder_ids": [
@@ -1750,164 +1750,164 @@
             "affected_community"
           ],
           "x_normalized": {
-            "accountability": 0.4166666666666667,
-            "fairness_nondiscrimination": 0.16666666666666666,
-            "human_agency_oversight": 0.6666666666666666,
-            "privacy_data_governance": 0.5,
-            "safety_robustness": 0.5,
-            "transparency_explainability": 0.3333333333333333
+            "accountability": 0.5833333333333334,
+            "fairness_nondiscrimination": 0.08333333333333333,
+            "human_agency_oversight": 0.16666666666666666,
+            "privacy_data_governance": 0.3333333333333333,
+            "safety_robustness": 0.3333333333333333,
+            "transparency_explainability": 0.25
           }
         },
         "pareto_solutions": [
           {
             "objective_scores": {
-              "affected_community": 0.014517661906041444,
-              "developer": 0.055494951264028855,
-              "regulator": 0.052756009928460114
+              "affected_community": 0.004110511933323304,
+              "developer": 0.0517110224613525,
+              "regulator": 0.060088544042516276
             },
             "rank": 1,
-            "solution_id": "ps_9a4317a5",
+            "solution_id": "ps_2003e480",
             "weights": {
               "consensus": {
-                "accountability": 0.1553432824713477,
-                "fairness_nondiscrimination": 0.31274852164534944,
-                "human_agency_oversight": 0.162684473067338,
-                "privacy_data_governance": 0.15848617844236265,
-                "safety_robustness": 0.10272129991498322,
-                "transparency_explainability": 0.108016244458619
+                "accountability": 0.14974964746704147,
+                "fairness_nondiscrimination": 0.2805025910079911,
+                "human_agency_oversight": 0.19995136314034662,
+                "privacy_data_governance": 0.15418441581780704,
+                "safety_robustness": 0.10139998918609444,
+                "transparency_explainability": 0.11421199338071938
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.021187461834809344,
-              "developer": 0.05445728088657179,
-              "regulator": 0.05058901192182623
+              "affected_community": 0.008188474591061933,
+              "developer": 0.0500407380334534,
+              "regulator": 0.058490453702665715
             },
             "rank": 2,
-            "solution_id": "ps_ed331937",
+            "solution_id": "ps_57877237",
             "weights": {
               "consensus": {
-                "accountability": 0.16145836046663442,
-                "fairness_nondiscrimination": 0.31849744828697096,
-                "human_agency_oversight": 0.14662491354707555,
-                "privacy_data_governance": 0.16520377365937122,
-                "safety_robustness": 0.10571963411628034,
-                "transparency_explainability": 0.10249586992366763
+                "accountability": 0.15735448171837738,
+                "fairness_nondiscrimination": 0.2737616260404765,
+                "human_agency_oversight": 0.19514618423168742,
+                "privacy_data_governance": 0.14986912031865016,
+                "safety_robustness": 0.11240130708968522,
+                "transparency_explainability": 0.11146728060112335
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.0014416543971057221,
-              "developer": 0.06261626200374008,
-              "regulator": 0.06261305599211442
+              "affected_community": 0.005374038035363467,
+              "developer": 0.05248626884041908,
+              "regulator": 0.059237125565735835
             },
             "rank": 3,
-            "solution_id": "ps_45874045",
+            "solution_id": "ps_cd610327",
             "weights": {
               "consensus": {
-                "accountability": 0.14924575472905935,
-                "fairness_nondiscrimination": 0.29910320895141634,
-                "human_agency_oversight": 0.2014643902516855,
-                "privacy_data_governance": 0.15236724994178846,
-                "safety_robustness": 0.09780697283100097,
-                "transparency_explainability": 0.10001242329504949
+                "accountability": 0.15242173992660799,
+                "fairness_nondiscrimination": 0.27445511131063033,
+                "human_agency_oversight": 0.20407734678277561,
+                "privacy_data_governance": 0.15387145909711125,
+                "safety_robustness": 0.1011941719643866,
+                "transparency_explainability": 0.11398017091848821
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.0038773974350525186,
-              "developer": 0.06363718217892342,
-              "regulator": 0.059462785749573276
+              "affected_community": 0.012597021901386157,
+              "developer": 0.05591500465305305,
+              "regulator": 0.05047364900638382
             },
             "rank": 4,
-            "solution_id": "ps_7c5b7dfa",
+            "solution_id": "ps_0270f66a",
             "weights": {
               "consensus": {
-                "accountability": 0.16294062893098543,
-                "fairness_nondiscrimination": 0.2934149136564986,
-                "human_agency_oversight": 0.19868085452712522,
-                "privacy_data_governance": 0.15041367809385361,
-                "safety_robustness": 0.09625476501763681,
-                "transparency_explainability": 0.09829515977390028
+                "accountability": 0.16157112266010668,
+                "fairness_nondiscrimination": 0.2758253193947375,
+                "human_agency_oversight": 0.1770067497488825,
+                "privacy_data_governance": 0.15247259705303798,
+                "safety_robustness": 0.09941208592014181,
+                "transparency_explainability": 0.13371212522309342
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.03450562608697421,
-              "developer": 0.0657328464483642,
-              "regulator": 0.02850893914740463
+              "affected_community": 0.019711369709012584,
+              "developer": 0.05940109924148488,
+              "regulator": 0.04327803290392093
             },
             "rank": 5,
-            "solution_id": "ps_fd1adef0",
+            "solution_id": "ps_164c88f9",
             "weights": {
               "consensus": {
-                "accountability": 0.18601101373254025,
-                "fairness_nondiscrimination": 0.2751774547768094,
-                "human_agency_oversight": 0.12816979052729208,
-                "privacy_data_governance": 0.14826787213653364,
-                "safety_robustness": 0.10272216565867899,
-                "transparency_explainability": 0.15965170316814564
+                "accountability": 0.1605214462844473,
+                "fairness_nondiscrimination": 0.24002857409858588,
+                "human_agency_oversight": 0.1758567929961866,
+                "privacy_data_governance": 0.15144650548098357,
+                "safety_robustness": 0.09859932362203311,
+                "transparency_explainability": 0.17354735751776343
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.0367961541808611,
-              "developer": 0.06348424887938059,
-              "regulator": 0.030999460002840554
+              "affected_community": 0.011172027167691879,
+              "developer": 0.054839715408665474,
+              "regulator": 0.0567518927954964
             },
             "rank": 6,
-            "solution_id": "ps_ff324b23",
+            "solution_id": "ps_156899bb",
             "weights": {
               "consensus": {
-                "accountability": 0.1839550038354149,
-                "fairness_nondiscrimination": 0.27213587374816994,
-                "human_agency_oversight": 0.12675310904941195,
-                "privacy_data_governance": 0.14662904330365203,
-                "safety_robustness": 0.1134343799448813,
-                "transparency_explainability": 0.15709259011846985
+                "accountability": 0.1644325014298486,
+                "fairness_nondiscrimination": 0.2851451363430329,
+                "human_agency_oversight": 0.17966743594582055,
+                "privacy_data_governance": 0.16305796947725643,
+                "safety_robustness": 0.10274232042611281,
+                "transparency_explainability": 0.10495463637792872
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.03922136321021283,
-              "developer": 0.07015506411384316,
-              "regulator": 0.022749291463061688
+              "affected_community": 0.023828024334483066,
+              "developer": 0.06601349175238182,
+              "regulator": 0.03856610427581568
             },
             "rank": 7,
-            "solution_id": "ps_adc44a8d",
+            "solution_id": "ps_654a2af4",
             "weights": {
               "consensus": {
-                "accountability": 0.18203485624822485,
-                "fairness_nondiscrimination": 0.26796130881028757,
-                "human_agency_oversight": 0.1181149709536461,
-                "privacy_data_governance": 0.149317517696425,
-                "safety_robustness": 0.10107504226905085,
-                "transparency_explainability": 0.1814963040223656
+                "accountability": 0.20244818574043638,
+                "fairness_nondiscrimination": 0.24831165515309614,
+                "human_agency_oversight": 0.18481787636742042,
+                "privacy_data_governance": 0.15017672378372562,
+                "safety_robustness": 0.09889213618169145,
+                "transparency_explainability": 0.11535342277362995
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.006670126497651169,
-              "developer": 0.06195442042302754,
-              "regulator": 0.06485707932066863
+              "affected_community": 0.025923048063317064,
+              "developer": 0.02998684858932088,
+              "regulator": 0.07363208397557296
             },
             "rank": 8,
-            "solution_id": "ps_9fc5afbb",
+            "solution_id": "ps_b262e378",
             "weights": {
               "consensus": {
-                "accountability": 0.1461858854922647,
-                "fairness_nondiscrimination": 0.2924343033701745,
-                "human_agency_oversight": 0.1958786452520527,
-                "privacy_data_governance": 0.1626620426331585,
-                "safety_robustness": 0.10749853548557282,
-                "transparency_explainability": 0.09534058776677694
+                "accountability": 0.14831430374390683,
+                "fairness_nondiscrimination": 0.28155596285321455,
+                "human_agency_oversight": 0.13469445711273612,
+                "privacy_data_governance": 0.14696575884168459,
+                "safety_robustness": 0.1909715143325436,
+                "transparency_explainability": 0.09749800311591436
               }
             }
           }
@@ -1917,9 +1917,9 @@
       "provenance": {
         "deployment_type": "real_deployment",
         "source_ids": [
-          "workday_product_page",
-          "eeoc_workday_lawsuit",
-          "reuters_workday_ruling"
+          "eeoc_itutorgroup_suit_2022",
+          "eeoc_itutorgroup_settlement_2023",
+          "courtlistener_itutorgroup_1_22_cv_02565"
         ]
       },
       "summary": {
@@ -1927,8 +1927,8 @@
         "conflict_pairs": 3,
         "deployment_type": "real_deployment",
         "framework_id": "eu_altai",
-        "mean_spearman_rho": 0.314286,
-        "overall_score": 0.437511,
+        "mean_spearman_rho": 0.619048,
+        "overall_score": 0.302155,
         "pareto_solutions": 8,
         "source_count": 3,
         "top_consensus_dimension": "fairness_nondiscrimination"
@@ -1938,32 +1938,32 @@
       "conflicts": {
         "conflicts": [
           {
-            "conflict_level": "high",
+            "conflict_level": "moderate",
             "conflicting_dimensions": [
               "safety_robustness",
-              "accountability"
+              "transparency_explainability"
             ],
-            "spearman_rho": 0.028571428571428574,
+            "spearman_rho": 0.5428571428571429,
             "stakeholder_a_id": "developer",
             "stakeholder_b_id": "regulator"
           },
           {
-            "conflict_level": "moderate",
+            "conflict_level": "low",
             "conflicting_dimensions": [
               "safety_robustness",
               "accountability"
             ],
-            "spearman_rho": 0.6,
+            "spearman_rho": 0.7714285714285715,
             "stakeholder_a_id": "developer",
             "stakeholder_b_id": "affected_community"
           },
           {
             "conflict_level": "moderate",
             "conflicting_dimensions": [
-              "human_agency_oversight",
-              "transparency_explainability"
+              "transparency_explainability",
+              "human_agency_oversight"
             ],
-            "spearman_rho": 0.3142857142857143,
+            "spearman_rho": 0.5428571428571429,
             "stakeholder_a_id": "regulator",
             "stakeholder_b_id": "affected_community"
           }
@@ -1973,88 +1973,88 @@
             {
               "domain_id": "opacity_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.4866666666666667,
-              "severity": "moderate",
+              "score": 0.5449999999999999,
+              "severity": "high",
               "unified_dimension": "transparency_explainability"
             },
             {
               "domain_id": "discrimination_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.6133333333333334,
+              "score": 0.6716666666666666,
               "severity": "high",
               "unified_dimension": "fairness_nondiscrimination"
             },
             {
               "domain_id": "safety_failure_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.38999999999999996,
-              "severity": "moderate",
+              "score": 0.5066666666666667,
+              "severity": "high",
               "unified_dimension": "safety_robustness"
             },
             {
               "domain_id": "privacy_intrusion_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.35,
+              "score": 0.4666666666666667,
               "severity": "moderate",
               "unified_dimension": "privacy_data_governance"
             },
             {
               "domain_id": "autonomy_oversight_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.25333333333333335,
-              "severity": "moderate",
+              "score": 0.6033333333333334,
+              "severity": "high",
               "unified_dimension": "human_agency_oversight"
             },
             {
               "domain_id": "accountability_redress_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.4283333333333333,
+              "score": 0.31166666666666665,
               "severity": "moderate",
               "unified_dimension": "accountability"
             }
           ],
           "model_version": "harm_taxonomy_v1",
-          "overall_score": 0.4142333333333333,
+          "overall_score": 0.4760666666666667,
           "overall_severity": "moderate",
           "top_risk_domains": [
             "fairness_nondiscrimination",
-            "transparency_explainability"
+            "human_agency_oversight"
           ]
         },
         "metadata": {
           "ai_system_id": "evidence_hiring_algorithm",
-          "ai_system_name": "Workday AI Screening in Enterprise Hiring",
+          "ai_system_name": "iTutorGroup Automated Hiring Screening",
           "correlation_matrix": {
             "affected_community": {
               "affected_community": 1.0,
-              "developer": 0.6,
-              "regulator": 0.3142857142857143
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429
             },
             "developer": {
-              "affected_community": 0.6,
+              "affected_community": 0.7714285714285715,
               "developer": 1.0,
-              "regulator": 0.028571428571428574
+              "regulator": 0.5428571428571429
             },
             "regulator": {
-              "affected_community": 0.3142857142857143,
-              "developer": 0.028571428571428574,
+              "affected_community": 0.5428571428571429,
+              "developer": 0.5428571428571429,
               "regulator": 1.0
             }
           },
           "correlation_matrix_contrib": {
             "affected_community": {
               "affected_community": 1.0,
-              "developer": 0.6,
-              "regulator": 0.3142857142857143
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429
             },
             "developer": {
-              "affected_community": 0.6,
+              "affected_community": 0.7714285714285715,
               "developer": 1.0,
-              "regulator": 0.028571428571428574
+              "regulator": 0.5428571428571429
             },
             "regulator": {
-              "affected_community": 0.3142857142857143,
-              "developer": 0.028571428571428574,
+              "affected_community": 0.5428571428571429,
+              "developer": 0.5428571428571429,
               "regulator": 1.0
             }
           },
@@ -2081,58 +2081,58 @@
             "affected_community|regulator": 0.2571428571428572,
             "developer|regulator": 0.08571428571428573
           },
-          "run_id": "c9e5e83a-c588-4e29-adef-f191d186c96d",
+          "run_id": "8ea17459-5710-487e-804d-1998ba89f6e6",
           "scoring_method": "topsis",
           "stakeholder_rankings": {
             "affected_community": [
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination",
-              "transparency_explainability"
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
             ],
             "developer": [
               "safety_robustness",
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "transparency_explainability",
+              "human_agency_oversight",
               "fairness_nondiscrimination"
             ],
             "regulator": [
               "accountability",
-              "privacy_data_governance",
               "transparency_explainability",
-              "human_agency_oversight",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination"
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
             ]
           },
           "stakeholder_rankings_contrib": {
             "affected_community": [
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination",
-              "transparency_explainability"
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
             ],
             "developer": [
               "safety_robustness",
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "transparency_explainability",
+              "human_agency_oversight",
               "fairness_nondiscrimination"
             ],
             "regulator": [
               "accountability",
-              "privacy_data_governance",
               "transparency_explainability",
-              "human_agency_oversight",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination"
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
             ]
           },
           "stakeholder_rankings_weights": {
@@ -2162,9 +2162,9 @@
             ]
           },
           "stakeholder_scores": {
-            "affected_community": 0.3598543672601424,
-            "developer": 0.4533505228007353,
-            "regulator": 0.3714967874555914
+            "affected_community": 0.231977938159084,
+            "developer": 0.31427739762078555,
+            "regulator": 0.3407536839563278
           }
         },
         "pareto_solutions": [],
@@ -2175,21 +2175,21 @@
         "framework_scores": [
           {
             "dimension_scores": {
-              "accountability": 0.14194904712146095,
-              "fairness_nondiscrimination": 0.02299016436947471,
-              "human_agency_oversight": 0.0631669735118011,
-              "privacy_data_governance": 0.04667860874757426,
-              "safety_robustness": 0.12541672886500474,
-              "transparency_explainability": 0.02748005506626196
+              "accountability": 0.19872866597004532,
+              "fairness_nondiscrimination": 0.011495082184737356,
+              "human_agency_oversight": 0.015791743377950276,
+              "privacy_data_governance": 0.031119072498382843,
+              "safety_robustness": 0.08361115257666983,
+              "transparency_explainability": 0.020610041299696475
             },
             "framework_id": "nist_ai_rmf",
             "risk_level": "high",
-            "score": 0.4262742072108376
+            "score": 0.4154641497439999
           }
         ],
-        "generated_at": "2026-03-02T01:19:54.871883Z",
-        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=4deb374e-781c-4c49-99b4-460082e13257",
-        "overall_score": 0.4262742072108376,
+        "generated_at": "2026-03-02T01:47:50.720403Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=3eec12ad-1213-47fb-af0a-84f566b9a0b3",
+        "overall_score": 0.4154641497439999,
         "scoring_method": "topsis"
       },
       "pareto": {
@@ -2198,31 +2198,31 @@
         "metadata": {
           "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
           "ablation_utility_by_solution": {
-            "ps_0a987310": 0.3849464368644322,
-            "ps_399b096d": 0.38890187825281575,
-            "ps_463af544": 0.38752627848987625,
-            "ps_634941b9": 0.4053475921624558,
-            "ps_8c2753d6": 0.4070960846664658,
-            "ps_b0726a3e": 0.39191659068039103,
-            "ps_b70bf9be": 0.3877341611360249,
-            "ps_bbc8a38b": 0.40477044528154565
+            "ps_04643438": 0.26968480608728723,
+            "ps_083d27ea": 0.26241824316410034,
+            "ps_2ab29b7d": 0.2641259820896041,
+            "ps_666026cc": 0.2578022041429782,
+            "ps_6f325d9d": 0.25931375178032445,
+            "ps_982ef2e0": 0.2814517013544625,
+            "ps_aa9193fb": 0.26944900877755756,
+            "ps_f30f1991": 0.2644643822492398
           },
           "ai_system_id": "evidence_hiring_algorithm",
-          "ai_system_name": "Workday AI Screening in Enterprise Hiring",
+          "ai_system_name": "iTutorGroup Automated Hiring Screening",
           "deterministic_mode": true,
           "framework_id": "nist_ai_rmf",
           "n_gen": 80,
           "n_solutions_returned": 8,
           "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
           "pop_size": 40,
-          "run_id": "2e14c386-d931-4768-98a4-cbc2b20efa54",
+          "run_id": "5147039b-8c43-4a44-94ab-68cdf203536f",
           "salience_vector": {
-            "accountability": 0.16129032258064518,
-            "fairness_nondiscrimination": 0.06451612903225806,
-            "human_agency_oversight": 0.25806451612903225,
-            "privacy_data_governance": 0.19354838709677422,
-            "safety_robustness": 0.19354838709677422,
-            "transparency_explainability": 0.12903225806451613
+            "accountability": 0.33333333333333337,
+            "fairness_nondiscrimination": 0.047619047619047616,
+            "human_agency_oversight": 0.09523809523809523,
+            "privacy_data_governance": 0.19047619047619047,
+            "safety_robustness": 0.19047619047619047,
+            "transparency_explainability": 0.14285714285714285
           },
           "seed": 42,
           "stakeholder_ids": [
@@ -2231,164 +2231,164 @@
             "affected_community"
           ],
           "x_normalized": {
-            "accountability": 0.4166666666666667,
-            "fairness_nondiscrimination": 0.16666666666666666,
-            "human_agency_oversight": 0.6666666666666666,
-            "privacy_data_governance": 0.5,
-            "safety_robustness": 0.5,
-            "transparency_explainability": 0.3333333333333333
+            "accountability": 0.5833333333333334,
+            "fairness_nondiscrimination": 0.08333333333333333,
+            "human_agency_oversight": 0.16666666666666666,
+            "privacy_data_governance": 0.3333333333333333,
+            "safety_robustness": 0.3333333333333333,
+            "transparency_explainability": 0.25
           }
         },
         "pareto_solutions": [
           {
             "objective_scores": {
-              "affected_community": 0.014517661906041444,
-              "developer": 0.055494951264028855,
-              "regulator": 0.052756009928460114
+              "affected_community": 0.004110511933323304,
+              "developer": 0.0517110224613525,
+              "regulator": 0.060088544042516276
             },
             "rank": 1,
-            "solution_id": "ps_b0726a3e",
+            "solution_id": "ps_666026cc",
             "weights": {
               "consensus": {
-                "accountability": 0.1553432824713477,
-                "fairness_nondiscrimination": 0.31274852164534944,
-                "human_agency_oversight": 0.162684473067338,
-                "privacy_data_governance": 0.15848617844236265,
-                "safety_robustness": 0.10272129991498322,
-                "transparency_explainability": 0.108016244458619
+                "accountability": 0.14974964746704147,
+                "fairness_nondiscrimination": 0.2805025910079911,
+                "human_agency_oversight": 0.19995136314034662,
+                "privacy_data_governance": 0.15418441581780704,
+                "safety_robustness": 0.10139998918609444,
+                "transparency_explainability": 0.11421199338071938
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.021187461834809344,
-              "developer": 0.05445728088657179,
-              "regulator": 0.05058901192182623
+              "affected_community": 0.008188474591061933,
+              "developer": 0.0500407380334534,
+              "regulator": 0.058490453702665715
             },
             "rank": 2,
-            "solution_id": "ps_b70bf9be",
+            "solution_id": "ps_083d27ea",
             "weights": {
               "consensus": {
-                "accountability": 0.16145836046663442,
-                "fairness_nondiscrimination": 0.31849744828697096,
-                "human_agency_oversight": 0.14662491354707555,
-                "privacy_data_governance": 0.16520377365937122,
-                "safety_robustness": 0.10571963411628034,
-                "transparency_explainability": 0.10249586992366763
+                "accountability": 0.15735448171837738,
+                "fairness_nondiscrimination": 0.2737616260404765,
+                "human_agency_oversight": 0.19514618423168742,
+                "privacy_data_governance": 0.14986912031865016,
+                "safety_robustness": 0.11240130708968522,
+                "transparency_explainability": 0.11146728060112335
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.0014416543971057221,
-              "developer": 0.06261626200374008,
-              "regulator": 0.06261305599211442
+              "affected_community": 0.005374038035363467,
+              "developer": 0.05248626884041908,
+              "regulator": 0.059237125565735835
             },
             "rank": 3,
-            "solution_id": "ps_bbc8a38b",
+            "solution_id": "ps_6f325d9d",
             "weights": {
               "consensus": {
-                "accountability": 0.14924575472905935,
-                "fairness_nondiscrimination": 0.29910320895141634,
-                "human_agency_oversight": 0.2014643902516855,
-                "privacy_data_governance": 0.15236724994178846,
-                "safety_robustness": 0.09780697283100097,
-                "transparency_explainability": 0.10001242329504949
+                "accountability": 0.15242173992660799,
+                "fairness_nondiscrimination": 0.27445511131063033,
+                "human_agency_oversight": 0.20407734678277561,
+                "privacy_data_governance": 0.15387145909711125,
+                "safety_robustness": 0.1011941719643866,
+                "transparency_explainability": 0.11398017091848821
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.0038773974350525186,
-              "developer": 0.06363718217892342,
-              "regulator": 0.059462785749573276
+              "affected_community": 0.012597021901386157,
+              "developer": 0.05591500465305305,
+              "regulator": 0.05047364900638382
             },
             "rank": 4,
-            "solution_id": "ps_634941b9",
+            "solution_id": "ps_2ab29b7d",
             "weights": {
               "consensus": {
-                "accountability": 0.16294062893098543,
-                "fairness_nondiscrimination": 0.2934149136564986,
-                "human_agency_oversight": 0.19868085452712522,
-                "privacy_data_governance": 0.15041367809385361,
-                "safety_robustness": 0.09625476501763681,
-                "transparency_explainability": 0.09829515977390028
+                "accountability": 0.16157112266010668,
+                "fairness_nondiscrimination": 0.2758253193947375,
+                "human_agency_oversight": 0.1770067497488825,
+                "privacy_data_governance": 0.15247259705303798,
+                "safety_robustness": 0.09941208592014181,
+                "transparency_explainability": 0.13371212522309342
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.03450562608697421,
-              "developer": 0.0657328464483642,
-              "regulator": 0.02850893914740463
+              "affected_community": 0.019711369709012584,
+              "developer": 0.05940109924148488,
+              "regulator": 0.04327803290392093
             },
             "rank": 5,
-            "solution_id": "ps_463af544",
+            "solution_id": "ps_04643438",
             "weights": {
               "consensus": {
-                "accountability": 0.18601101373254025,
-                "fairness_nondiscrimination": 0.2751774547768094,
-                "human_agency_oversight": 0.12816979052729208,
-                "privacy_data_governance": 0.14826787213653364,
-                "safety_robustness": 0.10272216565867899,
-                "transparency_explainability": 0.15965170316814564
+                "accountability": 0.1605214462844473,
+                "fairness_nondiscrimination": 0.24002857409858588,
+                "human_agency_oversight": 0.1758567929961866,
+                "privacy_data_governance": 0.15144650548098357,
+                "safety_robustness": 0.09859932362203311,
+                "transparency_explainability": 0.17354735751776343
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.0367961541808611,
-              "developer": 0.06348424887938059,
-              "regulator": 0.030999460002840554
+              "affected_community": 0.011172027167691879,
+              "developer": 0.054839715408665474,
+              "regulator": 0.0567518927954964
             },
             "rank": 6,
-            "solution_id": "ps_399b096d",
+            "solution_id": "ps_f30f1991",
             "weights": {
               "consensus": {
-                "accountability": 0.1839550038354149,
-                "fairness_nondiscrimination": 0.27213587374816994,
-                "human_agency_oversight": 0.12675310904941195,
-                "privacy_data_governance": 0.14662904330365203,
-                "safety_robustness": 0.1134343799448813,
-                "transparency_explainability": 0.15709259011846985
+                "accountability": 0.1644325014298486,
+                "fairness_nondiscrimination": 0.2851451363430329,
+                "human_agency_oversight": 0.17966743594582055,
+                "privacy_data_governance": 0.16305796947725643,
+                "safety_robustness": 0.10274232042611281,
+                "transparency_explainability": 0.10495463637792872
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.03922136321021283,
-              "developer": 0.07015506411384316,
-              "regulator": 0.022749291463061688
+              "affected_community": 0.023828024334483066,
+              "developer": 0.06601349175238182,
+              "regulator": 0.03856610427581568
             },
             "rank": 7,
-            "solution_id": "ps_0a987310",
+            "solution_id": "ps_982ef2e0",
             "weights": {
               "consensus": {
-                "accountability": 0.18203485624822485,
-                "fairness_nondiscrimination": 0.26796130881028757,
-                "human_agency_oversight": 0.1181149709536461,
-                "privacy_data_governance": 0.149317517696425,
-                "safety_robustness": 0.10107504226905085,
-                "transparency_explainability": 0.1814963040223656
+                "accountability": 0.20244818574043638,
+                "fairness_nondiscrimination": 0.24831165515309614,
+                "human_agency_oversight": 0.18481787636742042,
+                "privacy_data_governance": 0.15017672378372562,
+                "safety_robustness": 0.09889213618169145,
+                "transparency_explainability": 0.11535342277362995
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.006670126497651169,
-              "developer": 0.06195442042302754,
-              "regulator": 0.06485707932066863
+              "affected_community": 0.025923048063317064,
+              "developer": 0.02998684858932088,
+              "regulator": 0.07363208397557296
             },
             "rank": 8,
-            "solution_id": "ps_8c2753d6",
+            "solution_id": "ps_aa9193fb",
             "weights": {
               "consensus": {
-                "accountability": 0.1461858854922647,
-                "fairness_nondiscrimination": 0.2924343033701745,
-                "human_agency_oversight": 0.1958786452520527,
-                "privacy_data_governance": 0.1626620426331585,
-                "safety_robustness": 0.10749853548557282,
-                "transparency_explainability": 0.09534058776677694
+                "accountability": 0.14831430374390683,
+                "fairness_nondiscrimination": 0.28155596285321455,
+                "human_agency_oversight": 0.13469445711273612,
+                "privacy_data_governance": 0.14696575884168459,
+                "safety_robustness": 0.1909715143325436,
+                "transparency_explainability": 0.09749800311591436
               }
             }
           }
@@ -2398,9 +2398,9 @@
       "provenance": {
         "deployment_type": "real_deployment",
         "source_ids": [
-          "workday_product_page",
-          "eeoc_workday_lawsuit",
-          "reuters_workday_ruling"
+          "eeoc_itutorgroup_suit_2022",
+          "eeoc_itutorgroup_settlement_2023",
+          "courtlistener_itutorgroup_1_22_cv_02565"
         ]
       },
       "summary": {
@@ -2408,8 +2408,8 @@
         "conflict_pairs": 3,
         "deployment_type": "real_deployment",
         "framework_id": "nist_ai_rmf",
-        "mean_spearman_rho": 0.314286,
-        "overall_score": 0.426274,
+        "mean_spearman_rho": 0.619048,
+        "overall_score": 0.415464,
         "pareto_solutions": 8,
         "source_count": 3,
         "top_consensus_dimension": "fairness_nondiscrimination"
@@ -2419,32 +2419,32 @@
       "conflicts": {
         "conflicts": [
           {
-            "conflict_level": "high",
+            "conflict_level": "moderate",
             "conflicting_dimensions": [
               "safety_robustness",
-              "accountability"
+              "transparency_explainability"
             ],
-            "spearman_rho": 0.028571428571428574,
+            "spearman_rho": 0.5428571428571429,
             "stakeholder_a_id": "developer",
             "stakeholder_b_id": "regulator"
           },
           {
-            "conflict_level": "moderate",
+            "conflict_level": "low",
             "conflicting_dimensions": [
               "safety_robustness",
               "accountability"
             ],
-            "spearman_rho": 0.6,
+            "spearman_rho": 0.7714285714285715,
             "stakeholder_a_id": "developer",
             "stakeholder_b_id": "affected_community"
           },
           {
             "conflict_level": "moderate",
             "conflicting_dimensions": [
-              "human_agency_oversight",
-              "transparency_explainability"
+              "transparency_explainability",
+              "human_agency_oversight"
             ],
-            "spearman_rho": 0.3142857142857143,
+            "spearman_rho": 0.5428571428571429,
             "stakeholder_a_id": "regulator",
             "stakeholder_b_id": "affected_community"
           }
@@ -2454,88 +2454,88 @@
             {
               "domain_id": "opacity_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.4866666666666667,
-              "severity": "moderate",
+              "score": 0.5449999999999999,
+              "severity": "high",
               "unified_dimension": "transparency_explainability"
             },
             {
               "domain_id": "discrimination_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.6133333333333334,
+              "score": 0.6716666666666666,
               "severity": "high",
               "unified_dimension": "fairness_nondiscrimination"
             },
             {
               "domain_id": "safety_failure_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.38999999999999996,
-              "severity": "moderate",
+              "score": 0.5066666666666667,
+              "severity": "high",
               "unified_dimension": "safety_robustness"
             },
             {
               "domain_id": "privacy_intrusion_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.35,
+              "score": 0.4666666666666667,
               "severity": "moderate",
               "unified_dimension": "privacy_data_governance"
             },
             {
               "domain_id": "autonomy_oversight_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.25333333333333335,
-              "severity": "moderate",
+              "score": 0.6033333333333334,
+              "severity": "high",
               "unified_dimension": "human_agency_oversight"
             },
             {
               "domain_id": "accountability_redress_harm",
               "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement.",
-              "score": 0.4283333333333333,
+              "score": 0.31166666666666665,
               "severity": "moderate",
               "unified_dimension": "accountability"
             }
           ],
           "model_version": "harm_taxonomy_v1",
-          "overall_score": 0.41633333333333333,
-          "overall_severity": "moderate",
+          "overall_score": 0.5085000000000001,
+          "overall_severity": "high",
           "top_risk_domains": [
             "fairness_nondiscrimination",
-            "transparency_explainability"
+            "human_agency_oversight"
           ]
         },
         "metadata": {
           "ai_system_id": "evidence_hiring_algorithm",
-          "ai_system_name": "Workday AI Screening in Enterprise Hiring",
+          "ai_system_name": "iTutorGroup Automated Hiring Screening",
           "correlation_matrix": {
             "affected_community": {
               "affected_community": 1.0,
-              "developer": 0.6,
-              "regulator": 0.3142857142857143
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429
             },
             "developer": {
-              "affected_community": 0.6,
+              "affected_community": 0.7714285714285715,
               "developer": 1.0,
-              "regulator": 0.028571428571428574
+              "regulator": 0.5428571428571429
             },
             "regulator": {
-              "affected_community": 0.3142857142857143,
-              "developer": 0.028571428571428574,
+              "affected_community": 0.5428571428571429,
+              "developer": 0.5428571428571429,
               "regulator": 1.0
             }
           },
           "correlation_matrix_contrib": {
             "affected_community": {
               "affected_community": 1.0,
-              "developer": 0.6,
-              "regulator": 0.3142857142857143
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429
             },
             "developer": {
-              "affected_community": 0.6,
+              "affected_community": 0.7714285714285715,
               "developer": 1.0,
-              "regulator": 0.028571428571428574
+              "regulator": 0.5428571428571429
             },
             "regulator": {
-              "affected_community": 0.3142857142857143,
-              "developer": 0.028571428571428574,
+              "affected_community": 0.5428571428571429,
+              "developer": 0.5428571428571429,
               "regulator": 1.0
             }
           },
@@ -2562,58 +2562,58 @@
             "affected_community|regulator": 0.2571428571428572,
             "developer|regulator": 0.08571428571428573
           },
-          "run_id": "d798660f-5e58-468a-bce2-906d615fa905",
+          "run_id": "f18754b8-5848-43d5-83ce-078344ae4540",
           "scoring_method": "topsis",
           "stakeholder_rankings": {
             "affected_community": [
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination",
-              "transparency_explainability"
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
             ],
             "developer": [
               "safety_robustness",
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "transparency_explainability",
+              "human_agency_oversight",
               "fairness_nondiscrimination"
             ],
             "regulator": [
               "accountability",
-              "privacy_data_governance",
               "transparency_explainability",
-              "human_agency_oversight",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination"
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
             ]
           },
           "stakeholder_rankings_contrib": {
             "affected_community": [
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination",
-              "transparency_explainability"
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
             ],
             "developer": [
               "safety_robustness",
-              "human_agency_oversight",
-              "privacy_data_governance",
               "accountability",
+              "privacy_data_governance",
               "transparency_explainability",
+              "human_agency_oversight",
               "fairness_nondiscrimination"
             ],
             "regulator": [
               "accountability",
-              "privacy_data_governance",
               "transparency_explainability",
-              "human_agency_oversight",
+              "privacy_data_governance",
               "safety_robustness",
-              "fairness_nondiscrimination"
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
             ]
           },
           "stakeholder_rankings_weights": {
@@ -2643,9 +2643,9 @@
             ]
           },
           "stakeholder_scores": {
-            "affected_community": 0.3598543672601424,
-            "developer": 0.4533505228007353,
-            "regulator": 0.3714967874555914
+            "affected_community": 0.231977938159084,
+            "developer": 0.31427739762078555,
+            "regulator": 0.3407536839563278
           }
         },
         "pareto_solutions": [],
@@ -2656,21 +2656,21 @@
         "framework_scores": [
           {
             "dimension_scores": {
-              "accountability": 0.09377306029938857,
-              "fairness_nondiscrimination": 0.022496969217794646,
-              "human_agency_oversight": 0.12515812776723592,
-              "privacy_data_governance": 0.04645991461100569,
-              "safety_robustness": 0.0777099146110057,
-              "transparency_explainability": 0.06796199662660764
+              "accountability": 0.13128228441914402,
+              "fairness_nondiscrimination": 0.011248484608897323,
+              "human_agency_oversight": 0.03128953194180898,
+              "privacy_data_governance": 0.030973276407337127,
+              "safety_robustness": 0.05180660974067045,
+              "transparency_explainability": 0.050971497469955725
             },
             "framework_id": "sg_mgaf",
-            "risk_level": "high",
-            "score": 0.43128828481023723
+            "risk_level": "critical",
+            "score": 0.3253513051156482
           }
         ],
-        "generated_at": "2026-03-02T01:19:55.136113Z",
-        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=fe0f9f7d-3672-4a95-9bfa-6bbcf8dd6616",
-        "overall_score": 0.43128828481023723,
+        "generated_at": "2026-03-02T01:47:50.985499Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=92459b3d-0902-45ee-8fe6-3617fc2fed73",
+        "overall_score": 0.3253513051156482,
         "scoring_method": "topsis"
       },
       "pareto": {
@@ -2679,31 +2679,31 @@
         "metadata": {
           "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
           "ablation_utility_by_solution": {
-            "ps_2effc6fd": 0.3877341611360249,
-            "ps_440ac15d": 0.4053475921624558,
-            "ps_8c163c87": 0.4070960846664658,
-            "ps_a19150b7": 0.38752627848987625,
-            "ps_a5fb9fe3": 0.40477044528154565,
-            "ps_a67eea05": 0.3849464368644322,
-            "ps_ed9527d1": 0.38890187825281575,
-            "ps_f0b0d4c0": 0.39191659068039103
+            "ps_008fa1cb": 0.26944900877755756,
+            "ps_0a984a7a": 0.26241824316410034,
+            "ps_183bf86e": 0.2644643822492398,
+            "ps_2f5aeda1": 0.2641259820896041,
+            "ps_49360687": 0.25931375178032445,
+            "ps_5481875b": 0.2814517013544625,
+            "ps_a01796f4": 0.2578022041429782,
+            "ps_da9a4dd4": 0.26968480608728723
           },
           "ai_system_id": "evidence_hiring_algorithm",
-          "ai_system_name": "Workday AI Screening in Enterprise Hiring",
+          "ai_system_name": "iTutorGroup Automated Hiring Screening",
           "deterministic_mode": true,
           "framework_id": "sg_mgaf",
           "n_gen": 80,
           "n_solutions_returned": 8,
           "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
           "pop_size": 40,
-          "run_id": "e96c021d-fcbd-4b5f-a3ea-a34884a7e554",
+          "run_id": "cbda0597-b323-4f2e-a343-5fbbdc7306ce",
           "salience_vector": {
-            "accountability": 0.16129032258064518,
-            "fairness_nondiscrimination": 0.06451612903225806,
-            "human_agency_oversight": 0.25806451612903225,
-            "privacy_data_governance": 0.19354838709677422,
-            "safety_robustness": 0.19354838709677422,
-            "transparency_explainability": 0.12903225806451613
+            "accountability": 0.33333333333333337,
+            "fairness_nondiscrimination": 0.047619047619047616,
+            "human_agency_oversight": 0.09523809523809523,
+            "privacy_data_governance": 0.19047619047619047,
+            "safety_robustness": 0.19047619047619047,
+            "transparency_explainability": 0.14285714285714285
           },
           "seed": 42,
           "stakeholder_ids": [
@@ -2712,164 +2712,164 @@
             "affected_community"
           ],
           "x_normalized": {
-            "accountability": 0.4166666666666667,
-            "fairness_nondiscrimination": 0.16666666666666666,
-            "human_agency_oversight": 0.6666666666666666,
-            "privacy_data_governance": 0.5,
-            "safety_robustness": 0.5,
-            "transparency_explainability": 0.3333333333333333
+            "accountability": 0.5833333333333334,
+            "fairness_nondiscrimination": 0.08333333333333333,
+            "human_agency_oversight": 0.16666666666666666,
+            "privacy_data_governance": 0.3333333333333333,
+            "safety_robustness": 0.3333333333333333,
+            "transparency_explainability": 0.25
           }
         },
         "pareto_solutions": [
           {
             "objective_scores": {
-              "affected_community": 0.014517661906041444,
-              "developer": 0.055494951264028855,
-              "regulator": 0.052756009928460114
+              "affected_community": 0.004110511933323304,
+              "developer": 0.0517110224613525,
+              "regulator": 0.060088544042516276
             },
             "rank": 1,
-            "solution_id": "ps_f0b0d4c0",
+            "solution_id": "ps_a01796f4",
             "weights": {
               "consensus": {
-                "accountability": 0.1553432824713477,
-                "fairness_nondiscrimination": 0.31274852164534944,
-                "human_agency_oversight": 0.162684473067338,
-                "privacy_data_governance": 0.15848617844236265,
-                "safety_robustness": 0.10272129991498322,
-                "transparency_explainability": 0.108016244458619
+                "accountability": 0.14974964746704147,
+                "fairness_nondiscrimination": 0.2805025910079911,
+                "human_agency_oversight": 0.19995136314034662,
+                "privacy_data_governance": 0.15418441581780704,
+                "safety_robustness": 0.10139998918609444,
+                "transparency_explainability": 0.11421199338071938
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.021187461834809344,
-              "developer": 0.05445728088657179,
-              "regulator": 0.05058901192182623
+              "affected_community": 0.008188474591061933,
+              "developer": 0.0500407380334534,
+              "regulator": 0.058490453702665715
             },
             "rank": 2,
-            "solution_id": "ps_2effc6fd",
+            "solution_id": "ps_0a984a7a",
             "weights": {
               "consensus": {
-                "accountability": 0.16145836046663442,
-                "fairness_nondiscrimination": 0.31849744828697096,
-                "human_agency_oversight": 0.14662491354707555,
-                "privacy_data_governance": 0.16520377365937122,
-                "safety_robustness": 0.10571963411628034,
-                "transparency_explainability": 0.10249586992366763
+                "accountability": 0.15735448171837738,
+                "fairness_nondiscrimination": 0.2737616260404765,
+                "human_agency_oversight": 0.19514618423168742,
+                "privacy_data_governance": 0.14986912031865016,
+                "safety_robustness": 0.11240130708968522,
+                "transparency_explainability": 0.11146728060112335
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.0014416543971057221,
-              "developer": 0.06261626200374008,
-              "regulator": 0.06261305599211442
+              "affected_community": 0.005374038035363467,
+              "developer": 0.05248626884041908,
+              "regulator": 0.059237125565735835
             },
             "rank": 3,
-            "solution_id": "ps_a5fb9fe3",
+            "solution_id": "ps_49360687",
             "weights": {
               "consensus": {
-                "accountability": 0.14924575472905935,
-                "fairness_nondiscrimination": 0.29910320895141634,
-                "human_agency_oversight": 0.2014643902516855,
-                "privacy_data_governance": 0.15236724994178846,
-                "safety_robustness": 0.09780697283100097,
-                "transparency_explainability": 0.10001242329504949
+                "accountability": 0.15242173992660799,
+                "fairness_nondiscrimination": 0.27445511131063033,
+                "human_agency_oversight": 0.20407734678277561,
+                "privacy_data_governance": 0.15387145909711125,
+                "safety_robustness": 0.1011941719643866,
+                "transparency_explainability": 0.11398017091848821
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.0038773974350525186,
-              "developer": 0.06363718217892342,
-              "regulator": 0.059462785749573276
+              "affected_community": 0.012597021901386157,
+              "developer": 0.05591500465305305,
+              "regulator": 0.05047364900638382
             },
             "rank": 4,
-            "solution_id": "ps_440ac15d",
+            "solution_id": "ps_2f5aeda1",
             "weights": {
               "consensus": {
-                "accountability": 0.16294062893098543,
-                "fairness_nondiscrimination": 0.2934149136564986,
-                "human_agency_oversight": 0.19868085452712522,
-                "privacy_data_governance": 0.15041367809385361,
-                "safety_robustness": 0.09625476501763681,
-                "transparency_explainability": 0.09829515977390028
+                "accountability": 0.16157112266010668,
+                "fairness_nondiscrimination": 0.2758253193947375,
+                "human_agency_oversight": 0.1770067497488825,
+                "privacy_data_governance": 0.15247259705303798,
+                "safety_robustness": 0.09941208592014181,
+                "transparency_explainability": 0.13371212522309342
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.03450562608697421,
-              "developer": 0.0657328464483642,
-              "regulator": 0.02850893914740463
+              "affected_community": 0.019711369709012584,
+              "developer": 0.05940109924148488,
+              "regulator": 0.04327803290392093
             },
             "rank": 5,
-            "solution_id": "ps_a19150b7",
+            "solution_id": "ps_da9a4dd4",
             "weights": {
               "consensus": {
-                "accountability": 0.18601101373254025,
-                "fairness_nondiscrimination": 0.2751774547768094,
-                "human_agency_oversight": 0.12816979052729208,
-                "privacy_data_governance": 0.14826787213653364,
-                "safety_robustness": 0.10272216565867899,
-                "transparency_explainability": 0.15965170316814564
+                "accountability": 0.1605214462844473,
+                "fairness_nondiscrimination": 0.24002857409858588,
+                "human_agency_oversight": 0.1758567929961866,
+                "privacy_data_governance": 0.15144650548098357,
+                "safety_robustness": 0.09859932362203311,
+                "transparency_explainability": 0.17354735751776343
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.0367961541808611,
-              "developer": 0.06348424887938059,
-              "regulator": 0.030999460002840554
+              "affected_community": 0.011172027167691879,
+              "developer": 0.054839715408665474,
+              "regulator": 0.0567518927954964
             },
             "rank": 6,
-            "solution_id": "ps_ed9527d1",
+            "solution_id": "ps_183bf86e",
             "weights": {
               "consensus": {
-                "accountability": 0.1839550038354149,
-                "fairness_nondiscrimination": 0.27213587374816994,
-                "human_agency_oversight": 0.12675310904941195,
-                "privacy_data_governance": 0.14662904330365203,
-                "safety_robustness": 0.1134343799448813,
-                "transparency_explainability": 0.15709259011846985
+                "accountability": 0.1644325014298486,
+                "fairness_nondiscrimination": 0.2851451363430329,
+                "human_agency_oversight": 0.17966743594582055,
+                "privacy_data_governance": 0.16305796947725643,
+                "safety_robustness": 0.10274232042611281,
+                "transparency_explainability": 0.10495463637792872
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.03922136321021283,
-              "developer": 0.07015506411384316,
-              "regulator": 0.022749291463061688
+              "affected_community": 0.023828024334483066,
+              "developer": 0.06601349175238182,
+              "regulator": 0.03856610427581568
             },
             "rank": 7,
-            "solution_id": "ps_a67eea05",
+            "solution_id": "ps_5481875b",
             "weights": {
               "consensus": {
-                "accountability": 0.18203485624822485,
-                "fairness_nondiscrimination": 0.26796130881028757,
-                "human_agency_oversight": 0.1181149709536461,
-                "privacy_data_governance": 0.149317517696425,
-                "safety_robustness": 0.10107504226905085,
-                "transparency_explainability": 0.1814963040223656
+                "accountability": 0.20244818574043638,
+                "fairness_nondiscrimination": 0.24831165515309614,
+                "human_agency_oversight": 0.18481787636742042,
+                "privacy_data_governance": 0.15017672378372562,
+                "safety_robustness": 0.09889213618169145,
+                "transparency_explainability": 0.11535342277362995
               }
             }
           },
           {
             "objective_scores": {
-              "affected_community": 0.006670126497651169,
-              "developer": 0.06195442042302754,
-              "regulator": 0.06485707932066863
+              "affected_community": 0.025923048063317064,
+              "developer": 0.02998684858932088,
+              "regulator": 0.07363208397557296
             },
             "rank": 8,
-            "solution_id": "ps_8c163c87",
+            "solution_id": "ps_008fa1cb",
             "weights": {
               "consensus": {
-                "accountability": 0.1461858854922647,
-                "fairness_nondiscrimination": 0.2924343033701745,
-                "human_agency_oversight": 0.1958786452520527,
-                "privacy_data_governance": 0.1626620426331585,
-                "safety_robustness": 0.10749853548557282,
-                "transparency_explainability": 0.09534058776677694
+                "accountability": 0.14831430374390683,
+                "fairness_nondiscrimination": 0.28155596285321455,
+                "human_agency_oversight": 0.13469445711273612,
+                "privacy_data_governance": 0.14696575884168459,
+                "safety_robustness": 0.1909715143325436,
+                "transparency_explainability": 0.09749800311591436
               }
             }
           }
@@ -2879,9 +2879,9 @@
       "provenance": {
         "deployment_type": "real_deployment",
         "source_ids": [
-          "workday_product_page",
-          "eeoc_workday_lawsuit",
-          "reuters_workday_ruling"
+          "eeoc_itutorgroup_suit_2022",
+          "eeoc_itutorgroup_settlement_2023",
+          "courtlistener_itutorgroup_1_22_cv_02565"
         ]
       },
       "summary": {
@@ -2889,8 +2889,8 @@
         "conflict_pairs": 3,
         "deployment_type": "real_deployment",
         "framework_id": "sg_mgaf",
-        "mean_spearman_rho": 0.314286,
-        "overall_score": 0.431288,
+        "mean_spearman_rho": 0.619048,
+        "overall_score": 0.325351,
         "pareto_solutions": 8,
         "source_count": 3,
         "top_consensus_dimension": "fairness_nondiscrimination"
@@ -2985,7 +2985,7 @@
         },
         "metadata": {
           "ai_system_id": "evidence_healthcare_diagnostic",
-          "ai_system_name": "Royal Free NHS\u2013DeepMind Streams Deployment",
+          "ai_system_name": "Royal Free NHS-DeepMind Streams Deployment",
           "correlation_matrix": {
             "affected_community": {
               "affected_community": 1.0,
@@ -3043,7 +3043,7 @@
             "affected_community|regulator": 0.2571428571428572,
             "developer|regulator": 0.08571428571428573
           },
-          "run_id": "08ba293e-0ad5-4576-83aa-567de48513ed",
+          "run_id": "d476de84-934b-40dc-b550-0c97aaa32ff2",
           "scoring_method": "topsis",
           "stakeholder_rankings": {
             "affected_community": [
@@ -3149,8 +3149,8 @@
             "score": 0.5841125234483067
           }
         ],
-        "generated_at": "2026-03-02T01:19:55.399006Z",
-        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=066fac4e-36ea-4941-ad61-b2ea69cdd510",
+        "generated_at": "2026-03-02T01:47:51.248827Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=7c80bbb6-9583-4fcd-9d7e-2ee1f9e65e6f",
         "overall_score": 0.5841125234483067,
         "scoring_method": "topsis"
       },
@@ -3160,24 +3160,24 @@
         "metadata": {
           "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
           "ablation_utility_by_solution": {
-            "ps_4efd2069": 0.5684993828031355,
-            "ps_74d64cbd": 0.5670530347143331,
-            "ps_80fef5a2": 0.5639074230524862,
-            "ps_82cf8d4e": 0.5676357200949271,
-            "ps_8ba95407": 0.5667246694859721,
-            "ps_9bf471f3": 0.568708517307972,
-            "ps_c9a4c25e": 0.5621317462126298,
-            "ps_f3f8f478": 0.565379280987416
+            "ps_4a2b406a": 0.5670530347143331,
+            "ps_5bc85cd3": 0.5676357200949271,
+            "ps_7a21741f": 0.5667246694859721,
+            "ps_8b5f182c": 0.565379280987416,
+            "ps_a16704fd": 0.5684993828031355,
+            "ps_b8af2ae7": 0.568708517307972,
+            "ps_d017939e": 0.5639074230524862,
+            "ps_fbe31d42": 0.5621317462126298
           },
           "ai_system_id": "evidence_healthcare_diagnostic",
-          "ai_system_name": "Royal Free NHS\u2013DeepMind Streams Deployment",
+          "ai_system_name": "Royal Free NHS-DeepMind Streams Deployment",
           "deterministic_mode": true,
           "framework_id": "eu_altai",
           "n_gen": 80,
           "n_solutions_returned": 8,
           "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
           "pop_size": 40,
-          "run_id": "e587795c-b485-4a5f-92c2-eb30ec12b576",
+          "run_id": "94a1472d-3932-4f18-9391-cb4dda2f6b7f",
           "salience_vector": {
             "accountability": 0.16666666666666669,
             "fairness_nondiscrimination": 0.14285714285714285,
@@ -3209,7 +3209,7 @@
               "regulator": 0.05786251853703662
             },
             "rank": 1,
-            "solution_id": "ps_9bf471f3",
+            "solution_id": "ps_b8af2ae7",
             "weights": {
               "consensus": {
                 "accountability": 0.17240789954796323,
@@ -3228,7 +3228,7 @@
               "regulator": 0.060918170131966945
             },
             "rank": 2,
-            "solution_id": "ps_80fef5a2",
+            "solution_id": "ps_d017939e",
             "weights": {
               "consensus": {
                 "accountability": 0.15149715415163081,
@@ -3247,7 +3247,7 @@
               "regulator": 0.0643960911340887
             },
             "rank": 3,
-            "solution_id": "ps_74d64cbd",
+            "solution_id": "ps_4a2b406a",
             "weights": {
               "consensus": {
                 "accountability": 0.14685960332822007,
@@ -3266,7 +3266,7 @@
               "regulator": 0.06363685651856466
             },
             "rank": 4,
-            "solution_id": "ps_82cf8d4e",
+            "solution_id": "ps_5bc85cd3",
             "weights": {
               "consensus": {
                 "accountability": 0.14827416208631553,
@@ -3285,7 +3285,7 @@
               "regulator": 0.04894432412734825
             },
             "rank": 5,
-            "solution_id": "ps_f3f8f478",
+            "solution_id": "ps_8b5f182c",
             "weights": {
               "consensus": {
                 "accountability": 0.16405396231259742,
@@ -3304,7 +3304,7 @@
               "regulator": 0.032276110741639226
             },
             "rank": 6,
-            "solution_id": "ps_8ba95407",
+            "solution_id": "ps_7a21741f",
             "weights": {
               "consensus": {
                 "accountability": 0.18437810914807262,
@@ -3323,7 +3323,7 @@
               "regulator": 0.02718643066811706
             },
             "rank": 7,
-            "solution_id": "ps_c9a4c25e",
+            "solution_id": "ps_fbe31d42",
             "weights": {
               "consensus": {
                 "accountability": 0.198603874536953,
@@ -3342,7 +3342,7 @@
               "regulator": 0.03634386806719957
             },
             "rank": 8,
-            "solution_id": "ps_4efd2069",
+            "solution_id": "ps_a16704fd",
             "weights": {
               "consensus": {
                 "accountability": 0.2185338898387865,
@@ -3360,9 +3360,9 @@
       "provenance": {
         "deployment_type": "real_deployment",
         "source_ids": [
-          "ico_royal_free_enforcement",
-          "royal_free_statement",
-          "deepmind_streams_rollout"
+          "royal_free_partnership_2016",
+          "royal_free_dpa_statement_2017",
+          "deepmind_legal_audit_streams_2017"
         ]
       },
       "summary": {
@@ -3466,7 +3466,7 @@
         },
         "metadata": {
           "ai_system_id": "evidence_healthcare_diagnostic",
-          "ai_system_name": "Royal Free NHS\u2013DeepMind Streams Deployment",
+          "ai_system_name": "Royal Free NHS-DeepMind Streams Deployment",
           "correlation_matrix": {
             "affected_community": {
               "affected_community": 1.0,
@@ -3524,7 +3524,7 @@
             "affected_community|regulator": 0.2571428571428572,
             "developer|regulator": 0.08571428571428573
           },
-          "run_id": "746fbc9c-13dd-45e3-989a-f91415314457",
+          "run_id": "c3add6b1-db7b-430b-8f4f-44459ace649d",
           "scoring_method": "topsis",
           "stakeholder_rankings": {
             "affected_community": [
@@ -3630,8 +3630,8 @@
             "score": 0.6258174652418557
           }
         ],
-        "generated_at": "2026-03-02T01:19:55.662194Z",
-        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=4d8ea753-f4d9-4ebd-a7f0-98a8f9855273",
+        "generated_at": "2026-03-02T01:47:51.524430Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=2e724961-f57b-48ec-b0cb-2c2194444a03",
         "overall_score": 0.6258174652418557,
         "scoring_method": "topsis"
       },
@@ -3641,24 +3641,24 @@
         "metadata": {
           "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
           "ablation_utility_by_solution": {
-            "ps_17a93ba4": 0.5667246694859721,
-            "ps_23898150": 0.568708517307972,
-            "ps_248476f8": 0.5684993828031355,
-            "ps_55a28194": 0.5676357200949271,
-            "ps_578fa775": 0.5639074230524862,
-            "ps_6dbb4c65": 0.5670530347143331,
-            "ps_df25231a": 0.565379280987416,
-            "ps_e6861b0c": 0.5621317462126298
+            "ps_32bc8a3c": 0.5670530347143331,
+            "ps_648f2478": 0.5639074230524862,
+            "ps_6b937912": 0.568708517307972,
+            "ps_9b07bd91": 0.5676357200949271,
+            "ps_a8e55e59": 0.565379280987416,
+            "ps_b53fc46a": 0.5684993828031355,
+            "ps_f29f92de": 0.5667246694859721,
+            "ps_fd60a027": 0.5621317462126298
           },
           "ai_system_id": "evidence_healthcare_diagnostic",
-          "ai_system_name": "Royal Free NHS\u2013DeepMind Streams Deployment",
+          "ai_system_name": "Royal Free NHS-DeepMind Streams Deployment",
           "deterministic_mode": true,
           "framework_id": "nist_ai_rmf",
           "n_gen": 80,
           "n_solutions_returned": 8,
           "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
           "pop_size": 40,
-          "run_id": "c3ece894-277b-4f09-bc74-5eba157ab7bd",
+          "run_id": "5aa04184-c8a4-4aa9-b08b-52754b6a073c",
           "salience_vector": {
             "accountability": 0.16666666666666669,
             "fairness_nondiscrimination": 0.14285714285714285,
@@ -3690,7 +3690,7 @@
               "regulator": 0.05786251853703662
             },
             "rank": 1,
-            "solution_id": "ps_23898150",
+            "solution_id": "ps_6b937912",
             "weights": {
               "consensus": {
                 "accountability": 0.17240789954796323,
@@ -3709,7 +3709,7 @@
               "regulator": 0.060918170131966945
             },
             "rank": 2,
-            "solution_id": "ps_578fa775",
+            "solution_id": "ps_648f2478",
             "weights": {
               "consensus": {
                 "accountability": 0.15149715415163081,
@@ -3728,7 +3728,7 @@
               "regulator": 0.0643960911340887
             },
             "rank": 3,
-            "solution_id": "ps_6dbb4c65",
+            "solution_id": "ps_32bc8a3c",
             "weights": {
               "consensus": {
                 "accountability": 0.14685960332822007,
@@ -3747,7 +3747,7 @@
               "regulator": 0.06363685651856466
             },
             "rank": 4,
-            "solution_id": "ps_55a28194",
+            "solution_id": "ps_9b07bd91",
             "weights": {
               "consensus": {
                 "accountability": 0.14827416208631553,
@@ -3766,7 +3766,7 @@
               "regulator": 0.04894432412734825
             },
             "rank": 5,
-            "solution_id": "ps_df25231a",
+            "solution_id": "ps_a8e55e59",
             "weights": {
               "consensus": {
                 "accountability": 0.16405396231259742,
@@ -3785,7 +3785,7 @@
               "regulator": 0.032276110741639226
             },
             "rank": 6,
-            "solution_id": "ps_17a93ba4",
+            "solution_id": "ps_f29f92de",
             "weights": {
               "consensus": {
                 "accountability": 0.18437810914807262,
@@ -3804,7 +3804,7 @@
               "regulator": 0.02718643066811706
             },
             "rank": 7,
-            "solution_id": "ps_e6861b0c",
+            "solution_id": "ps_fd60a027",
             "weights": {
               "consensus": {
                 "accountability": 0.198603874536953,
@@ -3823,7 +3823,7 @@
               "regulator": 0.03634386806719957
             },
             "rank": 8,
-            "solution_id": "ps_248476f8",
+            "solution_id": "ps_b53fc46a",
             "weights": {
               "consensus": {
                 "accountability": 0.2185338898387865,
@@ -3841,9 +3841,9 @@
       "provenance": {
         "deployment_type": "real_deployment",
         "source_ids": [
-          "ico_royal_free_enforcement",
-          "royal_free_statement",
-          "deepmind_streams_rollout"
+          "royal_free_partnership_2016",
+          "royal_free_dpa_statement_2017",
+          "deepmind_legal_audit_streams_2017"
         ]
       },
       "summary": {
@@ -3947,7 +3947,7 @@
         },
         "metadata": {
           "ai_system_id": "evidence_healthcare_diagnostic",
-          "ai_system_name": "Royal Free NHS\u2013DeepMind Streams Deployment",
+          "ai_system_name": "Royal Free NHS-DeepMind Streams Deployment",
           "correlation_matrix": {
             "affected_community": {
               "affected_community": 1.0,
@@ -4005,7 +4005,7 @@
             "affected_community|regulator": 0.2571428571428572,
             "developer|regulator": 0.08571428571428573
           },
-          "run_id": "0cac92d7-b184-4a79-874d-5c13f631c734",
+          "run_id": "cfe17bc8-d52d-4234-9ea9-aacfd784b0f3",
           "scoring_method": "topsis",
           "stakeholder_rankings": {
             "affected_community": [
@@ -4111,8 +4111,8 @@
             "score": 0.590990663901431
           }
         ],
-        "generated_at": "2026-03-02T01:19:55.924436Z",
-        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=b811cd3f-5b91-42be-807b-c5de12f211b1",
+        "generated_at": "2026-03-02T01:47:51.800320Z",
+        "notes": "Evaluation computed from supplied ai_system.context.dimension_scores. framework_weighting=section_based_product_pooling. run_id=502eadad-5b46-465b-8cd3-453f898e096a",
         "overall_score": 0.590990663901431,
         "scoring_method": "topsis"
       },
@@ -4122,24 +4122,24 @@
         "metadata": {
           "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
           "ablation_utility_by_solution": {
-            "ps_018394b1": 0.5670530347143331,
-            "ps_0717ac39": 0.565379280987416,
-            "ps_075a1fe2": 0.5621317462126298,
-            "ps_22ffd676": 0.5684993828031355,
-            "ps_2f316059": 0.5667246694859721,
-            "ps_529b9860": 0.5639074230524862,
-            "ps_60ca1aca": 0.568708517307972,
-            "ps_b1e6ed3f": 0.5676357200949271
+            "ps_18f061fb": 0.5670530347143331,
+            "ps_54484aaa": 0.5684993828031355,
+            "ps_602cf381": 0.565379280987416,
+            "ps_69cc5549": 0.5676357200949271,
+            "ps_9b3f8342": 0.568708517307972,
+            "ps_b4ef7a3b": 0.5667246694859721,
+            "ps_c32a1262": 0.5621317462126298,
+            "ps_cbc0b176": 0.5639074230524862
           },
           "ai_system_id": "evidence_healthcare_diagnostic",
-          "ai_system_name": "Royal Free NHS\u2013DeepMind Streams Deployment",
+          "ai_system_name": "Royal Free NHS-DeepMind Streams Deployment",
           "deterministic_mode": true,
           "framework_id": "sg_mgaf",
           "n_gen": 80,
           "n_solutions_returned": 8,
           "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
           "pop_size": 40,
-          "run_id": "2f04ab69-3e6f-4b6e-a497-c5b7f4632f7f",
+          "run_id": "93184597-5d28-48b9-8a9b-aa75d71299af",
           "salience_vector": {
             "accountability": 0.16666666666666669,
             "fairness_nondiscrimination": 0.14285714285714285,
@@ -4171,7 +4171,7 @@
               "regulator": 0.05786251853703662
             },
             "rank": 1,
-            "solution_id": "ps_60ca1aca",
+            "solution_id": "ps_9b3f8342",
             "weights": {
               "consensus": {
                 "accountability": 0.17240789954796323,
@@ -4190,7 +4190,7 @@
               "regulator": 0.060918170131966945
             },
             "rank": 2,
-            "solution_id": "ps_529b9860",
+            "solution_id": "ps_cbc0b176",
             "weights": {
               "consensus": {
                 "accountability": 0.15149715415163081,
@@ -4209,7 +4209,7 @@
               "regulator": 0.0643960911340887
             },
             "rank": 3,
-            "solution_id": "ps_018394b1",
+            "solution_id": "ps_18f061fb",
             "weights": {
               "consensus": {
                 "accountability": 0.14685960332822007,
@@ -4228,7 +4228,7 @@
               "regulator": 0.06363685651856466
             },
             "rank": 4,
-            "solution_id": "ps_b1e6ed3f",
+            "solution_id": "ps_69cc5549",
             "weights": {
               "consensus": {
                 "accountability": 0.14827416208631553,
@@ -4247,7 +4247,7 @@
               "regulator": 0.04894432412734825
             },
             "rank": 5,
-            "solution_id": "ps_0717ac39",
+            "solution_id": "ps_602cf381",
             "weights": {
               "consensus": {
                 "accountability": 0.16405396231259742,
@@ -4266,7 +4266,7 @@
               "regulator": 0.032276110741639226
             },
             "rank": 6,
-            "solution_id": "ps_2f316059",
+            "solution_id": "ps_b4ef7a3b",
             "weights": {
               "consensus": {
                 "accountability": 0.18437810914807262,
@@ -4285,7 +4285,7 @@
               "regulator": 0.02718643066811706
             },
             "rank": 7,
-            "solution_id": "ps_075a1fe2",
+            "solution_id": "ps_c32a1262",
             "weights": {
               "consensus": {
                 "accountability": 0.198603874536953,
@@ -4304,7 +4304,7 @@
               "regulator": 0.03634386806719957
             },
             "rank": 8,
-            "solution_id": "ps_22ffd676",
+            "solution_id": "ps_54484aaa",
             "weights": {
               "consensus": {
                 "accountability": 0.2185338898387865,
@@ -4322,9 +4322,9 @@
       "provenance": {
         "deployment_type": "real_deployment",
         "source_ids": [
-          "ico_royal_free_enforcement",
-          "royal_free_statement",
-          "deepmind_streams_rollout"
+          "royal_free_partnership_2016",
+          "royal_free_dpa_statement_2017",
+          "deepmind_legal_audit_streams_2017"
         ]
       },
       "summary": {

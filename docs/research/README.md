@@ -10,6 +10,7 @@ Generated files:
 
 - `statistical_results.json`
 - `statistical_summary.md`
+- `links.md` (RQ-05 source link log with quoted factual claims)
 
 The pipeline covers:
 

@@ -1,6 +1,6 @@
 {
   "id": "healthcare_diagnostic",
-  "name": "Royal Free NHS–DeepMind Streams Deployment",
+  "name": "Royal Free NHS-DeepMind Streams Deployment",
   "description": "Clinical deployment of the Streams application within Royal Free London NHS workflows for acute kidney injury alerting and response.",
   "dimension_scores": {
     "transparency_explainability": 4.0,
@@ -27,95 +27,118 @@
     ]
   },
   "evidence_manifest": {
-    "manifest_version": "1.0",
+    "manifest_version": "2.0",
     "deployment_type": "real_deployment",
     "deployment_name": "Streams deployment at Royal Free London NHS Foundation Trust",
     "sources": [
       {
-        "source_id": "ico_royal_free_enforcement",
-        "title": "Royal Free NHS Foundation Trust enforcement action",
-        "authors": "Information Commissioner's Office",
-        "publisher": "Information Commissioner's Office",
-        "publication_date": "2017-07-03",
-        "url": "https://ico.org.uk/action-weve-taken/enforcement/royal-free-nhs-foundation-trust/",
-        "accessed_date": "2026-03-02",
-        "document_type": "regulatory enforcement action",
-        "license_status": "All rights reserved; metadata only",
-        "quote_allowed": false
-      },
-      {
-        "source_id": "royal_free_statement",
-        "title": "Statement on agreement between Royal Free London and DeepMind",
-        "authors": "Royal Free London NHS Foundation Trust",
+        "source_id": "royal_free_partnership_2016",
+        "title": "NHS and technology leaders agree groundbreaking partnership to improve safety and save lives",
         "publisher": "Royal Free London NHS Foundation Trust",
-        "publication_date": "2016-11-16",
-        "url": "https://www.royalfree.nhs.uk/news/media-statements/statement-on-agreement-between-royal-free-london-and-deepmind",
-        "accessed_date": "2026-03-02",
-        "document_type": "hospital statement",
-        "license_status": "All rights reserved; metadata only",
-        "quote_allowed": false
+        "published_at": "2016-11-16",
+        "retrieved_at": "2026-03-02",
+        "primary_url": "https://www.royalfree.nhs.uk/news/nhs-and-technology-leaders-agree-groundbreaking-partnership-improve-safety-and-save-lives",
+        "archived_url": null,
+        "doi_or_stable_id": "RFL-NEWS-2016-11-16-DEEPMIND-PARTNERSHIP",
+        "license": "All rights reserved; metadata only",
+        "quote_allowed": false,
+        "excerpt": null,
+        "sha256": null
       },
       {
-        "source_id": "deepmind_streams_rollout",
-        "title": "Streams app rolling out across the UK",
-        "authors": "DeepMind",
-        "publisher": "DeepMind",
-        "publication_date": "2017-02-22",
-        "url": "https://deepmind.google/discover/blog/streams-app-rolling-out-across-the-uk/",
-        "accessed_date": "2026-03-02",
-        "document_type": "deployment update",
-        "license_status": "All rights reserved; metadata only",
-        "quote_allowed": false
+        "source_id": "royal_free_dpa_statement_2017",
+        "title": "Statement re DeepMind data processing agreement during testing phase of Streams app",
+        "publisher": "Royal Free London NHS Foundation Trust",
+        "published_at": "2017-11-16",
+        "retrieved_at": "2026-03-02",
+        "primary_url": "https://www.royalfree.nhs.uk/news/statement-re-deepmind-data-processing-agreement-during-testing-phase-streams-app",
+        "archived_url": null,
+        "doi_or_stable_id": "RFL-NEWS-2017-11-16-STREAMS-DPA-STATEMENT",
+        "license": "All rights reserved; metadata only",
+        "quote_allowed": false,
+        "excerpt": null,
+        "sha256": null
+      },
+      {
+        "source_id": "deepmind_legal_audit_streams_2017",
+        "title": "Royal Free London publishes findings of legal audit in use of Streams",
+        "publisher": "Google DeepMind",
+        "published_at": "2017-11-16",
+        "retrieved_at": "2026-03-02",
+        "primary_url": "https://deepmind.google/discover/blog/royal-free-london-publishes-findings-of-legal-audit-in-use-of-streams/",
+        "archived_url": null,
+        "doi_or_stable_id": "DEEPMIND-BLOG-2017-11-16-LEGAL-AUDIT-STREAMS",
+        "license": "All rights reserved; metadata only",
+        "quote_allowed": false,
+        "excerpt": null,
+        "sha256": null
       }
     ],
     "dimension_rationale": {
       "transparency_explainability": [
         {
-          "source_id": "royal_free_statement",
-          "claim": "Public statements disclose deployment purpose and operating context, but technical detail remains limited.",
+          "source_ids": [
+            "royal_free_partnership_2016",
+            "royal_free_dpa_statement_2017"
+          ],
+          "claim": "Public statements disclosed deployment purpose and agreement boundaries, while technical internals remained limited in public disclosures.",
           "scoring_impact": "supports mid transparency score"
         }
       ],
       "fairness_nondiscrimination": [
         {
-          "source_id": "deepmind_streams_rollout",
-          "claim": "Deployment is clinically targeted and not explicitly framed around demographic fairness outcomes.",
+          "source_ids": [
+            "royal_free_partnership_2016"
+          ],
+          "claim": "The deployment targeted acute kidney injury workflows and did not claim explicit demographic fairness optimization.",
           "scoring_impact": "maintains neutral-mid fairness score"
         }
       ],
       "safety_robustness": [
         {
-          "source_id": "deepmind_streams_rollout",
-          "claim": "Deployment objective focuses on timely clinical alerts and operational reliability in care workflows.",
+          "source_ids": [
+            "royal_free_partnership_2016",
+            "deepmind_legal_audit_streams_2017"
+          ],
+          "claim": "The deployment aimed to improve timely clinical response and was embedded in routine care settings with documented operational collaboration.",
           "scoring_impact": "supports high safety score"
         }
       ],
       "privacy_data_governance": [
         {
-          "source_id": "ico_royal_free_enforcement",
-          "claim": "Regulatory enforcement identified significant data-governance shortcomings in the deployment period.",
-          "scoring_impact": "reduces privacy score"
+          "source_ids": [
+            "royal_free_dpa_statement_2017",
+            "deepmind_legal_audit_streams_2017"
+          ],
+          "claim": "Public updates emphasized stricter contractual constraints and regulator-visible governance expectations for patient data handling.",
+          "scoring_impact": "keeps privacy score below high range"
         }
       ],
       "human_agency_oversight": [
         {
-          "source_id": "royal_free_statement",
-          "claim": "Clinical staff remained responsible for diagnosis and treatment decisions.",
+          "source_ids": [
+            "royal_free_partnership_2016",
+            "royal_free_dpa_statement_2017"
+          ],
+          "claim": "Clinical teams retained responsibility for diagnosis and treatment while Streams operated as workflow support.",
           "scoring_impact": "supports high oversight score"
         }
       ],
       "accountability": [
         {
-          "source_id": "ico_royal_free_enforcement",
-          "claim": "Formal regulatory action and remediation obligations establish explicit accountability pathways.",
+          "source_ids": [
+            "deepmind_legal_audit_streams_2017",
+            "royal_free_dpa_statement_2017"
+          ],
+          "claim": "Legal-audit publication and clarified governance agreements created explicit accountability and external scrutiny pathways.",
           "scoring_impact": "supports mid-high accountability score"
         }
       ]
     }
   },
   "assumptions": [
-    "Scores convert documented deployment and regulatory evidence into MEDF's Likert representation.",
+    "Scores convert documented deployment and governance evidence into MEDF's Likert representation.",
     "Evidence is interpreted for governance evaluation rather than clinical efficacy benchmarking.",
-    "The case is treated as a real hospital deployment with public, reproducible source provenance."
+    "The case is treated as a real hospital deployment with durable source provenance metadata."
   ]
 }

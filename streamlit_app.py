@@ -3455,15 +3455,23 @@ def main() -> None:
                             source_id = str(source.get("source_id", "")).strip()
                             title = str(source.get("title", "")).strip()
                             publisher = str(source.get("publisher", "")).strip()
-                            publication_date = str(source.get("publication_date", "")).strip()
-                            url = str(source.get("url", "")).strip()
+                            published_at = str(
+                                source.get("published_at", source.get("publication_date", ""))
+                            ).strip()
+                            primary_url = str(
+                                source.get("primary_url", source.get("url", ""))
+                            ).strip()
+                            archived_url = str(source.get("archived_url", "") or "").strip()
+                            stable_id = str(source.get("doi_or_stable_id", "") or "").strip()
                             source_rows.append(
                                 {
                                     "source_id": source_id,
                                     "title": title,
                                     "publisher": publisher,
-                                    "publication_date": publication_date,
-                                    "url": url,
+                                    "published_at": published_at,
+                                    "primary_url": primary_url,
+                                    "archived_url": archived_url,
+                                    "doi_or_stable_id": stable_id,
                                 }
                             )
                         st.dataframe(source_rows, width="stretch", hide_index=True)
@@ -3481,10 +3489,21 @@ def main() -> None:
                                 for entry in entries:
                                     if not isinstance(entry, dict):
                                         continue
+                                    raw_source_ids = entry.get("source_ids")
+                                    source_ids: list[str] = []
+                                    if isinstance(raw_source_ids, list):
+                                        source_ids = [
+                                            str(item).strip()
+                                            for item in raw_source_ids
+                                            if str(item).strip()
+                                        ]
+                                    legacy_source_id = str(entry.get("source_id", "")).strip()
+                                    if legacy_source_id and not source_ids:
+                                        source_ids = [legacy_source_id]
                                     rationale_rows.append(
                                         {
                                             "dimension": DIMENSION_DISPLAY_NAMES.get(dimension, dimension),
-                                            "source_id": str(entry.get("source_id", "")).strip(),
+                                            "source_ids": ", ".join(source_ids),
                                             "claim": str(entry.get("claim", "")).strip(),
                                             "scoring_impact": str(entry.get("scoring_impact", "")).strip(),
                                         }

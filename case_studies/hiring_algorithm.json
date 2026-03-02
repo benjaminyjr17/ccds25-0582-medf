@@ -1,121 +1,143 @@
 {
   "id": "hiring_algorithm",
-  "name": "Workday AI Screening in Enterprise Hiring",
-  "description": "Production use of AI-assisted candidate screening workflows in enterprise hiring pipelines using Workday recruiting tooling.",
+  "name": "iTutorGroup Automated Hiring Screening",
+  "description": "Production use of automated hiring-screening software in iTutorGroup recruiting workflows, including EEOC age-discrimination enforcement and settlement.",
   "dimension_scores": {
-    "transparency_explainability": 3.0,
-    "fairness_nondiscrimination": 2.0,
-    "safety_robustness": 4.0,
-    "privacy_data_governance": 4.0,
-    "human_agency_oversight": 5.0,
-    "accountability": 3.5
+    "transparency_explainability": 2.5,
+    "fairness_nondiscrimination": 1.5,
+    "safety_robustness": 3.0,
+    "privacy_data_governance": 3.0,
+    "human_agency_oversight": 2.0,
+    "accountability": 4.5
   },
   "deployment_context": {
     "domain": "human resources",
-    "deployment_setting": "production candidate screening and ranking support",
-    "region": "United States enterprise hiring market",
+    "deployment_setting": "production applicant screening and auto-rejection workflows",
+    "region": "United States",
     "stakeholders_impacted": [
       "job applicants",
-      "hr recruiters",
+      "recruiters",
       "enterprise compliance teams",
       "civil-rights regulators"
     ],
     "known_risks": [
-      "disparate-impact discrimination",
-      "limited explanation transparency to applicants",
-      "automation bias in recruiter workflows"
+      "automated disparate-impact discrimination",
+      "opaque rejection logic for applicants",
+      "weak human override in screening pipelines"
     ]
   },
   "evidence_manifest": {
-    "manifest_version": "1.0",
+    "manifest_version": "2.0",
     "deployment_type": "real_deployment",
-    "deployment_name": "Workday Recruiting AI-assisted screening",
+    "deployment_name": "iTutorGroup AI-assisted applicant screening",
     "sources": [
       {
-        "source_id": "workday_product_page",
-        "title": "Workday Recruiting",
-        "authors": "Workday",
-        "publisher": "Workday",
-        "publication_date": "2024-01-01",
-        "url": "https://www.workday.com/en-us/products/talent-management/recruiting.html",
-        "accessed_date": "2026-03-02",
-        "document_type": "product documentation",
-        "license_status": "All rights reserved; metadata only",
-        "quote_allowed": false
+        "source_id": "eeoc_itutorgroup_suit_2022",
+        "title": "EEOC Sues iTutorGroup, Inc. for Age Discrimination",
+        "publisher": "U.S. Equal Employment Opportunity Commission",
+        "published_at": "2022-05-05",
+        "retrieved_at": "2026-03-02",
+        "primary_url": "https://www.eeoc.gov/newsroom/eeoc-sues-itutorgroup-inc-age-discrimination",
+        "archived_url": null,
+        "doi_or_stable_id": "EEOC-NEWSROOM-2022-05-05-ITUTORGROUP",
+        "license": "Public domain (U.S. government work)",
+        "quote_allowed": true,
+        "excerpt": "More than 200 qualified applicants age 55 and older were denied employment because of age.",
+        "sha256": null
       },
       {
-        "source_id": "eeoc_workday_lawsuit",
-        "title": "EEOC Files First-Ever Lawsuit Against AI Hiring Software Developer Workday",
-        "authors": "U.S. Equal Employment Opportunity Commission",
-        "publisher": "EEOC",
-        "publication_date": "2023-09-19",
-        "url": "https://www.eeoc.gov/newsroom/eeoc-files-first-ever-lawsuit-against-ai-hiring-software-developer-workday-inc",
-        "accessed_date": "2026-03-02",
-        "document_type": "regulatory enforcement announcement",
-        "license_status": "Public domain U.S. government work",
-        "quote_allowed": true
+        "source_id": "eeoc_itutorgroup_settlement_2023",
+        "title": "EEOC Settles First AI Discrimination Lawsuit",
+        "publisher": "U.S. Equal Employment Opportunity Commission",
+        "published_at": "2023-08-09",
+        "retrieved_at": "2026-03-02",
+        "primary_url": "https://www.eeoc.gov/newsroom/eeoc-settles-first-ai-discrimination-lawsuit",
+        "archived_url": null,
+        "doi_or_stable_id": "EEOC-NEWSROOM-2023-08-09-AI-DISCRIMINATION-SETTLEMENT",
+        "license": "Public domain (U.S. government work)",
+        "quote_allowed": true,
+        "excerpt": "The software automatically rejected older applicants, violating federal anti-discrimination law.",
+        "sha256": null
       },
       {
-        "source_id": "reuters_workday_ruling",
-        "title": "Workday must face AI hiring bias lawsuit, US judge rules",
-        "authors": "Reuters",
-        "publisher": "Reuters",
-        "publication_date": "2024-05-17",
-        "url": "https://www.reuters.com/legal/litigation/workday-must-face-ai-hiring-bias-lawsuit-us-judge-rules-2024-05-17/",
-        "accessed_date": "2026-03-02",
-        "document_type": "legal news reporting",
-        "license_status": "All rights reserved; metadata only",
-        "quote_allowed": false
+        "source_id": "courtlistener_itutorgroup_1_22_cv_02565",
+        "title": "Equal Employment Opportunity Commission v. iTutorGroup, Inc. (1:22-cv-02565)",
+        "publisher": "CourtListener",
+        "published_at": "2022-05-05",
+        "retrieved_at": "2026-03-02",
+        "primary_url": "https://www.courtlistener.com/docket/63288748/equal-employment-opportunity-commission-v-itutorgroup-inc/",
+        "archived_url": null,
+        "doi_or_stable_id": "1:22-cv-02565",
+        "license": "CourtListener terms; metadata only",
+        "quote_allowed": false,
+        "excerpt": null,
+        "sha256": null
       }
     ],
     "dimension_rationale": {
       "transparency_explainability": [
         {
-          "source_id": "eeoc_workday_lawsuit",
-          "claim": "Regulatory filings emphasize opacity concerns for applicant-facing decision explanations.",
+          "source_ids": [
+            "eeoc_itutorgroup_suit_2022",
+            "eeoc_itutorgroup_settlement_2023"
+          ],
+          "claim": "Applicants were screened by software logic that produced opaque rejection outcomes, with limited applicant-facing explanation.",
           "scoring_impact": "sets transparency below midpoint"
         }
       ],
       "fairness_nondiscrimination": [
         {
-          "source_id": "reuters_workday_ruling",
-          "claim": "Federal court proceedings on discrimination allegations indicate elevated fairness risk in deployment context.",
+          "source_ids": [
+            "eeoc_itutorgroup_suit_2022",
+            "eeoc_itutorgroup_settlement_2023"
+          ],
+          "claim": "Federal enforcement established age-based disparate treatment allegations tied to deployed screening automation.",
           "scoring_impact": "drives low fairness score"
         }
       ],
       "safety_robustness": [
         {
-          "source_id": "workday_product_page",
-          "claim": "Production-grade platform controls and enterprise operations indicate moderate robustness.",
-          "scoring_impact": "supports mid robustness score"
+          "source_ids": [
+            "courtlistener_itutorgroup_1_22_cv_02565",
+            "eeoc_itutorgroup_settlement_2023"
+          ],
+          "claim": "Enforcement-driven remediation indicates controls existed but were insufficient to prevent harmful production behavior.",
+          "scoring_impact": "supports low-mid robustness score"
         }
       ],
       "privacy_data_governance": [
         {
-          "source_id": "workday_product_page",
-          "claim": "Enterprise HR systems include formal data governance and retention controls.",
-          "scoring_impact": "supports mid privacy score"
+          "source_ids": [
+            "eeoc_itutorgroup_suit_2022"
+          ],
+          "claim": "Automated handling of applicant attributes for screening creates governance risk around lawful and appropriate data use.",
+          "scoring_impact": "supports low-mid privacy score"
         }
       ],
       "human_agency_oversight": [
         {
-          "source_id": "workday_product_page",
-          "claim": "Recruiter workflows are decision-support oriented with humans retaining final selection authority.",
-          "scoring_impact": "raises oversight score"
+          "source_ids": [
+            "eeoc_itutorgroup_settlement_2023"
+          ],
+          "claim": "Auto-rejection behavior indicates weak human intervention checkpoints before adverse hiring outcomes were issued.",
+          "scoring_impact": "keeps oversight score low"
         }
       ],
       "accountability": [
         {
-          "source_id": "eeoc_workday_lawsuit",
-          "claim": "Active legal and regulatory accountability channels are present for contested deployment outcomes.",
-          "scoring_impact": "supports mid accountability score"
+          "source_ids": [
+            "eeoc_itutorgroup_settlement_2023",
+            "courtlistener_itutorgroup_1_22_cv_02565"
+          ],
+          "claim": "Public enforcement action and court-tracked settlement provide explicit legal accountability pathways.",
+          "scoring_impact": "supports high accountability score"
         }
       ]
     }
   },
   "assumptions": [
-    "Scores synthesize publicly available product, regulatory, and legal evidence into the MEDF scale.",
-    "This case evaluates governance characteristics of deployed hiring automation workflows rather than proprietary model internals.",
-    "The evidence set is intended for reproducible pre-deployment governance comparison."
+    "Scores synthesize deployed workflow evidence and enforcement records into the MEDF Likert scale.",
+    "This case evaluates governance properties of real hiring automation use, not proprietary model internals.",
+    "The evidence set is curated for reproducible pre-deployment governance comparison."
   ]
 }
