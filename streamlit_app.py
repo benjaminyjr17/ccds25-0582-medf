@@ -48,7 +48,7 @@ INLINE_CODE_BADGE_STYLE = f"color:{BRAND_TURQUOISE_HEX};"
 
 DIMENSION_DISPLAY_NAMES = {
     "transparency_explainability": "Transparency and Explainability",
-    "fairness_nondiscrimination": "Fairness and Non-discrimination",
+    "fairness_nondiscrimination": "Fairness and Non-Discrimination",
     "safety_robustness": "Safety and Robustness",
     "privacy_data_governance": "Privacy and Data Governance",
     "human_agency_oversight": "Human Agency and Oversight",
@@ -61,7 +61,7 @@ UNICODE_MINUS = "\u2212"
 ENABLE_LIKERT_TRACK_TURQUOISE = True
 LIKERT_SLIDER_LABELS = [
     "Transparency and Explainability",
-    "Fairness and Non-discrimination",
+    "Fairness and Non-Discrimination",
     "Safety and Robustness",
     "Privacy and Data Governance",
     "Human Agency and Oversight",
@@ -1055,6 +1055,22 @@ def _format_sentence_like_bullet(text: Any) -> str:
     return cleaned
 
 
+
+def _sentence_case(text: str) -> str:
+    """Normalize text to sentence case, preserving acronyms (fully-uppercase words ≤5 chars)."""
+    cleaned = text.strip()
+    if not cleaned:
+        return ""
+    words = cleaned.split()
+    result: list[str] = []
+    for i, word in enumerate(words):
+        if i == 0:
+            result.append(word[0].upper() + word[1:] if len(word) > 1 else word.upper())
+        elif word.isupper() and len(word) <= 5:
+            result.append(word)
+        else:
+            result.append(word.lower() if word[0].isupper() and not word.isupper() else word)
+    return " ".join(result)
 def render_if_present(label: str, value: Any) -> None:
     text = safe_str(value).strip()
     if not text or text.lower() == "undefined":
@@ -2203,7 +2219,7 @@ def main() -> None:
 
         if page == "Evaluate":
             st.markdown("**Method**")
-            scoring_method = st.radio("Scoring method", ["topsis", "wsm"], horizontal=True)
+            scoring_method = st.radio("Scoring Method", ["topsis", "wsm"], horizontal=True)
 
             st.markdown("**Stakeholders**")
             if stakeholder_options:
@@ -2233,7 +2249,7 @@ def main() -> None:
                 raw_custom: dict[str, float] = {}
                 for dimension in UNIFIED_DIMENSIONS:
                     raw_custom[dimension] = st.slider(
-                        f"{DIMENSION_DISPLAY_NAMES[dimension]} weight",
+                        f"{DIMENSION_DISPLAY_NAMES[dimension]} Weight",
                         min_value=0.0,
                         max_value=1.0,
                         value=float(base_weights.get(dimension, 0.0)),
@@ -2247,7 +2263,7 @@ def main() -> None:
                         for dimension, value in raw_custom.items()
                     }
                     st.caption(
-                        f"Raw sum: {raw_sum:.4f} | Normalized sum: {sum(weights_for_request.values()):.4f}"
+                        f"Raw Sum: {raw_sum:.4f} | Normalized Sum: {sum(weights_for_request.values()):.4f}"
                     )
                 else:
                     st.error("Weight sum cannot be zero.")
@@ -2280,7 +2296,7 @@ def main() -> None:
                 st.warning("No stakeholders available from backend.")
             st.markdown("**Method**")
             conflict_metric = st.radio(
-                "Conflict metric",
+                "Conflict Metric",
                 [
                     "Priority Conflict (Weights-Only)",
                     "System-Salience Conflict (Contribution-Based)",
@@ -2288,13 +2304,13 @@ def main() -> None:
                 index=0,
             )
             st.caption(
-                "Contribution (Contrib) is the stakeholder-weighted impact of a dimension for the selected AI system: "
+                "Contribution (Contrib) is the stakeholder-weighted impact of a dimension for the selected AI System: "
                 "contrib_i = normalized_score_i × stakeholder_weight_i. "
                 "System-Salience Conflict compares stakeholders after accounting for system performance, "
                 "not only stated priorities."
             )
             st.markdown("**Display**")
-            screenshot_mode = st.checkbox("Screenshot mode", value=False)
+            screenshot_mode = st.checkbox("Screenshot Mode", value=False)
             detect_clicked = st.button("Detect Conflicts", type="primary")
         elif page == "Pareto Resolution":
             st.markdown("**Stakeholders**")
@@ -2361,8 +2377,8 @@ def main() -> None:
                     st.caption("Advanced settings are hidden while Conference Mode is enabled.")
                     st.caption(
                         "Current values in use: "
-                        f"options={pareto_n_solutions}, mode={pareto_search_mode_label}, "
-                        f"breadth={pareto_pop_size}, depth={pareto_n_gen}."
+                        f"options = {pareto_n_solutions}, mode = {pareto_search_mode_label}, "
+                        f"breadth = {pareto_pop_size}, depth = {pareto_n_gen}."
                     )
                 else:
                     pareto_n_solutions = st.slider(
@@ -2474,7 +2490,7 @@ def main() -> None:
                 )
                 st.caption(f"Computed Population: {pareto_pop_size}.")
                 st.caption(f"Computed Generations: {pareto_n_gen_effective}.")
-                st.caption(f"Estimated evaluations = {pareto_pop_size * pareto_n_gen_effective}.")
+                st.caption(f"Estimated Evaluations = {pareto_pop_size * pareto_n_gen_effective:,}.")
             else:
                 entered_pop_size = pareto_pop_size
                 entered_n_gen = pareto_n_gen
@@ -2485,9 +2501,9 @@ def main() -> None:
                     st.warning(
                         "Manual search exceeded the evaluation cap; generations were adjusted to remain within limit."
                     )
-                    st.caption(f"Entered: p={entered_pop_size}, g={entered_n_gen}.")
-                    st.caption(f"Effective: p={entered_pop_size}, g={pareto_n_gen_effective}.")
-                st.caption(f"Estimated evaluations = {entered_pop_size * pareto_n_gen_effective}.")
+                    st.caption(f"Entered: p = {entered_pop_size}, g = {entered_n_gen}.")
+                    st.caption(f"Effective: p = {entered_pop_size}, g = {pareto_n_gen_effective}.")
+                st.caption(f"Estimated Evaluations = {entered_pop_size * pareto_n_gen_effective:,}.")
 
             if len(pareto_stakeholder_ids) < 2:
                 st.warning("Select at least 2 stakeholders to enable Pareto generation.")
@@ -2499,7 +2515,7 @@ def main() -> None:
         else:
             st.markdown("**Display**")
             case_screenshot_mode = st.checkbox("Screenshot Mode", value=False)
-            st.caption("Case Studies runs fixed scenarios through Evaluate → Conflicts → Pareto.")
+            st.caption("Case Studies run fixed scenarios through Evaluation → Conflict Detection → Pareto Resolution.")
 
     demo_active = bool(st.session_state.get("demo_mode"))
     _inject_slider_fill_color_patcher()
@@ -2540,7 +2556,7 @@ def main() -> None:
                         _apply_dimension_preset(PRESET_BASELINE)
                     if preset_col_2.button("Preset: Flipped (4.5,5.0,2.5,3.5,4.5,3.0)"):
                         _apply_dimension_preset(PRESET_FLIPPED)
-                    if preset_col_3.button("Preset: Safety-heavy (4.0,4.0,7.0,4.0,4.0,4.0)"):
+                    if preset_col_3.button("Preset: Safety-Heavy (4.0,4.0,7.0,4.0,4.0,4.0)"):
                         _apply_dimension_preset(PRESET_SAFETY_HEAVY)
 
                 default_scores = PRESET_BASELINE
@@ -3074,8 +3090,8 @@ def main() -> None:
                 st.warning("Please select at least 2 stakeholders.")
                 return
             st.caption(
-                "Pareto request parameters (effective): "
-                f"n_solutions={pareto_n_solutions}, pop_size={pareto_pop_size}, n_gen={pareto_n_gen_effective}."
+                "Pareto Request Parameters (Effective): "
+                f"n_solutions = {pareto_n_solutions}, pop_size = {pareto_pop_size}, n_gen = {pareto_n_gen_effective}."
             )
 
             payload = {
@@ -3471,16 +3487,16 @@ def main() -> None:
                     themed_figures=[parallel_figure],
                     parcoords_figure=parallel_figure,
                 )
-                st.caption(f"Selected solution: {selected_solution_id} (rank {selected_rank}).")
+                st.caption(f"Selected Solution: {selected_solution_id} (Rank {selected_rank}).")
             else:
                 _render_operational_banner("Select at least 2 stakeholders to view tradeoffs.")
 
         def _render_pareto_technical_detail() -> None:
             st.caption(
-                "Search parameters: "
-                f"options={pareto_n_solutions}, breadth={pareto_pop_size}, depth={pareto_n_gen_effective}."
+                "Search Parameters: "
+                f"options = {pareto_n_solutions}, breadth = {pareto_pop_size}, depth = {pareto_n_gen_effective}."
             )
-            st.caption(f"Stakeholders in scope: {', '.join(stakeholder_ids)}.")
+            st.caption(f"Stakeholders in Scope: {', '.join(stakeholder_ids)}.")
 
         if conference_mode:
             with st.expander("Supporting Analysis", expanded=False):
@@ -3593,7 +3609,7 @@ def main() -> None:
                                             "dimension": DIMENSION_DISPLAY_NAMES.get(dimension, dimension),
                                             "source_ids": ", ".join(source_ids),
                                             "claim": str(entry.get("claim", "")).strip(),
-                                            "scoring_impact": str(entry.get("scoring_impact", "")).strip(),
+                                            "scoring_impact": _sentence_case(str(entry.get("scoring_impact", "")).strip()),
                                         }
                                     )
                             if rationale_rows:
@@ -3712,7 +3728,7 @@ def main() -> None:
                             "n_gen": 80,
                         }
 
-                        with st.spinner("Running Evaluate → Conflicts → Pareto..."):
+                        with st.spinner("Running Evaluation → Conflict Detection → Pareto Resolution..."):
                             ok_eval, evaluate_data, evaluate_error = api_call(
                                 "POST",
                                 f"{backend_url}/api/evaluate",
@@ -4130,7 +4146,7 @@ def main() -> None:
                 "deterministic_mode": True,
             }
 
-            with st.spinner("Running demo scenario (Evaluate → Conflicts → Pareto)..."):
+            with st.spinner("Running demo scenario (Evaluation → Conflict Detection → Pareto Resolution)..."):
                 ok_eval, evaluate_data, evaluate_error = api_call(
                     "POST",
                     f"{backend_url}/api/evaluate",
