@@ -1,50 +1,63 @@
-# ===============================
-# Python bytecode / cache
-# ===============================
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
-
-# ===============================
-# Virtual environments
-# ===============================
-.venv/
-venv/
-env/
-
-# ===============================
-# Runtime data (DO NOT COMMIT)
-# ===============================
-data/
-*.db
-*.sqlite3
-*.jsonl
-
-# ===============================
-# Logs
-# ===============================
-*.log
-
-# ===============================
-# OS files
-# ===============================
-.DS_Store
-Thumbs.db
-
-# ===============================
-# Editor / IDE
-# ===============================
-.vscode/
-.idea/
-
-# ===============================
-# Pytest cache
-# ===============================
-.pytest_cache/
-
-# ===============================
-# Build artifacts
-# ===============================
+*.so
+*.egg-info/
 dist/
 build/
-*.egg-info/
+eggs/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Distribution
+*.whl
+*.tar.gz
+
+# Database
+# Ignore SQLite databases by default. If a specific .db file must be versioned, force-add it explicitly.
+*.db
+*.db-journal
+*.db-wal
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+*.env
+!.env.example
+
+# Misc
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
