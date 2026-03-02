@@ -2350,7 +2350,7 @@ def main() -> None:
             if pareto_preset == "Standard":
                 st.caption("Standard balances runtime and coverage.")
             else:
-                st.caption("Deep increases search depth for higher exploration.")
+                st.caption("Deep Search increases search depth to enhance exploration of the decision space.")
 
             pareto_n_solutions = int(
                 st.session_state.get("pareto_options_to_show", preset_values["n_solutions"])
