@@ -2414,7 +2414,7 @@ def main() -> None:
                                 500,
                                 50_000,
                             ),
-                            step=500,
+                            step=1,
                             key="pareto_compute_budget",
                         )
                         pareto_explore_bias = st.slider(
