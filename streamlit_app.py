@@ -43,6 +43,7 @@ PARCOORDS_TICKFONT_HEX = "#E6E6E6"
 
 BRAND_BLUE_HEX = SEM_INFO_HEX
 BRAND_BLUE_FILL_RGBA = "rgba(56, 189, 248, 0.22)"
+INLINE_CODE_BADGE_STYLE = f"color:{BRAND_TURQUOISE_HEX};"
 
 DIMENSION_DISPLAY_NAMES = {
     "transparency_explainability": "Transparency and Explainability",
@@ -947,6 +948,14 @@ def _safe_json(value: Any) -> Any:
 
 def safe_str(x: Any) -> str:
     return "" if x is None else str(x)
+
+
+def _inline_code_badge(text: Any) -> str:
+    return f"<code style='{INLINE_CODE_BADGE_STYLE}'>{escape(safe_str(text))}</code>"
+
+
+def _render_operational_banner(message: Any) -> None:
+    st.info(safe_str(message))
 
 
 _DISPLAY_MINUS_PATTERN = re.compile(r"(?<!\w)-(?=\d)")
@@ -2809,7 +2818,7 @@ def main() -> None:
             st.caption("Cross-stakeholder alignment and conflict concentration.")
             summary_text = result.get("summary")
             if summary_text is not None and str(summary_text).strip().lower() not in {"", "undefined"}:
-                st.info(str(summary_text))
+                _render_operational_banner(summary_text)
             technical_note = ""
             if not screenshot_mode:
                 technical_note = (
@@ -2916,7 +2925,7 @@ def main() -> None:
                 st.plotly_chart(styled_conflict_heatmap, use_container_width=True, key="conflict_heatmap")
                 _assert_ui_contract(kpi_cards=executive_kpis, themed_figures=[styled_conflict_heatmap])
             else:
-                st.info("No correlation matrix returned in metadata.")
+                _render_operational_banner("No correlation matrix returned in metadata.")
 
             def _render_conflict_supporting_analysis() -> None:
                 demo_box = st.container(border=True)
@@ -2964,7 +2973,7 @@ def main() -> None:
                 if rows:
                     st.dataframe(rows, width="stretch", hide_index=True)
                 else:
-                    st.info("No stakeholder conflicts were returned.")
+                    _render_operational_banner("No stakeholder conflicts were returned.")
 
             if conference_mode:
                 with st.expander("Supporting Analysis", expanded=False):
@@ -2976,10 +2985,10 @@ def main() -> None:
             if technical_note:
                 if conference_mode:
                     with st.expander("Technical Details", expanded=False):
-                        st.info(technical_note)
+                        _render_operational_banner(technical_note)
                 else:
                     st.markdown("## Technical Details")
-                    st.info(technical_note)
+                    _render_operational_banner(technical_note)
     elif page == "Pareto Resolution":
         if generate_pareto_clicked:
             if not framework_id:
@@ -3068,7 +3077,7 @@ def main() -> None:
         st.caption("Consensus profile and stakeholder distance for the selected solution.")
         summary = result.get("summary")
         if summary is not None and str(summary).strip().lower() not in {"", "undefined"}:
-            st.info(str(summary))
+            _render_operational_banner(summary)
 
         solutions = result.get("pareto_solutions", [])
         metadata = result.get("metadata", {}) if isinstance(result, dict) else {}
@@ -3182,7 +3191,7 @@ def main() -> None:
 
         utility_text = fmt_score(selected_utility)
 
-        st.info(
+        _render_operational_banner(
             "\n".join(
                 [
                     "**Resolution Summary**",
@@ -3198,8 +3207,8 @@ def main() -> None:
         st.markdown("### Consensus Weights Radar")
         st.markdown(
             "Weights shown are derived from backend "
-            f"<code style='color:{BRAND_TURQUOISE_HEX};'>/api/pareto</code> output "
-            f"(<code style='color:{BRAND_TURQUOISE_HEX};'>pareto_solutions[*].weights.consensus</code>): "
+            f"{_inline_code_badge('/api/pareto')} output "
+            f"({_inline_code_badge('pareto_solutions[*].weights.consensus')}): "
             "candidate consensus vectors are simplex-normalized and selected using salience-weighted "
             "distance objectives against stakeholder weight vectors.",
             unsafe_allow_html=True,
@@ -3388,7 +3397,7 @@ def main() -> None:
                 )
                 st.caption(f"Selected solution: {selected_solution_id} (rank {selected_rank}).")
             else:
-                st.info("Select at least 2 stakeholders to view tradeoffs.")
+                _render_operational_banner("Select at least 2 stakeholders to view tradeoffs.")
 
         def _render_pareto_technical_detail() -> None:
             st.caption(
@@ -3445,9 +3454,12 @@ def main() -> None:
                             manifest_sources = [item for item in raw_sources if isinstance(item, dict)]
 
                     st.markdown("**Deployment Evidence Manifest**")
-                    st.write(
-                        f"Deployment type: `{deployment_type or 'unknown'}` | "
-                        f"Sources listed: `{len(manifest_sources)}`"
+                    st.markdown(
+                        "Deployment type: "
+                        f"{_inline_code_badge(deployment_type or 'unknown')} | "
+                        "Sources listed: "
+                        f"{_inline_code_badge(len(manifest_sources))}",
+                        unsafe_allow_html=True,
                     )
                     if manifest_sources:
                         source_rows: list[dict[str, str]] = []
@@ -3476,7 +3488,7 @@ def main() -> None:
                             )
                         st.dataframe(source_rows, width="stretch", hide_index=True)
                     else:
-                        st.info("No sources were found in the evidence manifest.")
+                        _render_operational_banner("No sources were found in the evidence manifest.")
 
                     if isinstance(case_evidence_manifest, dict):
                         raw_rationale = case_evidence_manifest.get("dimension_rationale")
@@ -3719,7 +3731,7 @@ def main() -> None:
 
                 case_result = st.session_state.get(case_result_key)
                 if not isinstance(case_result, dict):
-                    st.info("Run Case Study to generate report outputs.")
+                    _render_operational_banner("Run Case Study to generate report outputs.")
                     continue
 
                 evaluate_result = case_result.get("evaluate_response", {})
@@ -3789,7 +3801,7 @@ def main() -> None:
                             key=f"case_{case_id}_weights_heatmap",
                         )
                     else:
-                        st.info("Priority Conflict matrix is unavailable.")
+                        _render_operational_banner("Priority Conflict matrix is unavailable.")
                 with matrix_col_2:
                     if isinstance(matrix_contrib, dict):
                         contrib_heatmap = _build_correlation_heatmap(
@@ -3803,7 +3815,7 @@ def main() -> None:
                             key=f"case_{case_id}_contrib_heatmap",
                         )
                     else:
-                        st.info("System-Salience Conflict matrix is unavailable.")
+                        _render_operational_banner("System-Salience Conflict matrix is unavailable.")
 
                 rho_weights = "N/A"
                 rho_contrib = "N/A"
@@ -3903,8 +3915,8 @@ def main() -> None:
                     )
                     st.markdown(
                         "Weights shown are derived from backend "
-                        f"<code style='color:{BRAND_TURQUOISE_HEX};'>/api/pareto</code> output "
-                        f"(<code style='color:{BRAND_TURQUOISE_HEX};'>pareto_solutions[*].weights.consensus</code>) "
+                        f"{_inline_code_badge('/api/pareto')} output "
+                        f"({_inline_code_badge('pareto_solutions[*].weights.consensus')}) "
                         "and are displayed without UI-side reweighting.",
                         unsafe_allow_html=True,
                     )
@@ -4137,7 +4149,7 @@ def main() -> None:
 
         st.divider()
         st.subheader("Demo Scenario Results")
-        st.success(
+        _render_operational_banner(
             f"{DEMO_SCENARIO_NAME} completed using framework '{demo_result.get('framework_id')}'."
         )
         render_if_present("Scoring Method", str(demo_result.get("scoring_method", "")).upper())
