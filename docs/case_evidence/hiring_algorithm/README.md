@@ -14,20 +14,23 @@ Deployment type: `real_deployment`
 1. `eeoc_itutorgroup_suit_2022`
 - Title: EEOC Sues iTutorGroup, Inc. for Age Discrimination
 - Publisher: U.S. Equal Employment Opportunity Commission
-- Primary URL: https://www.eeoc.gov/newsroom/eeoc-sues-itutorgroup-inc-age-discrimination
-- Durable resolver: `doi_or_stable_id=EEOC-NEWSROOM-2022-05-05-ITUTORGROUP`
+- Primary URL: https://www.eeoc.gov/newsroom/itutorgroup-pay-365000-settle-eeoc-discriminatory-hiring-suit
+- Archived URL: https://clearinghouse.net/case/44258/
+- Durable resolver: `doi_or_stable_id=EDNY-1:22-cv-02565-PKC-PK`
 
 2. `eeoc_itutorgroup_settlement_2023`
 - Title: EEOC Settles First AI Discrimination Lawsuit
 - Publisher: U.S. Equal Employment Opportunity Commission
-- Primary URL: https://www.eeoc.gov/newsroom/eeoc-settles-first-ai-discrimination-lawsuit
-- Durable resolver: `doi_or_stable_id=EEOC-NEWSROOM-2023-08-09-AI-DISCRIMINATION-SETTLEMENT`
+- Primary URL: https://www.eeoc.gov/newsroom/itutorgroup-pay-365000-settle-eeoc-discriminatory-hiring-suit
+- Archived URL: https://clearinghouse.net/case/44258/
+- Durable resolver: `doi_or_stable_id=EDNY-1:22-cv-02565-PKC-PK`
 
 3. `courtlistener_itutorgroup_1_22_cv_02565`
 - Title: Equal Employment Opportunity Commission v. iTutorGroup, Inc. (1:22-cv-02565)
 - Publisher: CourtListener
 - Primary URL: https://www.courtlistener.com/docket/63288748/equal-employment-opportunity-commission-v-itutorgroup-inc/
-- Durable resolver: `doi_or_stable_id=1:22-cv-02565`
+- Archived URL: https://clearinghouse.net/case/44258/
+- Durable resolver: `doi_or_stable_id=EDNY-1:22-cv-02565-PKC-PK`
 
 ## Integrity
 

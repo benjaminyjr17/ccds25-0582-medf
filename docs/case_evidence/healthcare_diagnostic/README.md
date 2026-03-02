@@ -26,7 +26,8 @@ Deployment type: `real_deployment`
 3. `deepmind_legal_audit_streams_2017`
 - Title: Royal Free London publishes findings of legal audit in use of Streams
 - Publisher: Google DeepMind
-- Primary URL: https://deepmind.google/discover/blog/royal-free-london-publishes-findings-of-legal-audit-in-use-of-streams/
+- Primary URL: https://deepmind.google/blog/royal-free-london-publishes-findings-of-legal-audit-in-use-of-streams
+- Archived URL: https://deepmind.google/discover/blog/royal-free-london-publishes-findings-of-legal-audit-in-use-of-streams/
 - Durable resolver: `doi_or_stable_id=DEEPMIND-BLOG-2017-11-16-LEGAL-AUDIT-STREAMS`
 
 ## Integrity

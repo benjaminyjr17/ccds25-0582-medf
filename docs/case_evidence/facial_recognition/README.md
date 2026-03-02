@@ -15,18 +15,21 @@ Deployment type: `real_deployment`
 - Title: Live Facial Recognition - Overview and how to submit a Subject Access Request
 - Publisher: Metropolitan Police Service
 - Primary URL: https://www.met.police.uk/foi-ai/metropolitan-police/disclosure-2025/july-2025/live-facial-recognition---overview-and-how-to-submit-a-subject-access-request
+- Archived URL: https://news.met.police.uk/news/live-facial-recognition-helping-to-make-the-capital-safer-according-to-new-report-502769
 - Durable resolver: `doi_or_stable_id=MET-FOI-2025-07-LFR-OVERVIEW`
 
 2. `met_lfr_policy_document`
 - Title: Live Facial Recognition Policy Document
 - Publisher: Metropolitan Police Service
-- Primary URL: https://www.met.police.uk/SysSiteAssets/media/downloads/force-content/met/advice/lfr/other-lfr-documents/live-facial-recognition-policy-document.pdf
+- Primary URL: https://www.met.police.uk/SysSiteAssets/media/downloads/force-content/met/advice/lfr/policy-documents/lfr-policy-document2.pdf
+- Archived URL: https://news.met.police.uk/documents/live-facial-recognition-annual-report-2025-dot-pdf-451735
 - Durable resolver: `doi_or_stable_id=MET-LFR-POLICY-DOCUMENT-2025`
 
 3. `met_lfr_deployment_record_2026`
 - Title: Live Facial Recognition - Deployment Record 2026 to date
 - Publisher: Metropolitan Police Service
 - Primary URL: https://www.met.police.uk/SysSiteAssets/media/downloads/force-content/met/advice/lfr/deployment-records/live-facial-recognition---deployment-record-2026-to-date.pdf
+- Archived URL: https://www.met.police.uk/SysSiteAssets/media/downloads/force-content/met/advice/lfr/other-lfr-documents/live-facial-recognition-annual-report-2025.pdf
 - Durable resolver: `doi_or_stable_id=MET-LFR-DEPLOYMENT-RECORD-2026`
 
 ## Integrity
