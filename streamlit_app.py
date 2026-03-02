@@ -282,10 +282,10 @@ html, body, [data-testid="stAppViewContainer"] {{
 
 [data-testid="stAppViewContainer"] .main .block-container {{
     max-width: 1280px;
-    padding-top: 0.95rem;
-    padding-bottom: 1.1rem;
-    padding-left: 1.05rem;
-    padding-right: 1.05rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }}
 
 section[data-testid="stSidebar"] {{
@@ -294,9 +294,9 @@ section[data-testid="stSidebar"] {{
 }}
 
 section[data-testid="stSidebar"] > div {{
-    padding-top: 0.45rem;
-    padding-left: 0.35rem;
-    padding-right: 0.35rem;
+    padding-top: 0.5rem;
+    padding-left: 0.55rem;
+    padding-right: 0.55rem;
 }}
 
 h1, h2, h3, h4 {{
@@ -346,11 +346,18 @@ h1, h2, h3, h4 {{
     border-radius: 10px;
     padding: 0.72rem 0.8rem;
     min-height: 106px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}}
+
+.medf-kpi-card:hover {{
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }}
 
 .medf-kpi-value {{
     color: var(--medf-text);
-    font-size: 1.16rem;
+    font-size: 1.32rem;
     font-weight: 700;
     line-height: 1.2;
     margin-top: 0.08rem;
@@ -412,6 +419,7 @@ div.stButton > button {{
     background: #111827;
     color: var(--medf-text);
     font-weight: 600;
+    transition: border-color 0.15s ease, background 0.15s ease;
 }}
 
 div.stButton > button:hover {{
@@ -428,6 +436,7 @@ div.stButton > button:hover {{
     border-radius: 999px;
     padding: 0.25rem 0.68rem;
     background: rgba(39,196,183,0.08);
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }}
 
 .medf-page-nav [data-testid="stRadio"] label:hover {{
@@ -1988,7 +1997,7 @@ def _build_radar_chart(
         polar={"radialaxis": {"visible": True, "range": [0, radial_max], "tickformat": ".1f"}},
         showlegend=False,
         height=460,
-        margin={"l": 52, "r": 52, "t": 62, "b": 52},
+        margin={"l": 48, "r": 48, "t": 56, "b": 48},
     )
     return figure
 
@@ -2020,7 +2029,7 @@ def _build_correlation_heatmap(
     )
     figure.update_layout(
         title=title,
-        margin={"l": 52, "r": 52, "t": 62, "b": 52},
+        margin={"l": 48, "r": 48, "t": 56, "b": 48},
     )
     return figure
 
@@ -2794,7 +2803,7 @@ def main() -> None:
                     polar={"radialaxis": {"visible": True, "range": [0, 1], "tickformat": ".1f"}},
                     showlegend=False,
                     height=460,
-                    margin={"l": 52, "r": 52, "t": 56, "b": 52},
+                    margin={"l": 48, "r": 48, "t": 56, "b": 48},
                 )
                 styled_evaluate_radar = style_plotly(fig, tokens)
                 st.plotly_chart(styled_evaluate_radar, use_container_width=True, key="evaluate_radar")
@@ -2986,7 +2995,7 @@ def main() -> None:
                 )
                 heatmap.update_layout(
                     title=matrix_title,
-                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                    margin={"l": 48, "r": 48, "t": 56, "b": 48},
                 )
                 styled_conflict_heatmap = style_plotly(heatmap, tokens)
                 st.plotly_chart(styled_conflict_heatmap, use_container_width=True, key="conflict_heatmap")
@@ -3302,7 +3311,7 @@ def main() -> None:
             polar={"radialaxis": {"visible": True, "range": [0, 1], "tickformat": ".1f"}},
             showlegend=False,
             height=460,
-            margin={"l": 52, "r": 52, "t": 56, "b": 52},
+            margin={"l": 48, "r": 48, "t": 56, "b": 48},
         )
         styled_pareto_radar = style_plotly(radar_figure, tokens)
         st.plotly_chart(
@@ -3326,7 +3335,7 @@ def main() -> None:
         bar_figure.update_layout(
             xaxis_title="Stakeholder",
             yaxis_title="Distance",
-            margin={"l": 40, "r": 40, "t": 60, "b": 40},
+            margin={"l": 48, "r": 48, "t": 56, "b": 48},
         )
         styled_pareto_distance_bar = style_plotly(bar_figure, tokens)
         st.plotly_chart(
@@ -3385,7 +3394,7 @@ def main() -> None:
                     title=f"Tradeoff: {stakeholder_a} vs {stakeholder_b}",
                     xaxis_title=f"{stakeholder_a} distance",
                     yaxis_title=f"{stakeholder_b} distance",
-                    margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                    margin={"l": 48, "r": 48, "t": 56, "b": 48},
                 )
                 styled_scatter_figure = style_plotly(scatter_figure, tokens)
                 st.plotly_chart(
@@ -4010,7 +4019,7 @@ def main() -> None:
                         title="Stakeholder Distance (Lower = Better Alignment)",
                         xaxis_title="Stakeholder",
                         yaxis_title="Distance",
-                        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+                        margin={"l": 48, "r": 48, "t": 56, "b": 48},
                     )
                     st.plotly_chart(
                         style_plotly(stakeholder_distance_bar, tokens),
