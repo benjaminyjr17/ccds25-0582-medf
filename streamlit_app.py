@@ -2491,7 +2491,7 @@ def main() -> None:
                 )
                 st.caption(f"Computed Population: {pareto_pop_size}.")
                 st.caption(f"Computed Generations: {pareto_n_gen_effective}.")
-                st.caption(f"Estimated Evaluations = {pareto_pop_size * pareto_n_gen_effective:,}.")
+                st.caption(f"Estimated Evaluations: {pareto_pop_size * pareto_n_gen_effective:,}.")
             else:
                 entered_pop_size = pareto_pop_size
                 entered_n_gen = pareto_n_gen
@@ -2504,7 +2504,7 @@ def main() -> None:
                     )
                     st.caption(f"Entered: p = {entered_pop_size}, g = {entered_n_gen}.")
                     st.caption(f"Effective: p = {entered_pop_size}, g = {pareto_n_gen_effective}.")
-                st.caption(f"Estimated Evaluations = {entered_pop_size * pareto_n_gen_effective:,}.")
+                st.caption(f"Estimated Evaluations: {entered_pop_size * pareto_n_gen_effective:,}.")
 
             if len(pareto_stakeholder_ids) < 2:
                 st.warning("Select at least 2 stakeholders to enable Pareto generation.")
@@ -4353,7 +4353,7 @@ def main() -> None:
             ]
             st.dataframe(sample_table, width="stretch", hide_index=True)
 
-    st.caption("MEDF v1.1.0-freeze: Feature-Frozen Build • Reproducible Artifact.")
+    st.caption("MEDF v1.1.0-Freeze: Feature-Frozen Build • Reproducible Artifact.")
 
 
 if __name__ == "__main__":
