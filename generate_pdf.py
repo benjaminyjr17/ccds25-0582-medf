@@ -141,12 +141,12 @@ def build_pdf():
 
     # Use markdown=True in multi_cell for justified text with inline bold
     intro_text = (
-        f"This document provides detailed course descriptions for all quantitative courses successfully "
+        f"This document provides detailed course descriptions for all quantitative courses "
         f"completed by **Benjamin Oliver Yick** during his Bachelor of Computing (Hons) in Data Science and "
         f"Artificial Intelligence at **Nanyang Technological University, Singapore**. It is submitted to the "
         f"Erasmus School of Economics at Erasmus University Rotterdam as direct evidence of the **sufficient "
-        f"mathematical background** required for admission to the **Pre{MINUS}Master Econometrics and Management "
-        f"Science Program (NL)**. As stipulated by the Examination Board of the Erasmus School of Economics, "
+        f"mathematical background** required for admission to the **Pre-Master Econometrics and Management "
+        f"Science Program (NL)**. As stipulated by the Examination Board at the Erasmus School of Economics, "
         f"applicants are required to demonstrate a solid foundation in advanced mathematics, applied statistics, "
         f"and quantitative analysis by uploading course descriptions and literature lists of equivalent courses "
         f"they have passed. The content herein, including course objectives, main topics treated, workload, and "
