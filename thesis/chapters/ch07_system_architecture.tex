@@ -1,0 +1,148 @@
+\chapter{System Architecture}
+\label{ch:architecture}
+
+The MEDF platform is implemented as a modern web application with a clear separation of concerns, following a three-tier architecture. This design ensures modularity, scalability, and maintainability. The three primary layers are the Presentation Layer, the API/Orchestration Layer, and the Data/Configuration Layer. This chapter details the components within each layer and the interactions between them, as illustrated in Figure~\ref{fig:architecture}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=0.6cm,
+  layer/.style={rectangle, draw, thick, minimum width=14cm, minimum height=2.8cm, rounded corners=3pt},
+  comp/.style={rectangle, draw, fill=white, text width=5.5em, text centered, minimum height=2em, font=\small, rounded corners=2pt},
+  arrow/.style={-{Stealth[length=2.5mm]}, thick},
+]
+  % Presentation Layer
+  \node[layer, fill=blue!8] (pres) {};
+  \node[above=0pt of pres.north, anchor=south, font=\bfseries\small] {Presentation Layer};
+  \node[comp, fill=blue!15] at ([yshift=-0.3cm]pres.center) (streamlit) {Streamlit Dashboard};
+
+  % API Layer
+  \node[layer, fill=green!8, below=1.2cm of pres] (api) {};
+  \node[above=0pt of api.north, anchor=south, font=\bfseries\small] {API / Orchestration Layer (FastAPI)};
+  \node[comp, fill=green!15] at ([xshift=-4cm, yshift=-0.3cm]api.center) (eval) {/api/evaluate};
+  \node[comp, fill=green!15] at ([xshift=-1.3cm, yshift=-0.3cm]api.center) (conf) {/api/conflicts};
+  \node[comp, fill=green!15] at ([xshift=1.3cm, yshift=-0.3cm]api.center) (par) {/api/pareto};
+  \node[comp, fill=green!15] at ([xshift=4cm, yshift=-0.3cm]api.center) (fw) {/api/frameworks};
+
+  % Engine Layer
+  \node[layer, fill=orange!8, below=1.2cm of api] (eng) {};
+  \node[above=0pt of eng.north, anchor=south, font=\bfseries\small] {Engine Layer};
+  \node[comp, fill=orange!15] at ([xshift=-3.5cm, yshift=-0.3cm]eng.center) (scoring) {Scoring Engine};
+  \node[comp, fill=orange!15] at ([xshift=0cm, yshift=-0.3cm]eng.center) (conflict) {Conflict Detection};
+  \node[comp, fill=orange!15] at ([xshift=3.5cm, yshift=-0.3cm]eng.center) (harm) {Harm Assessment};
+
+  % Data Layer
+  \node[layer, fill=gray!10, below=1.2cm of eng] (data) {};
+  \node[above=0pt of data.north, anchor=south, font=\bfseries\small] {Data and Configuration Layer};
+  \node[comp, fill=gray!20] at ([xshift=-3.5cm, yshift=-0.3cm]data.center) (yaml) {YAML Registry};
+  \node[comp, fill=gray!20] at ([xshift=0cm, yshift=-0.3cm]data.center) (sqlite) {SQLite DB};
+  \node[comp, fill=gray!20] at ([xshift=3.5cm, yshift=-0.3cm]data.center) (json) {Case Study JSON};
+
+  % Arrows
+  \draw[arrow, <->] (pres.south) -- node[right, font=\footnotesize] {REST API} (api.north);
+  \draw[arrow] (api.south) -- (eng.north);
+  \draw[arrow] (eng.south) -- (data.north);
+\end{tikzpicture}
+\caption{MEDF system architecture diagram.}
+\label{fig:architecture}
+\end{figure}
+
+\section{Presentation Layer}
+\label{sec:presentation}
+
+The Presentation Layer is the user-facing component of the system, implemented as an interactive web dashboard using Streamlit. The complete frontend is contained within a single Python script, \texttt{streamlit\_app.py}. This choice was made to facilitate rapid prototyping and tight integration with the Python-based data analysis and visualization libraries used to display evaluation results.
+
+The dashboard provides a graphical user interface (GUI) for analysts to:
+
+\begin{itemize}[leftmargin=2em]
+  \item Configure and initiate evaluation runs.
+  \item Define or select AI systems and their baseline dimension scores.
+  \item Select and customize stakeholder profiles and their priority weightings.
+  \item View evaluation results, including overall scores, per-framework breakdowns, and dimensional contributions.
+  \item Analyze stakeholder conflicts through correlation matrices and divergence tables.
+  \item Trigger and explore Pareto-optimal consensus solutions.
+  \item Export evaluation data and visualizations for reporting.
+\end{itemize}
+
+The Streamlit application communicates with the backend exclusively through the defined REST API, ensuring a clean separation between the user interface and the core business logic.
+
+\section{API/Orchestration Layer}
+\label{sec:api}
+
+The backend is a robust API server built with FastAPI. FastAPI was chosen for its high performance, native support for asynchronous operations, and automatic generation of interactive OpenAPI documentation, which provides excellent visibility into the API contract for development and auditing. The API layer is responsible for orchestrating the complete evaluation workflow.
+
+It is composed of several modular routers, each handling a specific domain of functionality:
+
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{/api/frameworks}: Serves the definitions of the available governance frameworks.
+  \item \texttt{/api/stakeholders}: Manages the creation, retrieval, and updating of stakeholder profiles.
+  \item \texttt{/api/evaluate}: The primary endpoint for running an ethical evaluation. It receives the evaluation context and returns the computed scores.
+  \item \texttt{/api/conflicts}: Analyzes the evaluation results to identify and quantify disagreements between stakeholders.
+  \item \texttt{/api/pareto}: Executes the multi-objective optimization to find consensus solutions when conflicts are detected.
+\end{itemize}
+
+This layer acts as the central nervous system of the application, validating all incoming requests against strict Pydantic data models (\texttt{app/models.py}) and coordinating the execution of tasks by the Engine Layer.
+
+\section{Engine Layer}
+\label{sec:engine}
+
+This layer contains the core algorithmic and business logic of the MEDF platform. It consists of several specialized Python modules:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Scoring Engine} (\texttt{scoring\_engine.py}): Implements the MCDM algorithms, including TOPSIS and WSM, for calculating ethical scores.
+  \item \textbf{Conflict Detection} (\texttt{conflict\_detection.py}): Contains the logic for comparing stakeholder weightings and calculating conflict metrics like Spearman's rank correlation.
+  \item \textbf{Harm Assessment} (\texttt{harm\_assessment.py}): Implements a model to estimate the potential severity of ethical risks based on system scores and stakeholder disagreement.
+  \item \textbf{Pareto Engine} (\texttt{routers/pareto.py}): Integrates the NSGA-II algorithm to compute the Pareto frontier of consensus weightings.
+\end{itemize}
+
+These engines are stateless and operate on the data passed to them by the API layer, ensuring that the core logic is decoupled from the web-serving and data persistence concerns.
+
+\section{Data and Configuration Layer}
+\label{sec:data}
+
+This layer is responsible for all data persistence and static configuration. It comprises:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Framework YAML Registry.} The definitions for ALTAI, NIST RMF, and MGAF are stored in human-readable YAML files. This allows the governance criteria to be version-controlled and updated without changing application code. The \texttt{framework\_registry.py} module is responsible for loading and validating these files at startup.
+
+  \item \textbf{SQLite Database.} A lightweight SQLite database is used to store stakeholder profiles. SQLAlchemy, a Python ORM, is used to interact with the database, providing an abstraction layer that would facilitate migration to a more powerful database system like PostgreSQL if needed.
+
+  \item \textbf{Case Study JSON Files.} The three case studies are defined in structured JSON files, containing their baseline scores and contextual information. This allows for consistent and reproducible testing and demonstration.
+
+  \item \textbf{Audit Logs.} To ensure complete traceability, the system can be configured to write detailed JSONL audit logs for every API request and response, capturing the exact inputs and outputs of every evaluation.
+\end{itemize}
+
+This layered architecture, summarized in the module diagram in Figure~\ref{fig:modules}, creates a robust and maintainable system where each component has a clearly defined responsibility.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=0.5cm and 0.8cm,
+  mod/.style={rectangle, draw, fill=blue!8, text width=9em, text centered, minimum height=2em, font=\small, rounded corners=2pt},
+  arrow/.style={-{Stealth[length=2mm]}, thick},
+]
+  \node[mod] (main) {\texttt{main.py}};
+  \node[mod, below left=1cm and 0.5cm of main] (eval_r) {\texttt{routers/evaluate.py}};
+  \node[mod, below=1cm of main] (conf_r) {\texttt{routers/conflicts.py}};
+  \node[mod, below right=1cm and 0.5cm of main] (par_r) {\texttt{routers/pareto.py}};
+
+  \node[mod, below=1cm of eval_r] (scoring) {\texttt{scoring\_engine.py}};
+  \node[mod, below=1cm of conf_r] (conflict) {\texttt{conflict\_detection.py}};
+  \node[mod, below=1cm of par_r] (harm) {\texttt{harm\_assessment.py}};
+
+  \node[mod, below=1.5cm of scoring] (models) {\texttt{models.py}};
+  \node[mod, below=1.5cm of harm] (registry) {\texttt{framework\_registry.py}};
+
+  \draw[arrow] (main) -- (eval_r);
+  \draw[arrow] (main) -- (conf_r);
+  \draw[arrow] (main) -- (par_r);
+  \draw[arrow] (eval_r) -- (scoring);
+  \draw[arrow] (conf_r) -- (conflict);
+  \draw[arrow] (par_r) -- (harm);
+  \draw[arrow] (scoring) -- (models);
+  \draw[arrow] (eval_r) -- (registry);
+  \draw[arrow] (par_r) -- (scoring);
+\end{tikzpicture}
+\caption{MEDF software module diagram.}
+\label{fig:modules}
+\end{figure}

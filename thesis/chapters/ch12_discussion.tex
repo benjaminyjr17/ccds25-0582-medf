@@ -1,0 +1,62 @@
+\chapter{Discussion}
+\label{ch:discussion}
+
+The development and evaluation of the MEDF platform have yielded several important insights into the challenges and opportunities of computational AI ethics. This chapter discusses the key findings from the project, the implications of the MEDF approach, and the role of such a tool in the broader AI governance ecosystem.
+
+\section{Key Findings}
+\label{sec:findings}
+
+\subsection{The Value of Quantification}
+
+One of the most significant findings from the case study evaluations is the power of quantification in clarifying ethical debates. Abstract discussions about whether a system is \enquote{fair} or \enquote{transparent} can be unproductive. By requiring assessors to assign a numerical score (even a subjective one) and forcing stakeholders to articulate their priorities as numerical weights, MEDF transforms a vague conversation into a structured, analytical process. The final scores, while not an absolute measure of ethicality, serve as a powerful, data-driven focal point for discussion. For example, seeing a system score 0.35 overall, with a High Risk flag on fairness, is a much more concrete and actionable starting point than simply stating that the system has \enquote{fairness issues.}
+
+\subsection{Surfacing Implicit Trade-offs}
+
+Ethical decision-making is often about managing trade-offs. The MEDF framework makes these trade-offs explicit. The conflict analysis between the Developer and Affected Community in the facial recognition case study, for instance, does not just say they disagree. It shows \textit{why} they disagree by pinpointing the dimensions (privacy versus safety) where their values diverge. Furthermore, the Pareto optimization engine demonstrates that there is often no single \enquote{correct} answer. Instead, there is a frontier of viable compromises. By presenting this frontier to decision-makers, MEDF shifts the conversation from a confrontational, zero-sum argument to a collaborative exploration of possible solutions. It provides a map of the solution space, allowing stakeholders to negotiate more effectively.
+
+\subsection{The Importance of a Multi-Framework Approach}
+
+Integrating three distinct governance frameworks (ALTAI, NIST RMF, MGAF) proved to be a valuable design decision. The case study evaluations showed that a system's ethical score could vary depending on the framework used for evaluation. This reflects the reality that different regulatory regimes have different priorities. A system that is compliant with the industry-focused MGAF might not satisfy the more stringent, rights-based requirements of ALTAI. MEDF's ability to evaluate against multiple frameworks simultaneously provides a more comprehensive and globally-aware assessment, which is crucial for organizations deploying AI systems in multiple jurisdictions.
+
+\section{Implications and Role in AI Governance}
+\label{sec:implications}
+
+The MEDF platform is not intended to be an automated \enquote{ethics oracle} that delivers a final, unquestionable verdict. Rather, it is a \textbf{decision-support tool}. Its primary role is to structure and inform human judgment, not to replace it. The scores and analyses it produces are best understood as inputs into a broader governance process that includes human deliberation, legal review, and public consultation.
+
+MEDF can be integrated into the AI development lifecycle at several key points:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Design Phase.} As a complement to qualitative methods like the FID framework~\cite{zhang2023fairness}, MEDF can be used to model the potential ethical impacts of different design choices before implementation begins.
+
+  \item \textbf{Internal Audit and Review.} Development teams can use MEDF to conduct internal ethical audits of their systems, identify areas of high risk, and document their due diligence.
+
+  \item \textbf{External Reporting and Compliance.} The outputs from MEDF can be used to generate reports for regulators, auditors, and the public, providing transparent and data-driven evidence of a system's ethical posture and the process used to evaluate it.
+
+  \item \textbf{Procurement.} Organizations looking to procure third-party AI systems could use MEDF to evaluate and compare the ethical performance of different vendors in a standardized way.
+\end{itemize}
+
+By providing a common language and a shared analytical framework, MEDF can help to foster a more productive and evidence-based dialogue between the diverse actors in the AI ecosystem, from the engineers building the systems to the regulators overseeing them and the public living with their consequences.
+
+\section{Comparison with Existing Approaches}
+\label{sec:comparison}
+
+It is useful to position MEDF relative to other approaches in the field. Existing tools for ethical AI assessment can be broadly categorized into three types: (1) qualitative checklists and guidelines, such as the raw ALTAI checklist itself, (2) technical fairness toolkits, such as IBM's AI Fairness 360 or Google's What-If Tool, which focus on detecting statistical bias in model outputs, and (3) governance platforms, which provide organizational workflows for managing AI risk.
+
+MEDF occupies a distinct position in this landscape. Unlike qualitative checklists, it provides a quantitative, computational output. Unlike technical fairness toolkits, it operates at a higher level of abstraction, evaluating the system against a broad set of ethical dimensions rather than focusing solely on statistical bias. And unlike most governance platforms, it explicitly models multi-stakeholder conflict and provides algorithmic tools for consensus generation. This combination of features makes MEDF a unique contribution to the field, filling a gap between high-level principles and low-level technical metrics.
+
+\section{Future Work}
+\label{sec:future}
+
+Several promising directions for future research and development emerge from this project:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Empirical Validation.} Conducting user studies with AI practitioners, ethicists, and policymakers to evaluate the usability and perceived value of the MEDF platform. This would provide empirical evidence to complement the technical validation presented in this report.
+
+  \item \textbf{Automated Score Generation.} Exploring the use of Natural Language Processing (NLP) techniques to automatically generate baseline dimension scores from system documentation, audit reports, or news articles. This would reduce the reliance on subjective manual scoring.
+
+  \item \textbf{Dynamic and Longitudinal Evaluation.} Extending MEDF to support longitudinal tracking of a system's ethical posture over time, allowing organizations to monitor how their ethical performance evolves as the system is updated and the regulatory landscape changes.
+
+  \item \textbf{Integration with CI/CD Pipelines.} Developing plugins or integrations that allow MEDF evaluations to be triggered automatically as part of a Continuous Integration/Continuous Deployment (CI/CD) pipeline, embedding ethical checks directly into the software development workflow.
+
+  \item \textbf{Expanded Framework Library.} Adding support for additional governance frameworks, such as the IEEE Ethically Aligned Design standards, the OECD AI Principles, or sector-specific regulations for healthcare, finance, and criminal justice.
+\end{itemize}

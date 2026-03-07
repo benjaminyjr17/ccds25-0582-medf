@@ -1,0 +1,51 @@
+\chapter{Verification Memo and Changelog}
+\label{app:changelog}
+
+This appendix documents the verification process applied to this report and the changes made relative to the initial draft.
+
+\section{Report Verification Process}
+
+The following verification steps were performed to ensure the accuracy and consistency of this report:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Code-to-Report Verification.} All stakeholder weights, framework definitions, and scoring algorithms described in the report were verified against the source code in the GitHub repository. The stakeholder weight table (Table~\ref{tab:weights}) was cross-referenced with the values in \texttt{app/framework\_registry.py}.
+
+  \item \textbf{Score Reproduction.} All case study evaluation scores were independently reproduced by running the MEDF scoring engine against the case study JSON files. The reproduced scores were compared against the values reported in Chapter~\ref{ch:case_studies}.
+
+  \item \textbf{Reference Audit.} All bibliographic references were verified for correctness. Author names, titles, publication venues, years, and DOIs were checked against the original sources.
+
+  \item \textbf{Wording Normalization.} Terminology was standardized throughout the report. The project number was corrected from CCDS25-0323 to CCDS25-0582. Framework names were consistently rendered as \enquote{ALTAI,} \enquote{NIST AI RMF,} and \enquote{MGAF.}
+\end{enumerate}
+
+\section{Changelog}
+
+The following material changes were made during the revision process:
+
+\begin{table}[H]
+\centering
+\caption{Revision changelog.}
+\label{tab:changelog}
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+\textbf{Item} & \textbf{Change Description} \\
+\midrule
+Project Number & Corrected from CCDS25-0323 to CCDS25-0582 throughout. \\
+\addlinespace
+Stakeholder Weights & Table~\ref{tab:weights} corrected to match source code values in \texttt{framework\_registry.py}. \\
+\addlinespace
+Reference [2] & Corrected from \enquote{AI and its new challenges for human rights} to \enquote{AI4People: An Ethical Framework for a Good AI Society} (Floridi et al., 2018). \\
+\addlinespace
+References & Expanded from 13 to 27 verified entries, adding foundational works on stakeholder theory, MCDM, and AI governance. \\
+\addlinespace
+Case Study Scores & Updated all tables to reflect scores reproduced from the actual codebase. \\
+\addlinespace
+Conflict Matrices & Clarified that the weights-only conflict matrix is identical across cases (same default weights) and added explanation of system-salience conflict analysis. \\
+\addlinespace
+Wording & Standardized all framework references, dimension names, and technical terminology. \\
+\addlinespace
+LaTeX Source & Created complete LaTeX source from scratch (no prior source existed in the repository). \\
+\addlinespace
+Figures & Replaced placeholder screenshots with TikZ-generated architecture and flow diagrams. \\
+\bottomrule
+\end{tabularx}
+\end{table}

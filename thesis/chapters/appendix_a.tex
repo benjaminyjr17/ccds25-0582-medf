@@ -1,0 +1,55 @@
+\chapter{API Reference}
+\label{app:api}
+
+This appendix provides a summary of the MEDF REST API endpoints. The complete, interactive API documentation is available at \texttt{/docs} when the FastAPI server is running.
+
+\section{Evaluation Endpoints}
+
+\begin{table}[H]
+\centering
+\caption{MEDF API endpoint reference.}
+\label{tab:api_ref}
+\begin{tabularx}{\textwidth}{@{}llX@{}}
+\toprule
+\textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\
+\midrule
+\texttt{GET}  & \texttt{/api/health} & Returns the health status of the API server. \\
+\texttt{GET}  & \texttt{/api/frameworks} & Lists all available governance frameworks and their definitions. \\
+\texttt{GET}  & \texttt{/api/stakeholders} & Lists all registered stakeholder profiles. \\
+\texttt{POST} & \texttt{/api/stakeholders} & Creates a new stakeholder profile with custom weights. \\
+\texttt{POST} & \texttt{/api/evaluate} & Runs an ethical evaluation given system scores, frameworks, and stakeholders. Returns per-framework and aggregated scores. \\
+\texttt{POST} & \texttt{/api/conflicts} & Computes the stakeholder conflict matrix (Spearman $\rho$) for a given evaluation context. \\
+\texttt{POST} & \texttt{/api/pareto} & Runs NSGA-II optimization to find Pareto-optimal consensus weight vectors. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Example: Evaluation Request}
+
+\begin{lstlisting}[language=Python, caption={Example API call to the evaluate endpoint.}]
+import requests
+
+payload = {
+    "system_name": "Facial Recognition LFR",
+    "dimension_scores": {
+        "transparency": 2.5,
+        "fairness": 1.5,
+        "safety": 5.0,
+        "privacy": 1.5,
+        "human_oversight": 2.5,
+        "accountability": 4.0
+    },
+    "frameworks": ["eu_altai", "nist_ai_rmf", "sg_mgaf"],
+    "stakeholders": ["developer", "regulator",
+                     "affected_community"],
+    "method": "topsis"
+}
+
+response = requests.post(
+    "http://localhost:8000/api/evaluate",
+    json=payload
+)
+result = response.json()
+print(f"Overall Score: {result['overall_score']:.4f}")
+print(f"Risk Level: {result['risk_level']}")
+\end{lstlisting}

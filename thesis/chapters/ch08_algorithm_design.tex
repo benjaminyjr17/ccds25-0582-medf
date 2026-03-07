@@ -1,0 +1,193 @@
+\chapter{Algorithm Design}
+\label{ch:algorithms}
+
+The analytical power of the MEDF platform is derived from a set of carefully selected and implemented algorithms that translate qualitative ethical considerations into a quantitative, decision-oriented format. This chapter details the design of the core algorithms responsible for scoring, weighting, and conflict resolution.
+
+\section{Ethical Scoring Engine}
+\label{sec:scoring_engine}
+
+The scoring engine is the heart of the evaluation pipeline. Its purpose is to compute a single, normalized score representing the ethical performance of an AI system, taking into account the system's characteristics, the chosen governance framework, and the priorities of a given stakeholder. This process involves three steps: weighting, aggregation, and normalization.
+
+\subsection{Stakeholder and Framework Weighting}
+\label{sec:weighting}
+
+The evaluation process begins by establishing the \enquote{effective weights} for each of the six Unified Dimensions. This is not simply the stakeholder's stated priorities. Instead, MEDF computes a combined weight that reflects both the stakeholder's values and the intrinsic emphasis of the selected governance framework. This is achieved through a \textbf{product pooling method}:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Stakeholder Weights} ($\mathbf{w}_s$): Each stakeholder provides a vector of weights, where each element represents the importance they assign to a dimension. This vector is normalized to sum to 1.0.
+
+  \item \textbf{Framework Weights} ($\mathbf{w}_f$): For each governance framework, a vector of intrinsic weights is pre-calculated. This is derived from the structure of the framework itself, for example, by counting the number of requirements, clauses, or principles related to each dimension. This vector is also normalized to sum to 1.0.
+
+  \item \textbf{Effective Weights} ($\mathbf{w}_{\mathrm{eff}}$): The effective weight for each dimension is calculated as the element-wise product of the stakeholder and framework weight vectors. The resulting vector is then re-normalized to sum to 1.0:
+\end{enumerate}
+
+\begin{equation}
+  \mathbf{w}_{\mathrm{eff}} \propto \mathbf{w}_s \odot \mathbf{w}_f
+  \label{eq:effective_weights}
+\end{equation}
+
+This product pooling approach ensures that a dimension receives a high effective weight only if \textit{both} the stakeholder and the framework consider it important. A dimension that is critical to the stakeholder but not emphasized by the framework (or vice versa) will receive a moderate effective weight. This prevents any single source of weighting from dominating the evaluation and produces a more balanced, context-sensitive result.
+
+\subsection{TOPSIS for Score Aggregation}
+\label{sec:topsis_algo}
+
+TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution)~\cite{hwang1981mcdm,behzadian2012topsis} is the primary scoring method in MEDF. Given a decision matrix $\mathbf{D}$ containing the AI system's scores across the six dimensions and the effective weight vector $\mathbf{w}_{\mathrm{eff}}$, the TOPSIS algorithm proceeds as follows:
+
+\textbf{Step 1: Normalize the Decision Matrix.} Raw Likert scores (1--7) are scaled to the $[0, 1]$ range:
+\begin{equation}
+  x'_{ij} = \frac{x_{ij} - 1}{7 - 1}
+  \label{eq:normalize}
+\end{equation}
+
+\textbf{Step 2: Vector Normalization.} The scaled matrix is then vector-normalized:
+\begin{equation}
+  r_{ij} = \frac{x'_{ij}}{\sqrt{\sum_{i} (x'_{ij})^2}}
+  \label{eq:vector_norm}
+\end{equation}
+
+\textbf{Step 3: Weighted Normalized Matrix.} The normalized values are multiplied by the effective weights:
+\begin{equation}
+  v_{ij} = r_{ij} \times w_{\mathrm{eff},j}
+  \label{eq:weighted}
+\end{equation}
+
+\textbf{Step 4: Determine Ideal and Anti-Ideal Solutions.} For benefit criteria (where higher is better), the ideal solution $A^+$ contains the maximum values and the anti-ideal solution $A^-$ contains the minimum values:
+\begin{equation}
+  A^+ = \{\max(v_{ij})\}, \quad A^- = \{\min(v_{ij})\}
+  \label{eq:ideal}
+\end{equation}
+
+\textbf{Step 5: Calculate Euclidean Distances.} The distance of each alternative to the ideal and anti-ideal solutions is computed:
+\begin{equation}
+  d^+ = \sqrt{\sum_{j} (v_{ij} - A^+_j)^2}, \quad d^- = \sqrt{\sum_{j} (v_{ij} - A^-_j)^2}
+  \label{eq:distances}
+\end{equation}
+
+\textbf{Step 6: Closeness Coefficient.} The final TOPSIS score is the closeness coefficient:
+\begin{equation}
+  C = \frac{d^-}{d^+ + d^-}
+  \label{eq:closeness}
+\end{equation}
+
+A score of $C = 1.0$ indicates a perfect match with the ideal solution, while $C = 0.0$ indicates a match with the anti-ideal solution. The scoring aggregation process is illustrated in Figure~\ref{fig:scoring_flow}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=1cm,
+  block/.style={rectangle, draw, fill=blue!8, text width=11em, text centered, rounded corners, minimum height=2.5em, font=\small},
+  arrow/.style={-{Stealth[length=2.5mm]}, thick},
+]
+  \node[block] (input) {Baseline Dimension Scores (1--7 Likert)};
+  \node[block, below=of input] (norm) {Normalize to $[0,1]$};
+  \node[block, below=of norm] (weight) {Apply Effective Weights $\mathbf{w}_{\mathrm{eff}}$};
+  \node[block, below=of weight] (ideal) {Compute Ideal / Anti-Ideal};
+  \node[block, below=of ideal] (dist) {Euclidean Distances};
+  \node[block, below=of dist] (score) {Closeness Coefficient $C$};
+
+  \draw[arrow] (input) -- (norm);
+  \draw[arrow] (norm) -- (weight);
+  \draw[arrow] (weight) -- (ideal);
+  \draw[arrow] (ideal) -- (dist);
+  \draw[arrow] (dist) -- (score);
+\end{tikzpicture}
+\caption{Ethical scoring aggregation process.}
+\label{fig:scoring_flow}
+\end{figure}
+
+\section{Conflict Detection and Consensus Generation}
+\label{sec:conflict}
+
+\subsection{Conflict Detection with Spearman's Correlation}
+\label{sec:spearman}
+
+To quantify the degree of agreement or disagreement between stakeholder groups, MEDF uses Spearman's rank correlation coefficient ($\rho$). For each pair of stakeholders, the algorithm computes the correlation between their weight vectors. A $\rho$ close to $+1$ indicates strong agreement (both stakeholders rank the dimensions in a similar order of importance), while a $\rho$ close to $-1$ indicates strong disagreement (their priorities are inversely related). A $\rho$ near $0$ indicates no significant relationship.
+
+The conflict detection module computes two types of correlation matrices:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{Priority Conflict (Weights-Only).} This matrix computes Spearman's $\rho$ directly between the raw stakeholder weight vectors. It measures whether stakeholders agree on which dimensions are most important, independent of the AI system being evaluated.
+
+  \item \textbf{System-Salience Conflict (Contribution-Based).} This matrix computes Spearman's $\rho$ between the \enquote{contribution vectors}, which are the element-wise products of the effective weights and the system's dimension scores. This measures whether stakeholders agree on which dimensions contribute most to the final score for a specific AI system. Two stakeholders might disagree on general priorities but agree on the critical issues for a particular system.
+\end{enumerate}
+
+\subsection{Pareto Optimization with NSGA-II}
+\label{sec:pareto}
+
+When the conflict analysis reveals significant disagreement between stakeholders, MEDF employs the NSGA-II algorithm~\cite{deb2002nsga2} to find a set of Pareto-optimal consensus weight vectors. The optimization problem is formulated as follows:
+
+For each stakeholder $k$, define an objective function that measures the weighted distance between a candidate consensus weight vector $\mathbf{w}_c$ and the stakeholder's preferred weight vector $\mathbf{w}_k$:
+\begin{equation}
+  f_k(\mathbf{w}_c) = \sum_{i} s_i \cdot |w_{c,i} - w_{k,i}|
+  \label{eq:pareto_obj}
+\end{equation}
+where $s_i$ is a salience factor derived from the AI system's dimension scores, ensuring that the optimization prioritizes agreement on the dimensions that matter most for the system under evaluation.
+
+NSGA-II then searches for the set of weight vectors that minimize all objective functions simultaneously. The resulting Pareto frontier represents the set of all possible compromises where no stakeholder can be made better off without making another worse off. Each point on the frontier is a viable consensus solution, and the decision-makers can select the one that best reflects the desired balance of interests.
+
+\section{Weighted Sum Model (WSM)}
+\label{sec:wsm}
+
+In addition to TOPSIS, MEDF implements the Weighted Sum Model (WSM) as an alternative scoring method. WSM computes the overall score as a simple weighted average of the normalized dimension scores:
+\begin{equation}
+  S_{\mathrm{WSM}} = \sum_{j} w_{\mathrm{eff},j} \times x'_j
+  \label{eq:wsm}
+\end{equation}
+WSM is simpler and more intuitive than TOPSIS but does not account for the distance to ideal and anti-ideal solutions. It is provided as an option for users who prefer a more straightforward aggregation method or who wish to compare results across different scoring approaches.
+
+\section{Harm Assessment Model}
+\label{sec:harm}
+
+The harm assessment module provides a high-level risk classification based on the evaluation results. It maps the overall score to a risk level using predefined thresholds:
+
+\begin{table}[H]
+\centering
+\caption{Risk classification thresholds.}
+\label{tab:risk_levels}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Score Range} & \textbf{Risk Level} & \textbf{Description} \\
+\midrule
+0.00--0.25 & Critical & Severe ethical deficiencies. \\
+0.25--0.50 & High & Significant ethical concerns. \\
+0.50--0.75 & Medium & Moderate ethical issues. \\
+0.75--1.00 & Low & Acceptable ethical performance. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The harm assessment also considers the level of stakeholder conflict. A system with a moderate overall score but high stakeholder conflict may be flagged as higher risk than its score alone would suggest, reflecting the additional governance challenge posed by unresolved ethical disagreements.
+
+\section{End-to-End Evaluation Pipeline}
+\label{sec:pipeline}
+
+The complete MEDF evaluation pipeline integrates all the components described above into a coherent, sequential workflow. Figure~\ref{fig:pipeline} illustrates the end-to-end process from input to output.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=0.9cm,
+  block/.style={rectangle, draw, fill=blue!8, text width=12em, text centered, rounded corners, minimum height=2.5em, font=\small},
+  io/.style={trapezium, draw, fill=green!8, trapezium left angle=70, trapezium right angle=110, text width=9em, text centered, minimum height=2em, font=\small},
+  arrow/.style={-{Stealth[length=2.5mm]}, thick},
+]
+  \node[io] (in1) {AI System Scores};
+  \node[io, right=2cm of in1] (in2) {Stakeholder Weights};
+  \node[block, below=1.2cm of $(in1)!0.5!(in2)$] (ew) {Compute Effective Weights};
+  \node[block, below=of ew] (topsis) {TOPSIS / WSM Scoring};
+  \node[block, below=of topsis] (agg) {Aggregate Across Frameworks};
+  \node[block, below=of agg] (conflict) {Conflict Detection (Spearman $\rho$)};
+  \node[block, below=of conflict] (harm) {Harm Assessment};
+  \node[io, below=of harm] (out) {Evaluation Result};
+
+  \draw[arrow] (in1.south) -- ++(0,-0.3) -| (ew.north west);
+  \draw[arrow] (in2.south) -- ++(0,-0.3) -| (ew.north east);
+  \draw[arrow] (ew) -- (topsis);
+  \draw[arrow] (topsis) -- (agg);
+  \draw[arrow] (agg) -- (conflict);
+  \draw[arrow] (conflict) -- (harm);
+  \draw[arrow] (harm) -- (out);
+\end{tikzpicture}
+\caption{End-to-end MEDF evaluation pipeline.}
+\label{fig:pipeline}
+\end{figure}

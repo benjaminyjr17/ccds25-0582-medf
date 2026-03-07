@@ -1,0 +1,78 @@
+\chapter{Framework YAML Definitions}
+\label{app:yaml}
+
+This appendix reproduces the YAML configuration files that define the three governance frameworks integrated into MEDF. These files are located in the \texttt{app/frameworks/} directory of the repository.
+
+\section{EU ALTAI (\texttt{eu\_altai.yaml})}
+
+\begin{lstlisting}[language={}, caption={EU ALTAI framework definition (excerpt).}]
+id: eu_altai
+name: EU Assessment List for Trustworthy AI
+version: "1.0"
+source: AI HLEG, European Commission, 2020
+dimensions:
+  transparency:
+    name: Transparency and Explainability
+    weight: 0.18
+    criteria:
+      - id: T1
+        text: Traceability of AI decisions
+      - id: T2
+        text: Explainability of model outputs
+      - id: T3
+        text: Communication of limitations
+  fairness:
+    name: Fairness and Non-discrimination
+    weight: 0.20
+    criteria:
+      - id: F1
+        text: Avoidance of unfair bias
+      - id: F2
+        text: Accessibility and universal design
+      - id: F3
+        text: Stakeholder participation
+  safety:
+    name: Safety and Robustness
+    weight: 0.18
+    criteria:
+      - id: S1
+        text: Resilience to attack
+      - id: S2
+        text: Fallback plan and safety
+      - id: S3
+        text: Accuracy and reliability
+  privacy:
+    name: Privacy and Data Governance
+    weight: 0.18
+    criteria:
+      - id: P1
+        text: Privacy and data protection
+      - id: P2
+        text: Quality and integrity of data
+      - id: P3
+        text: Access to data
+  human_oversight:
+    name: Human Agency and Oversight
+    weight: 0.12
+    criteria:
+      - id: H1
+        text: Human agency and autonomy
+      - id: H2
+        text: Human oversight mechanisms
+  accountability:
+    name: Accountability
+    weight: 0.14
+    criteria:
+      - id: A1
+        text: Auditability
+      - id: A2
+        text: Risk management
+\end{lstlisting}
+
+\section{NIST AI RMF (\texttt{nist\_ai\_rmf.yaml})}
+
+The NIST framework definition follows the same structure, with 15 criteria mapped to the six unified dimensions. The weights reflect the emphasis of the NIST AI RMF's four core functions (Govern, Map, Measure, Manage) on each dimension.
+
+\section{Singapore MGAF (\texttt{sg\_mgaf.yaml})}
+
+The Singapore MGAF definition contains 12 criteria with weights reflecting the framework's emphasis on accountability and internal governance structures. The complete YAML files are available in the project repository.

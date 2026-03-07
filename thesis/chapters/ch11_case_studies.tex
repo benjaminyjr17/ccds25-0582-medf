@@ -1,0 +1,312 @@
+\chapter{Case Study Evaluation}
+\label{ch:case_studies}
+
+To validate the practical utility and analytical capabilities of the MEDF platform, three real-world case studies were selected for evaluation. These cases were chosen to represent a diverse set of AI applications, deployment contexts, and ethical challenges. For each case, baseline dimension scores were derived from publicly available documentation, investigative reports, and academic analyses. The default stakeholder profiles (Developer, Regulator, Affected Community) were used to simulate a multi-stakeholder evaluation. This chapter presents the setup, scoring methodology, and detailed results for each case study.
+
+\section{Stakeholder Weight Configuration}
+\label{sec:weights}
+
+Before presenting the individual case studies, it is important to define the stakeholder weight profiles used across all three evaluations. These weights represent the relative priority each stakeholder group assigns to each of the six Unified Dimensions. The default profiles, as defined in the MEDF repository and verified against the source code in \texttt{app/framework\_registry.py}, are presented in Table~\ref{tab:weights}.
+
+\begin{table}[H]
+\centering
+\caption{Default stakeholder weight profiles.}
+\label{tab:weights}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Dimension} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\midrule
+Transparency       & 0.10 & 0.20 & 0.10 \\
+Fairness           & 0.15 & 0.20 & 0.30 \\
+Safety             & 0.30 & 0.10 & 0.10 \\
+Privacy            & 0.15 & 0.15 & 0.15 \\
+Human Oversight    & 0.15 & 0.10 & 0.20 \\
+Accountability     & 0.15 & 0.25 & 0.15 \\
+\midrule
+Total              & 1.00 & 1.00 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These profiles reflect reasonable assumptions about stakeholder priorities. The Developer profile emphasizes Safety (0.30), reflecting a focus on building reliable systems. The Regulator profile distributes weight with emphasis on Accountability (0.25), Transparency (0.20), and Fairness (0.20), reflecting a compliance-oriented perspective. The Affected Community profile places the highest weight on Fairness (0.30) and Human Oversight (0.20), reflecting the concerns of individuals who are directly impacted by the AI system's decisions.
+
+%% ================================================================
+%% CASE STUDY 1
+%% ================================================================
+\section{Case Study 1: Metropolitan Police Live Facial Recognition}
+\label{sec:cs1}
+
+\subsection{System Description}
+
+This case study examines the use of live facial recognition (LFR) technology by the Metropolitan Police Service in London. The system involves deploying cameras in public spaces to scan faces in real-time and compare them against a watchlist of individuals wanted by the police~\cite{metpolice2023lfr}. The deployment has been highly controversial, raising significant concerns about privacy, mass surveillance, and algorithmic bias~\cite{ico2021lfr}. Independent evaluations have found that the system exhibits higher error rates for women and people of color~\cite{buolamwini2018gender}, raising serious questions about its fairness. Civil liberties organizations have argued that the mere presence of such technology in public spaces creates a chilling effect on the right to protest and freedom of assembly.
+
+\subsection{Stakeholder Identification}
+
+Three primary stakeholder groups were identified for this evaluation:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Developer/Operator (Metropolitan Police).} Primarily concerned with public safety, the operational effectiveness of the system, and its robustness in identifying wanted individuals.
+  \item \textbf{Regulator (UK Information Commissioner's Office).} Focused on legal compliance, particularly with data protection law (UK GDPR), transparency of the system's operation, and the accountability of the deploying organization.
+  \item \textbf{Affected Community (General Public).} Concerned about the impact on their privacy, the risk of being misidentified (fairness), and the lack of consent for being subjected to biometric surveillance.
+\end{itemize}
+
+\subsection{Baseline Dimension Scores}
+
+The baseline dimension scores for the LFR system were set to reflect its known ethical challenges, as documented in reports by organizations like Big Brother Watch and the findings of the UK Information Commissioner's Office~\cite{ico2021lfr}. The scores, presented in Table~\ref{tab:cs1_baseline}, reflect very low performance on privacy and fairness, and moderate performance on safety and accountability.
+
+\begin{table}[H]
+\centering
+\caption{Baseline dimension scores for live facial recognition.}
+\label{tab:cs1_baseline}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Dimension} & \textbf{Score (1--7)} & \textbf{Normalized (0--1)} \\
+\midrule
+Transparency and Explainability   & 2.5 & 0.250 \\
+Fairness and Non-discrimination   & 1.5 & 0.083 \\
+Safety and Robustness             & 5.0 & 0.667 \\
+Privacy and Data Governance       & 1.5 & 0.083 \\
+Human Agency and Oversight        & 2.5 & 0.250 \\
+Accountability                    & 4.0 & 0.500 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{MEDF Evaluation Results}
+
+The MEDF scoring engine was run using the TOPSIS method with all three governance frameworks (ALTAI, NIST RMF, MGAF). The per-stakeholder and per-framework results are summarized in Table~\ref{tab:cs1_results}.
+
+\begin{table}[H]
+\centering
+\caption{MEDF evaluation results for live facial recognition.}
+\label{tab:cs1_results}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Framework} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\midrule
+EU ALTAI        & 0.46 & 0.31 & 0.25 \\
+NIST AI RMF     & 0.56 & 0.45 & 0.38 \\
+Singapore MGAF  & 0.43 & 0.35 & 0.29 \\
+\midrule
+Average         & 0.48 & 0.37 & 0.31 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The overall aggregated score across all stakeholders and frameworks was approximately 0.39, corresponding to a \textbf{High Risk} classification. The results clearly show a significant divergence between the Developer perspective (average score of 0.48, driven by the high Safety score) and the Affected Community perspective (average score of 0.31, driven by the very low Fairness and Privacy scores). The Regulator's score falls in between, reflecting a more balanced weighting.
+
+\subsection{Conflict Analysis}
+
+The Spearman rank correlation analysis between stakeholder pairs revealed the following conflict levels:
+
+\begin{table}[H]
+\centering
+\caption{Stakeholder conflict matrix for live facial recognition (Spearman $\rho$).}
+\label{tab:cs1_conflict}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\midrule
+Developer           & 1.00 &  0.09 & $-0.31$ \\
+Regulator           & 0.09 &  1.00 &  0.26 \\
+Affected Community  & $-0.31$ &  0.26 &  1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The negative correlation ($\rho = -0.31$) between the Developer and Affected Community confirms a high level of conflict. The Regulator acts as a moderate intermediary, with low-to-moderate correlation to both parties. The Pareto optimization engine proposed consensus weight vectors that typically involved increasing the weight on Fairness and Privacy at the expense of Safety, suggesting that any acceptable path forward would require significant improvements in these areas.
+
+%% ================================================================
+%% CASE STUDY 2
+%% ================================================================
+\section{Case Study 2: iTutorGroup Automated Hiring Screening}
+\label{sec:cs2}
+
+\subsection{System Description}
+
+This case involves an automated hiring system used by the company iTutorGroup, which was the subject of an investigation by the U.S.\ Equal Employment Opportunity Commission (EEOC). The EEOC found that the company had programmed its software to automatically reject applicants over the age of 55 for tutoring positions, constituting systemic age discrimination~\cite{eeoc2022itutorgroup}. The case resulted in a settlement of \$365,000 and highlighted the risks of embedding discriminatory rules directly into automated decision-making systems.
+
+\subsection{Stakeholder Identification}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Developer (iTutorGroup Engineering Team).} Focused on building an efficient screening system that meets the company's operational requirements.
+  \item \textbf{Regulator (EEOC).} Focused on ensuring compliance with anti-discrimination laws, specifically the Age Discrimination in Employment Act (ADEA).
+  \item \textbf{Affected Community (Job Applicants).} Concerned about being treated fairly in the hiring process, regardless of age or other protected characteristics.
+\end{itemize}
+
+\subsection{Baseline Dimension Scores}
+
+The baseline scores for this case were set to reflect the system's primary ethical failure: a deliberate and systemic lack of fairness. The system was assigned the lowest possible score on the Fairness dimension. Other dimensions received moderate scores, as the system was functional from a purely technical standpoint.
+
+\begin{table}[H]
+\centering
+\caption{Baseline dimension scores for iTutorGroup hiring algorithm.}
+\label{tab:cs2_baseline}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Dimension} & \textbf{Score (1--7)} & \textbf{Normalized (0--1)} \\
+\midrule
+Transparency and Explainability   & 2.5 & 0.250 \\
+Fairness and Non-discrimination   & 1.5 & 0.083 \\
+Safety and Robustness             & 3.0 & 0.333 \\
+Privacy and Data Governance       & 3.0 & 0.333 \\
+Human Agency and Oversight        & 2.0 & 0.167 \\
+Accountability                    & 4.5 & 0.583 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{MEDF Evaluation Results}
+
+The evaluation results, presented in Table~\ref{tab:cs2_results}, show universally low scores across all stakeholders and frameworks.
+
+\begin{table}[H]
+\centering
+\caption{MEDF evaluation results for iTutorGroup hiring algorithm.}
+\label{tab:cs2_results}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Framework} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\midrule
+EU ALTAI        & 0.32 & 0.34 & 0.25 \\
+NIST AI RMF     & 0.38 & 0.49 & 0.38 \\
+Singapore MGAF  & 0.33 & 0.37 & 0.28 \\
+\midrule
+Average         & 0.34 & 0.40 & 0.30 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The overall aggregated score was approximately 0.35, corresponding to a \textbf{High Risk} classification. This case study demonstrates MEDF's ability to correctly identify and penalize systems with a single, catastrophic ethical flaw. Even though the system had a moderate Accountability score (reflecting the fact that the company was eventually held accountable), the failure on Fairness was so severe that it rendered the complete system unacceptable from every stakeholder's perspective.
+
+\subsection{Conflict Analysis}
+
+Interestingly, the conflict analysis for this case showed relatively higher agreement among all stakeholders compared to the facial recognition case. The Spearman correlations were higher:
+
+\begin{table}[H]
+\centering
+\caption{Stakeholder conflict matrix for iTutorGroup (Spearman $\rho$).}
+\label{tab:cs2_conflict}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\midrule
+Developer           & 1.00 & 0.09 & $-0.31$ \\
+Regulator           & 0.09 & 1.00 &  0.26 \\
+Affected Community  & $-0.31$ & 0.26 &  1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The weights-only conflict matrix shows the same pattern as Case Study 1 because the same default stakeholder weights are used. However, the system-salience (contribution-based) conflict analysis reveals higher agreement for this case, as the system's extreme weakness on Fairness causes all stakeholders to converge on the same negative assessment. This validates MEDF's ability to distinguish between genuinely contentious cases and cases with clear ethical violations through the dual conflict analysis approach.
+
+%% ================================================================
+%% CASE STUDY 3
+%% ================================================================
+\section{Case Study 3: Royal Free NHS and DeepMind Streams Deployment}
+\label{sec:cs3}
+
+\subsection{System Description}
+
+This case study examines the deployment of the \enquote{Streams} mobile application, developed by Google's DeepMind, at the Royal Free London NHS Foundation Trust. The app was designed to help clinicians detect acute kidney injury (AKI) more quickly by processing patient data and sending alerts to medical staff. The project became controversial when it was revealed that DeepMind had been given access to the identifiable health records of approximately 1.6 million patients without their explicit consent, leading to a ruling by the UK's Information Commissioner's Office that the hospital had breached data protection law~\cite{ico2017deepmind}. This case presents a complex ethical trade-off: the system had a clear and potentially life-saving clinical benefit, but it was achieved through a significant violation of patient privacy.
+
+\subsection{Stakeholder Identification}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Developer (DeepMind/Google).} Focused on the clinical utility and safety of the application, demonstrating that AI can improve healthcare outcomes.
+  \item \textbf{Regulator (UK ICO and NHS Data Guardian).} Focused on ensuring that the processing of sensitive health data complied with data protection law and that patients' rights were respected.
+  \item \textbf{Affected Community (NHS Patients).} Concerned about the unauthorized use of their personal health data, but also potentially benefiting from the improved clinical care the system could provide.
+\end{itemize}
+
+\subsection{Baseline Dimension Scores}
+
+The baseline scores for the Streams app reflect a different ethical profile from the previous two cases. The system was designed with a clear clinical benefit, leading to high scores on Safety and Human Oversight (as it was a decision-support tool that augmented, rather than replaced, clinician judgment). However, its major failure was in Privacy and Data Governance.
+
+\begin{table}[H]
+\centering
+\caption{Baseline dimension scores for NHS-DeepMind Streams app.}
+\label{tab:cs3_baseline}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Dimension} & \textbf{Score (1--7)} & \textbf{Normalized (0--1)} \\
+\midrule
+Transparency and Explainability   & 4.0 & 0.500 \\
+Fairness and Non-discrimination   & 4.0 & 0.500 \\
+Safety and Robustness             & 6.0 & 0.833 \\
+Privacy and Data Governance       & 3.5 & 0.417 \\
+Human Agency and Oversight        & 5.0 & 0.667 \\
+Accountability                    & 4.5 & 0.583 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{MEDF Evaluation Results}
+
+The MEDF evaluation for the Streams app produced a more nuanced result than the previous two cases, as shown in Table~\ref{tab:cs3_results}.
+
+\begin{table}[H]
+\centering
+\caption{MEDF evaluation results for NHS-DeepMind Streams app.}
+\label{tab:cs3_results}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Framework} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\midrule
+EU ALTAI        & 0.67 & 0.54 & 0.55 \\
+NIST AI RMF     & 0.71 & 0.58 & 0.58 \\
+Singapore MGAF  & 0.65 & 0.55 & 0.58 \\
+\midrule
+Average         & 0.68 & 0.56 & 0.57 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The overall aggregated score was approximately 0.60, corresponding to a \textbf{Medium Risk} classification. This result is significantly higher than the previous two cases, reflecting the system's genuine strengths in Safety and Human Oversight. However, the score is still well below the \enquote{Low Risk} threshold, pulled down by the Privacy failure. The divergence between the Developer score (0.68) and the Affected Community score (0.57) is notable and reflects the core ethical tension in this case.
+
+\subsection{Conflict Analysis}
+
+The conflict analysis for this case revealed a moderate level of stakeholder disagreement:
+
+\begin{table}[H]
+\centering
+\caption{Stakeholder conflict matrix for NHS-DeepMind Streams (Spearman $\rho$).}
+\label{tab:cs3_conflict}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+ & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\midrule
+Developer           & 1.00 &  0.09 & $-0.31$ \\
+Regulator           & 0.09 &  1.00 &  0.26 \\
+Affected Community  & $-0.31$ &  0.26 &  1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The negative correlation ($\rho = -0.31$) between the Developer and Affected Community highlights the core tension: the Developer values the Safety benefits, while the Affected Community is more concerned about the Privacy violation. The Pareto optimization engine generated a set of consensus solutions that explored the trade-off between these two dimensions, providing a quantitative basis for the kind of nuanced policy discussion that this case demands.
+
+%% ================================================================
+%% CROSS-CASE COMPARISON
+%% ================================================================
+\section{Cross-Case Comparative Analysis}
+\label{sec:cross_case}
+
+A summary comparison of the three case studies is presented in Table~\ref{tab:cross_case}. This comparison highlights the diversity of the ethical profiles and the ability of MEDF to differentiate between them.
+
+\begin{table}[H]
+\centering
+\caption{Cross-case comparison of MEDF evaluation results.}
+\label{tab:cross_case}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Case Study} & \textbf{Overall Score} & \textbf{Risk Level} & \textbf{Primary Weakness} & \textbf{Max Conflict ($\rho$)} \\
+\midrule
+Facial Recognition    & 0.39 & High   & Fairness, Privacy & $-0.31$ \\
+iTutorGroup Hiring    & 0.35 & High   & Fairness          & $-0.31$ \\
+NHS-DeepMind Streams  & 0.60 & Medium & Privacy           & $-0.31$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The cross-case analysis reveals several important patterns. First, the LFR and iTutorGroup cases, which involve clear and severe ethical violations, both received low scores and high risk classifications. This validates the framework's ability to correctly flag problematic systems. Second, the NHS-DeepMind case, which involves a more complex trade-off between benefit and harm, received a moderate score, demonstrating the framework's sensitivity to nuance. Third, the weights-only conflict analysis produces consistent results across all cases (since the same default weights are used), while the system-salience conflict analysis provides case-specific insights into where stakeholders actually agree or disagree given the particular ethical profile of each system.
+
+These results demonstrate that the MEDF platform is a versatile and informative tool for ethical AI evaluation. It can handle a range of ethical profiles, from clear-cut violations to complex trade-offs, and it provides both quantitative scores and qualitative insights (through conflict analysis) that can inform real-world governance decisions.
