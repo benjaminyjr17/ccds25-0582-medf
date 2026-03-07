@@ -1,7 +1,7 @@
 \chapter{Platform Interface}
 \label{ch:interface}
 
-The MEDF platform is equipped with an interactive web-based dashboard built using Streamlit. This interface provides a user-friendly environment for analysts, developers, and other stakeholders to conduct ethical evaluations without needing to interact directly with the backend API or the codebase. The dashboard is designed to guide the user through the evaluation workflow, from configuration to results analysis. This chapter describes the critical features and components of the user interface.
+The MEDF platform is equipped with an interactive web-based dashboard built using Streamlit. This interface provides a user-friendly environment for analysts, developers, and other stakeholders to conduct ethical evaluations without needing to interact directly with the backend API or the codebase. The dashboard is designed to guide the user through the evaluation workflow, from configuration to results analysis. This chapter describes the critical features and components of the user interface, illustrated with screenshots captured from the live application running on localhost.
 
 \section{Main Evaluation View}
 \label{sec:main_view}
@@ -18,7 +18,14 @@ The primary view of the dashboard allows the user to configure and run a new eva
   \item \textbf{Stakeholder Weight Customization.} An expandable section where the user can view and override the default priority weights for each selected stakeholder, providing complete control over the evaluation context.
 \end{itemize}
 
-Once the configuration is set, the user can click the \enquote{Run Evaluation} button. The dashboard then sends a request to the backend API and displays the results in real-time. The interface also provides a \enquote{Run Demo Scenario} button that populates the form with pre-configured case study data for quick demonstration and testing.
+Once the configuration is set, the user can click the \enquote{Run Evaluation} button. The dashboard then sends a request to the backend API and displays the results in real-time. The interface also provides a \enquote{Run Demo Scenario} button that populates the form with pre-configured case study data for quick demonstration and testing. Figure~\ref{fig:evaluate_tab} shows the evaluation configuration interface.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/screenshot_evaluate.png}
+\caption{MEDF evaluation configuration interface showing dimension score sliders, framework selection, and stakeholder weight customization.}
+\label{fig:evaluate_tab}
+\end{figure}
 
 \section{Results Visualization}
 \label{sec:results_viz}
@@ -33,20 +40,57 @@ After an evaluation is complete, the results are presented in a series of clear 
   \item \textbf{Dimensional Contribution Radar Chart.} A radar chart visualizes the contribution of each of the six Unified Dimensions to the final score. This helps the user quickly identify the ethical strengths and weaknesses of the system.
 \end{itemize}
 
+Figure~\ref{fig:evaluate_results} shows the evaluation results after running the demo scenario.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/screenshot_evaluate_results.png}
+\caption{MEDF evaluation results showing the overall score, framework breakdown, and dimensional contributions.}
+\label{fig:evaluate_results}
+\end{figure}
+
 \section{Conflict and Consensus Analysis}
 \label{sec:conflict_viz}
 
-The dashboard also includes dedicated views for analyzing stakeholder disagreement:
+The dashboard includes dedicated views for analyzing stakeholder disagreement:
 
 \begin{itemize}[leftmargin=2em]
-  \item \textbf{Conflict Matrix.} A heatmap displays the Spearman's rank correlation coefficient for each pair of stakeholders, providing an at-a-glance overview of where the most significant conflicts in priorities lie.
+  \item \textbf{Conflict Matrix.} A heatmap displays the Spearman's rank correlation coefficient for each pair of stakeholders, providing an at-a-glance overview of where the most significant conflicts in priorities lie. Figure~\ref{fig:conflict_tab} shows the conflict detection interface.
 
-  \item \textbf{Pareto Frontier Visualization.} When the Pareto optimization is run, the interface displays a plot of the resulting non-dominated consensus solutions. This allows the user to visually explore the trade-offs between different compromise solutions.
+  \item \textbf{Pareto Frontier Visualization.} When the Pareto optimization is run, the interface displays a plot of the resulting non-dominated consensus solutions. This allows the user to visually explore the trade-offs between different compromise solutions. Figure~\ref{fig:pareto_tab} shows the Pareto resolution interface.
 \end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/screenshot_conflict.png}
+\caption{Conflict detection interface showing the stakeholder conflict matrix heatmap.}
+\label{fig:conflict_tab}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/screenshot_pareto.png}
+\caption{Pareto resolution interface showing the consensus optimization results.}
+\label{fig:pareto_tab}
+\end{figure}
 
 \section{Case Study Browser}
 \label{sec:case_browser}
 
-The dashboard includes a dedicated \enquote{Case Studies} tab that allows the user to browse and run the three pre-configured case studies (Facial Recognition, Hiring Algorithm, Healthcare Diagnostic). Each case study entry displays a summary of the AI system, its deployment context, known risks, and the evidence sources used to derive the baseline scores. The user can select a case study and run a complete evaluation with a single click, making it easy to reproduce the results presented in Chapter~\ref{ch:case_studies}.
+The dashboard includes a dedicated \enquote{Case Studies} tab that allows the user to browse and run the three pre-configured case studies (Facial Recognition, Hiring Algorithm, Healthcare Diagnostic). Each case study entry displays a summary of the AI system, its deployment context, known risks, and the evidence sources used to derive the baseline scores. The user can select a case study and run a complete evaluation with a single click, making it easy to reproduce the results presented in Chapter~\ref{ch:case_studies}. Figure~\ref{fig:casestudies_tab} shows the case study browser, and Figure~\ref{fig:casestudy_results} shows the results after running Case Study~1.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/screenshot_casestudies.png}
+\caption{Case study browser showing the three pre-configured case studies with system descriptions and evidence sources.}
+\label{fig:casestudies_tab}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/screenshot_casestudy_results.png}
+\caption{Case Study 1 (Facial Recognition) evaluation results showing the overall score of 0.3379 and per-stakeholder breakdown.}
+\label{fig:casestudy_results}
+\end{figure}
 
 By providing these interactive visualizations, the Streamlit dashboard makes the complex, multi-dimensional results of the MEDF evaluation accessible and interpretable for a non-technical audience, facilitating a more informed and data-driven discussion about AI ethics.

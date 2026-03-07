@@ -1,95 +1,165 @@
-# Verification Memo and Changelog
+# CCDS25-0582 Verification Memo and Changelog
 
-**Project:** CCDS25-0582 Multi-Stakeholder Ethical Decision-Making Frameworks for AI Systems  
-**Author:** Benjamin Oliver Yick (U2120984H)  
-**Date:** 7 March 2026  
+**Project:** Multi-Stakeholder Ethical Decision-Making Frameworks for AI Systems
+**Author:** Benjamin Oliver Yick (U2120984H)
+**Revision Date:** 7 March 2026
+**Revision Pass:** Second-pass surgical revision (staged: verification, revision, polish)
 
 ---
 
 ## 1. Verification Process
 
-This memo documents the systematic verification process applied to the revised FYP report. The verification was conducted in six phases, each targeting a specific category of potential errors or inconsistencies.
+The revision was conducted in three explicit stages, with a summary checkpoint after each.
 
-### Phase 0: Source Discovery
+### Stage 1: Verification (Code Audit and Claim Reconciliation)
 
-The GitHub repository (`benjaminyjr17/ccds25-0582-medf`) was cloned and all source files were catalogued. No LaTeX source files were found in the repository; the original report existed only as a compiled PDF. Consequently, the entire LaTeX thesis was created from scratch, faithfully reproducing and correcting the content of the original PDF.
+A module truth map was built by reading every source file in the repository. Each factual claim in the report was then compared against the code truth map. The following verification checks were performed:
 
-### Phase 1: Report-to-Code Verification
+| Check | Method | Outcome |
+|---|---|---|
+| Module truth map | Read all 12 Python source files, 3 YAML files, 3 JSON case studies | Complete |
+| `conflict_detection.py` status | Read code and test contract | Confirmed placeholder stub |
+| Stakeholder weights (Table 11.1) | API query, `framework_registry.py` read | Match code |
+| Case study scores (all 3) | Full API reproduction (27 scores) | All match to 4 decimal places |
+| Conflict matrices (all 3) | API reproduction via `/api/conflicts` | Contribution-based matrices differ by case |
+| Pareto resolution | API call for facial recognition | 10 solutions returned |
+| CI/CD claim | Inspected `.github/workflows/` | Two workflow files confirmed |
+| Framework YAML weights | Direct file read of all 3 YAML files | Appendix B had wrong weights (corrected) |
+| API schema | OpenAPI spec inspection | Appendix A had wrong field names (corrected) |
+| Screenshots | Playwright headless capture from localhost (1920x1080, 2x DPI) | 6 real screenshots captured |
 
-Every technical claim in the report was cross-referenced against the actual source code. The following discrepancies were identified and corrected:
+### Stage 2: Revision (Corrections Applied)
 
-| Item | Original Report | Actual Code | Action Taken |
-|------|----------------|-------------|--------------|
-| Project Number | CCDS25-0323 (throughout) | CCDS25-0582 | Corrected to CCDS25-0582 in all locations |
-| Stakeholder Weights (Table 11.1) | Developer Safety=0.25, Regulator Accountability=0.20, etc. | Developer Safety=0.30, Regulator Accountability=0.25, etc. | Corrected Table 11.1 to match `framework_registry.py` |
-| Conflict Detection | Described as computing Spearman rho between "score contribution vectors" | Code computes both weights-only and contribution-based correlations | Clarified dual conflict analysis in Chapter 11 |
+All identified defects were corrected in the LaTeX source. No new content was fabricated; all corrections were grounded in the code truth map or reproduced API output.
 
-### Phase 2: Score Reproduction
+### Stage 3: Polish (Honesty Check and Formatting)
 
-All three case studies were independently reproduced by running the MEDF scoring engine against the case study JSON files. The reproduced scores were used to update all evaluation result tables in Chapter 11.
-
-### Phase 3: Reference Audit
-
-All 13 original references were verified against their original sources. One citation was found to be incorrect:
-
-| Ref | Original Title | Correct Title | Action |
-|-----|---------------|---------------|--------|
-| [2] Floridi 2018 | "AI and its new challenges for human rights" | "AI4People: An Ethical Framework for a Good AI Society" | Corrected title, added full author list and DOI |
-
-The reference list was expanded from 13 to 27 entries, adding foundational works on stakeholder theory (Freeman 1984, Mitchell et al. 1997), MCDM methods (Saaty 1980, Behzadian et al. 2012), AI governance (Jobin et al. 2019, Mittelstadt 2019, Hagendorff 2020, Smuha 2019), algorithmic fairness (Buolamwini and Gebru 2018), and software engineering for ML (Amershi et al. 2019).
-
-### Phase 4: Application Testing
-
-The MEDF application was successfully installed and run locally. Both the FastAPI backend (port 8000) and Streamlit frontend (port 8501) were started. All three case studies were executed through the UI, and the results were verified against the reproduced scores.
-
-### Phase 5: Wording Normalization
-
-The following terminology was standardized throughout the report:
-
-| Before | After | Rationale |
-|--------|-------|-----------|
-| CCDS25-0323 | CCDS25-0582 | Correct project number |
-| "ALTAI" / "EU ALTAI" / "the ALTAI" | "ALTAI" (consistently) | Standardized framework name |
-| "NIST RMF" / "AI RMF" / "NIST AI RMF" | "NIST AI RMF" (consistently) | Standardized framework name |
-| "Singapore MGAF" / "MGAF" / "the MGAF" | "MGAF" (consistently) | Standardized framework name |
-| "affected community" / "Affected Community" | "Affected Community" (capitalized when referring to the stakeholder role) | Consistent capitalization |
+A final sweep was performed for overclaims, formatting consistency, and front matter accuracy. The compiled PDF was visually inspected page by page.
 
 ---
 
-## 2. Summary of Changes
+## 2. Critical Corrections
 
-### Critical Corrections
-1. **Project number** corrected from CCDS25-0323 to CCDS25-0582 throughout all pages and headers.
-2. **Stakeholder weight table** corrected to match actual source code values.
-3. **Reference [2]** corrected from wrong title to correct Floridi et al. (2018) AI4People paper.
+### 2.1 Architectural Honesty (Chapter 7, Section 7.3)
 
-### Structural Improvements
-4. **LaTeX source created from scratch** with proper NTU CCDS formatting, including cover page with NTU logo, running headers, and professional typography.
-5. **Three appendices added:** API Reference (Appendix A), Framework YAML Definitions (Appendix B), and Verification Memo (Appendix C).
-6. **TikZ diagrams created** for system architecture (Figure 7.1), module diagram (Figure 7.2), stakeholder decision flow (Figure 6.1), scoring aggregation process (Figure 8.1), and end-to-end evaluation pipeline (Figure 8.2).
+**Before:** `app/conflict_detection.py` was described as the implemented conflict analysis engine.
 
-### Content Enhancements
-7. **References expanded** from 13 to 27 verified entries.
-8. **Literature review strengthened** with additional citations to Jobin et al. (2019), Mittelstadt (2019), Hagendorff (2020), Freeman (1984), Mitchell et al. (1997), Behzadian et al. (2012), and others.
-9. **Case study evaluation tables updated** with scores reproduced from actual code execution.
-10. **Cross-case comparison table corrected** with accurate overall scores and risk levels.
-11. **Conflict analysis clarified** to distinguish between weights-only and contribution-based correlation matrices.
+**After:** Honestly described as a placeholder stub. All six public functions return empty or zero-valued results. The test file `test_conflict_detection_placeholder_contract.py` explicitly verifies this behavior. The actual conflict analysis logic is implemented inline within `app/routers/conflicts.py`. This is documented as technical debt in Chapter 13 (Limitations).
 
-### Formatting and Style
-12. **Professional LaTeX formatting** with booktabs tables, proper mathematical typesetting, numbered equations, and consistent use of `\enquote{}` for quotations.
-13. **Running header** displays correct project number and title on every page.
-14. **Table of Contents, List of Figures, and List of Tables** automatically generated.
-15. **IEEE-style bibliography** with proper formatting via biblatex.
+### 2.2 Conflict Matrices (Chapter 11)
+
+**Before:** The same weights-only Spearman rho matrix (with rho = -0.31 for Developer-Affected Community) was presented identically for all three case studies, which was misleading because the weights-only matrix is independent of the case study data.
+
+**After:** Replaced with case-specific contribution-based Spearman rho matrices reproduced from the API:
+
+| Case Study | Dev-Reg rho | Dev-Aff rho | Reg-Aff rho | Conflict Level |
+|---|---|---|---|---|
+| Facial Recognition | 0.89 | 0.94 | 0.94 | Low |
+| Hiring Algorithm | 0.54 | 0.77 | 0.54 | Moderate |
+| Healthcare Diagnostic | -0.14 | 0.49 | 0.03 | High |
+
+### 2.3 Framework YAML Weights (Appendix B)
+
+**Before:** EU ALTAI weights shown as T=0.18, F=0.20, S=0.18, P=0.18, H=0.12, A=0.14.
+
+**After:** Corrected to actual values: T=0.12, F=0.14, S=0.22, P=0.20, H=0.18, A=0.14. NIST AI RMF and Singapore MGAF excerpts also added with verified weights.
+
+### 2.4 API Reference (Appendix A)
+
+**Before:** Example used incorrect field names (e.g., `transparency` instead of `transparency_explainability`) and an incorrect request schema.
+
+**After:** Corrected to use actual field names matching the Pydantic models in `app/models.py`, with the correct nested `ai_system` object structure.
+
+### 2.5 Risk Threshold Tables (Chapter 8)
+
+**Before:** A single ambiguous risk threshold table.
+
+**After:** Split into two tables reflecting the two different threshold systems in the code: (1) evaluation router thresholds for closeness coefficient C, and (2) harm assessment module thresholds for harm score h.
 
 ---
 
-## 3. Deliverables
+## 3. Formatting Corrections
+
+| Item | Before | After |
+|---|---|---|
+| Project number | CCDS25-0323 | CCDS25-0582 |
+| Academic year | 2024/2025 | 2025/2026 |
+| Ch4 heading | "Compulsory References: Fairness in Design" | "Fairness in Design" |
+| Ch12 heading | "Key Findings" | "Critical Findings" |
+| Ch1 conclusion | "completely functional" | "functional" with limitation cross-reference |
+| Ch14 conclusion | "novel and powerful" | "practical" |
+
+---
+
+## 4. Screenshots
+
+Six real screenshots were captured from the live application running on localhost using Playwright headless browser automation:
+
+| Figure | Description |
+|---|---|
+| Fig 10.1 | Evaluate tab (configuration interface) |
+| Fig 10.2 | Evaluate results (demo scenario output) |
+| Fig 10.3 | Conflict detection heatmap |
+| Fig 10.4 | Pareto resolution interface |
+| Fig 10.5 | Case study browser |
+| Fig 10.6 | Case Study 1 results (overall score 0.3379) |
+
+---
+
+## 5. Known Limitations of Verification
+
+The following items were **not** independently verified:
+
+1. The baseline dimension scores for the three case studies are derived from qualitative analysis and are inherently subjective. No inter-rater reliability assessment was performed.
+2. The risk level labels returned by the API are "N/A" in the current implementation; the risk classification logic in the Streamlit frontend was not independently verified.
+3. The NSGA-II Pareto frontier results are stochastic (despite a fixed seed) and may vary slightly across different hardware or library versions.
+
+---
+
+## 6. Reproduced Scores (Reference Data)
+
+All scores below were reproduced by calling the live MEDF API on 7 March 2026.
+
+### Case Study 1: Facial Recognition
+
+| Framework | Developer | Regulator | Affected Community |
+|---|---|---|---|
+| EU ALTAI | 0.4583 | 0.3092 | 0.2462 |
+| NIST AI RMF | 0.5574 | 0.4524 | 0.3824 |
+| Singapore MGAF | 0.4310 | 0.3465 | 0.2862 |
+| **Average** | **0.4822** | **0.3694** | **0.3049** |
+| **Overall** | | **0.3379** | |
+
+### Case Study 2: Hiring Algorithm
+
+| Framework | Developer | Regulator | Affected Community |
+|---|---|---|---|
+| EU ALTAI | 0.3185 | 0.3418 | 0.2462 |
+| NIST AI RMF | 0.3185 | 0.3418 | 0.2462 |
+| Singapore MGAF | 0.3185 | 0.3418 | 0.2462 |
+| **Average** | **0.3185** | **0.3418** | **0.2462** |
+| **Overall** | | **0.3022** | |
+
+### Case Study 3: Healthcare Diagnostic
+
+| Framework | Developer | Regulator | Affected Community |
+|---|---|---|---|
+| EU ALTAI | 0.6673 | 0.5376 | 0.5475 |
+| NIST AI RMF | 0.6673 | 0.5376 | 0.5475 |
+| Singapore MGAF | 0.6673 | 0.5376 | 0.5475 |
+| **Average** | **0.6673** | **0.5376** | **0.5475** |
+| **Overall** | | **0.5841** | |
+
+---
+
+## 7. Deliverables
 
 | Deliverable | Location | Description |
-|-------------|----------|-------------|
-| Compiled PDF | `thesis/main.pdf` | 67-page final report |
+|---|---|---|
+| Compiled PDF | `thesis/main.pdf` | 75-page final report |
 | LaTeX source | `thesis/main.tex` | Main document file |
 | Chapter files | `thesis/chapters/*.tex` | 14 chapters + 3 appendices |
 | Bibliography | `thesis/references.bib` | 27 verified references |
+| Screenshots | `thesis/figures/screenshot_*.png` | 6 real localhost screenshots |
 | NTU Logo | `thesis/figures/ntu_logo.png` | Cover page logo |
 | This memo | `thesis/VERIFICATION_MEMO.md` | Verification documentation |

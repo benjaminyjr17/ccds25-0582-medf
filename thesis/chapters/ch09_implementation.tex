@@ -41,7 +41,17 @@ This module contains the core algorithmic implementation for the scoring process
 
 \subsection{\texttt{app/routers/}}
 
-The \texttt{app/routers/} directory contains the individual FastAPI routers for each major API endpoint. For example, \texttt{evaluate.py} handles the logic for the \texttt{/api/evaluate} endpoint. It receives the \texttt{EvaluateRequest} payload, coordinates calls to the scoring engine and framework registry, aggregates the results, and returns a validated \texttt{EvaluationResult} response. This modular approach keeps the endpoint logic clean and organized.
+The \texttt{app/routers/} directory contains the individual FastAPI routers for each major API endpoint:
+
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{evaluate.py} handles the \texttt{/api/evaluate} endpoint. It receives the \texttt{EvaluateRequest} payload, computes effective weights through section-based product pooling of stakeholder and framework weights, coordinates calls to the scoring engine, and returns a validated \texttt{EvaluationResult} response.
+
+  \item \texttt{conflicts.py} handles the \texttt{/api/conflicts} endpoint and is the \emph{de facto} conflict analysis engine. It implements the complete Spearman rank correlation computation for both weights-only and contribution-based conflict metrics, identifies divergent dimensions, determines conflict severity levels, and integrates the harm assessment module. As noted in Chapter~\ref{ch:architecture}, the standalone \texttt{conflict\_detection.py} module currently serves as a placeholder stub; the full logic resides here.
+
+  \item \texttt{pareto.py} handles the \texttt{/api/pareto} endpoint and implements the NSGA-II multi-objective optimization for computing Pareto-optimal consensus weight vectors.
+\end{itemize}
+
+This modular approach keeps the endpoint logic clean and organized, though the concentration of conflict analysis logic within the router rather than a dedicated engine module is an acknowledged technical debt item.
 
 \section{Design Decisions and Implementation Rationale}
 \label{sec:decisions}

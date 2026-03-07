@@ -1,21 +1,37 @@
 \chapter{Verification Memo and Changelog}
 \label{app:changelog}
 
-This appendix documents the verification process applied to this report and the changes made relative to the initial draft.
+This appendix documents the verification process applied to this report and the changes made relative to the initial draft. It is intended to provide an honest and transparent record of what was checked, what was corrected, and what limitations remain.
 
 \section{Report Verification Process}
 
 The following verification steps were performed to ensure the accuracy and consistency of this report:
 
 \begin{enumerate}[leftmargin=2em]
-  \item \textbf{Code-to-Report Verification.} All stakeholder weights, framework definitions, and scoring algorithms described in the report were verified against the source code in the GitHub repository. The stakeholder weight table (Table~\ref{tab:weights}) was cross-referenced with the values in \texttt{app/framework\_registry.py}.
+  \item \textbf{Code-to-Report Verification.} The stakeholder weight table (Table~\ref{tab:weights}) was cross-referenced with the default values in \texttt{app/framework\_registry.py} and confirmed to match. The framework YAML dimension weights in Appendix~\ref{app:yaml} were verified against the actual \texttt{app/frameworks/*.yaml} files. The scoring algorithm descriptions in Chapter~\ref{ch:algorithms} were compared against the implementations in \texttt{app/scoring\_engine.py} and \texttt{app/routers/evaluate.py}. The conflict analysis descriptions were verified against \texttt{app/routers/conflicts.py}.
 
-  \item \textbf{Score Reproduction.} All case study evaluation scores were independently reproduced by running the MEDF scoring engine against the case study JSON files. The reproduced scores were compared against the values reported in Chapter~\ref{ch:case_studies}.
+  \item \textbf{Score Reproduction.} All nine per-stakeholder, per-framework scores for each of the three case studies (27 scores total) were independently reproduced by calling the live MEDF API with the case study dimension scores and default stakeholder weights. The reproduced scores matched the values reported in Chapter~\ref{ch:case_studies} to four decimal places.
 
-  \item \textbf{Reference Audit.} All bibliographic references were verified for correctness. Author names, titles, publication venues, years, and DOIs were checked against the original sources.
+  \item \textbf{Conflict Matrix Reproduction.} The contribution-based Spearman $\rho$ values for all three case studies were independently reproduced via the \texttt{/api/conflicts} endpoint. The reproduced matrices matched the values reported in Chapter~\ref{ch:case_studies}.
+
+  \item \textbf{Architectural Honesty Check.} The module \texttt{app/conflict\_detection.py} was identified as a placeholder stub (all six public functions return empty or zero-valued results). This was confirmed by the test file \texttt{test\_conflict\_detection\_placeholder\_contract.py}. The report was revised to accurately describe this module's status and to identify \texttt{app/routers/conflicts.py} as the actual conflict analysis engine.
+
+  \item \textbf{Reference Audit.} All bibliographic references were verified for correctness. Author names, titles, publication venues, years, and DOIs were checked against the original sources. One incorrect citation was corrected (Floridi 2018).
 
   \item \textbf{Wording Normalization.} Terminology was standardized throughout the report. The project number was corrected from CCDS25-0323 to CCDS25-0582. Framework names were consistently rendered as \enquote{ALTAI,} \enquote{NIST AI RMF,} and \enquote{MGAF.}
+
+  \item \textbf{Screenshot Verification.} All platform interface screenshots in Chapter~\ref{ch:interface} were captured from the live application running on localhost, using Playwright headless browser automation at 1920$\times$1080 resolution with 2$\times$ device pixel ratio.
 \end{enumerate}
+
+\section{Known Limitations of Verification}
+
+The following items were \emph{not} independently verified and represent known limitations:
+
+\begin{itemize}[leftmargin=2em]
+  \item The baseline dimension scores for the three case studies were derived from qualitative analysis of public reports and are inherently subjective. No formal inter-rater reliability assessment was performed.
+  \item The risk level labels returned by the API are \texttt{"N/A"} in the current implementation; the risk classification logic in the Streamlit frontend was not independently verified against the thresholds documented in Chapter~\ref{ch:algorithms}.
+  \item The NSGA-II Pareto frontier results are stochastic (despite a fixed seed) and may vary slightly across different hardware or library versions.
+\end{itemize}
 
 \section{Changelog}
 
@@ -31,21 +47,35 @@ The following material changes were made during the revision process:
 \midrule
 Project Number & Corrected from CCDS25-0323 to CCDS25-0582 throughout. \\
 \addlinespace
-Stakeholder Weights & Table~\ref{tab:weights} corrected to match source code values in \texttt{framework\_registry.py}. \\
+Academic Year & Corrected from 2024/2025 to 2025/2026 on the cover page. \\
+\addlinespace
+Ch7 Sec 7.3 & Corrected description of \texttt{conflict\_detection.py} from \enquote{implemented conflict engine} to \enquote{placeholder stub.} Identified \texttt{routers/conflicts.py} as the actual conflict analysis engine. \\
+\addlinespace
+Ch7 Fig 7.2 & Changed the arrow from \texttt{routers/conflicts.py} to \texttt{conflict\_detection.py} to a dashed \enquote{planned} arrow, and added a direct arrow to \texttt{harm\_assessment.py}. \\
+\addlinespace
+Ch8 Sec 8.5 & Split the single risk threshold table into two tables: one for the evaluation router (closeness coefficient) and one for the harm assessment module (harm score), reflecting the two different threshold systems in the code. \\
+\addlinespace
+Ch9 Sec 9.2.4 & Expanded the routers description to individually document \texttt{evaluate.py}, \texttt{conflicts.py}, and \texttt{pareto.py}, noting that \texttt{conflicts.py} is the de facto conflict engine. \\
+\addlinespace
+Ch11 Conflict Matrices & Replaced the identical weights-only matrices (which were the same across all three cases) with case-specific contribution-based matrices reproduced from the API. \\
+\addlinespace
+Ch11 Cross-Case Table & Updated overall scores and max conflict values to reflect contribution-based analysis. \\
+\addlinespace
+Ch4 Heading & Removed \enquote{Compulsory References:} prefix from section heading. \\
+\addlinespace
+Ch12 Heading & Changed \enquote{Key Findings} to \enquote{Critical Findings.} \\
+\addlinespace
+Appendix A & Corrected API example to use actual field names (\texttt{transparency\_explainability} instead of \texttt{transparency}) and actual request schema (\texttt{ai\_system} object). \\
+\addlinespace
+Appendix B & Corrected EU ALTAI YAML excerpt weights from (T=0.18, F=0.20, S=0.18, P=0.18, H=0.12, A=0.14) to actual values (T=0.12, F=0.14, S=0.22, P=0.20, H=0.18, A=0.14). \\
 \addlinespace
 Reference [2] & Corrected from \enquote{AI and its new challenges for human rights} to \enquote{AI4People: An Ethical Framework for a Good AI Society} (Floridi et al., 2018). \\
 \addlinespace
 References & Expanded from 13 to 27 verified entries, adding foundational works on stakeholder theory, MCDM, and AI governance. \\
 \addlinespace
-Case Study Scores & Updated all tables to reflect scores reproduced from the actual codebase. \\
-\addlinespace
-Conflict Matrices & Clarified that the weights-only conflict matrix is identical across cases (same default weights) and added explanation of system-salience conflict analysis. \\
-\addlinespace
-Wording & Standardized all framework references, dimension names, and technical terminology. \\
-\addlinespace
 LaTeX Source & Created complete LaTeX source from scratch (no prior source existed in the repository). \\
 \addlinespace
-Figures & Replaced placeholder screenshots with TikZ-generated architecture and flow diagrams. \\
+Screenshots & Captured real screenshots from localhost using Playwright, replacing placeholder text descriptions. \\
 \bottomrule
 \end{tabularx}
 \end{table}

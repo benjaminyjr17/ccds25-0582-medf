@@ -138,25 +138,45 @@ WSM is simpler and more intuitive than TOPSIS but does not account for the dista
 \section{Harm Assessment Model}
 \label{sec:harm}
 
-The harm assessment module provides a high-level risk classification based on the evaluation results. It maps the overall score to a risk level using predefined thresholds:
+The harm assessment module provides a high-level risk classification based on the evaluation results. Two complementary threshold systems are used, reflecting the different scales of the underlying metrics.
+
+The \textbf{evaluation router} classifies the TOPSIS closeness coefficient $C$ (where higher values indicate better ethical performance) using the thresholds in Table~\ref{tab:risk_levels_eval}.
 
 \begin{table}[H]
 \centering
-\caption{Risk classification thresholds.}
-\label{tab:risk_levels}
+\caption{Evaluation risk classification (closeness coefficient $C$).}
+\label{tab:risk_levels_eval}
 \begin{tabular}{@{}lll@{}}
 \toprule
 \textbf{Score Range} & \textbf{Risk Level} & \textbf{Description} \\
 \midrule
-0.00--0.25 & Critical & Severe ethical deficiencies. \\
-0.25--0.50 & High & Significant ethical concerns. \\
-0.50--0.75 & Medium & Moderate ethical issues. \\
-0.75--1.00 & Low & Acceptable ethical performance. \\
+$C \geq 0.80$ & Low & Acceptable ethical performance. \\
+$0.60 \leq C < 0.80$ & Medium & Moderate ethical issues. \\
+$0.40 \leq C < 0.60$ & High & Significant ethical concerns. \\
+$C < 0.40$ & Critical & Severe ethical deficiencies. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The harm assessment also considers the level of stakeholder conflict. A system with a moderate overall score but high stakeholder conflict may be flagged as higher risk than its score alone would suggest, reflecting the additional governance challenge posed by unresolved ethical disagreements.
+The \textbf{harm assessment module} classifies a composite harm score $h$ (where higher values indicate greater harm) using the thresholds in Table~\ref{tab:risk_levels_harm}. The harm score is computed as $h = 0.7 \times (1 - s_{\text{norm}}) + 0.3 \times \bar{d}$, where $s_{\text{norm}}$ is the normalized dimension score and $\bar{d}$ is the mean pairwise stakeholder weight disagreement.
+
+\begin{table}[H]
+\centering
+\caption{Harm severity classification (harm score $h$).}
+\label{tab:risk_levels_harm}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Harm Score Range} & \textbf{Severity} & \textbf{Description} \\
+\midrule
+$h < 0.25$ & Low & Minimal ethical risk. \\
+$0.25 \leq h < 0.50$ & Moderate & Notable ethical risk. \\
+$0.50 \leq h < 0.75$ & High & Serious ethical risk. \\
+$h \geq 0.75$ & Critical & Severe ethical risk. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These two systems are conceptually consistent: the closeness coefficient is a \enquote{higher is better} metric while the harm score is a \enquote{higher is worse} metric. A system with a low closeness coefficient will tend to have a high harm score, and vice versa. The harm assessment also considers the level of stakeholder conflict. A system with a moderate overall score but high stakeholder conflict may be flagged as higher risk than its score alone would suggest, reflecting the additional governance challenge posed by unresolved ethical disagreements.
 
 \section{End-to-End Evaluation Pipeline}
 \label{sec:pipeline}

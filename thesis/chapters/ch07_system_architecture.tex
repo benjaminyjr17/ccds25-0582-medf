@@ -90,9 +90,9 @@ This layer contains the core algorithmic and business logic of the MEDF platform
 
 \begin{itemize}[leftmargin=2em]
   \item \textbf{Scoring Engine} (\texttt{scoring\_engine.py}): Implements the MCDM algorithms, including TOPSIS and WSM, for calculating ethical scores.
-  \item \textbf{Conflict Detection} (\texttt{conflict\_detection.py}): Contains the logic for comparing stakeholder weightings and calculating conflict metrics like Spearman's rank correlation.
-  \item \textbf{Harm Assessment} (\texttt{harm\_assessment.py}): Implements a model to estimate the potential severity of ethical risks based on system scores and stakeholder disagreement.
-  \item \textbf{Pareto Engine} (\texttt{routers/pareto.py}): Integrates the NSGA-II algorithm to compute the Pareto frontier of consensus weightings.
+  \item \textbf{Conflict Detection Stub} (\texttt{conflict\_detection.py}): Defines the interface contract for conflict analysis. In the current implementation, this module serves as a placeholder; all six of its public functions return empty or zero-valued results. The full conflict analysis logic---including Spearman's rank correlation, divergent-dimension identification, and harm-assessment integration---is implemented inline within \texttt{routers/conflicts.py}. A dedicated test (\texttt{test\_conflict\_detection\_placeholder\_contract.py}) verifies that the stub returns the expected empty results, confirming this architectural decision is intentional rather than accidental. Future refactoring may extract the inline logic into this module to complete the separation of concerns.
+  \item \textbf{Harm Assessment} (\texttt{harm\_assessment.py}): Implements a model to estimate the potential severity of ethical risks. The harm score is computed as a weighted combination: $h = 0.7 \times (1 - s_{\text{norm}}) + 0.3 \times \bar{d}$, where $s_{\text{norm}}$ is the normalized dimension score and $\bar{d}$ is the mean pairwise stakeholder weight disagreement.
+  \item \textbf{Pareto Engine} (\texttt{routers/pareto.py}): Integrates the NSGA-II algorithm via the \texttt{pymoo} library to compute the Pareto frontier of consensus weightings. A random-sampling fallback is provided if \texttt{pymoo} is unavailable.
 \end{itemize}
 
 These engines are stateless and operate on the data passed to them by the API layer, ensuring that the core logic is decoupled from the web-serving and data persistence concerns.
@@ -127,7 +127,7 @@ This layered architecture, summarized in the module diagram in Figure~\ref{fig:m
   \node[mod, below right=1cm and 0.5cm of main] (par_r) {\texttt{routers/pareto.py}};
 
   \node[mod, below=1cm of eval_r] (scoring) {\texttt{scoring\_engine.py}};
-  \node[mod, below=1cm of conf_r] (conflict) {\texttt{conflict\_detection.py}};
+  \node[mod, fill=gray!15, below=1cm of conf_r] (conflict) {\texttt{conflict\_detection.py}\\{\tiny (placeholder stub)}};
   \node[mod, below=1cm of par_r] (harm) {\texttt{harm\_assessment.py}};
 
   \node[mod, below=1.5cm of scoring] (models) {\texttt{models.py}};
@@ -137,7 +137,8 @@ This layered architecture, summarized in the module diagram in Figure~\ref{fig:m
   \draw[arrow] (main) -- (conf_r);
   \draw[arrow] (main) -- (par_r);
   \draw[arrow] (eval_r) -- (scoring);
-  \draw[arrow] (conf_r) -- (conflict);
+  \draw[arrow, dashed, gray] (conf_r) -- node[right, font=\tiny, text=gray] {planned} (conflict);
+  \draw[arrow] (conf_r) -- (harm);
   \draw[arrow] (par_r) -- (harm);
   \draw[arrow] (scoring) -- (models);
   \draw[arrow] (eval_r) -- (registry);

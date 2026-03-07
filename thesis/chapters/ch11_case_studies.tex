@@ -30,6 +30,11 @@ Total              & 1.00 & 1.00 & 1.00 \\
 
 These profiles reflect reasonable assumptions about stakeholder priorities. The Developer profile emphasizes Safety (0.30), reflecting a focus on building reliable systems. The Regulator profile distributes weight with emphasis on Accountability (0.25), Transparency (0.20), and Fairness (0.20), reflecting a compliance-oriented perspective. The Affected Community profile places the highest weight on Fairness (0.30) and Human Oversight (0.20), reflecting the concerns of individuals who are directly impacted by the AI system's decisions.
 
+\subsection{Note on Conflict Analysis Methodology}
+\label{sec:conflict_note}
+
+The MEDF conflict analysis engine computes Spearman's rank correlation between stakeholder contribution vectors, which are the element-wise products of each stakeholder's effective weights and the system's normalized dimension scores. Because the contribution vectors depend on the system's dimension scores, the conflict matrices differ across case studies even when the same default stakeholder weights are used. This is the \textbf{system-salience (contribution-based)} conflict metric described in Chapter~\ref{ch:algorithms}. All conflict matrices presented in this chapter use this contribution-based method, as it provides case-specific insights into where stakeholders actually agree or disagree given the particular ethical profile of each system.
+
 %% ================================================================
 %% CASE STUDY 1
 %% ================================================================
@@ -97,24 +102,24 @@ The overall aggregated score across all stakeholders and frameworks was approxim
 
 \subsection{Conflict Analysis}
 
-The Spearman rank correlation analysis between stakeholder pairs revealed the following conflict levels:
+The contribution-based Spearman rank correlation analysis between stakeholder pairs produced the results shown in Table~\ref{tab:cs1_conflict}. These values reflect how the stakeholders' priorities interact with the specific ethical profile of the facial recognition system.
 
 \begin{table}[H]
 \centering
-\caption{Stakeholder conflict matrix for live facial recognition (Spearman $\rho$).}
+\caption{Stakeholder conflict matrix for live facial recognition (contribution-based Spearman $\rho$).}
 \label{tab:cs1_conflict}
 \begin{tabular}{@{}lccc@{}}
 \toprule
  & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
 \midrule
-Developer           & 1.00 &  0.09 & $-0.31$ \\
-Regulator           & 0.09 &  1.00 &  0.26 \\
-Affected Community  & $-0.31$ &  0.26 &  1.00 \\
+Developer           & 1.00 &  0.89 &  0.94 \\
+Regulator           & 0.89 &  1.00 &  0.94 \\
+Affected Community  & 0.94 &  0.94 &  1.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The negative correlation ($\rho = -0.31$) between the Developer and Affected Community confirms a high level of conflict. The Regulator acts as a moderate intermediary, with low-to-moderate correlation to both parties. The Pareto optimization engine proposed consensus weight vectors that typically involved increasing the weight on Fairness and Privacy at the expense of Safety, suggesting that any acceptable path forward would require significant improvements in these areas.
+The high positive correlations ($\rho = 0.89$ to $0.94$) indicate \textbf{low conflict} across all stakeholder pairs for this case. This result may appear counterintuitive given the divergent evaluation scores, but it reflects the fact that the contribution-based analysis measures agreement on the \emph{ranking} of dimension contributions, not on the absolute scores. The system's extreme ethical profile---with very low Fairness and Privacy scores and a high Safety score---creates a clear ranking that all stakeholders tend to agree on, even though they weight the dimensions differently. The primary conflicting dimensions are Accountability versus Safety (Developer--Regulator) and Accountability versus Safety (Developer--Affected Community). The Pareto optimization engine proposed consensus weight vectors that typically involved increasing the weight on Fairness and Privacy at the expense of Safety, suggesting that any acceptable path forward would require significant improvements in these areas.
 
 %% ================================================================
 %% CASE STUDY 2
@@ -181,29 +186,29 @@ The overall aggregated score was approximately 0.35, corresponding to a \textbf{
 
 \subsection{Conflict Analysis}
 
-Interestingly, the conflict analysis for this case showed relatively higher agreement among all stakeholders compared to the facial recognition case. The Spearman correlations were higher:
+The contribution-based conflict analysis for this case revealed moderate levels of stakeholder disagreement, as shown in Table~\ref{tab:cs2_conflict}.
 
 \begin{table}[H]
 \centering
-\caption{Stakeholder conflict matrix for iTutorGroup (Spearman $\rho$).}
+\caption{Stakeholder conflict matrix for iTutorGroup (contribution-based Spearman $\rho$).}
 \label{tab:cs2_conflict}
 \begin{tabular}{@{}lccc@{}}
 \toprule
  & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
 \midrule
-Developer           & 1.00 & 0.09 & $-0.31$ \\
-Regulator           & 0.09 & 1.00 &  0.26 \\
-Affected Community  & $-0.31$ & 0.26 &  1.00 \\
+Developer           & 1.00 &  0.54 &  0.77 \\
+Regulator           & 0.54 &  1.00 &  0.54 \\
+Affected Community  & 0.77 &  0.54 &  1.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The weights-only conflict matrix shows the same pattern as Case Study 1 because the same default stakeholder weights are used. However, the system-salience (contribution-based) conflict analysis reveals higher agreement for this case, as the system's extreme weakness on Fairness causes all stakeholders to converge on the same negative assessment. This validates MEDF's ability to distinguish between genuinely contentious cases and cases with clear ethical violations through the dual conflict analysis approach.
+The Developer--Regulator and Regulator--Affected Community pairs show \textbf{moderate} conflict ($\rho = 0.54$), while the Developer--Affected Community pair shows \textbf{low} conflict ($\rho = 0.77$). The primary conflicting dimensions for the Developer--Regulator pair are Safety and Transparency, reflecting their different priorities when the system's ethical profile includes moderate Safety but low Transparency scores. This case demonstrates how the contribution-based conflict metric captures case-specific dynamics: unlike the facial recognition case (where all pairs showed low conflict), the hiring algorithm's more ambiguous ethical profile produces more differentiated conflict levels.
 
 %% ================================================================
 %% CASE STUDY 3
 %% ================================================================
-\section{Case Study 3: Royal Free NHS and DeepMind Streams Deployment}
+\section{Case Study 3: Royal Free NHS and DeepMind Streams App}
 \label{sec:cs3}
 
 \subsection{System Description}
@@ -265,24 +270,26 @@ The overall aggregated score was approximately 0.60, corresponding to a \textbf{
 
 \subsection{Conflict Analysis}
 
-The conflict analysis for this case revealed a moderate level of stakeholder disagreement:
+The contribution-based conflict analysis for this case revealed the highest levels of stakeholder disagreement among the three case studies, as shown in Table~\ref{tab:cs3_conflict}.
 
 \begin{table}[H]
 \centering
-\caption{Stakeholder conflict matrix for NHS-DeepMind Streams (Spearman $\rho$).}
+\caption{Stakeholder conflict matrix for NHS-DeepMind Streams (contribution-based Spearman $\rho$).}
 \label{tab:cs3_conflict}
 \begin{tabular}{@{}lccc@{}}
 \toprule
  & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
 \midrule
-Developer           & 1.00 &  0.09 & $-0.31$ \\
-Regulator           & 0.09 &  1.00 &  0.26 \\
-Affected Community  & $-0.31$ &  0.26 &  1.00 \\
+Developer           & 1.00 & $-0.14$ &  0.49 \\
+Regulator           & $-0.14$ &  1.00 &  0.03 \\
+Affected Community  & 0.49 &  0.03 &  1.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The negative correlation ($\rho = -0.31$) between the Developer and Affected Community highlights the core tension: the Developer values the Safety benefits, while the Affected Community is more concerned about the Privacy violation. The Pareto optimization engine generated a set of consensus solutions that explored the trade-off between these two dimensions, providing a quantitative basis for the kind of nuanced policy discussion that this case demands.
+The Developer--Regulator pair shows \textbf{high conflict} ($\rho = -0.14$), and the Regulator--Affected Community pair also shows \textbf{high conflict} ($\rho = 0.03$). The Developer--Affected Community pair shows \textbf{moderate conflict} ($\rho = 0.49$). The primary conflicting dimensions are Transparency and Human Oversight, reflecting the core tension in this case: the Developer values the system's clinical utility (Safety) while the Regulator prioritizes the data governance failure (Privacy, Transparency). This case study demonstrates the full power of the contribution-based conflict metric---unlike the facial recognition case where the extreme ethical profile led to broad agreement, the healthcare case's more balanced profile exposes genuine disagreements about which dimensions matter most.
+
+The Pareto optimization engine generated a set of consensus solutions that explored the trade-off between Safety/Human Oversight and Privacy/Transparency, providing a quantitative basis for the kind of nuanced policy discussion that this case demands.
 
 %% ================================================================
 %% CROSS-CASE COMPARISON
@@ -300,13 +307,15 @@ A summary comparison of the three case studies is presented in Table~\ref{tab:cr
 \toprule
 \textbf{Case Study} & \textbf{Overall Score} & \textbf{Risk Level} & \textbf{Primary Weakness} & \textbf{Max Conflict ($\rho$)} \\
 \midrule
-Facial Recognition    & 0.39 & High   & Fairness, Privacy & $-0.31$ \\
-iTutorGroup Hiring    & 0.35 & High   & Fairness          & $-0.31$ \\
-NHS-DeepMind Streams  & 0.60 & Medium & Privacy           & $-0.31$ \\
+Facial Recognition    & 0.34 & Critical & Fairness, Privacy & 0.89 (Low) \\
+iTutorGroup Hiring    & 0.30 & Critical & Fairness          & 0.54 (Moderate) \\
+NHS-DeepMind Streams  & 0.58 & High     & Privacy           & $-0.14$ (High) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The cross-case analysis reveals several important patterns. First, the LFR and iTutorGroup cases, which involve clear and severe ethical violations, both received low scores and high risk classifications. This validates the framework's ability to correctly flag problematic systems. Second, the NHS-DeepMind case, which involves a more complex trade-off between benefit and harm, received a moderate score, demonstrating the framework's sensitivity to nuance. Third, the weights-only conflict analysis produces consistent results across all cases (since the same default weights are used), while the system-salience conflict analysis provides case-specific insights into where stakeholders actually agree or disagree given the particular ethical profile of each system.
+The cross-case analysis reveals several important patterns. First, the LFR and iTutorGroup cases, which involve clear and severe ethical violations, both received low scores and critical risk classifications. This validates the framework's ability to correctly flag problematic systems. Second, the NHS-DeepMind case, which involves a more complex trade-off between benefit and harm, received a higher score but still fell within the High risk range, demonstrating the framework's sensitivity to nuance.
+
+Third, and most importantly, the contribution-based conflict analysis produces \emph{different} results across cases, even though the same default stakeholder weights are used. The facial recognition case shows low conflict (all stakeholders agree on the ranking of dimension contributions because the ethical profile is extreme), the hiring case shows moderate conflict, and the healthcare case shows high conflict (the more balanced ethical profile exposes genuine disagreements about priorities). This validates MEDF's ability to distinguish between genuinely contentious cases and cases with clear ethical violations through the contribution-based conflict analysis approach.
 
 These results demonstrate that the MEDF platform is a versatile and informative tool for ethical AI evaluation. It can handle a range of ethical profiles, from clear-cut violations to complex trade-offs, and it provides both quantitative scores and qualitative insights (through conflict analysis) that can inform real-world governance decisions.

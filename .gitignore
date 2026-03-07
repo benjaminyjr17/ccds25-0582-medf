@@ -81,3 +81,4 @@ data/audit_logs/*.jsonl
 /Yick_Benjamin_Oliver_Course_Descriptions_Sufficient_Mathematical_Background_EUR.pdf
 /cv_eur_ems.html
 /generate_pdf.py
+.hypothesis/
