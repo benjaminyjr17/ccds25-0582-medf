@@ -1,0 +1,66 @@
+{
+  "commit_hash": "38998f53ce167e3ede31e054cd693f3b765253e9",
+  "generation_timestamp": "2026-03-08T16:50:46.606952+00:00",
+  "cases": [
+    {
+      "case_id": "facial_recognition",
+      "case_name": "Metropolitan Police Live Facial Recognition",
+      "source_file": "case_studies/facial_recognition.json",
+      "dimension_scores": {
+        "transparency_explainability": 2.5,
+        "fairness_nondiscrimination": 1.5,
+        "safety_robustness": 5.0,
+        "privacy_data_governance": 1.5,
+        "human_agency_oversight": 2.5,
+        "accountability": 4.0
+      },
+      "validation": {
+        "all_dimensions_present": true,
+        "missing_dimensions": [],
+        "extra_dimensions": [],
+        "all_in_likert_range": true,
+        "out_of_range": {}
+      }
+    },
+    {
+      "case_id": "hiring_algorithm",
+      "case_name": "iTutorGroup Automated Hiring Screening",
+      "source_file": "case_studies/hiring_algorithm.json",
+      "dimension_scores": {
+        "transparency_explainability": 2.5,
+        "fairness_nondiscrimination": 1.5,
+        "safety_robustness": 3.0,
+        "privacy_data_governance": 3.0,
+        "human_agency_oversight": 2.0,
+        "accountability": 4.5
+      },
+      "validation": {
+        "all_dimensions_present": true,
+        "missing_dimensions": [],
+        "extra_dimensions": [],
+        "all_in_likert_range": true,
+        "out_of_range": {}
+      }
+    },
+    {
+      "case_id": "healthcare_diagnostic",
+      "case_name": "Royal Free NHS-DeepMind Streams Deployment",
+      "source_file": "case_studies/healthcare_diagnostic.json",
+      "dimension_scores": {
+        "transparency_explainability": 4.0,
+        "fairness_nondiscrimination": 4.0,
+        "safety_robustness": 6.0,
+        "privacy_data_governance": 3.5,
+        "human_agency_oversight": 5.0,
+        "accountability": 4.5
+      },
+      "validation": {
+        "all_dimensions_present": true,
+        "missing_dimensions": [],
+        "extra_dimensions": [],
+        "all_in_likert_range": true,
+        "out_of_range": {}
+      }
+    }
+  ]
+}

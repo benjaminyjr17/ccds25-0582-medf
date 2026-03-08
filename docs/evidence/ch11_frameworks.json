@@ -1,0 +1,284 @@
+[
+  {
+    "id": "eu_altai",
+    "name": "EU Assessment List for Trustworthy AI (ALTAI)",
+    "version": "2020",
+    "source_url": null,
+    "dimensions": [
+      {
+        "name": "transparency_explainability",
+        "display_name": "Transparency and Explainability",
+        "description": "Ensure traceability and explainability for relevant decisions.",
+        "weight_default": 0.12,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Is model behavior traceable through documentation and decision logs?",
+          "Are explanations available to affected users and operators at decision time?"
+        ]
+      },
+      {
+        "name": "fairness_nondiscrimination",
+        "display_name": "Fairness and Non-discrimination",
+        "description": "Assess fairness and discrimination risk across impacted groups.",
+        "weight_default": 0.14,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are impacted groups and vulnerable populations explicitly identified?",
+          "Are bias testing and mitigation controls documented across the lifecycle?",
+          "Is there a remediation path for discriminatory outcomes?"
+        ]
+      },
+      {
+        "name": "safety_robustness",
+        "display_name": "Technical Robustness and Safety",
+        "description": "Address reliability, resilience, and misuse prevention.",
+        "weight_default": 0.22,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are robustness tests performed across realistic stress and edge conditions?",
+          "Is there monitoring for model drift and performance degradation in production?",
+          "Are fallback or safe-fail mechanisms defined for unsafe operating states?",
+          "Are cybersecurity and adversarial resilience controls in place?",
+          "Is misuse/abuse prevention evaluated before deployment?"
+        ]
+      },
+      {
+        "name": "privacy_data_governance",
+        "display_name": "Privacy and Data Governance",
+        "description": "Enforce privacy controls and lawful data lifecycle management.",
+        "weight_default": 0.2,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Is personal data collection limited to a clear lawful purpose?",
+          "Are retention, deletion, and access controls enforced and auditable?",
+          "Is sensitive data handled with appropriate minimization and protection?",
+          "Are data lineage and provenance documented across processing steps?",
+          "Are third-party data transfers governed by explicit contractual controls?"
+        ]
+      },
+      {
+        "name": "human_agency_oversight",
+        "display_name": "Human Agency and Oversight",
+        "description": "Preserve meaningful human control and intervention capability.",
+        "weight_default": 0.18,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Can authorized humans override or halt automated decisions?",
+          "Are operator roles and decision authority clearly defined?",
+          "Are escalation pathways available for contested outcomes?",
+          "Is user recourse available when decisions have significant impact?"
+        ]
+      },
+      {
+        "name": "accountability",
+        "display_name": "Accountability",
+        "description": "Define responsibility, governance, and remediation ownership.",
+        "weight_default": 0.14,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are accountable owners assigned for deployment, monitoring, and incident response?",
+          "Is there a governance process for escalation and corrective action?",
+          "Are audit and reporting responsibilities documented end-to-end?"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nist_ai_rmf",
+    "name": "NIST AI Risk Management Framework",
+    "version": "1.0",
+    "source_url": null,
+    "dimensions": [
+      {
+        "name": "transparency_explainability",
+        "display_name": "Explainability and Traceability",
+        "description": "Support transparency and decision traceability.",
+        "weight_default": 0.12,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are model assumptions and limitations documented for stakeholders?",
+          "Are decision traces available for post-hoc review and audit?"
+        ]
+      },
+      {
+        "name": "fairness_nondiscrimination",
+        "display_name": "Fairness Risk Management",
+        "description": "Identify and mitigate inequitable model outcomes.",
+        "weight_default": 0.1,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are fairness risks identified with measurable indicators?",
+          "Are mitigation controls validated after model updates?"
+        ]
+      },
+      {
+        "name": "safety_robustness",
+        "display_name": "Robustness and Reliability",
+        "description": "Manage robustness, resilience, and safety risk.",
+        "weight_default": 0.24,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are reliability thresholds defined and monitored in operations?",
+          "Are stress, failure mode, and robustness evaluations routinely executed?",
+          "Are safety incidents captured and used to update controls?",
+          "Are resilience controls validated against foreseeable disruptions?",
+          "Are deployment gates tied to safety and reliability evidence?"
+        ]
+      },
+      {
+        "name": "privacy_data_governance",
+        "display_name": "Data and Privacy Risk",
+        "description": "Manage privacy and data governance risks.",
+        "weight_default": 0.12,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are privacy risks assessed for data collection and processing activities?",
+          "Are governance controls in place for data access and retention?"
+        ]
+      },
+      {
+        "name": "human_agency_oversight",
+        "display_name": "Human Oversight",
+        "description": "Include meaningful human review and oversight practices.",
+        "weight_default": 0.12,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are human review checkpoints defined for high-impact decisions?",
+          "Are escalation procedures available when automation confidence is low?"
+        ]
+      },
+      {
+        "name": "accountability",
+        "display_name": "Govern",
+        "description": "Establish governance and accountability controls.",
+        "weight_default": 0.3,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are governance roles and risk ownership formally assigned?",
+          "Are AI risk decisions recorded with rationale and approvers?",
+          "Are policy controls mapped to operational procedures?",
+          "Are independent reviews or audits scheduled and tracked?",
+          "Are incident response responsibilities defined and exercised?"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sg_mgaf",
+    "name": "Singapore Model AI Governance Framework",
+    "version": "2.0",
+    "source_url": null,
+    "dimensions": [
+      {
+        "name": "transparency_explainability",
+        "display_name": "Communication and Explainability",
+        "description": "Communicate AI behavior, limitations, and recourse.",
+        "weight_default": 0.22,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are user-facing disclosures provided on system purpose and limitations?",
+          "Are explanations tailored for affected users and operational teams?",
+          "Are channels available for questions, complaints, and contestability?",
+          "Are documentation artifacts updated when model behavior changes?",
+          "Are communication plans in place for high-impact incidents?"
+        ]
+      },
+      {
+        "name": "fairness_nondiscrimination",
+        "display_name": "Fairness and Inclusion",
+        "description": "Promote fairness outcomes and avoid discriminatory harm.",
+        "weight_default": 0.12,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are fairness impacts reviewed for affected communities and user groups?",
+          "Are corrective measures defined for inequitable outcomes?"
+        ]
+      },
+      {
+        "name": "safety_robustness",
+        "display_name": "Operations Management",
+        "description": "Maintain model quality, robustness, and operational safeguards.",
+        "weight_default": 0.16,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are operational safeguards in place for model reliability and drift?",
+          "Are robustness checks integrated into monitoring and release workflows?",
+          "Are contingency procedures defined for degraded or unsafe performance?"
+        ]
+      },
+      {
+        "name": "privacy_data_governance",
+        "display_name": "Data Governance",
+        "description": "Ensure strong personal data governance and protection controls.",
+        "weight_default": 0.12,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are data governance controls aligned with privacy and retention obligations?",
+          "Are access restrictions and protection safeguards monitored and enforced?"
+        ]
+      },
+      {
+        "name": "human_agency_oversight",
+        "display_name": "Human-in-the-loop Oversight",
+        "description": "Provide human override and escalation pathways where needed.",
+        "weight_default": 0.18,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are human override controls available for high-impact decisions?",
+          "Are operator responsibilities and escalation routes clearly documented?",
+          "Are oversight checkpoints applied for exception and edge cases?",
+          "Are affected users given meaningful recourse and human review options?"
+        ]
+      },
+      {
+        "name": "accountability",
+        "display_name": "Internal Governance",
+        "description": "Set governance structures and clear accountability ownership.",
+        "weight_default": 0.2,
+        "scale_min": 1.0,
+        "scale_max": 7.0,
+        "criteria_type": "benefit",
+        "assessment_questions": [
+          "Are governance responsibilities assigned across product and compliance teams?",
+          "Are accountability checkpoints integrated into lifecycle stage-gates?",
+          "Are decision logs maintained for key design and deployment choices?",
+          "Are issue escalation and remediation workflows periodically reviewed?"
+        ]
+      }
+    ]
+  }
+]

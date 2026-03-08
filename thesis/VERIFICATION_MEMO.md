@@ -2,14 +2,15 @@
 
 **Project:** Multi-Stakeholder Ethical Decision-Making Frameworks for AI Systems
 **Author:** Benjamin Oliver Yick (U2120984H)
-**Revision Date:** 7 March 2026
-**Revision Pass:** Second-pass surgical revision (staged: verification, revision, polish)
+**Revision Date:** 9 March 2026
+**Revision Pass:** Third-pass comprehensive audit (deterministic verification harness + evidence artifacts)
+**Commit Hash:** 38998f53ce167e3ede31e054cd693f3b765253e9
 
 ---
 
 ## 1. Verification Process
 
-The revision was conducted in three explicit stages, with a summary checkpoint after each.
+The revision was conducted using the PLAN, CRITIQUE, EXECUTE methodology with a deterministic verification harness for Chapter 11.
 
 ### Stage 1: Verification (Code Audit and Claim Reconciliation)
 
@@ -17,16 +18,16 @@ A module truth map was built by reading every source file in the repository. Eac
 
 | Check | Method | Outcome |
 |---|---|---|
-| Module truth map | Read all 12 Python source files, 3 YAML files, 3 JSON case studies | Complete |
+| Module truth map | Read all Python source files, YAML files, JSON case studies | Complete |
 | `conflict_detection.py` status | Read code and test contract | Confirmed placeholder stub |
 | Stakeholder weights (Table 11.1) | API query, `framework_registry.py` read | Match code |
-| Case study scores (all 3) | Full API reproduction (27 scores) | All match to 4 decimal places |
-| Conflict matrices (all 3) | API reproduction via `/api/conflicts` | Contribution-based matrices differ by case |
-| Pareto resolution | API call for facial recognition | 10 solutions returned |
-| CI/CD claim | Inspected `.github/workflows/` | Two workflow files confirmed |
-| Framework YAML weights | Direct file read of all 3 YAML files | Appendix B had wrong weights (corrected) |
-| API schema | OpenAPI spec inspection | Appendix A had wrong field names (corrected) |
-| Screenshots | Playwright headless capture from localhost (1920x1080, 2x DPI) | 6 real screenshots captured |
+| Case study scores (all 3 cases, all 3 frameworks, all 3 stakeholders) | Full API reproduction (27 per-stakeholder scores + 9 overall scores) | All match to 4 decimal places |
+| Conflict matrices (all 3 cases) | API reproduction via `/api/conflicts` | Contribution-based matrices verified |
+| Pareto resolution (all 3 cases) | API call for all cases | 10 solutions each |
+| Framework YAML weights | Direct file read of all 3 YAML files | Verified |
+| API schema | OpenAPI spec inspection | Verified |
+| Screenshots | Playwright headless capture from localhost (3840x2160, 2x DPI) | 4 high-resolution screenshots captured |
+| Evidence artifacts | Deterministic harness generated 20+ evidence files | All artifacts traceable |
 
 ### Stage 2: Revision (Corrections Applied)
 
@@ -34,47 +35,45 @@ All identified defects were corrected in the LaTeX source. No new content was fa
 
 ### Stage 3: Polish (Honesty Check and Formatting)
 
-A final sweep was performed for overclaims, formatting consistency, and front matter accuracy. The compiled PDF was visually inspected page by page.
+A final sweep was performed for overclaims, formatting consistency, and front matter accuracy.
 
 ---
 
-## 2. Critical Corrections
+## 2. Critical Corrections (This Revision)
 
-### 2.1 Architectural Honesty (Chapter 7, Section 7.3)
+### 2.1 Per-Framework Per-Stakeholder Scores (Chapter 11)
 
-**Before:** `app/conflict_detection.py` was described as the implemented conflict analysis engine.
+**Before (Previous VERIFICATION_MEMO):** Case Studies 2 and 3 showed identical per-stakeholder scores across all three frameworks, which was incorrect.
 
-**After:** Honestly described as a placeholder stub. All six public functions return empty or zero-valued results. The test file `test_conflict_detection_placeholder_contract.py` explicitly verifies this behavior. The actual conflict analysis logic is implemented inline within `app/routers/conflicts.py`. This is documented as technical debt in Chapter 13 (Limitations).
+**After:** Corrected with verified per-framework per-stakeholder scores from the live API. Each framework produces different scores because the framework weights modulate the TOPSIS evaluation differently.
 
-### 2.2 Conflict Matrices (Chapter 11)
+### 2.2 Evaluation Tables Enhanced with Overall Scores
 
-**Before:** The same weights-only Spearman rho matrix (with rho = -0.31 for Developer-Affected Community) was presented identically for all three case studies, which was misleading because the weights-only matrix is independent of the case study data.
+**Before:** Tables 11.3, 11.6, and 11.9 showed only per-stakeholder columns (Developer, Regulator, Affected Community).
 
-**After:** Replaced with case-specific contribution-based Spearman rho matrices reproduced from the API:
+**After:** Added an "Overall" column showing the aggregated TOPSIS closeness coefficient across all stakeholders for each framework. Added an "All Frameworks" row showing the aggregated score when all three frameworks are evaluated simultaneously.
 
-| Case Study | Dev-Reg rho | Dev-Aff rho | Reg-Aff rho | Conflict Level |
-|---|---|---|---|---|
-| Facial Recognition | 0.89 | 0.94 | 0.94 | Low |
-| Hiring Algorithm | 0.54 | 0.77 | 0.54 | Moderate |
-| Healthcare Diagnostic | -0.14 | 0.49 | 0.03 | High |
+### 2.3 Cross-Case Comparison Table Updated
 
-### 2.3 Framework YAML Weights (Appendix B)
+**Before:** Table 11.11 used EU ALTAI overall scores and inconsistent risk levels.
 
-**Before:** EU ALTAI weights shown as T=0.18, F=0.20, S=0.18, P=0.18, H=0.12, A=0.14.
+**After:** Updated to use all-frameworks overall scores with correct risk levels based on code thresholds (Critical < 0.40, High 0.40--0.59, Medium 0.60--0.79, Low >= 0.80). Added Conflict Level column.
 
-**After:** Corrected to actual values: T=0.12, F=0.14, S=0.22, P=0.20, H=0.18, A=0.14. NIST AI RMF and Singapore MGAF excerpts also added with verified weights.
+### 2.4 Risk Level Corrections
 
-### 2.4 API Reference (Appendix A)
+**Before:** Narrative described Facial Recognition and Hiring Algorithm as "High Risk."
 
-**Before:** Example used incorrect field names (e.g., `transparency` instead of `transparency_explainability`) and an incorrect request schema.
+**After:** Corrected to "Critical Risk" (both scores < 0.40). Healthcare Diagnostic correctly classified as "Medium Risk" (score = 0.60).
 
-**After:** Corrected to use actual field names matching the Pydantic models in `app/models.py`, with the correct nested `ai_system` object structure.
+### 2.5 Previous Corrections Retained
 
-### 2.5 Risk Threshold Tables (Chapter 8)
-
-**Before:** A single ambiguous risk threshold table.
-
-**After:** Split into two tables reflecting the two different threshold systems in the code: (1) evaluation router thresholds for closeness coefficient C, and (2) harm assessment module thresholds for harm score h.
+All corrections from the previous revision pass are retained:
+- Architectural honesty for `conflict_detection.py` (Chapter 7)
+- Contribution-based conflict matrices (Chapter 11)
+- Framework YAML weights (Appendix B)
+- API reference field names (Appendix A)
+- Risk threshold tables (Chapter 8)
+- Formatting corrections (project number, academic year, headings, etc.)
 
 ---
 
@@ -93,16 +92,14 @@ A final sweep was performed for overclaims, formatting consistency, and front ma
 
 ## 4. Screenshots
 
-Six real screenshots were captured from the live application running on localhost using Playwright headless browser automation:
+Four high-resolution screenshots were captured from the live application running on localhost using Playwright headless browser automation (3840x2160 pixels):
 
-| Figure | Description |
-|---|---|
-| Fig 10.1 | Evaluate tab (configuration interface) |
-| Fig 10.2 | Evaluate results (demo scenario output) |
-| Fig 10.3 | Conflict detection heatmap |
-| Fig 10.4 | Pareto resolution interface |
-| Fig 10.5 | Case study browser |
-| Fig 10.6 | Case Study 1 results (overall score 0.3379) |
+| Screenshot | Description | File |
+|---|---|---|
+| Evaluate | Evaluation results with demo scenario | `screenshot_evaluate.png` |
+| Conflict Detection | Conflict analysis heatmap and details | `screenshot_conflict_detection.png` |
+| Pareto Resolution | Pareto optimization interface and results | `screenshot_pareto_resolution.png` |
+| Case Studies | Case study browser with loaded case | `screenshot_case_studies.png` |
 
 ---
 
@@ -111,55 +108,88 @@ Six real screenshots were captured from the live application running on localhos
 The following items were **not** independently verified:
 
 1. The baseline dimension scores for the three case studies are derived from qualitative analysis and are inherently subjective. No inter-rater reliability assessment was performed.
-2. The risk level labels returned by the API are "N/A" in the current implementation; the risk classification logic in the Streamlit frontend was not independently verified.
+2. The risk level labels returned by the API are "N/A" in the current implementation; the risk classification is computed by the evaluate router's `_risk_level()` function using the closeness coefficient thresholds.
 3. The NSGA-II Pareto frontier results are stochastic (despite a fixed seed) and may vary slightly across different hardware or library versions.
+4. The per-stakeholder scores are computed by calling the evaluate API with a single stakeholder at a time. The "Average" row in the reproduced scores below is a simple arithmetic mean of the per-stakeholder scores, not the API's all-stakeholders aggregated score.
 
 ---
 
 ## 6. Reproduced Scores (Reference Data)
 
-All scores below were reproduced by calling the live MEDF API on 7 March 2026.
+All scores below were reproduced by calling the live MEDF API on 9 March 2026 (commit 38998f5).
 
 ### Case Study 1: Facial Recognition
 
-| Framework | Developer | Regulator | Affected Community |
-|---|---|---|---|
-| EU ALTAI | 0.4583 | 0.3092 | 0.2462 |
-| NIST AI RMF | 0.5574 | 0.4524 | 0.3824 |
-| Singapore MGAF | 0.4310 | 0.3465 | 0.2862 |
-| **Average** | **0.4822** | **0.3694** | **0.3049** |
-| **Overall** | | **0.3379** | |
+| Framework | Overall | Developer | Regulator | Affected Community |
+|---|---|---|---|---|
+| EU ALTAI | 0.3379 | 0.4583 | 0.3092 | 0.2462 |
+| NIST AI RMF | 0.4637 | 0.5552 | 0.4537 | 0.3823 |
+| Singapore MGAF | 0.3582 | 0.4344 | 0.3497 | 0.2905 |
+| **All Frameworks** | **0.3866** | | | |
+
+Risk Level: **Critical** (0.3866 < 0.40)
 
 ### Case Study 2: Hiring Algorithm
 
-| Framework | Developer | Regulator | Affected Community |
-|---|---|---|---|
-| EU ALTAI | 0.3185 | 0.3418 | 0.2462 |
-| NIST AI RMF | 0.3185 | 0.3418 | 0.2462 |
-| Singapore MGAF | 0.3185 | 0.3418 | 0.2462 |
-| **Average** | **0.3185** | **0.3418** | **0.2462** |
-| **Overall** | | **0.3022** | |
+| Framework | Overall | Developer | Regulator | Affected Community |
+|---|---|---|---|---|
+| EU ALTAI | 0.3022 | 0.3185 | 0.3418 | 0.2462 |
+| NIST AI RMF | 0.4155 | 0.3787 | 0.4892 | 0.3785 |
+| Singapore MGAF | 0.3254 | 0.3292 | 0.3702 | 0.2766 |
+| **All Frameworks** | **0.3477** | | | |
+
+Risk Level: **Critical** (0.3477 < 0.40)
 
 ### Case Study 3: Healthcare Diagnostic
 
-| Framework | Developer | Regulator | Affected Community |
-|---|---|---|---|
-| EU ALTAI | 0.6673 | 0.5376 | 0.5475 |
-| NIST AI RMF | 0.6673 | 0.5376 | 0.5475 |
-| Singapore MGAF | 0.6673 | 0.5376 | 0.5475 |
-| **Average** | **0.6673** | **0.5376** | **0.5475** |
-| **Overall** | | **0.5841** | |
+| Framework | Overall | Developer | Regulator | Affected Community |
+|---|---|---|---|---|
+| EU ALTAI | 0.5841 | 0.6673 | 0.5376 | 0.5475 |
+| NIST AI RMF | 0.6258 | 0.7092 | 0.5836 | 0.5847 |
+| Singapore MGAF | 0.5910 | 0.6479 | 0.5470 | 0.5780 |
+| **All Frameworks** | **0.6003** | | | |
+
+Risk Level: **Medium** (0.6003 >= 0.60)
+
+### Conflict Matrices (Contribution-Based Spearman Rho)
+
+| Case Study | Dev-Reg rho | Dev-Aff rho | Reg-Aff rho | Highest Conflict Level |
+|---|---|---|---|---|
+| Facial Recognition | 0.8857 | 0.9429 | 0.9429 | Low |
+| Hiring Algorithm | 0.5429 | 0.7714 | 0.5429 | Moderate |
+| Healthcare Diagnostic | -0.1429 | 0.4857 | 0.0286 | High |
 
 ---
 
-## 7. Deliverables
+## 7. Evidence Artifacts
+
+All evidence artifacts are stored in `docs/evidence/` and are machine-checkable:
+
+| Artifact | File | Description |
+|---|---|---|
+| Input Manifest | `ch11_inputs_manifest.json` | Case study inputs with validation |
+| Framework Snapshot | `ch11_frameworks.json` | Raw API framework data |
+| Stakeholder Snapshot | `ch11_stakeholders.json` | Raw API stakeholder data |
+| Raw Evaluations | `ch11_evaluate_raw.json` | All API evaluation responses |
+| Raw Conflicts | `ch11_conflicts_raw.json` | All API conflict responses |
+| Raw Pareto | `ch11_pareto_raw.json` | All API Pareto responses |
+| Normalized Bundle | `ch11_normalized_bundle.json` | Normalized evidence with source traces |
+| Claim Registry | `ch11_claim_registry.json` | 75 verified numerical claims |
+| Table CSVs | `ch11_table_11_*.csv` | All 11 Chapter 11 tables as CSV |
+| Verification Report | `ch11_verification_report.md` | Detailed verification findings |
+| Module Map | `module_responsibility_map.json` | Repository architecture map |
+| Risk Map | `chapter_risk_map.md` | Chapter-by-chapter risk assessment |
+
+---
+
+## 8. Deliverables
 
 | Deliverable | Location | Description |
 |---|---|---|
-| Compiled PDF | `thesis/main.pdf` | 75-page final report |
 | LaTeX source | `thesis/main.tex` | Main document file |
 | Chapter files | `thesis/chapters/*.tex` | 14 chapters + 3 appendices |
-| Bibliography | `thesis/references.bib` | 27 verified references |
-| Screenshots | `thesis/figures/screenshot_*.png` | 6 real localhost screenshots |
+| Bibliography | `thesis/references.bib` | Verified references |
+| Screenshots | `thesis/figures/screenshot_*.png` | 4 high-resolution localhost screenshots |
+| Evidence artifacts | `docs/evidence/` | 20+ machine-checkable evidence files |
 | NTU Logo | `thesis/figures/ntu_logo.png` | Cover page logo |
 | This memo | `thesis/VERIFICATION_MEMO.md` | Verification documentation |

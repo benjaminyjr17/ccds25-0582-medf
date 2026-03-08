@@ -1,0 +1,906 @@
+{
+  "commit_hash": "38998f53ce167e3ede31e054cd693f3b765253e9",
+  "generation_timestamp": "2026-03-08T16:50:46.606952+00:00",
+  "cases": [
+    {
+      "case_id": "facial_recognition",
+      "request_payload": {
+        "ai_system": {
+          "id": "facial_recognition",
+          "name": "facial_recognition",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 2.5,
+              "fairness_nondiscrimination": 1.5,
+              "safety_robustness": 5.0,
+              "privacy_data_governance": 1.5,
+              "human_agency_oversight": 2.5,
+              "accountability": 4.0
+            }
+          }
+        },
+        "framework_ids": [
+          "eu_altai",
+          "nist_ai_rmf",
+          "sg_mgaf"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework eu_altai.",
+        "conflicts": [],
+        "pareto_solutions": [
+          {
+            "solution_id": "ps_bb41aedb",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11345145809292966,
+                "fairness_nondiscrimination": 0.28654457458240384,
+                "safety_robustness": 0.10065895348188099,
+                "privacy_data_governance": 0.152123275662068,
+                "human_agency_oversight": 0.19838104536953355,
+                "accountability": 0.14884069281118392
+              }
+            },
+            "objective_scores": {
+              "developer": 0.087538617086805,
+              "regulator": 0.057076549230101276,
+              "affected_community": 0.0033189731926271276
+            },
+            "rank": 1
+          },
+          {
+            "solution_id": "ps_65081157",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11282558345670654,
+                "fairness_nondiscrimination": 0.27704663502539806,
+                "safety_robustness": 0.10248384712847305,
+                "privacy_data_governance": 0.16488838601045586,
+                "human_agency_oversight": 0.19038334097321818,
+                "accountability": 0.15237220740574822
+              }
+            },
+            "objective_scores": {
+              "developer": 0.08617837553328786,
+              "regulator": 0.05592026482630382,
+              "affected_community": 0.006330568177172575
+            },
+            "rank": 2
+          },
+          {
+            "solution_id": "ps_6e99d59d",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11900109606713155,
+                "fairness_nondiscrimination": 0.31070161117344114,
+                "safety_robustness": 0.10672046520995428,
+                "privacy_data_governance": 0.16112006944802598,
+                "human_agency_oversight": 0.14465313080821593,
+                "accountability": 0.1578036272932312
+              }
+            },
+            "objective_scores": {
+              "developer": 0.0835419826580894,
+              "regulator": 0.05025998830749852,
+              "affected_community": 0.015702320992601607
+            },
+            "rank": 3
+          },
+          {
+            "solution_id": "ps_3e6d77ae",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.10763857620239763,
+                "fairness_nondiscrimination": 0.2926447728213377,
+                "safety_robustness": 0.09952594997327247,
+                "privacy_data_governance": 0.14679728964266817,
+                "human_agency_oversight": 0.18138718736533735,
+                "accountability": 0.17200622399498663
+              }
+            },
+            "objective_scores": {
+              "developer": 0.09085247809389158,
+              "regulator": 0.04949310785960861,
+              "affected_community": 0.010233720374132506
+            },
+            "rank": 4
+          },
+          {
+            "solution_id": "ps_5cecc486",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11281171325332366,
+                "fairness_nondiscrimination": 0.26859797232379284,
+                "safety_robustness": 0.09937563477195072,
+                "privacy_data_governance": 0.1596154709080392,
+                "human_agency_oversight": 0.1830053458839137,
+                "accountability": 0.17659386285897996
+              }
+            },
+            "objective_scores": {
+              "developer": 0.09228285089190083,
+              "regulator": 0.04701027662700531,
+              "affected_community": 0.013408849985034107
+            },
+            "rank": 5
+          },
+          {
+            "solution_id": "ps_ccc93a38",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.1105037822820453,
+                "fairness_nondiscrimination": 0.28356118264521724,
+                "safety_robustness": 0.09734258254123411,
+                "privacy_data_governance": 0.15635001665528242,
+                "human_agency_oversight": 0.17926137556829094,
+                "accountability": 0.17298106030793
+              }
+            },
+            "objective_scores": {
+              "developer": 0.09174328974405527,
+              "regulator": 0.049070770771899266,
+              "affected_community": 0.01253007980313798
+            },
+            "rank": 6
+          },
+          {
+            "solution_id": "ps_29bb879d",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.14333227253662306,
+                "fairness_nondiscrimination": 0.2860600793048641,
+                "safety_robustness": 0.10856882329118075,
+                "privacy_data_governance": 0.16208480007945422,
+                "human_agency_oversight": 0.13344278815380964,
+                "accountability": 0.16651123663406822
+              }
+            },
+            "objective_scores": {
+              "developer": 0.08901500754580555,
+              "regulator": 0.04263452694367795,
+              "affected_community": 0.023786871820767535
+            },
+            "rank": 7
+          },
+          {
+            "solution_id": "ps_95585ad4",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.114264356900026,
+                "fairness_nondiscrimination": 0.26421248122640445,
+                "safety_robustness": 0.09777678416796064,
+                "privacy_data_governance": 0.15679268461962825,
+                "human_agency_oversight": 0.1796164085391472,
+                "accountability": 0.18733728454683365
+              }
+            },
+            "objective_scores": {
+              "developer": 0.09520258618640315,
+              "regulator": 0.04367378818812316,
+              "affected_community": 0.01765152192787169
+            },
+            "rank": 8
+          },
+          {
+            "solution_id": "ps_2146f0b0",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11571225770045217,
+                "fairness_nondiscrimination": 0.2627165560990567,
+                "safety_robustness": 0.13251988624796343,
+                "privacy_data_governance": 0.16007735898413308,
+                "human_agency_oversight": 0.16696233952083508,
+                "accountability": 0.16201160144755972
+              }
+            },
+            "objective_scores": {
+              "developer": 0.07421491933857738,
+              "regulator": 0.05975607462921308,
+              "affected_community": 0.023901784367863336
+            },
+            "rank": 9
+          },
+          {
+            "solution_id": "ps_6bd43709",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.12095474533491375,
+                "fairness_nondiscrimination": 0.2796826083658478,
+                "safety_robustness": 0.10340960611394905,
+                "privacy_data_governance": 0.16597318492885396,
+                "human_agency_oversight": 0.13167362784798828,
+                "accountability": 0.1983062274084473
+              }
+            },
+            "objective_scores": {
+              "developer": 0.09663907551338952,
+              "regulator": 0.03478417842249245,
+              "affected_community": 0.028238551926639037
+            },
+            "rank": 10
+          }
+        ],
+        "metadata": {
+          "framework_id": "eu_altai",
+          "ai_system_id": "facial_recognition",
+          "ai_system_name": "facial_recognition",
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "transparency_explainability": 0.25,
+            "fairness_nondiscrimination": 0.08333333333333333,
+            "safety_robustness": 0.6666666666666666,
+            "privacy_data_governance": 0.08333333333333333,
+            "human_agency_oversight": 0.25,
+            "accountability": 0.5
+          },
+          "salience_vector": {
+            "transparency_explainability": 0.13636363636363638,
+            "fairness_nondiscrimination": 0.045454545454545456,
+            "safety_robustness": 0.36363636363636365,
+            "privacy_data_governance": 0.045454545454545456,
+            "human_agency_oversight": 0.13636363636363638,
+            "accountability": 0.27272727272727276
+          },
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_bb41aedb": 0.25604009544616774,
+            "ps_65081157": 0.25713881798232513,
+            "ps_6e99d59d": 0.2552808205572109,
+            "ps_3e6d77ae": 0.2612303580769425,
+            "ps_5cecc486": 0.2641860729977525,
+            "ps_ccc93a38": 0.26048614125241343,
+            "ps_29bb879d": 0.26217400563245596,
+            "ps_95585ad4": 0.26740712023235325,
+            "ps_2146f0b0": 0.2752538671180098,
+            "ps_6bd43709": 0.268387927183807
+          },
+          "pop_size": 64,
+          "n_gen": 80,
+          "seed": 42,
+          "deterministic_mode": true,
+          "n_solutions_returned": 10,
+          "run_id": "04d33873-941b-4c56-bb9b-9f48db457a97"
+        },
+        "harm_assessment": null
+      },
+      "n_solutions": 10,
+      "execution_timestamp": "2026-03-08T16:50:47.728421+00:00"
+    },
+    {
+      "case_id": "hiring_algorithm",
+      "request_payload": {
+        "ai_system": {
+          "id": "hiring_algorithm",
+          "name": "hiring_algorithm",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 2.5,
+              "fairness_nondiscrimination": 1.5,
+              "safety_robustness": 3.0,
+              "privacy_data_governance": 3.0,
+              "human_agency_oversight": 2.0,
+              "accountability": 4.5
+            }
+          }
+        },
+        "framework_ids": [
+          "eu_altai",
+          "nist_ai_rmf",
+          "sg_mgaf"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework eu_altai.",
+        "conflicts": [],
+        "pareto_solutions": [
+          {
+            "solution_id": "ps_3b276069",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.12345947453277144,
+                "fairness_nondiscrimination": 0.26538703178464557,
+                "safety_robustness": 0.10559814679103982,
+                "privacy_data_governance": 0.15393886367667745,
+                "human_agency_oversight": 0.20427507596000258,
+                "accountability": 0.14734140725486305
+              }
+            },
+            "objective_scores": {
+              "developer": 0.052680410669594,
+              "regulator": 0.0600150929139602,
+              "affected_community": 0.008109511181928644
+            },
+            "rank": 1
+          },
+          {
+            "solution_id": "ps_65a43467",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.10257196279886323,
+                "fairness_nondiscrimination": 0.23755706680931193,
+                "safety_robustness": 0.15378783507404,
+                "privacy_data_governance": 0.14978887869300314,
+                "human_agency_oversight": 0.20405977972662223,
+                "accountability": 0.15223447689815936
+              }
+            },
+            "objective_scores": {
+              "developer": 0.03832033323228995,
+              "regulator": 0.06849120119538088,
+              "affected_community": 0.014757883088180246
+            },
+            "rank": 2
+          },
+          {
+            "solution_id": "ps_18e02125",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11600551238110643,
+                "fairness_nondiscrimination": 0.2491993919819502,
+                "safety_robustness": 0.1155349447565216,
+                "privacy_data_governance": 0.1538589706383015,
+                "human_agency_oversight": 0.20835965224863934,
+                "accountability": 0.1570415279934809
+              }
+            },
+            "objective_scores": {
+              "developer": 0.05078676348114448,
+              "regulator": 0.05934224404575408,
+              "affected_community": 0.011542990818681256
+            },
+            "rank": 3
+          },
+          {
+            "solution_id": "ps_074e420e",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11994120883428835,
+                "fairness_nondiscrimination": 0.2576539312794999,
+                "safety_robustness": 0.1191740294500425,
+                "privacy_data_governance": 0.15973679353663495,
+                "human_agency_oversight": 0.189972436595168,
+                "accountability": 0.15352160030436635
+              }
+            },
+            "objective_scores": {
+              "developer": 0.049253556640458815,
+              "regulator": 0.060417488942053156,
+              "affected_community": 0.012500919814776353
+            },
+            "rank": 4
+          },
+          {
+            "solution_id": "ps_afc7693f",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.127798241303876,
+                "fairness_nondiscrimination": 0.28155911243873,
+                "safety_robustness": 0.12988151874390697,
+                "privacy_data_governance": 0.15815087396268004,
+                "human_agency_oversight": 0.14708384048729778,
+                "accountability": 0.15552641306350917
+              }
+            },
+            "objective_scores": {
+              "developer": 0.04631183179501995,
+              "regulator": 0.05741794042302292,
+              "affected_community": 0.01897535203662927
+            },
+            "rank": 5
+          },
+          {
+            "solution_id": "ps_43d9e131",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.12712735829741803,
+                "fairness_nondiscrimination": 0.27856495689722366,
+                "safety_robustness": 0.1384463826653278,
+                "privacy_data_governance": 0.15646906614773154,
+                "human_agency_oversight": 0.14551972170511165,
+                "accountability": 0.15387251428718723
+              }
+            },
+            "objective_scores": {
+              "developer": 0.04371932963424666,
+              "regulator": 0.05908459622176761,
+              "affected_community": 0.019930812849874052
+            },
+            "rank": 6
+          },
+          {
+            "solution_id": "ps_f3d73bb9",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.10090690138311437,
+                "fairness_nondiscrimination": 0.2330427343057585,
+                "safety_robustness": 0.1681825295373248,
+                "privacy_data_governance": 0.14735734013593096,
+                "human_agency_oversight": 0.20074725594860618,
+                "accountability": 0.14976323868926505
+              }
+            },
+            "objective_scores": {
+              "developer": 0.03460741908735407,
+              "regulator": 0.07222736327782608,
+              "affected_community": 0.016958598501024606
+            },
+            "rank": 7
+          },
+          {
+            "solution_id": "ps_b1eb3411",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.19824871313880954,
+                "fairness_nondiscrimination": 0.20786406279053005,
+                "safety_robustness": 0.12488876293212847,
+                "privacy_data_governance": 0.15097440386240757,
+                "human_agency_oversight": 0.1566599309085543,
+                "accountability": 0.16136412636757025
+              }
+            },
+            "objective_scores": {
+              "developer": 0.054753405348484545,
+              "regulator": 0.040492455609350594,
+              "affected_community": 0.03126494126475838
+            },
+            "rank": 8
+          },
+          {
+            "solution_id": "ps_23196e01",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11011023351290829,
+                "fairness_nondiscrimination": 0.23065725310525703,
+                "safety_robustness": 0.1664609729152776,
+                "privacy_data_governance": 0.14584895513651297,
+                "human_agency_oversight": 0.19869235899357238,
+                "accountability": 0.14823022633647173
+              }
+            },
+            "objective_scores": {
+              "developer": 0.03673911309850773,
+              "regulator": 0.07107370272921112,
+              "affected_community": 0.018910724581241874
+            },
+            "rank": 9
+          },
+          {
+            "solution_id": "ps_30d19e36",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.1777427113889241,
+                "fairness_nondiscrimination": 0.21493361014793785,
+                "safety_robustness": 0.09964756520704086,
+                "privacy_data_governance": 0.15278327892290627,
+                "human_agency_oversight": 0.17793235561738607,
+                "accountability": 0.17696047871580486
+              }
+            },
+            "objective_scores": {
+              "developer": 0.06453774578207515,
+              "regulator": 0.03625665195565549,
+              "affected_community": 0.026842667555150385
+            },
+            "rank": 10
+          }
+        ],
+        "metadata": {
+          "framework_id": "eu_altai",
+          "ai_system_id": "hiring_algorithm",
+          "ai_system_name": "hiring_algorithm",
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "transparency_explainability": 0.25,
+            "fairness_nondiscrimination": 0.08333333333333333,
+            "safety_robustness": 0.3333333333333333,
+            "privacy_data_governance": 0.3333333333333333,
+            "human_agency_oversight": 0.16666666666666666,
+            "accountability": 0.5833333333333334
+          },
+          "salience_vector": {
+            "transparency_explainability": 0.14285714285714285,
+            "fairness_nondiscrimination": 0.047619047619047616,
+            "safety_robustness": 0.19047619047619047,
+            "privacy_data_governance": 0.19047619047619047,
+            "human_agency_oversight": 0.09523809523809523,
+            "accountability": 0.33333333333333337
+          },
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_3b276069": 0.2594877916631563,
+            "ps_65a43467": 0.26944505900120286,
+            "ps_18e02125": 0.2659001325963506,
+            "ps_074e420e": 0.2656430770874979,
+            "ps_afc7693f": 0.26666133163298883,
+            "ps_43d9e131": 0.2673129892051874,
+            "ps_f3d73bb9": 0.2706466749891827,
+            "ps_b1eb3411": 0.2790776346479336,
+            "ps_23196e01": 0.27043533068279924,
+            "ps_30d19e36": 0.2793727652566588
+          },
+          "pop_size": 64,
+          "n_gen": 80,
+          "seed": 42,
+          "deterministic_mode": true,
+          "n_solutions_returned": 10,
+          "run_id": "c321cb56-26ec-4739-a538-436406eb2d40"
+        },
+        "harm_assessment": null
+      },
+      "n_solutions": 10,
+      "execution_timestamp": "2026-03-08T16:50:48.180988+00:00"
+    },
+    {
+      "case_id": "healthcare_diagnostic",
+      "request_payload": {
+        "ai_system": {
+          "id": "healthcare_diagnostic",
+          "name": "healthcare_diagnostic",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 4.0,
+              "fairness_nondiscrimination": 4.0,
+              "safety_robustness": 6.0,
+              "privacy_data_governance": 3.5,
+              "human_agency_oversight": 5.0,
+              "accountability": 4.5
+            }
+          }
+        },
+        "framework_ids": [
+          "eu_altai",
+          "nist_ai_rmf",
+          "sg_mgaf"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Pareto consensus weights (NSGA-II) minimizing salience-weighted distance under framework eu_altai.",
+        "conflicts": [],
+        "pareto_solutions": [
+          {
+            "solution_id": "ps_b73d20d5",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.12257548371720142,
+                "fairness_nondiscrimination": 0.26720031213001,
+                "safety_robustness": 0.11003062985734069,
+                "privacy_data_governance": 0.15004087290285734,
+                "human_agency_oversight": 0.2012645959502038,
+                "accountability": 0.1488881054423869
+              }
+            },
+            "objective_scores": {
+              "developer": 0.07515363977450167,
+              "regulator": 0.059194277692130176,
+              "affected_community": 0.010730041002756286
+            },
+            "rank": 1
+          },
+          {
+            "solution_id": "ps_0e98cb85",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11912043472959219,
+                "fairness_nondiscrimination": 0.25966870678841014,
+                "safety_robustness": 0.10193984005968533,
+                "privacy_data_governance": 0.14651819325590917,
+                "human_agency_oversight": 0.19241980080024648,
+                "accountability": 0.18033302436615678
+              }
+            },
+            "objective_scores": {
+              "developer": 0.0791055966475401,
+              "regulator": 0.05016962625021642,
+              "affected_community": 0.015868823002988697
+            },
+            "rank": 2
+          },
+          {
+            "solution_id": "ps_f27d7b52",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.12455445092458568,
+                "fairness_nondiscrimination": 0.21443613338318948,
+                "safety_robustness": 0.1301743323857869,
+                "privacy_data_governance": 0.15193843515451133,
+                "human_agency_oversight": 0.15775692291510202,
+                "accountability": 0.2211397252368246
+              }
+            },
+            "objective_scores": {
+              "developer": 0.06671251946999826,
+              "regulator": 0.03606673573916886,
+              "affected_community": 0.043049240433708544
+            },
+            "rank": 3
+          },
+          {
+            "solution_id": "ps_4d0f911d",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.11648913622658309,
+                "fairness_nondiscrimination": 0.29441193022667295,
+                "safety_robustness": 0.09882342572500694,
+                "privacy_data_governance": 0.1459328825326354,
+                "human_agency_oversight": 0.19482682081772715,
+                "accountability": 0.14951580447137447
+              }
+            },
+            "objective_scores": {
+              "developer": 0.07998837295353538,
+              "regulator": 0.060991476888797344,
+              "affected_community": 0.0049842706724946674
+            },
+            "rank": 4
+          },
+          {
+            "solution_id": "ps_a07a5722",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.17532206094150424,
+                "fairness_nondiscrimination": 0.19026706436386973,
+                "safety_robustness": 0.09943288639628463,
+                "privacy_data_governance": 0.14889086332118345,
+                "human_agency_oversight": 0.17480315083876186,
+                "accountability": 0.21128397413839603
+              }
+            },
+            "objective_scores": {
+              "developer": 0.07933725230815113,
+              "regulator": 0.025883796555721796,
+              "affected_community": 0.041716890741802876
+            },
+            "rank": 5
+          },
+          {
+            "solution_id": "ps_c897c0ac",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.09956599860621337,
+                "fairness_nondiscrimination": 0.2010021241533111,
+                "safety_robustness": 0.11142729152603928,
+                "privacy_data_governance": 0.15522119304617285,
+                "human_agency_oversight": 0.18663871088958736,
+                "accountability": 0.2461446817786759
+              }
+            },
+            "objective_scores": {
+              "developer": 0.07587076816239259,
+              "regulator": 0.03497839401047168,
+              "affected_community": 0.036116029268289114
+            },
+            "rank": 6
+          },
+          {
+            "solution_id": "ps_bf349abf",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.10424318956324351,
+                "fairness_nondiscrimination": 0.30689257131695086,
+                "safety_robustness": 0.1022981508488583,
+                "privacy_data_governance": 0.16773210356186588,
+                "human_agency_oversight": 0.1592092715237042,
+                "accountability": 0.15962471318537738
+              }
+            },
+            "objective_scores": {
+              "developer": 0.07556049378783782,
+              "regulator": 0.05794855944552734,
+              "affected_community": 0.013622747897311587
+            },
+            "rank": 7
+          },
+          {
+            "solution_id": "ps_92580625",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.10074821755685134,
+                "fairness_nondiscrimination": 0.20338876742128414,
+                "safety_robustness": 0.11323581722445339,
+                "privacy_data_governance": 0.15706424628250498,
+                "human_agency_oversight": 0.1888548069869005,
+                "accountability": 0.23670814452800565
+              }
+            },
+            "objective_scores": {
+              "developer": 0.0748947723006678,
+              "regulator": 0.037795336834352856,
+              "affected_community": 0.03447511095884042
+            },
+            "rank": 8
+          },
+          {
+            "solution_id": "ps_9fe3ec88",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.16200295919026128,
+                "fairness_nondiscrimination": 0.21771702106730412,
+                "safety_robustness": 0.12473925715870833,
+                "privacy_data_governance": 0.16018222473081498,
+                "human_agency_oversight": 0.18620284077091934,
+                "accountability": 0.1491556970819919
+              }
+            },
+            "objective_scores": {
+              "developer": 0.0685088400048999,
+              "regulator": 0.04828859316897206,
+              "affected_community": 0.030483493291371504
+            },
+            "rank": 9
+          },
+          {
+            "solution_id": "ps_4d8d8208",
+            "weights": {
+              "consensus": {
+                "transparency_explainability": 0.1734486635967436,
+                "fairness_nondiscrimination": 0.21479894019122842,
+                "safety_robustness": 0.09757397384160586,
+                "privacy_data_governance": 0.14959776420000503,
+                "human_agency_oversight": 0.1413496086918024,
+                "accountability": 0.22323104947861475
+              }
+            },
+            "objective_scores": {
+              "developer": 0.08184708428875313,
+              "regulator": 0.018870300555593834,
+              "affected_community": 0.04666643471030694
+            },
+            "rank": 10
+          }
+        ],
+        "metadata": {
+          "framework_id": "eu_altai",
+          "ai_system_id": "healthcare_diagnostic",
+          "ai_system_name": "healthcare_diagnostic",
+          "stakeholder_ids": [
+            "developer",
+            "regulator",
+            "affected_community"
+          ],
+          "x_normalized": {
+            "transparency_explainability": 0.5,
+            "fairness_nondiscrimination": 0.5,
+            "safety_robustness": 0.8333333333333334,
+            "privacy_data_governance": 0.4166666666666667,
+            "human_agency_oversight": 0.6666666666666666,
+            "accountability": 0.5833333333333334
+          },
+          "salience_vector": {
+            "transparency_explainability": 0.14285714285714285,
+            "fairness_nondiscrimination": 0.14285714285714285,
+            "safety_robustness": 0.2380952380952381,
+            "privacy_data_governance": 0.11904761904761905,
+            "human_agency_oversight": 0.19047619047619047,
+            "accountability": 0.16666666666666669
+          },
+          "objective_definition": "minimize obj_k(w)=sum_i s_i*|w_i - wk_i|",
+          "ablation_definition": "utility_wsm(w)=sum_i w_i*x_i (recorded only, not optimized)",
+          "ablation_utility_by_solution": {
+            "ps_b73d20d5": 0.5701249119891084,
+            "ps_0e98cb85": 0.5688678160791236,
+            "ps_f27d7b52": 0.5754510387879721,
+            "ps_4d0f911d": 0.5657108555395184,
+            "ps_a07a5722": 0.5674775798399896,
+            "ps_c897c0ac": 0.5758258397179862,
+            "ps_bf349abf": 0.5599586463388628,
+            "ps_92580625": 0.5758580650930929,
+            "ps_9fe3ec88": 0.5716946818773206,
+            "ps_4d8d8208": 0.5622190331690532
+          },
+          "pop_size": 64,
+          "n_gen": 80,
+          "seed": 42,
+          "deterministic_mode": true,
+          "n_solutions_returned": 10,
+          "run_id": "eabbfee7-d3cb-46a0-a745-9de6d3667fff"
+        },
+        "harm_assessment": null
+      },
+      "n_solutions": 10,
+      "execution_timestamp": "2026-03-08T16:50:48.658186+00:00"
+    }
+  ]
+}

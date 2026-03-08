@@ -1,0 +1,1003 @@
+{
+  "commit_hash": "38998f53ce167e3ede31e054cd693f3b765253e9",
+  "generation_timestamp": "2026-03-08T16:50:46.606952+00:00",
+  "dimension_order": [
+    "transparency_explainability",
+    "fairness_nondiscrimination",
+    "safety_robustness",
+    "privacy_data_governance",
+    "human_agency_oversight",
+    "accountability"
+  ],
+  "framework_order": [
+    "eu_altai",
+    "nist_ai_rmf",
+    "sg_mgaf"
+  ],
+  "stakeholder_order": [
+    "developer",
+    "regulator",
+    "affected_community"
+  ],
+  "case_order": [
+    "facial_recognition",
+    "hiring_algorithm",
+    "healthcare_diagnostic"
+  ],
+  "stakeholder_weight_profiles": {
+    "developer": {
+      "transparency_explainability": {
+        "value": 0.1,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "developer",
+          "dimension": "transparency_explainability"
+        }
+      },
+      "fairness_nondiscrimination": {
+        "value": 0.15,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "developer",
+          "dimension": "fairness_nondiscrimination"
+        }
+      },
+      "safety_robustness": {
+        "value": 0.3,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "developer",
+          "dimension": "safety_robustness"
+        }
+      },
+      "privacy_data_governance": {
+        "value": 0.15,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "developer",
+          "dimension": "privacy_data_governance"
+        }
+      },
+      "human_agency_oversight": {
+        "value": 0.15,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "developer",
+          "dimension": "human_agency_oversight"
+        }
+      },
+      "accountability": {
+        "value": 0.15,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "developer",
+          "dimension": "accountability"
+        }
+      }
+    },
+    "regulator": {
+      "transparency_explainability": {
+        "value": 0.2,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "regulator",
+          "dimension": "transparency_explainability"
+        }
+      },
+      "fairness_nondiscrimination": {
+        "value": 0.2,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "regulator",
+          "dimension": "fairness_nondiscrimination"
+        }
+      },
+      "safety_robustness": {
+        "value": 0.1,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "regulator",
+          "dimension": "safety_robustness"
+        }
+      },
+      "privacy_data_governance": {
+        "value": 0.15,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "regulator",
+          "dimension": "privacy_data_governance"
+        }
+      },
+      "human_agency_oversight": {
+        "value": 0.1,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "regulator",
+          "dimension": "human_agency_oversight"
+        }
+      },
+      "accountability": {
+        "value": 0.25,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "regulator",
+          "dimension": "accountability"
+        }
+      }
+    },
+    "affected_community": {
+      "transparency_explainability": {
+        "value": 0.1,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "affected_community",
+          "dimension": "transparency_explainability"
+        }
+      },
+      "fairness_nondiscrimination": {
+        "value": 0.3,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "affected_community",
+          "dimension": "fairness_nondiscrimination"
+        }
+      },
+      "safety_robustness": {
+        "value": 0.1,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "affected_community",
+          "dimension": "safety_robustness"
+        }
+      },
+      "privacy_data_governance": {
+        "value": 0.15,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "affected_community",
+          "dimension": "privacy_data_governance"
+        }
+      },
+      "human_agency_oversight": {
+        "value": 0.2,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "affected_community",
+          "dimension": "human_agency_oversight"
+        }
+      },
+      "accountability": {
+        "value": 0.15,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_stakeholders.json",
+          "stakeholder_id": "affected_community",
+          "dimension": "accountability"
+        }
+      }
+    }
+  },
+  "cases": {
+    "facial_recognition": {
+      "baseline_dimension_scores": {
+        "transparency_explainability": {
+          "value": 2.5,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "facial_recognition",
+            "dimension": "transparency_explainability"
+          }
+        },
+        "fairness_nondiscrimination": {
+          "value": 1.5,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "facial_recognition",
+            "dimension": "fairness_nondiscrimination"
+          }
+        },
+        "safety_robustness": {
+          "value": 5.0,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "facial_recognition",
+            "dimension": "safety_robustness"
+          }
+        },
+        "privacy_data_governance": {
+          "value": 1.5,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "facial_recognition",
+            "dimension": "privacy_data_governance"
+          }
+        },
+        "human_agency_oversight": {
+          "value": 2.5,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "facial_recognition",
+            "dimension": "human_agency_oversight"
+          }
+        },
+        "accountability": {
+          "value": 4.0,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "facial_recognition",
+            "dimension": "accountability"
+          }
+        }
+      },
+      "per_framework_overall_scores": {
+        "eu_altai": {
+          "value": 0.3379083353264458,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "framework_id": "eu_altai",
+            "endpoint": "/api/evaluate",
+            "json_path": "$.cases[0].overall_evaluations[0].raw_response.overall_score"
+          }
+        },
+        "nist_ai_rmf": {
+          "value": 0.4637125740039189,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "framework_id": "nist_ai_rmf",
+            "endpoint": "/api/evaluate",
+            "json_path": "$.cases[0].overall_evaluations[1].raw_response.overall_score"
+          }
+        },
+        "sg_mgaf": {
+          "value": 0.358184872376371,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "framework_id": "sg_mgaf",
+            "endpoint": "/api/evaluate",
+            "json_path": "$.cases[0].overall_evaluations[2].raw_response.overall_score"
+          }
+        }
+      },
+      "per_framework_stakeholder_scores": {
+        "eu_altai__developer": {
+          "value": 0.45833560707364013,
+          "framework_id": "eu_altai",
+          "stakeholder_id": "developer",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=eu_altai,sh=developer].overall_score"
+          }
+        },
+        "eu_altai__regulator": {
+          "value": 0.3092252306534753,
+          "framework_id": "eu_altai",
+          "stakeholder_id": "regulator",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=eu_altai,sh=regulator].overall_score"
+          }
+        },
+        "eu_altai__affected_community": {
+          "value": 0.24616416825222198,
+          "framework_id": "eu_altai",
+          "stakeholder_id": "affected_community",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=eu_altai,sh=affected_community].overall_score"
+          }
+        },
+        "nist_ai_rmf__developer": {
+          "value": 0.5551847085967337,
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_id": "developer",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=nist_ai_rmf,sh=developer].overall_score"
+          }
+        },
+        "nist_ai_rmf__regulator": {
+          "value": 0.4536660941453052,
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_id": "regulator",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=nist_ai_rmf,sh=regulator].overall_score"
+          }
+        },
+        "nist_ai_rmf__affected_community": {
+          "value": 0.3822869192697177,
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_id": "affected_community",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=nist_ai_rmf,sh=affected_community].overall_score"
+          }
+        },
+        "sg_mgaf__developer": {
+          "value": 0.43441057207201056,
+          "framework_id": "sg_mgaf",
+          "stakeholder_id": "developer",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=sg_mgaf,sh=developer].overall_score"
+          }
+        },
+        "sg_mgaf__regulator": {
+          "value": 0.34966078913006815,
+          "framework_id": "sg_mgaf",
+          "stakeholder_id": "regulator",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=sg_mgaf,sh=regulator].overall_score"
+          }
+        },
+        "sg_mgaf__affected_community": {
+          "value": 0.29048325592703433,
+          "framework_id": "sg_mgaf",
+          "stakeholder_id": "affected_community",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "facial_recognition",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=sg_mgaf,sh=affected_community].overall_score"
+          }
+        }
+      },
+      "all_frameworks_overall_score": {
+        "value": 0.38660192723557857,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_evaluate_raw.json",
+          "case_id": "facial_recognition",
+          "endpoint": "/api/evaluate",
+          "json_path": "$.cases[0].all_frameworks_evaluation.overall_score"
+        }
+      },
+      "conflict_matrices": {
+        "eu_altai": {
+          "raw_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.8857142857142858,
+              "affected_community": 0.942857142857143
+            },
+            "regulator": {
+              "developer": 0.8857142857142858,
+              "regulator": 1.0,
+              "affected_community": 0.942857142857143
+            },
+            "affected_community": {
+              "developer": 0.942857142857143,
+              "regulator": 0.942857142857143,
+              "affected_community": 1.0
+            }
+          },
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_conflicts_raw.json",
+            "case_id": "facial_recognition",
+            "framework_id": "eu_altai",
+            "endpoint": "/api/conflicts",
+            "json_path": "$.raw_response.metadata.correlation_matrix"
+          }
+        },
+        "nist_ai_rmf": {
+          "raw_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.8857142857142858,
+              "affected_community": 0.942857142857143
+            },
+            "regulator": {
+              "developer": 0.8857142857142858,
+              "regulator": 1.0,
+              "affected_community": 0.942857142857143
+            },
+            "affected_community": {
+              "developer": 0.942857142857143,
+              "regulator": 0.942857142857143,
+              "affected_community": 1.0
+            }
+          },
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_conflicts_raw.json",
+            "case_id": "facial_recognition",
+            "framework_id": "nist_ai_rmf",
+            "endpoint": "/api/conflicts",
+            "json_path": "$.raw_response.metadata.correlation_matrix"
+          }
+        },
+        "sg_mgaf": {
+          "raw_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.8857142857142858,
+              "affected_community": 0.942857142857143
+            },
+            "regulator": {
+              "developer": 0.8857142857142858,
+              "regulator": 1.0,
+              "affected_community": 0.942857142857143
+            },
+            "affected_community": {
+              "developer": 0.942857142857143,
+              "regulator": 0.942857142857143,
+              "affected_community": 1.0
+            }
+          },
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_conflicts_raw.json",
+            "case_id": "facial_recognition",
+            "framework_id": "sg_mgaf",
+            "endpoint": "/api/conflicts",
+            "json_path": "$.raw_response.metadata.correlation_matrix"
+          }
+        }
+      }
+    },
+    "hiring_algorithm": {
+      "baseline_dimension_scores": {
+        "transparency_explainability": {
+          "value": 2.5,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "hiring_algorithm",
+            "dimension": "transparency_explainability"
+          }
+        },
+        "fairness_nondiscrimination": {
+          "value": 1.5,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "hiring_algorithm",
+            "dimension": "fairness_nondiscrimination"
+          }
+        },
+        "safety_robustness": {
+          "value": 3.0,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "hiring_algorithm",
+            "dimension": "safety_robustness"
+          }
+        },
+        "privacy_data_governance": {
+          "value": 3.0,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "hiring_algorithm",
+            "dimension": "privacy_data_governance"
+          }
+        },
+        "human_agency_oversight": {
+          "value": 2.0,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "hiring_algorithm",
+            "dimension": "human_agency_oversight"
+          }
+        },
+        "accountability": {
+          "value": 4.5,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "hiring_algorithm",
+            "dimension": "accountability"
+          }
+        }
+      },
+      "per_framework_overall_scores": {
+        "eu_altai": {
+          "value": 0.3021545378107828,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "framework_id": "eu_altai",
+            "endpoint": "/api/evaluate",
+            "json_path": "$.cases[1].overall_evaluations[0].raw_response.overall_score"
+          }
+        },
+        "nist_ai_rmf": {
+          "value": 0.4154641497439999,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "framework_id": "nist_ai_rmf",
+            "endpoint": "/api/evaluate",
+            "json_path": "$.cases[1].overall_evaluations[1].raw_response.overall_score"
+          }
+        },
+        "sg_mgaf": {
+          "value": 0.3253513051156482,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "framework_id": "sg_mgaf",
+            "endpoint": "/api/evaluate",
+            "json_path": "$.cases[1].overall_evaluations[2].raw_response.overall_score"
+          }
+        }
+      },
+      "per_framework_stakeholder_scores": {
+        "eu_altai__developer": {
+          "value": 0.3185093359334856,
+          "framework_id": "eu_altai",
+          "stakeholder_id": "developer",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=eu_altai,sh=developer].overall_score"
+          }
+        },
+        "eu_altai__regulator": {
+          "value": 0.34179144466145533,
+          "framework_id": "eu_altai",
+          "stakeholder_id": "regulator",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=eu_altai,sh=regulator].overall_score"
+          }
+        },
+        "eu_altai__affected_community": {
+          "value": 0.24616283283740728,
+          "framework_id": "eu_altai",
+          "stakeholder_id": "affected_community",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=eu_altai,sh=affected_community].overall_score"
+          }
+        },
+        "nist_ai_rmf__developer": {
+          "value": 0.37868997997969067,
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_id": "developer",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=nist_ai_rmf,sh=developer].overall_score"
+          }
+        },
+        "nist_ai_rmf__regulator": {
+          "value": 0.4891652626584123,
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_id": "regulator",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=nist_ai_rmf,sh=regulator].overall_score"
+          }
+        },
+        "nist_ai_rmf__affected_community": {
+          "value": 0.37853720659389684,
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_id": "affected_community",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=nist_ai_rmf,sh=affected_community].overall_score"
+          }
+        },
+        "sg_mgaf__developer": {
+          "value": 0.3291856376600614,
+          "framework_id": "sg_mgaf",
+          "stakeholder_id": "developer",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=sg_mgaf,sh=developer].overall_score"
+          }
+        },
+        "sg_mgaf__regulator": {
+          "value": 0.37023435486012524,
+          "framework_id": "sg_mgaf",
+          "stakeholder_id": "regulator",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=sg_mgaf,sh=regulator].overall_score"
+          }
+        },
+        "sg_mgaf__affected_community": {
+          "value": 0.2766339228267579,
+          "framework_id": "sg_mgaf",
+          "stakeholder_id": "affected_community",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "hiring_algorithm",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=sg_mgaf,sh=affected_community].overall_score"
+          }
+        }
+      },
+      "all_frameworks_overall_score": {
+        "value": 0.347656664223477,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_evaluate_raw.json",
+          "case_id": "hiring_algorithm",
+          "endpoint": "/api/evaluate",
+          "json_path": "$.cases[1].all_frameworks_evaluation.overall_score"
+        }
+      },
+      "conflict_matrices": {
+        "eu_altai": {
+          "raw_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.5428571428571429,
+              "affected_community": 0.7714285714285715
+            },
+            "regulator": {
+              "developer": 0.5428571428571429,
+              "regulator": 1.0,
+              "affected_community": 0.5428571428571429
+            },
+            "affected_community": {
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429,
+              "affected_community": 1.0
+            }
+          },
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_conflicts_raw.json",
+            "case_id": "hiring_algorithm",
+            "framework_id": "eu_altai",
+            "endpoint": "/api/conflicts",
+            "json_path": "$.raw_response.metadata.correlation_matrix"
+          }
+        },
+        "nist_ai_rmf": {
+          "raw_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.5428571428571429,
+              "affected_community": 0.7714285714285715
+            },
+            "regulator": {
+              "developer": 0.5428571428571429,
+              "regulator": 1.0,
+              "affected_community": 0.5428571428571429
+            },
+            "affected_community": {
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429,
+              "affected_community": 1.0
+            }
+          },
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_conflicts_raw.json",
+            "case_id": "hiring_algorithm",
+            "framework_id": "nist_ai_rmf",
+            "endpoint": "/api/conflicts",
+            "json_path": "$.raw_response.metadata.correlation_matrix"
+          }
+        },
+        "sg_mgaf": {
+          "raw_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.5428571428571429,
+              "affected_community": 0.7714285714285715
+            },
+            "regulator": {
+              "developer": 0.5428571428571429,
+              "regulator": 1.0,
+              "affected_community": 0.5428571428571429
+            },
+            "affected_community": {
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429,
+              "affected_community": 1.0
+            }
+          },
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_conflicts_raw.json",
+            "case_id": "hiring_algorithm",
+            "framework_id": "sg_mgaf",
+            "endpoint": "/api/conflicts",
+            "json_path": "$.raw_response.metadata.correlation_matrix"
+          }
+        }
+      }
+    },
+    "healthcare_diagnostic": {
+      "baseline_dimension_scores": {
+        "transparency_explainability": {
+          "value": 4.0,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "healthcare_diagnostic",
+            "dimension": "transparency_explainability"
+          }
+        },
+        "fairness_nondiscrimination": {
+          "value": 4.0,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "healthcare_diagnostic",
+            "dimension": "fairness_nondiscrimination"
+          }
+        },
+        "safety_robustness": {
+          "value": 6.0,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "healthcare_diagnostic",
+            "dimension": "safety_robustness"
+          }
+        },
+        "privacy_data_governance": {
+          "value": 3.5,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "healthcare_diagnostic",
+            "dimension": "privacy_data_governance"
+          }
+        },
+        "human_agency_oversight": {
+          "value": 5.0,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "healthcare_diagnostic",
+            "dimension": "human_agency_oversight"
+          }
+        },
+        "accountability": {
+          "value": 4.5,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_inputs_manifest.json",
+            "case_id": "healthcare_diagnostic",
+            "dimension": "accountability"
+          }
+        }
+      },
+      "per_framework_overall_scores": {
+        "eu_altai": {
+          "value": 0.5841125234483067,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "framework_id": "eu_altai",
+            "endpoint": "/api/evaluate",
+            "json_path": "$.cases[2].overall_evaluations[0].raw_response.overall_score"
+          }
+        },
+        "nist_ai_rmf": {
+          "value": 0.6258174652418557,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "framework_id": "nist_ai_rmf",
+            "endpoint": "/api/evaluate",
+            "json_path": "$.cases[2].overall_evaluations[1].raw_response.overall_score"
+          }
+        },
+        "sg_mgaf": {
+          "value": 0.590990663901431,
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "framework_id": "sg_mgaf",
+            "endpoint": "/api/evaluate",
+            "json_path": "$.cases[2].overall_evaluations[2].raw_response.overall_score"
+          }
+        }
+      },
+      "per_framework_stakeholder_scores": {
+        "eu_altai__developer": {
+          "value": 0.6672548479987791,
+          "framework_id": "eu_altai",
+          "stakeholder_id": "developer",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=eu_altai,sh=developer].overall_score"
+          }
+        },
+        "eu_altai__regulator": {
+          "value": 0.537603987333963,
+          "framework_id": "eu_altai",
+          "stakeholder_id": "regulator",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=eu_altai,sh=regulator].overall_score"
+          }
+        },
+        "eu_altai__affected_community": {
+          "value": 0.5474787350121779,
+          "framework_id": "eu_altai",
+          "stakeholder_id": "affected_community",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=eu_altai,sh=affected_community].overall_score"
+          }
+        },
+        "nist_ai_rmf__developer": {
+          "value": 0.7092291184541893,
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_id": "developer",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=nist_ai_rmf,sh=developer].overall_score"
+          }
+        },
+        "nist_ai_rmf__regulator": {
+          "value": 0.5835613888082574,
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_id": "regulator",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=nist_ai_rmf,sh=regulator].overall_score"
+          }
+        },
+        "nist_ai_rmf__affected_community": {
+          "value": 0.5846618884631203,
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_id": "affected_community",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=nist_ai_rmf,sh=affected_community].overall_score"
+          }
+        },
+        "sg_mgaf__developer": {
+          "value": 0.6479416312559779,
+          "framework_id": "sg_mgaf",
+          "stakeholder_id": "developer",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=sg_mgaf,sh=developer].overall_score"
+          }
+        },
+        "sg_mgaf__regulator": {
+          "value": 0.547006308761829,
+          "framework_id": "sg_mgaf",
+          "stakeholder_id": "regulator",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=sg_mgaf,sh=regulator].overall_score"
+          }
+        },
+        "sg_mgaf__affected_community": {
+          "value": 0.578024051686486,
+          "framework_id": "sg_mgaf",
+          "stakeholder_id": "affected_community",
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_evaluate_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "endpoint": "/api/evaluate",
+            "json_path": "per_stakeholder_evaluations[fw=sg_mgaf,sh=affected_community].overall_score"
+          }
+        }
+      },
+      "all_frameworks_overall_score": {
+        "value": 0.6003068841971978,
+        "source_trace": {
+          "artifact": "docs/evidence/ch11_evaluate_raw.json",
+          "case_id": "healthcare_diagnostic",
+          "endpoint": "/api/evaluate",
+          "json_path": "$.cases[2].all_frameworks_evaluation.overall_score"
+        }
+      },
+      "conflict_matrices": {
+        "eu_altai": {
+          "raw_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": -0.14285714285714288,
+              "affected_community": 0.48571428571428577
+            },
+            "regulator": {
+              "developer": -0.14285714285714288,
+              "regulator": 1.0,
+              "affected_community": 0.028571428571428574
+            },
+            "affected_community": {
+              "developer": 0.48571428571428577,
+              "regulator": 0.028571428571428574,
+              "affected_community": 1.0
+            }
+          },
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_conflicts_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "framework_id": "eu_altai",
+            "endpoint": "/api/conflicts",
+            "json_path": "$.raw_response.metadata.correlation_matrix"
+          }
+        },
+        "nist_ai_rmf": {
+          "raw_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": -0.14285714285714288,
+              "affected_community": 0.48571428571428577
+            },
+            "regulator": {
+              "developer": -0.14285714285714288,
+              "regulator": 1.0,
+              "affected_community": 0.028571428571428574
+            },
+            "affected_community": {
+              "developer": 0.48571428571428577,
+              "regulator": 0.028571428571428574,
+              "affected_community": 1.0
+            }
+          },
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_conflicts_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "framework_id": "nist_ai_rmf",
+            "endpoint": "/api/conflicts",
+            "json_path": "$.raw_response.metadata.correlation_matrix"
+          }
+        },
+        "sg_mgaf": {
+          "raw_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": -0.14285714285714288,
+              "affected_community": 0.48571428571428577
+            },
+            "regulator": {
+              "developer": -0.14285714285714288,
+              "regulator": 1.0,
+              "affected_community": 0.028571428571428574
+            },
+            "affected_community": {
+              "developer": 0.48571428571428577,
+              "regulator": 0.028571428571428574,
+              "affected_community": 1.0
+            }
+          },
+          "source_trace": {
+            "artifact": "docs/evidence/ch11_conflicts_raw.json",
+            "case_id": "healthcare_diagnostic",
+            "framework_id": "sg_mgaf",
+            "endpoint": "/api/conflicts",
+            "json_path": "$.raw_response.metadata.correlation_matrix"
+          }
+        }
+      }
+    }
+  }
+}

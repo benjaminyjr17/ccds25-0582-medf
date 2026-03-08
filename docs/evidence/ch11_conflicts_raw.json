@@ -1,0 +1,2616 @@
+{
+  "commit_hash": "38998f53ce167e3ede31e054cd693f3b765253e9",
+  "generation_timestamp": "2026-03-08T16:50:46.606952+00:00",
+  "cases": [
+    {
+      "case_id": "facial_recognition",
+      "framework_id": "eu_altai",
+      "request_payload": {
+        "ai_system": {
+          "id": "facial_recognition",
+          "name": "facial_recognition",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 2.5,
+              "fairness_nondiscrimination": 1.5,
+              "safety_robustness": 5.0,
+              "privacy_data_governance": 1.5,
+              "human_agency_oversight": 2.5,
+              "accountability": 4.0
+            }
+          }
+        },
+        "framework_ids": [
+          "eu_altai"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Conflict analysis for framework 'eu_altai' indicates low overall stakeholder disagreement.",
+        "conflicts": [
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator",
+            "conflict_level": "low",
+            "spearman_rho": 0.8857142857142858,
+            "conflicting_dimensions": [
+              "accountability",
+              "human_agency_oversight"
+            ]
+          },
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "low",
+            "spearman_rho": 0.942857142857143,
+            "conflicting_dimensions": [
+              "accountability",
+              "safety_robustness"
+            ]
+          },
+          {
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "low",
+            "spearman_rho": 0.942857142857143,
+            "conflicting_dimensions": [
+              "human_agency_oversight",
+              "transparency_explainability"
+            ]
+          }
+        ],
+        "pareto_solutions": [],
+        "metadata": {
+          "framework_id": "eu_altai",
+          "stakeholder_rankings": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ]
+          },
+          "correlation_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.8857142857142858,
+              "affected_community": 0.942857142857143
+            },
+            "regulator": {
+              "developer": 0.8857142857142858,
+              "regulator": 1.0,
+              "affected_community": 0.942857142857143
+            },
+            "affected_community": {
+              "developer": 0.942857142857143,
+              "regulator": 0.942857142857143,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.8857142857142858,
+              "affected_community": 0.942857142857143
+            },
+            "regulator": {
+              "developer": 0.8857142857142858,
+              "regulator": 1.0,
+              "affected_community": 0.942857142857143
+            },
+            "affected_community": {
+              "developer": 0.942857142857143,
+              "regulator": 0.942857142857143,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.08571428571428573,
+              "affected_community": -0.3142857142857143
+            },
+            "regulator": {
+              "developer": 0.08571428571428573,
+              "regulator": 1.0,
+              "affected_community": 0.2571428571428572
+            },
+            "affected_community": {
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572,
+              "affected_community": 1.0
+            }
+          },
+          "pairwise_rho_weights": {
+            "developer|regulator": 0.08571428571428573,
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572
+          },
+          "ai_system_id": "facial_recognition",
+          "ai_system_name": "facial_recognition",
+          "scoring_method": "topsis",
+          "stakeholder_scores": {
+            "developer": 0.41898133160744866,
+            "regulator": 0.3122880342236406,
+            "affected_community": 0.2306768716821625
+          },
+          "run_id": "6b5b00db-6932-467e-9b84-aab73db8e785"
+        },
+        "harm_assessment": {
+          "overall_score": 0.4978000000000001,
+          "overall_severity": "moderate",
+          "domain_scores": [
+            {
+              "domain_id": "opacity_harm",
+              "unified_dimension": "transparency_explainability",
+              "score": 0.5449999999999999,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "discrimination_harm",
+              "unified_dimension": "fairness_nondiscrimination",
+              "score": 0.6716666666666666,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "safety_failure_harm",
+              "unified_dimension": "safety_robustness",
+              "score": 0.2733333333333333,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "privacy_intrusion_harm",
+              "unified_dimension": "privacy_data_governance",
+              "score": 0.6416666666666666,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "autonomy_oversight_harm",
+              "unified_dimension": "human_agency_oversight",
+              "score": 0.5449999999999999,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "accountability_redress_harm",
+              "unified_dimension": "accountability",
+              "score": 0.37,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            }
+          ],
+          "top_risk_domains": [
+            "fairness_nondiscrimination",
+            "privacy_data_governance"
+          ],
+          "model_version": "harm_taxonomy_v1"
+        }
+      },
+      "execution_timestamp": "2026-03-08T16:50:47.181509+00:00"
+    },
+    {
+      "case_id": "facial_recognition",
+      "framework_id": "nist_ai_rmf",
+      "request_payload": {
+        "ai_system": {
+          "id": "facial_recognition",
+          "name": "facial_recognition",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 2.5,
+              "fairness_nondiscrimination": 1.5,
+              "safety_robustness": 5.0,
+              "privacy_data_governance": 1.5,
+              "human_agency_oversight": 2.5,
+              "accountability": 4.0
+            }
+          }
+        },
+        "framework_ids": [
+          "nist_ai_rmf"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Conflict analysis for framework 'nist_ai_rmf' indicates low overall stakeholder disagreement.",
+        "conflicts": [
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator",
+            "conflict_level": "low",
+            "spearman_rho": 0.8857142857142858,
+            "conflicting_dimensions": [
+              "accountability",
+              "human_agency_oversight"
+            ]
+          },
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "low",
+            "spearman_rho": 0.942857142857143,
+            "conflicting_dimensions": [
+              "accountability",
+              "safety_robustness"
+            ]
+          },
+          {
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "low",
+            "spearman_rho": 0.942857142857143,
+            "conflicting_dimensions": [
+              "human_agency_oversight",
+              "transparency_explainability"
+            ]
+          }
+        ],
+        "pareto_solutions": [],
+        "metadata": {
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_rankings": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ]
+          },
+          "correlation_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.8857142857142858,
+              "affected_community": 0.942857142857143
+            },
+            "regulator": {
+              "developer": 0.8857142857142858,
+              "regulator": 1.0,
+              "affected_community": 0.942857142857143
+            },
+            "affected_community": {
+              "developer": 0.942857142857143,
+              "regulator": 0.942857142857143,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.8857142857142858,
+              "affected_community": 0.942857142857143
+            },
+            "regulator": {
+              "developer": 0.8857142857142858,
+              "regulator": 1.0,
+              "affected_community": 0.942857142857143
+            },
+            "affected_community": {
+              "developer": 0.942857142857143,
+              "regulator": 0.942857142857143,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.08571428571428573,
+              "affected_community": -0.3142857142857143
+            },
+            "regulator": {
+              "developer": 0.08571428571428573,
+              "regulator": 1.0,
+              "affected_community": 0.2571428571428572
+            },
+            "affected_community": {
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572,
+              "affected_community": 1.0
+            }
+          },
+          "pairwise_rho_weights": {
+            "developer|regulator": 0.08571428571428573,
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572
+          },
+          "ai_system_id": "facial_recognition",
+          "ai_system_name": "facial_recognition",
+          "scoring_method": "topsis",
+          "stakeholder_scores": {
+            "developer": 0.41898133160744866,
+            "regulator": 0.3122880342236406,
+            "affected_community": 0.2306768716821625
+          },
+          "run_id": "31215d01-336a-4c91-b71d-2fae8cabbe2c"
+        },
+        "harm_assessment": {
+          "overall_score": 0.45156666666666667,
+          "overall_severity": "moderate",
+          "domain_scores": [
+            {
+              "domain_id": "opacity_harm",
+              "unified_dimension": "transparency_explainability",
+              "score": 0.5449999999999999,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "discrimination_harm",
+              "unified_dimension": "fairness_nondiscrimination",
+              "score": 0.6716666666666666,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "safety_failure_harm",
+              "unified_dimension": "safety_robustness",
+              "score": 0.2733333333333333,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "privacy_intrusion_harm",
+              "unified_dimension": "privacy_data_governance",
+              "score": 0.6416666666666666,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "autonomy_oversight_harm",
+              "unified_dimension": "human_agency_oversight",
+              "score": 0.5449999999999999,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "accountability_redress_harm",
+              "unified_dimension": "accountability",
+              "score": 0.37,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            }
+          ],
+          "top_risk_domains": [
+            "fairness_nondiscrimination",
+            "privacy_data_governance"
+          ],
+          "model_version": "harm_taxonomy_v1"
+        }
+      },
+      "execution_timestamp": "2026-03-08T16:50:47.192012+00:00"
+    },
+    {
+      "case_id": "facial_recognition",
+      "framework_id": "sg_mgaf",
+      "request_payload": {
+        "ai_system": {
+          "id": "facial_recognition",
+          "name": "facial_recognition",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 2.5,
+              "fairness_nondiscrimination": 1.5,
+              "safety_robustness": 5.0,
+              "privacy_data_governance": 1.5,
+              "human_agency_oversight": 2.5,
+              "accountability": 4.0
+            }
+          }
+        },
+        "framework_ids": [
+          "sg_mgaf"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Conflict analysis for framework 'sg_mgaf' indicates low overall stakeholder disagreement.",
+        "conflicts": [
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator",
+            "conflict_level": "low",
+            "spearman_rho": 0.8857142857142858,
+            "conflicting_dimensions": [
+              "accountability",
+              "human_agency_oversight"
+            ]
+          },
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "low",
+            "spearman_rho": 0.942857142857143,
+            "conflicting_dimensions": [
+              "accountability",
+              "safety_robustness"
+            ]
+          },
+          {
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "low",
+            "spearman_rho": 0.942857142857143,
+            "conflicting_dimensions": [
+              "human_agency_oversight",
+              "transparency_explainability"
+            ]
+          }
+        ],
+        "pareto_solutions": [],
+        "metadata": {
+          "framework_id": "sg_mgaf",
+          "stakeholder_rankings": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "regulator": [
+              "accountability",
+              "safety_robustness",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "accountability",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ]
+          },
+          "correlation_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.8857142857142858,
+              "affected_community": 0.942857142857143
+            },
+            "regulator": {
+              "developer": 0.8857142857142858,
+              "regulator": 1.0,
+              "affected_community": 0.942857142857143
+            },
+            "affected_community": {
+              "developer": 0.942857142857143,
+              "regulator": 0.942857142857143,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.8857142857142858,
+              "affected_community": 0.942857142857143
+            },
+            "regulator": {
+              "developer": 0.8857142857142858,
+              "regulator": 1.0,
+              "affected_community": 0.942857142857143
+            },
+            "affected_community": {
+              "developer": 0.942857142857143,
+              "regulator": 0.942857142857143,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.08571428571428573,
+              "affected_community": -0.3142857142857143
+            },
+            "regulator": {
+              "developer": 0.08571428571428573,
+              "regulator": 1.0,
+              "affected_community": 0.2571428571428572
+            },
+            "affected_community": {
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572,
+              "affected_community": 1.0
+            }
+          },
+          "pairwise_rho_weights": {
+            "developer|regulator": 0.08571428571428573,
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572
+          },
+          "ai_system_id": "facial_recognition",
+          "ai_system_name": "facial_recognition",
+          "scoring_method": "topsis",
+          "stakeholder_scores": {
+            "developer": 0.41898133160744866,
+            "regulator": 0.3122880342236406,
+            "affected_community": 0.2306768716821625
+          },
+          "run_id": "67c745b6-d59d-4021-a14a-2a56253cf426"
+        },
+        "harm_assessment": {
+          "overall_score": 0.4933333333333333,
+          "overall_severity": "moderate",
+          "domain_scores": [
+            {
+              "domain_id": "opacity_harm",
+              "unified_dimension": "transparency_explainability",
+              "score": 0.5449999999999999,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "discrimination_harm",
+              "unified_dimension": "fairness_nondiscrimination",
+              "score": 0.6716666666666666,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "safety_failure_harm",
+              "unified_dimension": "safety_robustness",
+              "score": 0.2733333333333333,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "privacy_intrusion_harm",
+              "unified_dimension": "privacy_data_governance",
+              "score": 0.6416666666666666,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "autonomy_oversight_harm",
+              "unified_dimension": "human_agency_oversight",
+              "score": 0.5449999999999999,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "accountability_redress_harm",
+              "unified_dimension": "accountability",
+              "score": 0.37,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            }
+          ],
+          "top_risk_domains": [
+            "fairness_nondiscrimination",
+            "privacy_data_governance"
+          ],
+          "model_version": "harm_taxonomy_v1"
+        }
+      },
+      "execution_timestamp": "2026-03-08T16:50:47.203816+00:00"
+    },
+    {
+      "case_id": "hiring_algorithm",
+      "framework_id": "eu_altai",
+      "request_payload": {
+        "ai_system": {
+          "id": "hiring_algorithm",
+          "name": "hiring_algorithm",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 2.5,
+              "fairness_nondiscrimination": 1.5,
+              "safety_robustness": 3.0,
+              "privacy_data_governance": 3.0,
+              "human_agency_oversight": 2.0,
+              "accountability": 4.5
+            }
+          }
+        },
+        "framework_ids": [
+          "eu_altai"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Conflict analysis for framework 'eu_altai' indicates moderate overall stakeholder disagreement.",
+        "conflicts": [
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator",
+            "conflict_level": "moderate",
+            "spearman_rho": 0.5428571428571429,
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "transparency_explainability"
+            ]
+          },
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "low",
+            "spearman_rho": 0.7714285714285715,
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "accountability"
+            ]
+          },
+          {
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "moderate",
+            "spearman_rho": 0.5428571428571429,
+            "conflicting_dimensions": [
+              "transparency_explainability",
+              "human_agency_oversight"
+            ]
+          }
+        ],
+        "pareto_solutions": [],
+        "metadata": {
+          "framework_id": "eu_altai",
+          "stakeholder_rankings": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "accountability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "accountability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ]
+          },
+          "correlation_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.5428571428571429,
+              "affected_community": 0.7714285714285715
+            },
+            "regulator": {
+              "developer": 0.5428571428571429,
+              "regulator": 1.0,
+              "affected_community": 0.5428571428571429
+            },
+            "affected_community": {
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.5428571428571429,
+              "affected_community": 0.7714285714285715
+            },
+            "regulator": {
+              "developer": 0.5428571428571429,
+              "regulator": 1.0,
+              "affected_community": 0.5428571428571429
+            },
+            "affected_community": {
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.08571428571428573,
+              "affected_community": -0.3142857142857143
+            },
+            "regulator": {
+              "developer": 0.08571428571428573,
+              "regulator": 1.0,
+              "affected_community": 0.2571428571428572
+            },
+            "affected_community": {
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572,
+              "affected_community": 1.0
+            }
+          },
+          "pairwise_rho_weights": {
+            "developer|regulator": 0.08571428571428573,
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572
+          },
+          "ai_system_id": "hiring_algorithm",
+          "ai_system_name": "hiring_algorithm",
+          "scoring_method": "topsis",
+          "stakeholder_scores": {
+            "developer": 0.31427739762078555,
+            "regulator": 0.3407536839563278,
+            "affected_community": 0.231977938159084
+          },
+          "run_id": "b421fb71-3aed-4a08-acf6-d2bad3d30891"
+        },
+        "harm_assessment": {
+          "overall_score": 0.5164666666666667,
+          "overall_severity": "high",
+          "domain_scores": [
+            {
+              "domain_id": "opacity_harm",
+              "unified_dimension": "transparency_explainability",
+              "score": 0.5449999999999999,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "discrimination_harm",
+              "unified_dimension": "fairness_nondiscrimination",
+              "score": 0.6716666666666666,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "safety_failure_harm",
+              "unified_dimension": "safety_robustness",
+              "score": 0.5066666666666667,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "privacy_intrusion_harm",
+              "unified_dimension": "privacy_data_governance",
+              "score": 0.4666666666666667,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "autonomy_oversight_harm",
+              "unified_dimension": "human_agency_oversight",
+              "score": 0.6033333333333334,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "accountability_redress_harm",
+              "unified_dimension": "accountability",
+              "score": 0.31166666666666665,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            }
+          ],
+          "top_risk_domains": [
+            "fairness_nondiscrimination",
+            "human_agency_oversight"
+          ],
+          "model_version": "harm_taxonomy_v1"
+        }
+      },
+      "execution_timestamp": "2026-03-08T16:50:47.214305+00:00"
+    },
+    {
+      "case_id": "hiring_algorithm",
+      "framework_id": "nist_ai_rmf",
+      "request_payload": {
+        "ai_system": {
+          "id": "hiring_algorithm",
+          "name": "hiring_algorithm",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 2.5,
+              "fairness_nondiscrimination": 1.5,
+              "safety_robustness": 3.0,
+              "privacy_data_governance": 3.0,
+              "human_agency_oversight": 2.0,
+              "accountability": 4.5
+            }
+          }
+        },
+        "framework_ids": [
+          "nist_ai_rmf"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Conflict analysis for framework 'nist_ai_rmf' indicates moderate overall stakeholder disagreement.",
+        "conflicts": [
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator",
+            "conflict_level": "moderate",
+            "spearman_rho": 0.5428571428571429,
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "transparency_explainability"
+            ]
+          },
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "low",
+            "spearman_rho": 0.7714285714285715,
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "accountability"
+            ]
+          },
+          {
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "moderate",
+            "spearman_rho": 0.5428571428571429,
+            "conflicting_dimensions": [
+              "transparency_explainability",
+              "human_agency_oversight"
+            ]
+          }
+        ],
+        "pareto_solutions": [],
+        "metadata": {
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_rankings": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "accountability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "accountability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ]
+          },
+          "correlation_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.5428571428571429,
+              "affected_community": 0.7714285714285715
+            },
+            "regulator": {
+              "developer": 0.5428571428571429,
+              "regulator": 1.0,
+              "affected_community": 0.5428571428571429
+            },
+            "affected_community": {
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.5428571428571429,
+              "affected_community": 0.7714285714285715
+            },
+            "regulator": {
+              "developer": 0.5428571428571429,
+              "regulator": 1.0,
+              "affected_community": 0.5428571428571429
+            },
+            "affected_community": {
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.08571428571428573,
+              "affected_community": -0.3142857142857143
+            },
+            "regulator": {
+              "developer": 0.08571428571428573,
+              "regulator": 1.0,
+              "affected_community": 0.2571428571428572
+            },
+            "affected_community": {
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572,
+              "affected_community": 1.0
+            }
+          },
+          "pairwise_rho_weights": {
+            "developer|regulator": 0.08571428571428573,
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572
+          },
+          "ai_system_id": "hiring_algorithm",
+          "ai_system_name": "hiring_algorithm",
+          "scoring_method": "topsis",
+          "stakeholder_scores": {
+            "developer": 0.31427739762078555,
+            "regulator": 0.3407536839563278,
+            "affected_community": 0.231977938159084
+          },
+          "run_id": "729b3504-8bae-47db-a565-e2f91b876b8e"
+        },
+        "harm_assessment": {
+          "overall_score": 0.47606666666666664,
+          "overall_severity": "moderate",
+          "domain_scores": [
+            {
+              "domain_id": "opacity_harm",
+              "unified_dimension": "transparency_explainability",
+              "score": 0.5449999999999999,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "discrimination_harm",
+              "unified_dimension": "fairness_nondiscrimination",
+              "score": 0.6716666666666666,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "safety_failure_harm",
+              "unified_dimension": "safety_robustness",
+              "score": 0.5066666666666667,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "privacy_intrusion_harm",
+              "unified_dimension": "privacy_data_governance",
+              "score": 0.4666666666666667,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "autonomy_oversight_harm",
+              "unified_dimension": "human_agency_oversight",
+              "score": 0.6033333333333334,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "accountability_redress_harm",
+              "unified_dimension": "accountability",
+              "score": 0.31166666666666665,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            }
+          ],
+          "top_risk_domains": [
+            "fairness_nondiscrimination",
+            "human_agency_oversight"
+          ],
+          "model_version": "harm_taxonomy_v1"
+        }
+      },
+      "execution_timestamp": "2026-03-08T16:50:47.223864+00:00"
+    },
+    {
+      "case_id": "hiring_algorithm",
+      "framework_id": "sg_mgaf",
+      "request_payload": {
+        "ai_system": {
+          "id": "hiring_algorithm",
+          "name": "hiring_algorithm",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 2.5,
+              "fairness_nondiscrimination": 1.5,
+              "safety_robustness": 3.0,
+              "privacy_data_governance": 3.0,
+              "human_agency_oversight": 2.0,
+              "accountability": 4.5
+            }
+          }
+        },
+        "framework_ids": [
+          "sg_mgaf"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Conflict analysis for framework 'sg_mgaf' indicates moderate overall stakeholder disagreement.",
+        "conflicts": [
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator",
+            "conflict_level": "moderate",
+            "spearman_rho": 0.5428571428571429,
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "transparency_explainability"
+            ]
+          },
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "low",
+            "spearman_rho": 0.7714285714285715,
+            "conflicting_dimensions": [
+              "safety_robustness",
+              "accountability"
+            ]
+          },
+          {
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "moderate",
+            "spearman_rho": 0.5428571428571429,
+            "conflicting_dimensions": [
+              "transparency_explainability",
+              "human_agency_oversight"
+            ]
+          }
+        ],
+        "pareto_solutions": [],
+        "metadata": {
+          "framework_id": "sg_mgaf",
+          "stakeholder_rankings": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "accountability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "human_agency_oversight",
+              "fairness_nondiscrimination"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "fairness_nondiscrimination",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "accountability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight",
+              "transparency_explainability",
+              "fairness_nondiscrimination"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ]
+          },
+          "correlation_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.5428571428571429,
+              "affected_community": 0.7714285714285715
+            },
+            "regulator": {
+              "developer": 0.5428571428571429,
+              "regulator": 1.0,
+              "affected_community": 0.5428571428571429
+            },
+            "affected_community": {
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.5428571428571429,
+              "affected_community": 0.7714285714285715
+            },
+            "regulator": {
+              "developer": 0.5428571428571429,
+              "regulator": 1.0,
+              "affected_community": 0.5428571428571429
+            },
+            "affected_community": {
+              "developer": 0.7714285714285715,
+              "regulator": 0.5428571428571429,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.08571428571428573,
+              "affected_community": -0.3142857142857143
+            },
+            "regulator": {
+              "developer": 0.08571428571428573,
+              "regulator": 1.0,
+              "affected_community": 0.2571428571428572
+            },
+            "affected_community": {
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572,
+              "affected_community": 1.0
+            }
+          },
+          "pairwise_rho_weights": {
+            "developer|regulator": 0.08571428571428573,
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572
+          },
+          "ai_system_id": "hiring_algorithm",
+          "ai_system_name": "hiring_algorithm",
+          "scoring_method": "topsis",
+          "stakeholder_scores": {
+            "developer": 0.31427739762078555,
+            "regulator": 0.3407536839563278,
+            "affected_community": 0.231977938159084
+          },
+          "run_id": "1995f2b5-e056-4951-af48-4ebf59db9c84"
+        },
+        "harm_assessment": {
+          "overall_score": 0.5085,
+          "overall_severity": "high",
+          "domain_scores": [
+            {
+              "domain_id": "opacity_harm",
+              "unified_dimension": "transparency_explainability",
+              "score": 0.5449999999999999,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "discrimination_harm",
+              "unified_dimension": "fairness_nondiscrimination",
+              "score": 0.6716666666666666,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "safety_failure_harm",
+              "unified_dimension": "safety_robustness",
+              "score": 0.5066666666666667,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "privacy_intrusion_harm",
+              "unified_dimension": "privacy_data_governance",
+              "score": 0.4666666666666667,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "autonomy_oversight_harm",
+              "unified_dimension": "human_agency_oversight",
+              "score": 0.6033333333333334,
+              "severity": "high",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "accountability_redress_harm",
+              "unified_dimension": "accountability",
+              "score": 0.31166666666666665,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            }
+          ],
+          "top_risk_domains": [
+            "fairness_nondiscrimination",
+            "human_agency_oversight"
+          ],
+          "model_version": "harm_taxonomy_v1"
+        }
+      },
+      "execution_timestamp": "2026-03-08T16:50:47.234664+00:00"
+    },
+    {
+      "case_id": "healthcare_diagnostic",
+      "framework_id": "eu_altai",
+      "request_payload": {
+        "ai_system": {
+          "id": "healthcare_diagnostic",
+          "name": "healthcare_diagnostic",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 4.0,
+              "fairness_nondiscrimination": 4.0,
+              "safety_robustness": 6.0,
+              "privacy_data_governance": 3.5,
+              "human_agency_oversight": 5.0,
+              "accountability": 4.5
+            }
+          }
+        },
+        "framework_ids": [
+          "eu_altai"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Conflict analysis for framework 'eu_altai' indicates high overall stakeholder disagreement.",
+        "conflicts": [
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator",
+            "conflict_level": "high",
+            "spearman_rho": -0.14285714285714288,
+            "conflicting_dimensions": [
+              "transparency_explainability",
+              "human_agency_oversight"
+            ]
+          },
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "moderate",
+            "spearman_rho": 0.48571428571428577,
+            "conflicting_dimensions": [
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ]
+          },
+          {
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "high",
+            "spearman_rho": 0.028571428571428574,
+            "conflicting_dimensions": [
+              "transparency_explainability",
+              "human_agency_oversight"
+            ]
+          }
+        ],
+        "pareto_solutions": [],
+        "metadata": {
+          "framework_id": "eu_altai",
+          "stakeholder_rankings": {
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "accountability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "safety_robustness",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "accountability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "safety_robustness",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ]
+          },
+          "correlation_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": -0.14285714285714288,
+              "affected_community": 0.48571428571428577
+            },
+            "regulator": {
+              "developer": -0.14285714285714288,
+              "regulator": 1.0,
+              "affected_community": 0.028571428571428574
+            },
+            "affected_community": {
+              "developer": 0.48571428571428577,
+              "regulator": 0.028571428571428574,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": -0.14285714285714288,
+              "affected_community": 0.48571428571428577
+            },
+            "regulator": {
+              "developer": -0.14285714285714288,
+              "regulator": 1.0,
+              "affected_community": 0.028571428571428574
+            },
+            "affected_community": {
+              "developer": 0.48571428571428577,
+              "regulator": 0.028571428571428574,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.08571428571428573,
+              "affected_community": -0.3142857142857143
+            },
+            "regulator": {
+              "developer": 0.08571428571428573,
+              "regulator": 1.0,
+              "affected_community": 0.2571428571428572
+            },
+            "affected_community": {
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572,
+              "affected_community": 1.0
+            }
+          },
+          "pairwise_rho_weights": {
+            "developer|regulator": 0.08571428571428573,
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572
+          },
+          "ai_system_id": "healthcare_diagnostic",
+          "ai_system_name": "healthcare_diagnostic",
+          "scoring_method": "topsis",
+          "stakeholder_scores": {
+            "developer": 0.6377738534562891,
+            "regulator": 0.536785739819868,
+            "affected_community": 0.5411331654206445
+          },
+          "run_id": "1d072552-f50c-4b27-ad9d-49e15b5a51eb"
+        },
+        "harm_assessment": {
+          "overall_score": 0.3029666666666667,
+          "overall_severity": "moderate",
+          "domain_scores": [
+            {
+              "domain_id": "opacity_harm",
+              "unified_dimension": "transparency_explainability",
+              "score": 0.37,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "discrimination_harm",
+              "unified_dimension": "fairness_nondiscrimination",
+              "score": 0.37999999999999995,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "safety_failure_harm",
+              "unified_dimension": "safety_robustness",
+              "score": 0.15666666666666662,
+              "severity": "low",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "privacy_intrusion_harm",
+              "unified_dimension": "privacy_data_governance",
+              "score": 0.40833333333333327,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "autonomy_oversight_harm",
+              "unified_dimension": "human_agency_oversight",
+              "score": 0.25333333333333335,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "accountability_redress_harm",
+              "unified_dimension": "accountability",
+              "score": 0.31166666666666665,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            }
+          ],
+          "top_risk_domains": [
+            "privacy_data_governance",
+            "fairness_nondiscrimination"
+          ],
+          "model_version": "harm_taxonomy_v1"
+        }
+      },
+      "execution_timestamp": "2026-03-08T16:50:47.246045+00:00"
+    },
+    {
+      "case_id": "healthcare_diagnostic",
+      "framework_id": "nist_ai_rmf",
+      "request_payload": {
+        "ai_system": {
+          "id": "healthcare_diagnostic",
+          "name": "healthcare_diagnostic",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 4.0,
+              "fairness_nondiscrimination": 4.0,
+              "safety_robustness": 6.0,
+              "privacy_data_governance": 3.5,
+              "human_agency_oversight": 5.0,
+              "accountability": 4.5
+            }
+          }
+        },
+        "framework_ids": [
+          "nist_ai_rmf"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Conflict analysis for framework 'nist_ai_rmf' indicates high overall stakeholder disagreement.",
+        "conflicts": [
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator",
+            "conflict_level": "high",
+            "spearman_rho": -0.14285714285714288,
+            "conflicting_dimensions": [
+              "transparency_explainability",
+              "human_agency_oversight"
+            ]
+          },
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "moderate",
+            "spearman_rho": 0.48571428571428577,
+            "conflicting_dimensions": [
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ]
+          },
+          {
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "high",
+            "spearman_rho": 0.028571428571428574,
+            "conflicting_dimensions": [
+              "transparency_explainability",
+              "human_agency_oversight"
+            ]
+          }
+        ],
+        "pareto_solutions": [],
+        "metadata": {
+          "framework_id": "nist_ai_rmf",
+          "stakeholder_rankings": {
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "accountability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "safety_robustness",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "accountability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "safety_robustness",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ]
+          },
+          "correlation_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": -0.14285714285714288,
+              "affected_community": 0.48571428571428577
+            },
+            "regulator": {
+              "developer": -0.14285714285714288,
+              "regulator": 1.0,
+              "affected_community": 0.028571428571428574
+            },
+            "affected_community": {
+              "developer": 0.48571428571428577,
+              "regulator": 0.028571428571428574,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": -0.14285714285714288,
+              "affected_community": 0.48571428571428577
+            },
+            "regulator": {
+              "developer": -0.14285714285714288,
+              "regulator": 1.0,
+              "affected_community": 0.028571428571428574
+            },
+            "affected_community": {
+              "developer": 0.48571428571428577,
+              "regulator": 0.028571428571428574,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.08571428571428573,
+              "affected_community": -0.3142857142857143
+            },
+            "regulator": {
+              "developer": 0.08571428571428573,
+              "regulator": 1.0,
+              "affected_community": 0.2571428571428572
+            },
+            "affected_community": {
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572,
+              "affected_community": 1.0
+            }
+          },
+          "pairwise_rho_weights": {
+            "developer|regulator": 0.08571428571428573,
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572
+          },
+          "ai_system_id": "healthcare_diagnostic",
+          "ai_system_name": "healthcare_diagnostic",
+          "scoring_method": "topsis",
+          "stakeholder_scores": {
+            "developer": 0.6377738534562891,
+            "regulator": 0.536785739819868,
+            "affected_community": 0.5411331654206445
+          },
+          "run_id": "93b7ea0b-ac65-461c-9fa8-f194e35a0fe1"
+        },
+        "harm_assessment": {
+          "overall_score": 0.29289999999999994,
+          "overall_severity": "moderate",
+          "domain_scores": [
+            {
+              "domain_id": "opacity_harm",
+              "unified_dimension": "transparency_explainability",
+              "score": 0.37,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "discrimination_harm",
+              "unified_dimension": "fairness_nondiscrimination",
+              "score": 0.37999999999999995,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "safety_failure_harm",
+              "unified_dimension": "safety_robustness",
+              "score": 0.15666666666666662,
+              "severity": "low",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "privacy_intrusion_harm",
+              "unified_dimension": "privacy_data_governance",
+              "score": 0.40833333333333327,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "autonomy_oversight_harm",
+              "unified_dimension": "human_agency_oversight",
+              "score": 0.25333333333333335,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "accountability_redress_harm",
+              "unified_dimension": "accountability",
+              "score": 0.31166666666666665,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            }
+          ],
+          "top_risk_domains": [
+            "privacy_data_governance",
+            "fairness_nondiscrimination"
+          ],
+          "model_version": "harm_taxonomy_v1"
+        }
+      },
+      "execution_timestamp": "2026-03-08T16:50:47.256639+00:00"
+    },
+    {
+      "case_id": "healthcare_diagnostic",
+      "framework_id": "sg_mgaf",
+      "request_payload": {
+        "ai_system": {
+          "id": "healthcare_diagnostic",
+          "name": "healthcare_diagnostic",
+          "context": {
+            "dimension_scores": {
+              "transparency_explainability": 4.0,
+              "fairness_nondiscrimination": 4.0,
+              "safety_robustness": 6.0,
+              "privacy_data_governance": 3.5,
+              "human_agency_oversight": 5.0,
+              "accountability": 4.5
+            }
+          }
+        },
+        "framework_ids": [
+          "sg_mgaf"
+        ],
+        "stakeholder_ids": [
+          "developer",
+          "regulator",
+          "affected_community"
+        ],
+        "weights": {
+          "developer": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.15,
+            "safety_robustness": 0.3,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.15,
+            "accountability": 0.15
+          },
+          "regulator": {
+            "transparency_explainability": 0.2,
+            "fairness_nondiscrimination": 0.2,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.1,
+            "accountability": 0.25
+          },
+          "affected_community": {
+            "transparency_explainability": 0.1,
+            "fairness_nondiscrimination": 0.3,
+            "safety_robustness": 0.1,
+            "privacy_data_governance": 0.15,
+            "human_agency_oversight": 0.2,
+            "accountability": 0.15
+          }
+        }
+      },
+      "raw_response": {
+        "summary": "Conflict analysis for framework 'sg_mgaf' indicates high overall stakeholder disagreement.",
+        "conflicts": [
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "regulator",
+            "conflict_level": "high",
+            "spearman_rho": -0.14285714285714288,
+            "conflicting_dimensions": [
+              "transparency_explainability",
+              "human_agency_oversight"
+            ]
+          },
+          {
+            "stakeholder_a_id": "developer",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "moderate",
+            "spearman_rho": 0.48571428571428577,
+            "conflicting_dimensions": [
+              "fairness_nondiscrimination",
+              "safety_robustness"
+            ]
+          },
+          {
+            "stakeholder_a_id": "regulator",
+            "stakeholder_b_id": "affected_community",
+            "conflict_level": "high",
+            "spearman_rho": 0.028571428571428574,
+            "conflicting_dimensions": [
+              "transparency_explainability",
+              "human_agency_oversight"
+            ]
+          }
+        ],
+        "pareto_solutions": [],
+        "metadata": {
+          "framework_id": "sg_mgaf",
+          "stakeholder_rankings": {
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "accountability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "safety_robustness",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ]
+          },
+          "stakeholder_rankings_contrib": {
+            "developer": [
+              "safety_robustness",
+              "human_agency_oversight",
+              "accountability",
+              "fairness_nondiscrimination",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "transparency_explainability",
+              "fairness_nondiscrimination",
+              "safety_robustness",
+              "human_agency_oversight",
+              "privacy_data_governance"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "safety_robustness",
+              "privacy_data_governance",
+              "transparency_explainability"
+            ]
+          },
+          "stakeholder_rankings_weights": {
+            "developer": [
+              "safety_robustness",
+              "accountability",
+              "privacy_data_governance",
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "transparency_explainability"
+            ],
+            "regulator": [
+              "accountability",
+              "fairness_nondiscrimination",
+              "transparency_explainability",
+              "privacy_data_governance",
+              "safety_robustness",
+              "human_agency_oversight"
+            ],
+            "affected_community": [
+              "fairness_nondiscrimination",
+              "human_agency_oversight",
+              "accountability",
+              "privacy_data_governance",
+              "transparency_explainability",
+              "safety_robustness"
+            ]
+          },
+          "correlation_matrix": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": -0.14285714285714288,
+              "affected_community": 0.48571428571428577
+            },
+            "regulator": {
+              "developer": -0.14285714285714288,
+              "regulator": 1.0,
+              "affected_community": 0.028571428571428574
+            },
+            "affected_community": {
+              "developer": 0.48571428571428577,
+              "regulator": 0.028571428571428574,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_contrib": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": -0.14285714285714288,
+              "affected_community": 0.48571428571428577
+            },
+            "regulator": {
+              "developer": -0.14285714285714288,
+              "regulator": 1.0,
+              "affected_community": 0.028571428571428574
+            },
+            "affected_community": {
+              "developer": 0.48571428571428577,
+              "regulator": 0.028571428571428574,
+              "affected_community": 1.0
+            }
+          },
+          "correlation_matrix_weights": {
+            "developer": {
+              "developer": 1.0,
+              "regulator": 0.08571428571428573,
+              "affected_community": -0.3142857142857143
+            },
+            "regulator": {
+              "developer": 0.08571428571428573,
+              "regulator": 1.0,
+              "affected_community": 0.2571428571428572
+            },
+            "affected_community": {
+              "developer": -0.3142857142857143,
+              "regulator": 0.2571428571428572,
+              "affected_community": 1.0
+            }
+          },
+          "pairwise_rho_weights": {
+            "developer|regulator": 0.08571428571428573,
+            "affected_community|developer": -0.3142857142857143,
+            "affected_community|regulator": 0.2571428571428572
+          },
+          "ai_system_id": "healthcare_diagnostic",
+          "ai_system_name": "healthcare_diagnostic",
+          "scoring_method": "topsis",
+          "stakeholder_scores": {
+            "developer": 0.6377738534562891,
+            "regulator": 0.536785739819868,
+            "affected_community": 0.5411331654206445
+          },
+          "run_id": "fcc40cc0-0d0a-4418-9196-86916a53ee37"
+        },
+        "harm_assessment": {
+          "overall_score": 0.309,
+          "overall_severity": "moderate",
+          "domain_scores": [
+            {
+              "domain_id": "opacity_harm",
+              "unified_dimension": "transparency_explainability",
+              "score": 0.37,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "discrimination_harm",
+              "unified_dimension": "fairness_nondiscrimination",
+              "score": 0.37999999999999995,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "safety_failure_harm",
+              "unified_dimension": "safety_robustness",
+              "score": 0.15666666666666662,
+              "severity": "low",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "privacy_intrusion_harm",
+              "unified_dimension": "privacy_data_governance",
+              "score": 0.40833333333333327,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "autonomy_oversight_harm",
+              "unified_dimension": "human_agency_oversight",
+              "score": 0.25333333333333335,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            },
+            {
+              "domain_id": "accountability_redress_harm",
+              "unified_dimension": "accountability",
+              "score": 0.31166666666666665,
+              "severity": "moderate",
+              "evidence_note": "Derived from normalized base risk and mean pairwise stakeholder weight disagreement."
+            }
+          ],
+          "top_risk_domains": [
+            "privacy_data_governance",
+            "fairness_nondiscrimination"
+          ],
+          "model_version": "harm_taxonomy_v1"
+        }
+      },
+      "execution_timestamp": "2026-03-08T16:50:47.267010+00:00"
+    }
+  ]
+}

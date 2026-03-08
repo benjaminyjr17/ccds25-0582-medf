@@ -1,0 +1,4 @@
+Stakeholder Pair,Spearman Rho,Conflict Level
+developer vs regulator,0.5429,moderate
+developer vs affected_community,0.7714,low
+regulator vs affected_community,0.5429,moderate

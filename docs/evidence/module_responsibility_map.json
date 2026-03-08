@@ -1,0 +1,96 @@
+{
+  "commit_hash": "38998f53ce167e3ede31e054cd693f3b765253e9",
+  "generation_timestamp": "2026-03-09T00:00:00Z",
+  "modules": {
+    "app/main.py": {
+      "responsibility": "FastAPI application entry point; lifespan handler initializes database, loads frameworks, seeds default stakeholders; mounts all routers",
+      "endpoints": ["/api/health", "/favicon.ico"],
+      "dependencies": ["app.database", "app.framework_registry", "app.models", "app.routers.*"]
+    },
+    "app/models.py": {
+      "responsibility": "Pydantic request/response models, SQLAlchemy ORM models, enums (ScoringMethod, RiskLevel, ConflictLevel, StakeholderRole), constants (UNIFIED_DIMENSIONS, LIKERT_MIN/MAX)",
+      "key_constants": {
+        "UNIFIED_DIMENSIONS": ["transparency_explainability", "fairness_nondiscrimination", "safety_robustness", "privacy_data_governance", "human_agency_oversight", "accountability"],
+        "LIKERT_MIN": 1.0,
+        "LIKERT_MAX": 7.0
+      }
+    },
+    "app/scoring_engine.py": {
+      "responsibility": "Core scoring algorithms: TOPSIS, WSM, AHP eigenvector method, Likert normalization, weight validation",
+      "functions": ["topsis_score", "wsm_score", "wsm_scores", "normalize_likert", "validate_likert", "ahp_eigenvector_weights", "compute_scores"]
+    },
+    "app/framework_registry.py": {
+      "responsibility": "Loads ethical framework YAML definitions, seeds default stakeholder profiles into database, provides framework/stakeholder lookup",
+      "frameworks_loaded": ["eu_altai", "nist_ai_rmf", "sg_mgaf"],
+      "default_stakeholders": ["developer", "regulator", "affected_community"]
+    },
+    "app/database.py": {
+      "responsibility": "SQLAlchemy engine and session management (SQLite-based)"
+    },
+    "app/audit_log.py": {
+      "responsibility": "Writes JSON audit records for API calls to data/audit_logs/"
+    },
+    "app/harm_assessment.py": {
+      "responsibility": "Builds harm assessment objects for conflict analysis"
+    },
+    "app/routers/evaluate.py": {
+      "responsibility": "POST /api/evaluate endpoint; computes multi-framework multi-stakeholder evaluation scores using TOPSIS or WSM",
+      "endpoint": "POST /api/evaluate",
+      "input": "EvaluateRequest (ai_system with dimension_scores, framework_ids, stakeholder_ids, scoring_method, optional weights)",
+      "output": "EvaluationResult (framework_scores with per-framework score, dimension_scores, risk_level; overall_score)"
+    },
+    "app/routers/conflicts.py": {
+      "responsibility": "POST /api/conflicts endpoint; detects stakeholder priority conflicts using Spearman rank correlation on weight vectors or contribution vectors",
+      "endpoint": "POST /api/conflicts",
+      "input": "ConflictRequest (ai_system, framework_id, stakeholder_ids, conflict_metric)",
+      "output": "ConflictReport (conflicts with spearman_rho, conflict_level, stakeholder pair info; harm_assessment)"
+    },
+    "app/routers/pareto.py": {
+      "responsibility": "POST /api/pareto endpoint; computes Pareto-optimal consensus weight vectors using NSGA-II multi-objective optimization (pymoo)",
+      "endpoint": "POST /api/pareto",
+      "input": "ParetoRequest (ai_system, framework_id, stakeholder_ids, n_solutions, pop_size, n_gen, seed)",
+      "output": "ConflictReport (pareto_solutions with consensus weights, objective_scores, rank; metadata)"
+    },
+    "app/routers/frameworks.py": {
+      "responsibility": "GET /api/frameworks and GET /api/frameworks/{id} endpoints",
+      "endpoints": ["GET /api/frameworks", "GET /api/frameworks/{framework_id}"]
+    },
+    "app/routers/stakeholders.py": {
+      "responsibility": "GET /api/stakeholders and POST /api/stakeholders endpoints",
+      "endpoints": ["GET /api/stakeholders", "POST /api/stakeholders"]
+    },
+    "streamlit_app.py": {
+      "responsibility": "Streamlit frontend UI with 4 pages: Evaluate, Conflict Detection, Pareto Resolution, Case Studies; includes KPI strip, methodology summary, radar charts, parallel coordinates, bundle export",
+      "pages": ["Evaluate", "Conflict Detection", "Pareto Resolution", "Case Studies"],
+      "backend_default": "http://127.0.0.1:8000"
+    },
+    "app/frameworks/eu_altai.yaml": {
+      "responsibility": "EU ALTAI framework definition with dimension weights and assessment questions"
+    },
+    "app/frameworks/nist_ai_rmf.yaml": {
+      "responsibility": "NIST AI RMF framework definition with dimension weights and assessment questions"
+    },
+    "app/frameworks/sg_mgaf.yaml": {
+      "responsibility": "Singapore MGAF framework definition with dimension weights and assessment questions"
+    },
+    "case_studies/facial_recognition.json": {
+      "responsibility": "Case study 1: Facial recognition surveillance deployment with dimension scores and provenance metadata"
+    },
+    "case_studies/hiring_algorithm.json": {
+      "responsibility": "Case study 2: Hiring algorithm screening with dimension scores and provenance metadata"
+    },
+    "case_studies/healthcare_diagnostic.json": {
+      "responsibility": "Case study 3: Healthcare diagnostic AI (DeepMind Streams) with dimension scores and provenance metadata"
+    }
+  },
+  "api_endpoints": [
+    {"method": "GET", "path": "/api/health", "description": "Health check"},
+    {"method": "GET", "path": "/api/frameworks", "description": "List all frameworks"},
+    {"method": "GET", "path": "/api/frameworks/{framework_id}", "description": "Get framework by ID"},
+    {"method": "GET", "path": "/api/stakeholders", "description": "List all stakeholders"},
+    {"method": "POST", "path": "/api/stakeholders", "description": "Create custom stakeholder"},
+    {"method": "POST", "path": "/api/evaluate", "description": "Multi-framework multi-stakeholder evaluation"},
+    {"method": "POST", "path": "/api/conflicts", "description": "Stakeholder conflict detection via Spearman rho"},
+    {"method": "POST", "path": "/api/pareto", "description": "Pareto-optimal consensus weights via NSGA-II"}
+  ]
+}

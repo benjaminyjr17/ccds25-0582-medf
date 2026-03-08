@@ -85,20 +85,20 @@ The MEDF scoring engine was run using the TOPSIS method with all three governanc
 \centering
 \caption{MEDF evaluation results for live facial recognition.}
 \label{tab:cs1_results}
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Framework} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\textbf{Framework} & \textbf{Overall} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
 \midrule
-EU ALTAI        & 0.46 & 0.31 & 0.25 \\
-NIST AI RMF     & 0.56 & 0.45 & 0.38 \\
-Singapore MGAF  & 0.43 & 0.35 & 0.29 \\
+EU ALTAI        & 0.34 & 0.46 & 0.31 & 0.25 \\
+NIST AI RMF     & 0.46 & 0.56 & 0.45 & 0.38 \\
+Singapore MGAF  & 0.36 & 0.43 & 0.35 & 0.29 \\
 \midrule
-Average         & 0.48 & 0.37 & 0.31 \\
+All Frameworks  & 0.39 & 0.48 & 0.37 & 0.31 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The overall aggregated score across all stakeholders and frameworks was approximately 0.39, corresponding to a \textbf{High Risk} classification. The results clearly show a significant divergence between the Developer perspective (average score of 0.48, driven by the high Safety score) and the Affected Community perspective (average score of 0.31, driven by the very low Fairness and Privacy scores). The Regulator's score falls in between, reflecting a more balanced weighting.
+The overall aggregated score across all stakeholders and frameworks was approximately 0.39, corresponding to a \textbf{Critical Risk} classification. The results clearly show a significant divergence between the Developer perspective (average score of 0.48, driven by the high Safety score) and the Affected Community perspective (average score of 0.31, driven by the very low Fairness and Privacy scores). The Regulator's score falls in between, reflecting a more balanced weighting.
 
 \subsection{Conflict Analysis}
 
@@ -169,20 +169,20 @@ The evaluation results, presented in Table~\ref{tab:cs2_results}, show universal
 \centering
 \caption{MEDF evaluation results for iTutorGroup hiring algorithm.}
 \label{tab:cs2_results}
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Framework} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\textbf{Framework} & \textbf{Overall} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
 \midrule
-EU ALTAI        & 0.32 & 0.34 & 0.25 \\
-NIST AI RMF     & 0.38 & 0.49 & 0.38 \\
-Singapore MGAF  & 0.33 & 0.37 & 0.28 \\
+EU ALTAI        & 0.30 & 0.32 & 0.34 & 0.25 \\
+NIST AI RMF     & 0.42 & 0.38 & 0.49 & 0.38 \\
+Singapore MGAF  & 0.33 & 0.33 & 0.37 & 0.28 \\
 \midrule
-Average         & 0.34 & 0.40 & 0.30 \\
+All Frameworks  & 0.35 & 0.34 & 0.40 & 0.30 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The overall aggregated score was approximately 0.35, corresponding to a \textbf{High Risk} classification. This case study demonstrates MEDF's ability to correctly identify and penalize systems with a single, catastrophic ethical flaw. Even though the system had a moderate Accountability score (reflecting the fact that the company was eventually held accountable), the failure on Fairness was so severe that it rendered the complete system unacceptable from every stakeholder's perspective.
+The overall aggregated score was approximately 0.35, corresponding to a \textbf{Critical Risk} classification. This case study demonstrates MEDF's ability to correctly identify and penalize systems with a single, catastrophic ethical flaw. Even though the system had a moderate Accountability score (reflecting the fact that the company was eventually held accountable), the failure on Fairness was so severe that it rendered the complete system unacceptable from every stakeholder's perspective.
 
 \subsection{Conflict Analysis}
 
@@ -253,15 +253,15 @@ The MEDF evaluation for the Streams app produced a more nuanced result than the 
 \centering
 \caption{MEDF evaluation results for NHS-DeepMind Streams app.}
 \label{tab:cs3_results}
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Framework} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+\textbf{Framework} & \textbf{Overall} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
 \midrule
-EU ALTAI        & 0.67 & 0.54 & 0.55 \\
-NIST AI RMF     & 0.71 & 0.58 & 0.58 \\
-Singapore MGAF  & 0.65 & 0.55 & 0.58 \\
+EU ALTAI        & 0.58 & 0.67 & 0.54 & 0.55 \\
+NIST AI RMF     & 0.63 & 0.71 & 0.58 & 0.58 \\
+Singapore MGAF  & 0.59 & 0.65 & 0.55 & 0.58 \\
 \midrule
-Average         & 0.68 & 0.56 & 0.57 \\
+All Frameworks  & 0.60 & 0.68 & 0.56 & 0.57 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -303,19 +303,22 @@ A summary comparison of the three case studies is presented in Table~\ref{tab:cr
 \centering
 \caption{Cross-case comparison of MEDF evaluation results.}
 \label{tab:cross_case}
-\begin{tabular}{@{}lcccc@{}}
+\small
+\begin{tabular}{@{}lccl>{\centering\arraybackslash}p{2cm}c@{}}
 \toprule
-\textbf{Case Study} & \textbf{Overall Score} & \textbf{Risk Level} & \textbf{Primary Weakness} & \textbf{Max Conflict ($\rho$)} \\
+\textbf{Case Study} & \textbf{Overall} & \textbf{Risk} & \textbf{Weakness} & \textbf{Max Conflict ($\rho$)} & \textbf{Conflict} \\
 \midrule
-Facial Recognition    & 0.34 & Critical & Fairness, Privacy & 0.89 (Low) \\
-iTutorGroup Hiring    & 0.30 & Critical & Fairness          & 0.54 (Moderate) \\
-NHS-DeepMind Streams  & 0.58 & High     & Privacy           & $-0.14$ (High) \\
+Facial Recognition    & 0.39 & Critical & Fairness, Privacy & 0.89 & Low \\
+iTutorGroup Hiring    & 0.35 & Critical & Fairness          & 0.54 & Moderate \\
+NHS-DeepMind Streams  & 0.60 & Medium   & Privacy           & $-0.14$ & High \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The cross-case analysis reveals several important patterns. First, the LFR and iTutorGroup cases, which involve clear and severe ethical violations, both received low scores and critical risk classifications. This validates the framework's ability to correctly flag problematic systems. Second, the NHS-DeepMind case, which involves a more complex trade-off between benefit and harm, received a higher score but still fell within the High risk range, demonstrating the framework's sensitivity to nuance.
+The cross-case analysis reveals several important patterns. First, the LFR and iTutorGroup cases, which involve clear and severe ethical violations, both received low scores and critical risk classifications. This validates the framework's ability to correctly flag problematic systems. Second, the NHS-DeepMind case, which involves a more complex trade-off between benefit and harm, received a higher score but still fell within the Medium risk range, demonstrating the framework's sensitivity to nuance.
 
 Third, and most importantly, the contribution-based conflict analysis produces \emph{different} results across cases, even though the same default stakeholder weights are used. The facial recognition case shows low conflict (all stakeholders agree on the ranking of dimension contributions because the ethical profile is extreme), the hiring case shows moderate conflict, and the healthcare case shows high conflict (the more balanced ethical profile exposes genuine disagreements about priorities). This validates MEDF's ability to distinguish between genuinely contentious cases and cases with clear ethical violations through the contribution-based conflict analysis approach.
+
+Note that the \enquote{Overall} column in each evaluation table represents the aggregated TOPSIS closeness coefficient across all three stakeholders for a given framework, while the \enquote{All Frameworks} row represents the aggregated score when all three frameworks are evaluated simultaneously. The cross-case comparison table uses the all-frameworks overall score for each case study.
 
 These results demonstrate that the MEDF platform is a versatile and informative tool for ethical AI evaluation. It can handle a range of ethical profiles, from clear-cut violations to complex trade-offs, and it provides both quantitative scores and qualitative insights (through conflict analysis) that can inform real-world governance decisions.

@@ -82,3 +82,15 @@ data/audit_logs/*.jsonl
 /cv_eur_ems.html
 /generate_pdf.py
 .hypothesis/
+thesis/main.fdb_latexmk
+thesis/main.fls
+thesis/*.aux
+thesis/*.log
+thesis/*.bbl
+thesis/*.bcf
+thesis/*.blg
+thesis/*.run.xml
+thesis/*.toc
+thesis/*.lof
+thesis/*.lot
+thesis/*.out

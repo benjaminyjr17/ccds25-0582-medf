@@ -1,0 +1,50 @@
+[
+  {
+    "id": "developer",
+    "name": "Developer",
+    "role": "developer",
+    "description": "Represents AI system builders and maintainers.",
+    "weights": {
+      "transparency_explainability": 0.1,
+      "fairness_nondiscrimination": 0.15,
+      "safety_robustness": 0.3,
+      "privacy_data_governance": 0.15,
+      "human_agency_oversight": 0.15,
+      "accountability": 0.15
+    },
+    "is_default": true,
+    "created_at": "2026-03-08T16:28:33"
+  },
+  {
+    "id": "regulator",
+    "name": "Regulator",
+    "role": "regulator",
+    "description": "Represents governance, policy, and compliance oversight.",
+    "weights": {
+      "transparency_explainability": 0.2,
+      "fairness_nondiscrimination": 0.2,
+      "safety_robustness": 0.1,
+      "privacy_data_governance": 0.15,
+      "human_agency_oversight": 0.1,
+      "accountability": 0.25
+    },
+    "is_default": true,
+    "created_at": "2026-03-08T16:28:33"
+  },
+  {
+    "id": "affected_community",
+    "name": "Affected Community",
+    "role": "affected_community",
+    "description": "Represents impacted individuals and communities.",
+    "weights": {
+      "transparency_explainability": 0.1,
+      "fairness_nondiscrimination": 0.3,
+      "safety_robustness": 0.1,
+      "privacy_data_governance": 0.15,
+      "human_agency_oversight": 0.2,
+      "accountability": 0.15
+    },
+    "is_default": true,
+    "created_at": "2026-03-08T16:28:33"
+  }
+]

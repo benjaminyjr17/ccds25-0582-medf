@@ -1,0 +1,42 @@
+{
+  "capture_timestamp": "2026-03-08T16:36:33Z",
+  "streamlit_url": "http://127.0.0.1:8501",
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "screenshots": [
+    {
+      "page": "Evaluate",
+      "filename": "screenshot_evaluate.png",
+      "captured_at": "2026-03-08T16:36:50Z",
+      "viewport_width": 1920,
+      "device_scale_factor": 2,
+      "effective_width_px": 3840
+    },
+    {
+      "page": "Conflict Detection",
+      "filename": "screenshot_conflict_detection.png",
+      "captured_at": "2026-03-08T16:37:07Z",
+      "viewport_width": 1920,
+      "device_scale_factor": 2,
+      "effective_width_px": 3840
+    },
+    {
+      "page": "Pareto Resolution",
+      "filename": "screenshot_pareto_resolution.png",
+      "captured_at": "2026-03-08T16:37:31Z",
+      "viewport_width": 1920,
+      "device_scale_factor": 2,
+      "effective_width_px": 3840
+    },
+    {
+      "page": "Case Studies",
+      "filename": "screenshot_case_studies.png",
+      "captured_at": "2026-03-08T16:37:49Z",
+      "viewport_width": 1920,
+      "device_scale_factor": 2,
+      "effective_width_px": 3840
+    }
+  ]
+}

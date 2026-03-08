@@ -1,0 +1,10 @@
+Case Study,Framework,Overall Score,Risk Level,Dev Score,Reg Score,Aff Score,Highest Conflict Pair,Highest Conflict Rho
+Facial Recognition,eu_altai,0.3379,critical,0.4583,0.3092,0.2462,developer vs regulator,0.8857
+Facial Recognition,nist_ai_rmf,0.4637,high,0.5552,0.4537,0.3823,developer vs regulator,0.8857
+Facial Recognition,sg_mgaf,0.3582,critical,0.4344,0.3497,0.2905,developer vs regulator,0.8857
+Hiring Algorithm,eu_altai,0.3022,critical,0.3185,0.3418,0.2462,developer vs regulator,0.5429
+Hiring Algorithm,nist_ai_rmf,0.4155,high,0.3787,0.4892,0.3785,developer vs regulator,0.5429
+Hiring Algorithm,sg_mgaf,0.3254,critical,0.3292,0.3702,0.2766,developer vs regulator,0.5429
+Healthcare Diagnostic,eu_altai,0.5841,high,0.6673,0.5376,0.5475,developer vs regulator,-0.1429
+Healthcare Diagnostic,nist_ai_rmf,0.6258,medium,0.7092,0.5836,0.5847,developer vs regulator,-0.1429
+Healthcare Diagnostic,sg_mgaf,0.5910,high,0.6479,0.5470,0.5780,developer vs regulator,-0.1429
