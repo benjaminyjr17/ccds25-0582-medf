@@ -27,6 +27,7 @@ MEDF uses a three-tier architecture:
 3. Shared data layer in `case_studies/`, `data/`, and `app/frameworks/` for scenario inputs, runtime outputs, and framework definitions.
 
 Core routers are implemented in `app/routers/` and exposed as `evaluate`, `conflicts`, `pareto`, `frameworks`, and `stakeholders` endpoints. The canonical architecture diagram is available at [docs/architecture/system_architecture.svg](docs/architecture/system_architecture.svg).
+Conflict analysis is implemented in `app/routers/conflicts.py` in the current codebase.
 
 ## Quick Start
 ```bash
@@ -91,7 +92,6 @@ ccds25-0582-medf/
 │   ├── models.py
 │   ├── scoring_engine.py
 │   ├── harm_assessment.py
-│   ├── conflict_detection.py
 │   ├── framework_registry.py
 │   └── database.py
 ├── case_studies/

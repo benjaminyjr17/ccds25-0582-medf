@@ -51,7 +51,6 @@ thresholds = {
     "app/framework_registry.py": 92.0,
     "app/harm_assessment.py": 95.0,
     "app/database.py": 90.0,
-    "app/conflict_detection.py": 90.0,
 }
 
 with open("coverage.json", "r", encoding="utf-8") as handle:

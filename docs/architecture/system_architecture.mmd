@@ -11,7 +11,7 @@ flowchart LR
     RFW["Router: /api/frameworks"]
     RST["Router: /api/stakeholders"]
     REV["Router: /api/evaluate"]
-    RCF["Router: /api/conflicts"]
+    RCF["Router: /api/conflicts<br/>(validation + conflict analysis)"]
     RPR["Router: /api/pareto"]
 
     RFW --> FA
@@ -25,7 +25,6 @@ flowchart LR
     FW["Framework Weighting<br/>(section/coverage-derived prior wf)"]
     SW["Stakeholder Weighting (ws)<br/>+ Product Pooling<br/>(w_eff ∝ ws × wf)"]
     SE["Scoring Engine<br/>(TOPSIS, WSM)"]
-    CE["Conflict Engine<br/>(weights-only, contribution-based, Spearman)"]
     PE["Pareto Engine<br/>(non-dominated frontier)"]
 
     FW --> SW
@@ -54,7 +53,6 @@ flowchart LR
   REV --> SW
   REV --> SE
 
-  RCF --> CE
   RPR --> PE
 
   FA -->|"load at startup / registry"| YAML

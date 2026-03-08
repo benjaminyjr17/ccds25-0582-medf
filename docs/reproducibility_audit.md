@@ -39,7 +39,6 @@ bash scripts/release_smoke.sh
     - `app/framework_registry.py >= 92`
     - `app/harm_assessment.py >= 95`
     - `app/database.py >= 90`
-    - `app/conflict_detection.py >= 90`
 
 ## Replay Evidence
 
