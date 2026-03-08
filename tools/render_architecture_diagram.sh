@@ -2,9 +2,9 @@
 set -eu
 
 REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-INPUT="$REPO_ROOT/docs/system_architecture.mmd"
-OUTPUT_SVG="$REPO_ROOT/docs/system_architecture.svg"
-OUTPUT_PNG="$REPO_ROOT/docs/system_architecture.png"
+INPUT="$REPO_ROOT/docs/architecture/system_architecture.mmd"
+OUTPUT_SVG="$REPO_ROOT/docs/architecture/system_architecture.svg"
+OUTPUT_PNG="$REPO_ROOT/docs/architecture/system_architecture.png"
 
 if [ ! -f "$INPUT" ]; then
   echo "Missing input file: $INPUT" >&2
@@ -22,4 +22,4 @@ fi
 
 echo "Mermaid CLI (mmdc) not found."
 echo "Install it with: npm install -g @mermaid-js/mermaid-cli"
-echo "Then run: mmdc -i docs/system_architecture.mmd -o docs/system_architecture.svg"
+echo "Then run: mmdc -i docs/architecture/system_architecture.mmd -o docs/architecture/system_architecture.svg"

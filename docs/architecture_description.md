@@ -25,6 +25,8 @@ Core backend components:
 - `app/routers/pareto.py`: NSGA-II/non-dominated consensus generation.
 - `app/audit_log.py`: request/response audit persistence.
 
+Conflict analysis is currently implemented inside `app/routers/conflicts.py` rather than in a separate engine module.
+
 ## 3. Runtime Flow
 
 1. Startup: initialize DB, load framework YAMLs, seed default stakeholders.
