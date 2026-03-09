@@ -25,6 +25,10 @@ st.markdown(
         #MainMenu {display: none;}
         footer {display: none;}
         header {visibility: hidden;}
+        .viewerBadge_container__r5tak {display: none;}
+        .stBottom > div {display: none;}
+        [data-testid="stBottom"] {display: none;}
+        .viewerBadge_link__qRIco {display: none;}
     </style>
     """,
     unsafe_allow_html=True,
