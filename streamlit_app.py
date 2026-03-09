@@ -21,14 +21,23 @@ import streamlit as st
 st.markdown(
     """
     <style>
-        .stDeployButton {display: none;}
-        #MainMenu {display: none;}
-        footer {display: none;}
-        header {visibility: hidden;}
-        .viewerBadge_container__r5tak {display: none;}
-        .stBottom > div {display: none;}
-        [data-testid="stBottom"] {display: none;}
-        .viewerBadge_link__qRIco {display: none;}
+        .stDeployButton {display: none !important;}
+        #MainMenu {display: none !important;}
+        footer {display: none !important;}
+        header {visibility: hidden !important;}
+        .viewerBadge_container__r5tak {display: none !important;}
+        .viewerBadge_link__qRIco {display: none !important;}
+        [data-testid="stBottom"] {display: none !important;}
+        [data-testid="stStatusWidget"] {display: none !important;}
+        .stBottom > div {display: none !important;}
+        div[class*="viewerBadge"] {display: none !important;}
+        a[href*="streamlit.io/cloud"] {display: none !important;}
+        a[href*="share.streamlit.io"] {display: none !important;}
+        div[class*="stToolbar"] {display: none !important;}
+        iframe[src*="share.streamlit.io"] {display: none !important;}
+        ._profileContainer_gzau3_53 {display: none !important;}
+        div[data-testid="manage-app-button"] {display: none !important;}
+        section[data-testid="stSidebar"] > div:last-child > div:last-child {display: none !important;}
     </style>
     """,
     unsafe_allow_html=True,
