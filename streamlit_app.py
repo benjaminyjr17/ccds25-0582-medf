@@ -16,6 +16,20 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
+
+# Hide Streamlit Community Cloud branding
+st.markdown(
+    """
+    <style>
+        .stDeployButton {display: none;}
+        #MainMenu {display: none;}
+        footer {display: none;}
+        header {visibility: hidden;}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 import streamlit.components.v1 as components
 
 from plot_theme import BG, TEXT, apply_plot_theme as _shared_apply_plot_theme
