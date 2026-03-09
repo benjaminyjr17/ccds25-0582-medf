@@ -32,5 +32,6 @@ Complete C01-C10 with non-breaking changes, per-item test validation, and examin
 - 2026-02-28 15:27 C08: Reworked demo runbook into deterministic examiner sequence covering backend start, UI start, Evaluate/Conflict/Pareto/Case Studies flow, export step, and expected high-level outputs. Test: pytest -q PASS. Notes: No exact-score claims included.
 - 2026-02-28 15:28 C09: Updated presentation checklist with SS-01..SS-07 alignment to evidence index, explicit artifact list, and fallback plan for evidence-only delivery. Test: pytest -q PASS. Notes: Checklist now covers live and backup paths.
 - 2026-02-28 15:30 C10: Executed final strict-marker and smoke gates; both passed (`43 passed` and smoke `RESULT: PASS`). Test: pytest -q --strict-markers PASS; release_smoke PASS. Notes: `stress` marker remains registered in `pytest.ini`.
+- 2026-03-09 Post-freeze reconciliation: confirmed the current engineering-freeze baseline as `v1.1.0-freeze` -> `9a1996898acf5bab499cd623678d70ced86e2f77`, date `2026-03-02`. Notes: the earlier `fyp-freeze-v1.0.0` reference above is retained as a prior milestone record, not the current freeze baseline.
 
 Engineering Freeze = READY

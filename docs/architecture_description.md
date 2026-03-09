@@ -1,7 +1,8 @@
 # MEDF — Architecture Description
 Date: 2026-02-28
-Version: 1.0.0
-Scope: FYP freeze candidate
+Version: Historical architecture reference aligned to `v1.1.0-freeze`
+Scope: Architecture reference for the 2026-03-02 `v1.1.0-freeze` baseline
+Note: Prepared during freeze finalization and retained as the architecture reference for the frozen MEDF system state.
 
 ## 1. Architecture Overview
 
