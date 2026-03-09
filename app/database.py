@@ -33,7 +33,3 @@ def get_db() -> Generator[Session, None, None]:
 
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
-
-
-def seed_default_stakeholders(_: Session) -> int:
-    return 0

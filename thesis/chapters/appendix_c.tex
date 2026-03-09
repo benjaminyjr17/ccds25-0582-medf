@@ -14,7 +14,7 @@ The following verification steps were performed to ensure the accuracy and consi
 
   \item \textbf{Conflict Matrix Reproduction.} The contribution-based Spearman $\rho$ values for all three case studies were independently reproduced via the \texttt{/api/conflicts} endpoint. The reproduced matrices matched the values reported in Chapter~\ref{ch:case_studies}.
 
-  \item \textbf{Architectural Honesty Check.} The module \texttt{app/conflict\_detection.py} was identified as a placeholder stub (all six public functions return empty or zero-valued results). This was confirmed by the test file \texttt{test\_conflict\_detection\_placeholder\_contract.py}. The report was revised to accurately describe this module's status and to identify \texttt{app/routers/conflicts.py} as the actual conflict analysis engine.
+  \item \textbf{Architectural Honesty Check.} The final repository was verified to implement conflict analysis directly in \texttt{app/routers/conflicts.py}. The report was revised to remove references to a standalone \texttt{app/conflict\_detection.py} module and to describe the router-based implementation truthfully.
 
   \item \textbf{Reference Audit.} All bibliographic references were verified for correctness. Author names, titles, publication venues, years, and DOIs were checked against the original sources. One incorrect citation was corrected (Floridi 2018).
 
@@ -49,9 +49,9 @@ Project Number & Corrected from CCDS25-0323 to CCDS25-0582 throughout. \\
 \addlinespace
 Academic Year & Corrected from 2024/2025 to 2025/2026 on the cover page. \\
 \addlinespace
-Ch7 Sec 7.3 & Corrected description of \texttt{conflict\_detection.py} from \enquote{implemented conflict engine} to \enquote{placeholder stub.} Identified \texttt{routers/conflicts.py} as the actual conflict analysis engine. \\
+Ch7 Sec 7.3 & Corrected the conflict-analysis description to reflect the final repository state: \texttt{routers/conflicts.py} is the actual implementation, and no standalone \texttt{conflict\_detection.py} module is present in the final codebase. \\
 \addlinespace
-Ch7 Fig 7.2 & Changed the arrow from \texttt{routers/conflicts.py} to \texttt{conflict\_detection.py} to a dashed \enquote{planned} arrow, and added a direct arrow to \texttt{harm\_assessment.py}. \\
+Ch7 Fig 7.2 & Simplified the module diagram to remove the non-existent \texttt{conflict\_detection.py} node and show the direct relationship between \texttt{routers/conflicts.py} and \texttt{harm\_assessment.py}. \\
 \addlinespace
 Ch8 Sec 8.5 & Split the single risk threshold table into two tables: one for the evaluation router (closeness coefficient) and one for the harm assessment module (harm score), reflecting the two different threshold systems in the code. \\
 \addlinespace

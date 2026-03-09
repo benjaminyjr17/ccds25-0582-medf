@@ -1,5 +1,7 @@
 # MEDF Engineering Freeze — v1.1.0-freeze
 
+> Historical note (2026-03-09): This document records the `v1.1.0-freeze` baseline created on 2026-03-02. Subsequent repository cleanup and deployment-preparation commits were limited to hygiene, documentation, and configuration alignment and were not intended to change MEDF core functionality.
+
 **Date:** 2026-03-02
 **Project:** CCDS25-0582 — Multi-stakeholder Ethical Decision Framework for AI Systems
 **Status:** Feature-frozen. No further code changes permitted.

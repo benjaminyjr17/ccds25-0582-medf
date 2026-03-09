@@ -19,7 +19,7 @@ A module truth map was built by reading every source file in the repository. Eac
 | Check | Method | Outcome |
 |---|---|---|
 | Module truth map | Read all Python source files, YAML files, JSON case studies | Complete |
-| `conflict_detection.py` status | Read code and test contract | Confirmed placeholder stub |
+| Conflict analysis implementation | Read router code and repository structure | Confirmed router-based implementation in `app/routers/conflicts.py` |
 | Stakeholder weights (Table 11.1) | API query, `framework_registry.py` read | Match code |
 | Case study scores (all 3 cases, all 3 frameworks, all 3 stakeholders) | Full API reproduction (27 per-stakeholder scores + 9 overall scores) | All match to 4 decimal places |
 | Conflict matrices (all 3 cases) | API reproduction via `/api/conflicts` | Contribution-based matrices verified |
@@ -68,7 +68,7 @@ A final sweep was performed for overclaims, formatting consistency, and front ma
 ### 2.5 Previous Corrections Retained
 
 All corrections from the previous revision pass are retained:
-- Architectural honesty for `conflict_detection.py` (Chapter 7)
+- Architectural honesty for router-based conflict analysis (Chapter 7)
 - Contribution-based conflict matrices (Chapter 11)
 - Framework YAML weights (Appendix B)
 - API reference field names (Appendix A)

@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import math
+import os
 import re
 from datetime import datetime
 from html import escape
@@ -74,6 +75,23 @@ ADVANCED_SLIDER_LABELS = [
     "Search Breadth (Population)",
     "Search Depth (Generations)",
 ]
+DEFAULT_BACKEND_URL = "http://127.0.0.1:8000"
+
+
+def _resolve_default_backend_url() -> str:
+    try:
+        secret_url = st.secrets.get("backend_url", "")
+    except Exception:
+        secret_url = ""
+
+    if isinstance(secret_url, str) and secret_url.strip():
+        return secret_url.strip().rstrip("/")
+
+    env_url = os.getenv("MEDF_BACKEND_URL", "").strip()
+    if env_url:
+        return env_url.rstrip("/")
+
+    return DEFAULT_BACKEND_URL
 
 
 def _flip_likert_profile(profile: dict[str, float]) -> dict[str, float]:
@@ -2158,7 +2176,7 @@ def main() -> None:
         st.caption("Conference Mode prioritizes primary outputs.")
 
         st.markdown("**Backend URL**")
-        backend_url = st.text_input("Backend URL", value="http://127.0.0.1:8000").rstrip("/")
+        backend_url = st.text_input("Backend URL", value=_resolve_default_backend_url()).rstrip("/")
 
         frameworks: list[dict[str, Any]] = []
         stakeholders: list[dict[str, Any]] = []

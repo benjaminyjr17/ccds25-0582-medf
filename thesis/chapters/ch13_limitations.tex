@@ -37,7 +37,7 @@ The current implementation of MEDF has a defined scope, and several important as
 
   \item \textbf{Limited Harm Taxonomy.} The harm assessment module provides a high-level estimation of risk. A more sophisticated implementation would incorporate a more detailed and evidence-based taxonomy of AI-related harms, potentially drawing on fields like law and social science to create a more granular risk model.
 
-  \item \textbf{Incomplete Separation of Concerns.} The conflict analysis logic is currently implemented inline within the API router (\texttt{routers/conflicts.py}) rather than in the dedicated engine module (\texttt{conflict\_detection.py}), which remains a placeholder stub. While the functionality is complete and all tests pass, this architectural shortcut represents technical debt. A future refactoring should extract the conflict analysis logic into the standalone module to complete the intended separation of concerns.
+  \item \textbf{Incomplete Separation of Concerns.} The conflict analysis logic is currently implemented within the API router (\texttt{routers/conflicts.py}) rather than an extracted standalone engine module. While the functionality is complete and all tests pass, this architectural shortcut represents technical debt. A future refactoring should separate the conflict analysis logic into a dedicated module to complete the intended separation of concerns.
 \end{itemize}
 
 These limitations do not invalidate the MEDF approach. Rather, they clarify its role as a specific type of decision-support tool and provide a clear roadmap for future work aimed at building more comprehensive, empirically-grounded, and nuanced tools for computational ethics.

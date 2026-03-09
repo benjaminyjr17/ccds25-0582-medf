@@ -121,8 +121,17 @@ wait_for_health() {
 }
 
 echo "CMD: $PY -m py_compile \$(git ls-files '*.py')"
-# shellcheck disable=SC2046
-"$PY" -m py_compile $(git ls-files '*.py')
+tracked_py_files=()
+while IFS= read -r path; do
+  [ -f "$path" ] && tracked_py_files+=("$path")
+done < <(git ls-files '*.py')
+
+if [ "${#tracked_py_files[@]}" -eq 0 ]; then
+  echo "FAIL: No tracked Python files found for py_compile."
+  exit 1
+fi
+
+"$PY" -m py_compile "${tracked_py_files[@]}"
 echo "PASS: py_compile."
 
 echo "CMD: $PY -m pytest -q --strict-markers"

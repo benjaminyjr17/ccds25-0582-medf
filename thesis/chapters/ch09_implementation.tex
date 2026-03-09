@@ -46,7 +46,7 @@ The \texttt{app/routers/} directory contains the individual FastAPI routers for 
 \begin{itemize}[leftmargin=2em]
   \item \texttt{evaluate.py} handles the \texttt{/api/evaluate} endpoint. It receives the \texttt{EvaluateRequest} payload, computes effective weights through section-based product pooling of stakeholder and framework weights, coordinates calls to the scoring engine, and returns a validated \texttt{EvaluationResult} response.
 
-  \item \texttt{conflicts.py} handles the \texttt{/api/conflicts} endpoint and is the \emph{de facto} conflict analysis engine. It implements the complete Spearman rank correlation computation for both weights-only and contribution-based conflict metrics, identifies divergent dimensions, determines conflict severity levels, and integrates the harm assessment module. As noted in Chapter~\ref{ch:architecture}, the standalone \texttt{conflict\_detection.py} module currently serves as a placeholder stub; the full logic resides here.
+  \item \texttt{conflicts.py} handles the \texttt{/api/conflicts} endpoint and is the \emph{de facto} conflict analysis engine. It implements the complete Spearman rank correlation computation for both weights-only and contribution-based conflict metrics, identifies divergent dimensions, determines conflict severity levels, and integrates the harm assessment module. As noted in Chapter~\ref{ch:architecture}, this logic currently remains in the router layer rather than an extracted standalone engine module.
 
   \item \texttt{pareto.py} handles the \texttt{/api/pareto} endpoint and implements the NSGA-II multi-objective optimization for computing Pareto-optimal consensus weight vectors.
 \end{itemize}

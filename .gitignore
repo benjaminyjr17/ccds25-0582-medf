@@ -33,6 +33,7 @@ desktop.ini
 
 # Testing / coverage
 .coverage
+coverage.json
 htmlcov/
 .pytest_cache/
 .tox/
@@ -54,7 +55,6 @@ logs/
 
 # Environment variables
 *.env
-!.env.example
 
 # Misc
 .mypy_cache/
