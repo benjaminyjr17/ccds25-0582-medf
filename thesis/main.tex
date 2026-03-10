@@ -119,6 +119,10 @@
 % ---- Quotation marks ----
 \usepackage{csquotes}
 
+% ---- Paragraph formatting (block style) ----
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+
 % ---- Custom commands ----
 \newcommand{\medf}{MEDF}
 \newcommand{\topsis}{TOPSIS}
@@ -185,15 +189,21 @@ Academic Year 2025/2026
 \input{chapters/acknowledgements}
 
 % ---- Table of Contents ----
-\tableofcontents
+\clearpage
+{\hypersetup{linkcolor=black}%
+\tableofcontents}
 \clearpage
 
 % ---- List of Figures ----
-\listoffigures
+\clearpage
+{\hypersetup{linkcolor=black}%
+\listoffigures}
 \clearpage
 
 % ---- List of Tables ----
-\listoftables
+\clearpage
+{\hypersetup{linkcolor=black}%
+\listoftables}
 \clearpage
 
 % ---- Main matter (Arabic numerals) ----
