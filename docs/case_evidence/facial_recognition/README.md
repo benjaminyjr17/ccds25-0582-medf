@@ -1,6 +1,6 @@
 # Facial Recognition Evidence Notes
 
-Case ID: `facial_recognition`  
+Case ID: `facial_recognition`
 Deployment type: `real_deployment`
 
 ## Licensing Policy

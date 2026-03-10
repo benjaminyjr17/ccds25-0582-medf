@@ -1,6 +1,6 @@
 # MEDF — Multi-stakeholder Ethical Decision Framework for AI Systems
 
-> NTU Final Year Project CCDS25-0582  
+> NTU Final Year Project CCDS25-0582
 > `v1.1.0-freeze` baseline with post-freeze repository cleanup for deployment readiness
 
 ## Overview
@@ -53,6 +53,24 @@ python -m streamlit run streamlit_app.py
 ```
 
 For local development, the Streamlit sidebar defaults the backend URL to `http://127.0.0.1:8000`, which matches the local FastAPI server above.
+
+### Makefile Shortcuts
+For local development, the provided `Makefile` wraps the most common commands.
+Use `make dev` to start the FastAPI backend and Streamlit frontend together in one terminal session.
+Use `make test` to run the test suite, and `make doctor` to perform a quick environment health check before troubleshooting.
+
+```bash
+make dev
+```
+
+### Docker Compose
+If you prefer containerized development, `docker-compose up --build` starts both services in Docker.
+The FastAPI backend is exposed on port `8000`, and the Streamlit frontend is exposed on port `8501`.
+This mirrors the split local stack without requiring a local virtual environment.
+
+```bash
+docker-compose up --build
+```
 
 ## Deployed Split-Stack Configuration
 Preserve the local development workflow above, but treat deployment as a split stack: the Streamlit frontend requires a separately reachable FastAPI backend.

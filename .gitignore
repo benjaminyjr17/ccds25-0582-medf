@@ -76,11 +76,6 @@ data/audit_logs/*.jsonl
 # ── Editor config (keep .vscode/settings.json tracked) ──
 # .vscode/ is intentionally tracked for project-specific settings
 
-# ── Accidental non-project files (root only) ──
-/Yick_Benjamin_Oliver_CV_EUR_EMS.pdf
-/Yick_Benjamin_Oliver_Course_Descriptions_Sufficient_Mathematical_Background_EUR.pdf
-/cv_eur_ems.html
-/generate_pdf.py
 .hypothesis/
 thesis/main.fdb_latexmk
 thesis/main.fls
@@ -94,3 +89,7 @@ thesis/*.toc
 thesis/*.lof
 thesis/*.lot
 thesis/*.out
+thesis/*-blx.bib
+
+# ── LaTeX additional ──
+thesis/*.synctex.gz

@@ -85,15 +85,15 @@ for case_id in CASE_ORDER:
     filepath = CASE_FILES[case_id]
     with open(filepath) as f:
         data = json.load(f)
-    
+
     scores = data.get("dimension_scores", data.get("context", {}).get("dimension_scores", {}))
     case_scores[case_id] = scores
-    
+
     # Validation
     missing_dims = [d for d in DIMENSION_ORDER if d not in scores]
     extra_dims = [d for d in scores if d not in DIMENSION_ORDER]
     out_of_range = {d: v for d, v in scores.items() if v < 1 or v > 7}
-    
+
     entry = {
         "case_id": case_id,
         "case_name": data.get("name", case_id),
@@ -164,7 +164,7 @@ for case_id in CASE_ORDER:
         "overall_evaluations": [],
         "per_stakeholder_evaluations": []
     }
-    
+
     # Overall evaluation per framework
     for fw_id in FRAMEWORK_ORDER:
         payload = {
@@ -187,7 +187,7 @@ for case_id in CASE_ORDER:
             "execution_timestamp": datetime.now(timezone.utc).isoformat()
         })
         print(f"  {case_id}/{fw_id}: overall={result.get('overall_score', 'N/A')}")
-    
+
     # Per-stakeholder evaluation per framework
     for fw_id in FRAMEWORK_ORDER:
         for sh_id in STAKEHOLDER_ORDER:
@@ -212,7 +212,7 @@ for case_id in CASE_ORDER:
                 "overall_score": result.get("overall_score"),
                 "execution_timestamp": datetime.now(timezone.utc).isoformat()
             })
-    
+
     # All-frameworks evaluation
     payload_all = {
         "ai_system": {
@@ -234,7 +234,7 @@ for case_id in CASE_ORDER:
         "execution_timestamp": datetime.now(timezone.utc).isoformat()
     }
     print(f"  {case_id}/ALL: overall={result_all.get('overall_score', 'N/A')}")
-    
+
     evaluate_raw["cases"].append(case_entry)
 
 with open(f"{EVIDENCE_DIR}/ch11_evaluate_raw.json", "w") as f:
@@ -272,7 +272,7 @@ for case_id in CASE_ORDER:
             "raw_response": result,
             "execution_timestamp": datetime.now(timezone.utc).isoformat()
         })
-        
+
         # Extract key rho values
         matrix = result.get("conflict_matrix", result.get("correlation_matrix", {}))
         print(f"  {case_id}/{fw_id}: matrix keys={list(matrix.keys()) if isinstance(matrix, dict) else 'N/A'}")
@@ -365,7 +365,7 @@ for case_entry in evaluate_raw["cases"]:
         "all_frameworks_overall_score": None,
         "conflict_matrices": {}
     }
-    
+
     # Baseline scores
     for d in DIMENSION_ORDER:
         case_norm["baseline_dimension_scores"][d] = {
@@ -376,7 +376,7 @@ for case_entry in evaluate_raw["cases"]:
                 "dimension": d
             }
         }
-    
+
     # Per-framework overall scores
     for eval_entry in case_entry["overall_evaluations"]:
         fw_id = eval_entry["framework_id"]
@@ -390,7 +390,7 @@ for case_entry in evaluate_raw["cases"]:
                 "json_path": f"$.cases[{CASE_ORDER.index(case_id)}].overall_evaluations[{FRAMEWORK_ORDER.index(fw_id)}].raw_response.overall_score"
             }
         }
-    
+
     # Per-framework per-stakeholder scores
     for pse in case_entry["per_stakeholder_evaluations"]:
         fw_id = pse["framework_id"]
@@ -407,7 +407,7 @@ for case_entry in evaluate_raw["cases"]:
                 "json_path": f"per_stakeholder_evaluations[fw={fw_id},sh={sh_id}].overall_score"
             }
         }
-    
+
     # All-frameworks overall
     case_norm["all_frameworks_overall_score"] = {
         "value": case_entry["all_frameworks_evaluation"]["overall_score"],
@@ -418,7 +418,7 @@ for case_entry in evaluate_raw["cases"]:
             "json_path": f"$.cases[{CASE_ORDER.index(case_id)}].all_frameworks_evaluation.overall_score"
         }
     }
-    
+
     normalized["cases"][case_id] = case_norm
 
 # Add conflict data
@@ -426,9 +426,9 @@ for conflict_entry in conflicts_raw["cases"]:
     case_id = conflict_entry["case_id"]
     fw_id = conflict_entry["framework_id"]
     raw_resp = conflict_entry["raw_response"]
-    
+
     matrix = raw_resp.get("conflict_matrix", raw_resp.get("correlation_matrix", {}))
-    
+
     if case_id in normalized["cases"]:
         normalized["cases"][case_id]["conflict_matrices"][fw_id] = {
             "raw_matrix": matrix,
@@ -472,7 +472,7 @@ table_nums = {
 for case_id in CASE_ORDER:
     base_num, eval_num, conf_num = table_nums[case_id]
     case_data = normalized["cases"][case_id]
-    
+
     # Baseline scores table
     with open(f"{EVIDENCE_DIR}/ch11_table_11_{base_num}.csv", "w", newline="") as f:
         w = csv.writer(f)
@@ -487,7 +487,7 @@ for case_id in CASE_ORDER:
         }
         for d in DIMENSION_ORDER:
             w.writerow([dim_labels[d], case_data["baseline_dimension_scores"][d]["value"]])
-    
+
     # Evaluation results table (per-framework, with per-stakeholder scores)
     with open(f"{EVIDENCE_DIR}/ch11_table_11_{eval_num}.csv", "w", newline="") as f:
         w = csv.writer(f)
@@ -503,30 +503,30 @@ for case_id in CASE_ORDER:
                 risk = "high"
             else:
                 risk = "critical"
-            
+
             # Per-stakeholder scores
             dev_score = case_data["per_framework_stakeholder_scores"][f"{fw_id}__developer"]["value"]
             reg_score = case_data["per_framework_stakeholder_scores"][f"{fw_id}__regulator"]["value"]
             aff_score = case_data["per_framework_stakeholder_scores"][f"{fw_id}__affected_community"]["value"]
-            
+
             w.writerow([fw_id, f"{overall:.4f}", risk, f"{dev_score:.4f}", f"{reg_score:.4f}", f"{aff_score:.4f}"])
-    
+
     # Conflict matrix table
     # Use the first framework's conflict data (eu_altai) as the primary
     with open(f"{EVIDENCE_DIR}/ch11_table_11_{conf_num}.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["Stakeholder Pair", "Spearman Rho", "Conflict Level"])
-        
+
         # Get conflict data from eu_altai for this case
         conflict_data = case_data["conflict_matrices"].get("eu_altai", {})
         raw_matrix = conflict_data.get("raw_matrix", {})
-        
+
         pairs = [
             ("developer", "regulator"),
             ("developer", "affected_community"),
             ("regulator", "affected_community")
         ]
-        
+
         for sh1, sh2 in pairs:
             # Try to extract rho from matrix
             rho = None
@@ -535,10 +535,10 @@ for case_id in CASE_ORDER:
                     rho = raw_matrix[sh1].get(sh2)
                 elif sh2 in raw_matrix and isinstance(raw_matrix[sh2], dict):
                     rho = raw_matrix[sh2].get(sh1)
-            
+
             if rho is None:
                 rho = 0.0
-            
+
             # Conflict level
             if rho >= 0.7:
                 level = "low"
@@ -546,19 +546,19 @@ for case_id in CASE_ORDER:
                 level = "moderate"
             else:
                 level = "high"
-            
+
             w.writerow([f"{sh1} vs {sh2}", f"{rho:.4f}", level])
 
 # Table 11.11 — Cross-case comparison
 with open(f"{EVIDENCE_DIR}/ch11_table_11_11.csv", "w", newline="") as f:
     w = csv.writer(f)
-    w.writerow(["Case Study", "Framework", "Overall Score", "Risk Level", 
+    w.writerow(["Case Study", "Framework", "Overall Score", "Risk Level",
                 "Dev Score", "Reg Score", "Aff Score",
                 "Highest Conflict Pair", "Highest Conflict Rho"])
-    
+
     for case_id in CASE_ORDER:
         case_data = normalized["cases"][case_id]
-        
+
         for fw_id in FRAMEWORK_ORDER:
             overall = case_data["per_framework_overall_scores"][fw_id]["value"]
             if overall >= 0.80:
@@ -569,15 +569,15 @@ with open(f"{EVIDENCE_DIR}/ch11_table_11_11.csv", "w", newline="") as f:
                 risk = "high"
             else:
                 risk = "critical"
-            
+
             dev = case_data["per_framework_stakeholder_scores"][f"{fw_id}__developer"]["value"]
             reg = case_data["per_framework_stakeholder_scores"][f"{fw_id}__regulator"]["value"]
             aff = case_data["per_framework_stakeholder_scores"][f"{fw_id}__affected_community"]["value"]
-            
+
             # Get conflict info
             conflict_data = case_data["conflict_matrices"].get(fw_id, {})
             raw_matrix = conflict_data.get("raw_matrix", {})
-            
+
             # Find highest conflict (lowest rho)
             pairs = [("developer", "regulator"), ("developer", "affected_community"), ("regulator", "affected_community")]
             min_rho = 1.0
@@ -592,7 +592,7 @@ with open(f"{EVIDENCE_DIR}/ch11_table_11_11.csv", "w", newline="") as f:
                 if rho is not None and rho < min_rho:
                     min_rho = rho
                     min_pair = f"{sh1} vs {sh2}"
-            
+
             w.writerow([case_names[case_id], fw_id, f"{overall:.4f}", risk,
                        f"{dev:.4f}", f"{reg:.4f}", f"{aff:.4f}",
                        min_pair, f"{min_rho:.4f}"])
@@ -640,7 +640,7 @@ for case_id in CASE_ORDER:
     case_data = normalized["cases"][case_id]
     case_idx = CASE_ORDER.index(case_id)
     base_num, eval_num, conf_num = table_nums[case_id]
-    
+
     # Baseline score claims
     for d in DIMENSION_ORDER:
         val = case_data["baseline_dimension_scores"][d]["value"]
@@ -652,7 +652,7 @@ for case_id in CASE_ORDER:
             f"{EVIDENCE_DIR}/ch11_inputs_manifest.json",
             f"$.cases[{case_idx}].dimension_scores.{d}"
         )
-    
+
     # Overall score claims per framework
     for fw_id in FRAMEWORK_ORDER:
         overall = case_data["per_framework_overall_scores"][fw_id]["value"]
@@ -664,7 +664,7 @@ for case_id in CASE_ORDER:
             f"{EVIDENCE_DIR}/ch11_evaluate_raw.json",
             f"$.cases[{case_idx}].overall_evaluations[fw={fw_id}].raw_response.overall_score"
         )
-        
+
         # Per-stakeholder score claims
         for sh_id in STAKEHOLDER_ORDER:
             sh_score = case_data["per_framework_stakeholder_scores"][f"{fw_id}__{sh_id}"]["value"]
@@ -676,7 +676,7 @@ for case_id in CASE_ORDER:
                 f"{EVIDENCE_DIR}/ch11_evaluate_raw.json",
                 f"per_stakeholder[fw={fw_id},sh={sh_id}].overall_score"
             )
-    
+
     # All-frameworks overall
     all_fw_overall = case_data["all_frameworks_overall_score"]["value"]
     add_claim(
@@ -692,10 +692,10 @@ for case_id in CASE_ORDER:
 for case_id in CASE_ORDER:
     case_data = normalized["cases"][case_id]
     conf_num = table_nums[case_id][2]
-    
+
     conflict_data = case_data["conflict_matrices"].get("eu_altai", {})
     raw_matrix = conflict_data.get("raw_matrix", {})
-    
+
     pairs = [("developer", "regulator"), ("developer", "affected_community"), ("regulator", "affected_community")]
     for sh1, sh2 in pairs:
         rho = None
@@ -745,14 +745,14 @@ for case_id in CASE_ORDER:
     report_lines.append("")
     report_lines.append("| Framework | Overall | Developer | Regulator | Affected Community |")
     report_lines.append("|-----------|---------|-----------|-----------|-------------------|")
-    
+
     for fw_id in FRAMEWORK_ORDER:
         overall = case_data["per_framework_overall_scores"][fw_id]["value"]
         dev = case_data["per_framework_stakeholder_scores"][f"{fw_id}__developer"]["value"]
         reg = case_data["per_framework_stakeholder_scores"][f"{fw_id}__regulator"]["value"]
         aff = case_data["per_framework_stakeholder_scores"][f"{fw_id}__affected_community"]["value"]
         report_lines.append(f"| {fw_id} | {overall:.4f} | {dev:.4f} | {reg:.4f} | {aff:.4f} |")
-    
+
     all_fw = case_data["all_frameworks_overall_score"]["value"]
     report_lines.append(f"| **All Frameworks** | **{all_fw:.4f}** | | | |")
     report_lines.append("")
@@ -767,10 +767,10 @@ for case_id in CASE_ORDER:
     report_lines.append("")
     report_lines.append("| Stakeholder Pair | Spearman Rho | Conflict Level |")
     report_lines.append("|-----------------|-------------|---------------|")
-    
+
     conflict_data = case_data["conflict_matrices"].get("eu_altai", {})
     raw_matrix = conflict_data.get("raw_matrix", {})
-    
+
     pairs = [("developer", "regulator"), ("developer", "affected_community"), ("regulator", "affected_community")]
     for sh1, sh2 in pairs:
         rho = None

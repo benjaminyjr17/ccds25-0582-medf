@@ -1,6 +1,6 @@
 # Hiring Algorithm Evidence Notes
 
-Case ID: `hiring_algorithm`  
+Case ID: `hiring_algorithm`
 Deployment type: `real_deployment`
 
 ## Licensing Policy

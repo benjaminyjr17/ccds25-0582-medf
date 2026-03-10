@@ -147,7 +147,7 @@ ch11_path = f"{THESIS_DIR}/chapters/ch11_case_studies.tex"
 if os.path.exists(ch11_path):
     with open(ch11_path) as f:
         ch11_content = f.read()
-    
+
     # Check CS1 evaluation table values
     check("CS1 EU ALTAI scores in report (0.34, 0.46, 0.31, 0.25)",
           "0.34 & 0.46 & 0.31 & 0.25" in ch11_content)
@@ -155,7 +155,7 @@ if os.path.exists(ch11_path):
           "0.46 & 0.56 & 0.45 & 0.38" in ch11_content)
     check("CS1 MGAF scores in report (0.36, 0.43, 0.35, 0.29)",
           "0.36 & 0.43 & 0.35 & 0.29" in ch11_content)
-    
+
     # Check CS2 evaluation table values
     check("CS2 EU ALTAI scores in report (0.30, 0.32, 0.34, 0.25)",
           "0.30 & 0.32 & 0.34 & 0.25" in ch11_content)
@@ -163,7 +163,7 @@ if os.path.exists(ch11_path):
           "0.42 & 0.38 & 0.49 & 0.38" in ch11_content)
     check("CS2 MGAF scores in report (0.33, 0.33, 0.37, 0.28)",
           "0.33 & 0.33 & 0.37 & 0.28" in ch11_content)
-    
+
     # Check CS3 evaluation table values
     check("CS3 EU ALTAI scores in report (0.58, 0.67, 0.54, 0.55)",
           "0.58 & 0.67 & 0.54 & 0.55" in ch11_content)
@@ -171,7 +171,7 @@ if os.path.exists(ch11_path):
           "0.63 & 0.71 & 0.58 & 0.58" in ch11_content)
     check("CS3 MGAF scores in report (0.59, 0.65, 0.55, 0.58)",
           "0.59 & 0.65 & 0.55 & 0.58" in ch11_content)
-    
+
     # Check conflict matrices
     check("CS1 conflict: Dev-Reg=0.89",
           "0.89" in ch11_content)
@@ -179,7 +179,7 @@ if os.path.exists(ch11_path):
           "0.54" in ch11_content)
     check("CS3 conflict: Dev-Reg=-0.14",
           "-0.14" in ch11_content)
-    
+
     # Check cross-case table
     check("Cross-case: FR=0.39 Critical",
           "0.39 & Critical" in ch11_content)
@@ -187,11 +187,11 @@ if os.path.exists(ch11_path):
           "0.35 & Critical" in ch11_content)
     check("Cross-case: Healthcare=0.60 Medium",
           "0.60 & Medium" in ch11_content)
-    
+
     # Check Overall column exists
     check("Overall column added to evaluation tables",
           "\\textbf{Overall}" in ch11_content)
-    
+
     # Check All Frameworks row exists
     check("All Frameworks row added",
           "All Frameworks" in ch11_content)

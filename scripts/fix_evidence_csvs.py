@@ -15,10 +15,10 @@ for entry in conflicts_data["cases"]:
     fw_id = entry["framework_id"]
     if fw_id != "eu_altai":
         continue  # Use eu_altai as primary
-    
+
     meta = entry["raw_response"].get("metadata", {})
     corr_matrix = meta.get("correlation_matrix", {})
-    
+
     conflict_lookup[case_id] = {}
     pairs = [("developer", "regulator"), ("developer", "affected_community"), ("regulator", "affected_community")]
     for sh1, sh2 in pairs:
@@ -36,7 +36,7 @@ for case_id, table_num in case_table_nums.items():
     with open(f"{EVIDENCE_DIR}/ch11_table_11_{table_num}.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["Stakeholder Pair", "Spearman Rho", "Conflict Level"])
-        
+
         pairs = [("developer", "regulator"), ("developer", "affected_community"), ("regulator", "affected_community")]
         for sh1, sh2 in pairs:
             rho = conflict_lookup[case_id][(sh1, sh2)]
@@ -66,21 +66,21 @@ eval_table_nums = {
 for case_entry in eval_data["cases"]:
     case_id = case_entry["case_id"]
     table_num = eval_table_nums[case_id]
-    
+
     # Build per-stakeholder lookup
     per_sh = {}
     for pse in case_entry["per_stakeholder_evaluations"]:
         key = (pse["framework_id"], pse["stakeholder_id"])
         per_sh[key] = pse["overall_score"]
-    
+
     with open(f"{EVIDENCE_DIR}/ch11_table_11_{table_num}.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["Framework", "Overall Score", "Risk Level", "Developer", "Regulator", "Affected Community"])
-        
+
         for eval_entry in case_entry["overall_evaluations"]:
             fw_id = eval_entry["framework_id"]
             overall = eval_entry["raw_response"]["overall_score"]
-            
+
             if overall >= 0.80:
                 risk = "low"
             elif overall >= 0.60:
@@ -89,13 +89,13 @@ for case_entry in eval_data["cases"]:
                 risk = "high"
             else:
                 risk = "critical"
-            
+
             dev = per_sh.get((fw_id, "developer"), 0)
             reg = per_sh.get((fw_id, "regulator"), 0)
             aff = per_sh.get((fw_id, "affected_community"), 0)
-            
+
             w.writerow([fw_id, f"{overall:.4f}", risk, f"{dev:.4f}", f"{reg:.4f}", f"{aff:.4f}"])
-    
+
     print(f"Fixed ch11_table_11_{table_num}.csv ({case_id} evaluation)")
 
 # Fix cross-case comparison table 11.11
@@ -104,25 +104,25 @@ with open(f"{EVIDENCE_DIR}/ch11_table_11_11.csv", "w", newline="") as f:
     w.writerow(["Case Study", "Framework", "Overall Score", "Risk Level",
                 "Dev Score", "Reg Score", "Aff Score",
                 "Highest Conflict Pair", "Highest Conflict Rho"])
-    
+
     case_names = {
         "facial_recognition": "Facial Recognition",
         "hiring_algorithm": "Hiring Algorithm",
         "healthcare_diagnostic": "Healthcare Diagnostic"
     }
-    
+
     for case_entry in eval_data["cases"]:
         case_id = case_entry["case_id"]
-        
+
         per_sh = {}
         for pse in case_entry["per_stakeholder_evaluations"]:
             key = (pse["framework_id"], pse["stakeholder_id"])
             per_sh[key] = pse["overall_score"]
-        
+
         for eval_entry in case_entry["overall_evaluations"]:
             fw_id = eval_entry["framework_id"]
             overall = eval_entry["raw_response"]["overall_score"]
-            
+
             if overall >= 0.80:
                 risk = "low"
             elif overall >= 0.60:
@@ -131,11 +131,11 @@ with open(f"{EVIDENCE_DIR}/ch11_table_11_11.csv", "w", newline="") as f:
                 risk = "high"
             else:
                 risk = "critical"
-            
+
             dev = per_sh.get((fw_id, "developer"), 0)
             reg = per_sh.get((fw_id, "regulator"), 0)
             aff = per_sh.get((fw_id, "affected_community"), 0)
-            
+
             # Get conflict info
             conflicts = conflict_lookup.get(case_id, {})
             min_rho = 1.0
@@ -144,7 +144,7 @@ with open(f"{EVIDENCE_DIR}/ch11_table_11_11.csv", "w", newline="") as f:
                 if rho < min_rho:
                     min_rho = rho
                     min_pair = f"{sh1} vs {sh2}"
-            
+
             w.writerow([case_names[case_id], fw_id, f"{overall:.4f}", risk,
                        f"{dev:.4f}", f"{reg:.4f}", f"{aff:.4f}",
                        min_pair, f"{min_rho:.4f}"])

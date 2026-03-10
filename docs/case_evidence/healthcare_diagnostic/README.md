@@ -1,6 +1,6 @@
 # Healthcare Diagnostic Evidence Notes
 
-Case ID: `healthcare_diagnostic`  
+Case ID: `healthcare_diagnostic`
 Deployment type: `real_deployment`
 
 ## Licensing Policy

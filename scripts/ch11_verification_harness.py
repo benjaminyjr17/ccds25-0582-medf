@@ -302,7 +302,7 @@ def main():
 
             fw_scores = eval_resp.get("framework_scores", [])
             fw_score_data = fw_scores[0] if fw_scores else {}
-            
+
             # Extract conflict data
             conflicts = conf_resp.get("conflicts", [])
             conflict_matrix = {}

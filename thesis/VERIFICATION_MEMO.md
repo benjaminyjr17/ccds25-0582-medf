@@ -97,9 +97,9 @@ Four high-resolution screenshots were captured from the live application running
 | Screenshot | Description | File |
 |---|---|---|
 | Evaluate | Evaluation results with demo scenario | `screenshot_evaluate.png` |
-| Conflict Detection | Conflict analysis heatmap and details | `screenshot_conflict_detection.png` |
-| Pareto Resolution | Pareto optimization interface and results | `screenshot_pareto_resolution.png` |
-| Case Studies | Case study browser with loaded case | `screenshot_case_studies.png` |
+| Conflict Detection | Conflict analysis heatmap and details | `screenshot_conflict.png` |
+| Pareto Resolution | Pareto optimization interface and results | `screenshot_pareto.png` |
+| Case Studies | Case study browser with loaded case | `screenshot_casestudies.png` |
 
 ---
 
@@ -189,7 +189,7 @@ All evidence artifacts are stored in `docs/evidence/` and are machine-checkable:
 | LaTeX source | `thesis/main.tex` | Main document file |
 | Chapter files | `thesis/chapters/*.tex` | 14 chapters + 3 appendices |
 | Bibliography | `thesis/references.bib` | Verified references |
-| Screenshots | `thesis/figures/screenshot_*.png` | 4 high-resolution localhost screenshots |
+| Screenshots | `thesis/figures/screenshot_evaluate.png`, `thesis/figures/screenshot_conflict.png`, `thesis/figures/screenshot_pareto.png`, `thesis/figures/screenshot_casestudies.png`, `thesis/figures/screenshot_evaluate_results.png`, `thesis/figures/screenshot_casestudy_results.png` | Active thesis screenshots and result figures |
 | Evidence artifacts | `docs/evidence/` | 20+ machine-checkable evidence files |
 | NTU Logo | `thesis/figures/ntu_logo.png` | Cover page logo |
 | This memo | `thesis/VERIFICATION_MEMO.md` | Verification documentation |
