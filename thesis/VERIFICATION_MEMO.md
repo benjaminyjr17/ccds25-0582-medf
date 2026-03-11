@@ -26,7 +26,7 @@ A module truth map was built by reading every source file in the repository. Eac
 | Pareto resolution (all 3 cases) | API call for all cases | 10 solutions each |
 | Framework YAML weights | Direct file read of all 3 YAML files | Verified |
 | API schema | OpenAPI spec inspection | Verified |
-| Screenshots | Playwright headless capture from localhost (3840x2160, 2x DPI) | 4 high-resolution screenshots captured |
+| Chapter 10 interface figures | Playwright headless capture from localhost (3840x2160, 2x DPI) with final crop cleanup | 6 canonical fig_10_*.png figures captured |
 | Evidence artifacts | Deterministic harness generated 20+ evidence files | All artifacts traceable |
 
 ### Stage 2: Revision (Corrections Applied)
@@ -90,16 +90,18 @@ All corrections from the previous revision pass are retained:
 
 ---
 
-## 4. Screenshots
+## 4. Platform Interface Figures
 
-Four high-resolution screenshots were captured from the live application running on localhost using Playwright headless browser automation (3840x2160 pixels):
+Six high-resolution interface figures were captured from the live application running on localhost using Playwright headless browser automation (3840x2160 pixels) and curated as the canonical Chapter 10 figure set. The case study browser and Case Study I result views were re-cropped to remove sidebar artifacts.
 
-| Screenshot | Description | File |
+| Figure | Description | File |
 |---|---|---|
-| Evaluate | Evaluation results with demo scenario | `screenshot_evaluate.png` |
-| Conflict Detection | Conflict analysis heatmap and details | `screenshot_conflict.png` |
-| Pareto Resolution | Pareto optimization interface and results | `screenshot_pareto.png` |
-| Case Studies | Case study browser with loaded case | `screenshot_casestudies.png` |
+| Evaluate configuration | Evaluate tab with configuration sidebar, KPI cards, and dimension sliders | `thesis/figures/fig_10_1_evaluate_config.png` |
+| Results visualization | Radar chart and per-framework score table | `thesis/figures/fig_10_2_results_viz.png` |
+| Conflict detection | Spearman correlation heatmap (priority conflict, weights-only) | `thesis/figures/fig_10_3_conflict_heatmap.png` |
+| Pareto resolution | Solution selector, resolution summary, and consensus weights radar | `thesis/figures/fig_10_4_pareto_resolution.png` |
+| Case study browser | Three expandable case study accordions, re-cropped without sidebar | `thesis/figures/fig_10_5_case_study_browser.png` |
+| Case Study I results | Expanded evaluation, conflict analysis, and Pareto resolution, re-cropped without sidebar | `thesis/figures/fig_10_6_case_study_1_results.png` |
 
 ---
 
@@ -189,7 +191,7 @@ All evidence artifacts are stored in `docs/evidence/` and are machine-checkable:
 | LaTeX source | `thesis/main.tex` | Main document file |
 | Chapter files | `thesis/chapters/*.tex` | 14 chapters + 3 appendices |
 | Bibliography | `thesis/references.bib` | Verified references |
-| Screenshots | `thesis/figures/screenshot_evaluate.png`, `thesis/figures/screenshot_conflict.png`, `thesis/figures/screenshot_pareto.png`, `thesis/figures/screenshot_casestudies.png`, `thesis/figures/screenshot_evaluate_results.png`, `thesis/figures/screenshot_casestudy_results.png` | Active thesis screenshots and result figures |
+| Chapter 10 figures | `thesis/figures/fig_10_1_evaluate_config.png`, `thesis/figures/fig_10_2_results_viz.png`, `thesis/figures/fig_10_3_conflict_heatmap.png`, `thesis/figures/fig_10_4_pareto_resolution.png`, `thesis/figures/fig_10_5_case_study_browser.png`, `thesis/figures/fig_10_6_case_study_1_results.png` | Canonical platform interface figures used in Chapter 10 |
 | Evidence artifacts | `docs/evidence/` | 20+ machine-checkable evidence files |
 | NTU Logo | `thesis/figures/ntu_logo.png` | Cover page logo |
 | This memo | `thesis/VERIFICATION_MEMO.md` | Verification documentation |
