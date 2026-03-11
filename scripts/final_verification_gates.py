@@ -69,22 +69,24 @@ for fn in ["ch11_evaluate_raw.json", "ch11_conflicts_raw.json", "ch11_pareto_raw
           os.path.exists(f"{EVIDENCE_DIR}/{fn}"))
 
 # ============================================================
-# GATE 3: SCREENSHOT TRUTH
+# GATE 3: INTERFACE FIGURE TRUTH
 # ============================================================
-print("\n=== GATE 3: SCREENSHOT TRUTH ===")
+print("\n=== GATE 3: INTERFACE FIGURE TRUTH ===")
 
-screenshot_files = [
-    "screenshot_evaluate.png",
-    "screenshot_conflict_detection.png",
-    "screenshot_pareto_resolution.png",
-    "screenshot_case_studies.png"
+interface_figure_files = [
+    "fig_10_1_evaluate_config.png",
+    "fig_10_2_results_viz.png",
+    "fig_10_3_conflict_heatmap.png",
+    "fig_10_4_pareto_resolution.png",
+    "fig_10_5_case_study_browser.png",
+    "fig_10_6_case_study_1_results.png",
 ]
 
-for fn in screenshot_files:
+for fn in interface_figure_files:
     path = f"{THESIS_DIR}/figures/{fn}"
     exists = os.path.exists(path)
     size = os.path.getsize(path) if exists else 0
-    check(f"Screenshot: {fn}",
+    check(f"Interface figure: {fn}",
           exists and size > 100000,
           f"{size:,} bytes" if exists else "missing")
 
