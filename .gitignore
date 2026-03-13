@@ -25,6 +25,7 @@ env/
 
 # Streamlit
 .streamlit/secrets.toml
+.streamlit/cache/
 
 # OS files
 .DS_Store
@@ -93,3 +94,16 @@ thesis/*-blx.bib
 
 # ── LaTeX additional ──
 thesis/*.synctex.gz
+*.aux
+*.bbl
+*.blg
+*.toc
+*.lof
+*.lot
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb

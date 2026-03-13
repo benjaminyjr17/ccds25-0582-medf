@@ -56,10 +56,10 @@ All Chapter 11 numerical claims have been reproduced from the live MEDF API.
 
 ## Mismatches Found in Previous Report Version
 
-### VERIFICATION_MEMO.md Discrepancies
+### Prior Verification Notes Discrepancies
 
-The previous VERIFICATION_MEMO.md contained incorrect per-framework per-stakeholder scores
-for Case Studies 2 (Hiring Algorithm) and 3 (Healthcare Diagnostic). The memo showed
+The previous verification notes contained incorrect per-framework per-stakeholder scores
+for Case Studies 2 (Hiring Algorithm) and 3 (Healthcare Diagnostic). The notes showed
 identical scores across all three frameworks for these cases, which is incorrect.
 
 **Hiring Algorithm (MEMO claimed identical across frameworks):**
@@ -70,11 +70,11 @@ identical scores across all three frameworks for these cases, which is incorrect
 - MEMO: All frameworks = Dev 0.6673, Reg 0.5376, Aff 0.5475
 - Actual: EU ALTAI = 0.6673/0.5376/0.5475, NIST = 0.7092/0.5836/0.5847, MGAF = 0.6479/0.5470/0.5780
 
-These have been corrected in the updated report and VERIFICATION_MEMO.
+These were corrected in the canonical report package before repository cleanup.
 
 ## Corrections Applied
 
-1. Updated VERIFICATION_MEMO.md with correct per-framework per-stakeholder scores
+1. Corrected the per-framework per-stakeholder scores in the final report package
 2. Updated Chapter 11 evaluation tables with correct per-stakeholder columns
 3. Updated cross-case comparison table (Table 11.11) with per-stakeholder scores
 4. All evidence CSVs regenerated from fresh API calls

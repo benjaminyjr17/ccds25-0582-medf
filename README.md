@@ -16,6 +16,8 @@ The platform includes:
 ## Historical Note
 The repository preserves the `v1.1.0-freeze` milestone documented in [FREEZE.md](FREEZE.md) as a historical baseline dated March 2, 2026. Subsequent commits after that freeze are limited to repository hygiene, deployment-readiness cleanup, and documentation/configuration alignment, and are not intended to change MEDF core scoring logic, API contracts, or workflow behavior.
 
+The canonical submitted FYP report is stored at the repository root as [CCDS25-0582_FYP_Final_Report_Yick_Benjamin_Oliver.pdf](CCDS25-0582_FYP_Final_Report_Yick_Benjamin_Oliver.pdf).
+
 ## Architecture
 MEDF uses a three-tier architecture:
 
@@ -156,7 +158,7 @@ ccds25-0582-medf/
 │   ├── release_smoke.sh
 │   └── run_research_statistics.py
 ├── tests/
-├── thesis/
+├── CCDS25-0582_FYP_Final_Report_Yick_Benjamin_Oliver.pdf
 ├── .env.example
 ├── plot_theme.py
 ├── streamlit_app.py
