@@ -14,9 +14,13 @@ venv/
 .venv/
 env/
 .env/
+.env.local
+.env.*.local
 
 # IDE / editor
 .idea/
+.vscode/*
+!.vscode/settings.json
 *.swp
 *.swo
 *~
@@ -42,6 +46,7 @@ htmlcov/
 # Distribution
 *.whl
 *.tar.gz
+node_modules/
 
 # Database
 # Ignore SQLite databases by default. If a specific .db file must be versioned, force-add it explicitly.
@@ -61,6 +66,12 @@ logs/
 .mypy_cache/
 .ruff_cache/
 .ipynb_checkpoints/
+tmp/
+temp/
+scratch/
+*.tmp
+*.bak
+*.old
 
 # ── Development artifacts ──
 *.pyc
@@ -75,7 +86,6 @@ data/audit_logs/*.jsonl
 !data/audit_logs/.gitkeep
 
 # ── Editor config (keep .vscode/settings.json tracked) ──
-# .vscode/ is intentionally tracked for project-specific settings
 
 .hypothesis/
 thesis/main.fdb_latexmk
