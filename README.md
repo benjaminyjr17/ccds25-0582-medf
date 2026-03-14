@@ -177,8 +177,11 @@ Key test modules include:
 This project builds on the following foundational works:
 
 [1] J. Zhang, Y. Shu, and H. Yu, "Fairness in design: A framework for facilitating ethical artificial intelligence designs," Int. J. Crowd Sci., vol. 7, no. 1, pp. 32-39, 2023.
+
 [2] European Commission High-Level Expert Group on Artificial Intelligence, "The assessment list for trustworthy artificial intelligence (ALTAI) for self-assessment," European Commission, 2020.
+
 [3] National Institute of Standards and Technology, *Artificial Intelligence Risk Management Framework (AI RMF 1.0)*, NIST AI 100-1, 2023.
+
 [4] Personal Data Protection Commission Singapore, *Model Artificial Intelligence Governance Framework*, Singapore, 2020.
 
 A complete list of references is provided in the accompanying FYP report.
