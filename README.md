@@ -8,6 +8,13 @@
 > **Academic Year:** 2025/2026 | **Version:** 1.1.0 (feature-frozen)
 
 [![CI](https://github.com/benjaminyjr17/ccds25-0582-medf/actions/workflows/test.yml/badge.svg)](https://github.com/benjaminyjr17/ccds25-0582-medf/actions/workflows/test.yml)
+![Python](https://img.shields.io/badge/Python-3.9+-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.133+-009688)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.54+-FF4B4B)
+![License](https://img.shields.io/badge/License-NTU%20FYP-lightgrey)
+![Status](https://img.shields.io/badge/Status-Feature--Frozen-green)
+![Version](https://img.shields.io/badge/Version-1.1.0-orange)
+![Tests](https://img.shields.io/badge/Tests-105%20passed-brightgreen)
 
 
 ## Abstract
