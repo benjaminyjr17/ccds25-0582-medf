@@ -176,10 +176,10 @@ Key test modules include:
 
 This project builds on the following foundational works:
 
-- Zhang, J., Shu, Y., and Yu, H. (2023). "Fairness in Design: A Framework for Facilitating Ethical Artificial Intelligence Designs." *International Journal of Crowd Science*, 7(1), 32-39.
-- AI HLEG (2020). "The Assessment List for Trustworthy Artificial Intelligence (ALTAI) for Self-Assessment." European Commission.
-- NIST (2023). "Artificial Intelligence Risk Management Framework (AI RMF 1.0)." NIST AI 100-1.
-- PDPC (2020). "Model Artificial Intelligence Governance Framework." Personal Data Protection Commission, Singapore.
+[1] J. Zhang, Y. Shu, and H. Yu, "Fairness in design: A framework for facilitating ethical artificial intelligence designs," Int. J. Crowd Sci., vol. 7, no. 1, pp. 32-39, 2023.
+[2] European Commission High-Level Expert Group on Artificial Intelligence, "The assessment list for trustworthy artificial intelligence (ALTAI) for self-assessment," European Commission, 2020.
+[3] National Institute of Standards and Technology, *Artificial Intelligence Risk Management Framework (AI RMF 1.0)*, NIST AI 100-1, 2023.
+[4] Personal Data Protection Commission Singapore, *Model Artificial Intelligence Governance Framework*, Singapore, 2020.
 
 A complete list of references is provided in the accompanying FYP report.
 
@@ -194,7 +194,5 @@ This project was developed as a Final Year Project (CCDS25-0582) at Nanyang Tech
 If you use MEDF in academic work, please cite:
 
 ```text
-Yick, B. O. (2026). Multi-Stakeholder Ethical Decision-Making Frameworks
-for AI Systems (CCDS25-0582). Final Year Project Report, College of Computing
-and Data Science, Nanyang Technological University.
+B. O. Yick, "Multi-Stakeholder Ethical Decision-Making Frameworks for AI Systems (CCDS25-0582)," Final Year Project Report, College of Computing and Data Science, Nanyang Technological University, 2026.
 ```
