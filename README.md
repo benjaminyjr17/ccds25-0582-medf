@@ -1,192 +1,193 @@
-# MEDF — Multi-stakeholder Ethical Decision Framework for AI Systems
+# MEDF: Multi-Stakeholder Ethical Decision-Making Frameworks for AI Systems
 
-> NTU Final Year Project CCDS25-0582
-> `v1.1.0-freeze` baseline with post-freeze repository cleanup for deployment readiness
+> **Project CCDS25-0582** | College of Computing and Data Science, Nanyang Technological University
+>
+> **Author:** Benjamin Oliver Yick (U2120984H)
+> **Supervisor:** Dr. Zhang Jiehuang | **Examiner:** A/P A S Madhukumar
+> **Degree:** Bachelor of Computing in Data Science and Artificial Intelligence
+> **Academic Year:** 2025/2026 | **Version:** 1.1.0 (feature-frozen)
 
-## Overview
-MEDF is a decision-support platform for evaluating AI applications against policy and governance frameworks in a consistent, auditable workflow. It integrates the EU AI Act ALTAI, NIST AI RMF, and Singapore MGAF into a unified evaluation pipeline that produces framework-level and dimension-level outputs across six ethical dimensions: transparency and explainability, accountability, fairness and non-discrimination, safety and robustness, privacy and data governance, and human agency and oversight.
+[![CI](https://github.com/benjaminyjr17/ccds25-0582-medf/actions/workflows/test.yml/badge.svg)](https://github.com/benjaminyjr17/ccds25-0582-medf/actions/workflows/test.yml)
 
-The platform includes:
 
-- A FastAPI backend for evaluation, conflict analysis, Pareto resolution, framework loading, and stakeholder APIs.
-- A Streamlit frontend for analyst-facing interaction and visual review.
-- Three embedded case studies with assumptions and evidence-manifest metadata.
-- Audit logging, evidence-pack generation, and a reproducible research statistics pipeline.
+## Abstract
 
-## Historical Note
-The repository preserves the `v1.1.0-freeze` milestone documented in [FREEZE.md](FREEZE.md) as a historical baseline dated March 2, 2026. Subsequent commits after that freeze are limited to repository hygiene, deployment-readiness cleanup, and documentation/configuration alignment, and are not intended to change MEDF core scoring logic, API contracts, or workflow behavior.
+As Artificial Intelligence systems become increasingly integrated into critical societal domains, the need for robust, transparent, and multi-stakeholder ethical evaluation becomes paramount. MEDF is a decision-support platform that provides a structured, reproducible, and auditable workflow for evaluating AI applications against prominent governance frameworks: the EU Assessment List for Trustworthy AI (ALTAI), the NIST AI Risk Management Framework (RMF), and Singapore's Model AI Governance Framework (MGAF). The system operationalizes high-level ethical principles into quantifiable metrics across six unified dimensions, surfaces and quantifies stakeholder disagreements, and employs multi-objective optimization (NSGA-II) to identify Pareto-optimal consensus solutions.
 
-The canonical submitted FYP report is stored at the repository root as [CCDS25-0582_FYP_Final_Report_Yick_Benjamin_Oliver.pdf](CCDS25-0582_FYP_Final_Report_Yick_Benjamin_Oliver.pdf).
 
-## Architecture
-MEDF uses a three-tier architecture:
+## Live Deployment
 
-1. FastAPI backend in `app/` for evaluation logic, validation, optimization, and API contracts.
-2. Streamlit frontend in `streamlit_app.py` for analyst-facing interaction and visual review.
-3. Shared data layer in `case_studies/`, `data/`, `research/`, and `app/frameworks/` for scenario inputs, runtime outputs, framework definitions, and reproducibility assets.
+| Component | URL |
+|---|---|
+| **API Server** (FastAPI on Render) | <https://ccds25-0582-medf-api.onrender.com> |
+| **Dashboard** (Streamlit Community Cloud) | <https://ccds25-0582-medf-api.streamlit.app> |
+| **API Documentation** (OpenAPI) | <https://ccds25-0582-medf-api.onrender.com/docs> |
 
-Core routers are implemented in `app/routers/` and exposed as `evaluate`, `conflicts`, `pareto`, `frameworks`, and `stakeholders` endpoints. The canonical architecture diagram is available at [docs/architecture/system_architecture.svg](docs/architecture/system_architecture.svg).
+> **Note:** The Render free-tier instance may spin down after periods of inactivity. The first request can take 30–60 seconds while the service restarts.
 
-## Local Development
-Use the following commands from the repository root:
 
-```bash
-git clone https://github.com/<user>/ccds25-0582-medf.git
-cd ccds25-0582-medf
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
+## Six Unified Dimensions
 
-Start the backend:
+MEDF harmonizes the three governance frameworks into a single evaluation model based on six dimensions derived from a systematic cross-framework analysis:
 
-```bash
-python -m uvicorn app.main:app --reload --port 8000
-```
+1. **Transparency and Explainability.** Assesses the degree to which the AI system's operations, decisions, and logic can be understood by relevant stakeholders.
+2. **Fairness and Non-discrimination.** Evaluates whether the system produces equitable outcomes and avoids unjust bias based on protected characteristics.
+3. **Safety and Robustness.** Measures technical reliability, resilience to errors and adversarial inputs, and the ability to fail gracefully.
+4. **Privacy and Data Governance.** Assesses compliance with data protection principles including data minimization, consent, and security.
+5. **Human Agency and Oversight.** Evaluates mechanisms for human intervention and ultimate authority over the system's decisions.
+6. **Accountability.** Assesses mechanisms for redress, responsibility, and auditability.
 
-Backend startup automatically initializes the database, framework registry, and default stakeholders.
 
-In a separate terminal, start the Streamlit frontend:
+## Governance Frameworks
 
-```bash
-source .venv/bin/activate
-python -m streamlit run streamlit_app.py
-```
+| Framework | Origin | Criteria | Requirements/Subcategories |
+|---|---|---|---|
+| EU ALTAI | European Commission AI HLEG (2020) | 6 | 22 |
+| NIST AI RMF | U.S. National Institute of Standards and Technology (2023) | 6 | 19 |
+| Singapore MGAF | Personal Data Protection Commission (2020) | 6 | 20 |
 
-For local development, the Streamlit sidebar defaults the backend URL to `http://127.0.0.1:8000`, which matches the local FastAPI server above.
+Framework definitions are stored as version-controlled YAML files in `app/frameworks/`.
 
-### Makefile Shortcuts
-For local development, the provided `Makefile` wraps the most common commands.
-Use `make dev` to start the FastAPI backend and Streamlit frontend together in one terminal session.
-Use `make test` to run the test suite, and `make doctor` to perform a quick environment health check before troubleshooting.
 
-```bash
-make dev
-```
+## System Architecture
 
-### Docker Compose
-If you prefer containerized development, `docker-compose up --build` starts both services in Docker.
-The FastAPI backend is exposed on port `8000`, and the Streamlit frontend is exposed on port `8501`.
-This mirrors the split local stack without requiring a local virtual environment.
+MEDF follows a three-tier architecture with clear separation of concerns:
 
-```bash
-docker-compose up --build
-```
+- **Presentation Layer.** Interactive Streamlit dashboard (`streamlit_app.py`) providing evaluation configuration, results visualization, conflict heatmaps, and Pareto frontier exploration.
+- **API/Orchestration Layer.** FastAPI server with modular routers (`/api/evaluate`, `/api/conflicts`, `/api/pareto`, `/api/frameworks`, `/api/stakeholders`) and strict Pydantic schema validation.
+- **Engine Layer.** Stateless algorithmic modules for TOPSIS/WSM scoring (`scoring_engine.py`), harm assessment (`harm_assessment.py`), and NSGA-II Pareto optimization (`routers/pareto.py`).
+- **Data and Configuration Layer.** YAML framework registry, SQLite database (via SQLAlchemy), case study JSON files, and JSONL audit logging.
 
-## Deployed Split-Stack Configuration
-Preserve the local development workflow above, but treat deployment as a split stack: the Streamlit frontend requires a separately reachable FastAPI backend.
 
-The Streamlit `Backend URL` field is prefilled in this order:
+## Algorithms
 
-1. `backend_url` from `.streamlit/secrets.toml`
-2. `MEDF_BACKEND_URL`
-3. `http://127.0.0.1:8000`
+- **TOPSIS** (Technique for Order of Preference by Similarity to Ideal Solution). Primary scoring method producing a closeness coefficient in [0, 1].
+- **WSM** (Weighted Sum Model). Alternative scoring method provided for comparison.
+- **Product Pooling.** Effective weights computed as the element-wise product of stakeholder and framework weight vectors, then re-normalized.
+- **Spearman Rank Correlation.** Conflict detection computing both priority (weights-only) and system-salience (contribution-based) correlation matrices.
+- **NSGA-II.** Multi-objective evolutionary optimization (via `pymoo`) for Pareto-optimal consensus weight vectors.
+- **Harm Assessment.** Composite harm score: `h = 0.7 × (1 − s_norm) + 0.3 × d_bar`, where `s_norm` is the normalized dimension score and `d_bar` is the mean pairwise stakeholder weight disagreement.
 
-These settings only prefill the editable UI field. They do not provision, start, or proxy the backend service.
 
-For deployed Streamlit:
+## Case Studies
 
-- Point `backend_url` or `MEDF_BACKEND_URL` at the deployed FastAPI service.
-- Keep the backend reachable from the deployed Streamlit environment.
-- Use [.env.example](.env.example) only as a truthful variable reference, not as evidence of automatic dotenv loading.
+Three real-world case studies validate the platform's analytical capabilities:
 
-## Testing
-Run the full local suite:
+| # | Case Study | Overall Score | Risk Level | Primary Weakness |
+|---|---|---|---|---|
+| I | Metropolitan Police Live Facial Recognition | 0.3866 | Critical | Fairness, Privacy |
+| II | iTutorGroup Automated Hiring Screening | 0.3477 | Critical | Fairness |
+| III | Royal Free NHS, DeepMind Streams App | 0.6003 | Medium | Privacy |
 
-```bash
-python -m pytest
-```
+Case study data files are located in the `case_studies/` directory.
 
-Run the fast CI-equivalent gate:
 
-```bash
-python -m pytest -q --strict-markers -m "not extreme and not property and not soak"
-```
+## Repository Structure
 
-Run the heavy marker gate:
-
-```bash
-MEDF_EXTREME=1 python -m pytest -q --strict-markers -m "extreme or property or soak"
-```
-
-Run the freeze-level smoke and coverage gate:
-
-```bash
-bash scripts/freeze_extreme_gate.sh
-bash scripts/release_smoke.sh
-```
-
-The repository includes unit, integration, property-based, stress, and end-to-end tests, with CI gates for strict marker validation and freeze-level coverage checks.
-
-## Project Structure
 ```text
 ccds25-0582-medf/
-├── .github/
-│   └── workflows/
-│       ├── test.yml
-│       └── extreme-tests.yml
-├── .streamlit/
-│   └── config.toml
 ├── app/
-│   ├── frameworks/
+│   ├── main.py                  # FastAPI application entry point.
+│   ├── models.py                # Pydantic schemas and SQLAlchemy ORM models.
+│   ├── scoring_engine.py        # TOPSIS and WSM implementations.
+│   ├── harm_assessment.py       # Harm severity classification module.
+│   ├── framework_registry.py    # YAML framework loader and validator.
 │   ├── routers/
-│   ├── main.py
-│   ├── models.py
-│   ├── scoring_engine.py
-│   ├── harm_assessment.py
-│   ├── framework_registry.py
-│   └── database.py
-├── case_studies/
-├── data/
-│   ├── audit_logs/
-│   └── ui_runs/
+│   │   ├── evaluate.py          # /api/evaluate endpoint.
+│   │   ├── conflicts.py         # /api/conflicts endpoint and conflict analysis engine.
+│   │   └── pareto.py            # /api/pareto endpoint and NSGA-II optimization.
+│   └── frameworks/
+│       ├── eu_altai.yaml        # EU ALTAI framework definition (22 requirements).
+│       ├── nist_ai_rmf.yaml     # NIST AI RMF framework definition (19 subcategories).
+│       └── sg_mgaf.yaml         # Singapore MGAF framework definition (20 principles).
+├── streamlit_app.py             # Streamlit dashboard (single-file frontend).
+├── tests/                       # 105 test functions across 33 test files.
+├── case_studies/                # Pre-configured case study JSON files.
 ├── docs/
-│   ├── architecture/
-│   │   ├── system_architecture.mmd
-│   │   └── system_architecture.svg
-│   ├── evidence/
-│   ├── research/
-│   └── *.md
-├── research/
-│   └── data/
-│       └── raw/
-├── scripts/
-│   ├── doctor_env.sh
-│   ├── freeze_extreme_gate.sh
-│   ├── generate_evidence_pack.py
-│   ├── release_smoke.sh
-│   └── run_research_statistics.py
-├── tests/
-├── CCDS25-0582_FYP_Final_Report_Yick_Benjamin_Oliver.pdf
-├── .env.example
-├── plot_theme.py
-├── streamlit_app.py
-├── README.md
-├── FREEZE.md
-├── requirements.txt
-└── pytest.ini
+│   └── design_decisions.md      # Engineering decision log.
+├── requirements.txt             # Pinned Python dependencies.
+└── README.md
 ```
 
-## Research Data
-Raw study data is stored under `research/data/raw/` as six CSV datasets used by the statistical validation pipeline: Friedman repeated scores, Wilcoxon paired scores, Cliff’s delta groups, Krippendorff annotations, SUS responses, and CVI expert ratings. Consolidated analysis outputs and interpretation are documented in [docs/research/statistical_summary.md](docs/research/statistical_summary.md).
 
-## Documentation
-- `docs/architecture_description.md`: system architecture narrative and component responsibilities.
-- `docs/assumptions.md`: operational assumptions, scope assumptions, and modeling constraints.
-- `docs/data_model_spec.md`: schema details for core entities and request/response payloads.
-- `docs/design_decisions.md`: engineering decision log and rationale for key trade-offs.
-- `docs/demo_runbook.md`: reproducible steps for live demonstration and validation.
-- `docs/evaluation_results.md`: benchmark and case-study evaluation outcomes.
-- `docs/regulatory_traceability.md`: mapping from framework clauses to implementation artifacts.
-- `docs/reproducibility_audit.md`: reproducibility controls, CI gate design, and audit evidence.
-- `docs/requirements_traceability.md`: traceability matrix linking requirements to implementation and tests.
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/health` | Returns the health status of the API server. |
+| `GET` | `/api/frameworks` | Lists all available governance frameworks and their definitions. |
+| `GET` | `/api/stakeholders` | Lists all registered stakeholder profiles. |
+| `POST` | `/api/stakeholders` | Creates a new stakeholder profile with custom weights. |
+| `POST` | `/api/evaluate` | Runs an ethical evaluation and returns per-framework and aggregated scores. |
+| `POST` | `/api/conflicts` | Computes the stakeholder conflict matrix (contribution-based Spearman rho). |
+| `POST` | `/api/pareto` | Runs NSGA-II optimization to find Pareto-optimal consensus weight vectors. |
+
+Full interactive API documentation is available at the `/docs` endpoint of the deployed API server.
+
+
+## Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Backend Framework | FastAPI |
+| Frontend Framework | Streamlit |
+| Data Persistence | SQLAlchemy + SQLite |
+| Numerical Computing | NumPy |
+| Multi-objective Optimization | pymoo (NSGA-II) |
+| Schema Validation | Pydantic |
+| Configuration | YAML |
+| Testing | Pytest (105 functions, 33 files) |
+| CI/CD | GitHub Actions |
+| Deployment (API) | Render |
+| Deployment (Dashboard) | Streamlit Community Cloud |
+
+
+## Testing
+
+The test suite covers unit, integration, property-based, and end-to-end scenarios:
+
+```bash
+pytest --tb=short -q
+```
+
+Key test modules include:
+
+- `test_api_contract_lock.py` locks down the API schema to prevent regressions.
+- `test_topsis_hand_verification.py` verifies TOPSIS scores against hand-calculated examples.
+- End-to-end tests run complete evaluations with case study data.
+
+
+## Reproducibility
+
+- All Python dependencies are pinned to specific versions in `requirements.txt`.
+- Core scoring algorithms are deterministic.
+- NSGA-II uses a fixed random seed during evaluation runs.
+- GitHub Actions runs the complete test suite on every push and pull request.
+
+
+## References
+
+This project builds on the following foundational works:
+
+- Zhang, J., Shu, Y., and Yu, H. (2023). "Fairness in Design: A Framework for Facilitating Ethical Artificial Intelligence Designs." *International Journal of Crowd Science*, 7(1), 32-39.
+- AI HLEG (2020). "The Assessment List for Trustworthy Artificial Intelligence (ALTAI) for Self-Assessment." European Commission.
+- NIST (2023). "Artificial Intelligence Risk Management Framework (AI RMF 1.0)." NIST AI 100-1.
+- PDPC (2020). "Model Artificial Intelligence Governance Framework." Personal Data Protection Commission, Singapore.
+
+A complete list of references is provided in the accompanying FYP report.
+
 
 ## License
-This project is released under the terms in [LICENSE](LICENSE).
+
+This project was developed as a Final Year Project (CCDS25-0582) at Nanyang Technological University. Please refer to the university's intellectual property policies for usage terms.
+
 
 ## Citation
+
+If you use MEDF in academic work, please cite:
+
 ```text
-Yick, B. O. (2026). Multi-stakeholder Ethical Decision Framework for AI Systems.
-NTU Final Year Project CCDS25-0582. Nanyang Technological University.
+Yick, B. O. (2026). Multi-Stakeholder Ethical Decision-Making Frameworks
+for AI Systems (CCDS25-0582). Final Year Project Report, College of Computing
+and Data Science, Nanyang Technological University.
 ```
