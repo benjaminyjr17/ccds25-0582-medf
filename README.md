@@ -1,6 +1,6 @@
 # MEDF: Multi-Stakeholder Ethical Decision-Making Frameworks for AI Systems
 
-> **Project CCDS25-0582** | College of Computing and Data Science, Nanyang Technological University
+> **Project CCDS25-0582** | College of Computing and Data Science, Nanyang Technological University, Singapore (NTU Singapore)
 >
 > **Author:** Benjamin Oliver Yick (U2120984H)
 > **Supervisor:** Dr. Zhang Jiehuang | **Examiner:** A/P A S Madhukumar
@@ -184,12 +184,12 @@ This project builds on the following foundational works:
 
 [4] Personal Data Protection Commission Singapore, *Model Artificial Intelligence Governance Framework*, Singapore, 2020.
 
-A complete list of references is provided in the accompanying FYP report.
+I have provided a complete list of references in the accompanying FYP report.
 
 
 ## License
 
-This project was developed as a Final Year Project (CCDS25-0582) at Nanyang Technological University. Please refer to the university's intellectual property policies for usage terms.
+This project was developed as a Final Year Project (CCDS25-0582) at NTU Singapore. Please review the university's intellectual property policies for usage terms.
 
 
 ## Citation
