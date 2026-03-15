@@ -5,7 +5,7 @@
 > **Author:** Benjamin Oliver Yick (U2120984H)
 > **Supervisor:** Dr. Zhang Jiehuang | **Examiner:** A/P A S Madhukumar
 > **Degree:** Bachelor of Computing in Data Science and Artificial Intelligence
-> **Academic Year:** 2025/2026 | **Version:** 1.1.0 (feature-frozen)
+> **Academic Year:** 2025/2026 | **Version:** 1.1.0 (Feature-Frozen)
 
 [![CI](https://github.com/benjaminyjr17/ccds25-0582-medf/actions/workflows/test.yml/badge.svg)](https://github.com/benjaminyjr17/ccds25-0582-medf/actions/workflows/test.yml)
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
