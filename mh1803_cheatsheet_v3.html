@@ -1,0 +1,539 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MH1803 Midterm 2 In-Scope Cheatsheet v3</title>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    @page { size: A4 landscape; margin: 6mm; }
+    :root {
+      --red:#a61e2a;
+      --blue:#0b5f82;
+      --green:#1f8a70;
+      --purple:#6c4aa4;
+      --orange:#b86a1f;
+      --gold:#e9c46a;
+      --ink:#17212b;
+      --soft:#f8fafc;
+      --line:#d7dde5;
+      --muted:#5b6878;
+    }
+    * { box-sizing:border-box; }
+    html, body {
+      margin:0; padding:0; background:white; color:var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height:1.06;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    body { font-size:7.05px; }
+    .page {
+      width:100%; height:196mm; page-break-after:always;
+      display:flex; flex-direction:column; justify-content:flex-start; gap:1.9mm;
+      overflow:hidden;
+    }
+    .page:last-child { page-break-after:auto; }
+    .banner {
+      border:0.42mm solid var(--ink);
+      background:linear-gradient(90deg,#fff8df 0%,#eef7fb 50%,#f5eefc 100%);
+      padding:1.8mm 2.5mm 1.4mm 2.5mm;
+    }
+    .title { margin:0 0 0.5mm 0; font-size:12.4px; font-weight:700; letter-spacing:0.12px; }
+    .subtitle { margin:0; font-size:6.55px; display:flex; justify-content:space-between; gap:3mm; }
+    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.7mm; align-items:start; flex:1 1 auto; min-height:0; }
+    .stack { display:grid; gap:1.5mm; align-content:start; }
+    .box {
+      border:0.34mm solid var(--line); background:white; break-inside:avoid;
+      padding:1.15mm 1.45mm 1.05mm 1.45mm;
+    }
+    .box h2 {
+      margin:0 0 0.8mm 0; padding:0.6mm 1.15mm; color:white; font-size:7.45px; font-weight:700; letter-spacing:0.18px;
+    }
+    .red h2 { background:var(--red); }
+    .blue h2 { background:var(--blue); }
+    .green h2 { background:var(--green); }
+    .purple h2 { background:var(--purple); }
+    .orange h2 { background:var(--orange); }
+    .gold h2 { background:var(--gold); color:#3f3002; }
+    p { margin:0 0 0.55mm 0; }
+    .tiny { font-size:6.12px; }
+    .micro { font-size:5.78px; }
+    .eq { margin:0.35mm 0 0.75mm 0; }
+    .rule { border-top:0.23mm solid #e2e8f0; margin:0.65mm 0; }
+    .warn {
+      background:#fff8e8; border-left:0.72mm solid var(--gold);
+      padding:0.75mm 1.05mm; margin:0.55mm 0;
+    }
+    .tip {
+      background:#eef7fb; border-left:0.72mm solid var(--blue);
+      padding:0.75mm 1.05mm; margin:0.55mm 0;
+    }
+    .good {
+      background:#edf8f3; border-left:0.72mm solid var(--green);
+      padding:0.75mm 1.05mm; margin:0.55mm 0;
+    }
+    .trigger {
+      background:#fdedef; border-left:0.72mm solid var(--red);
+      padding:0.75mm 1.05mm; margin:0.55mm 0;
+      font-weight:700;
+    }
+    table { width:100%; border-collapse:collapse; font-size:5.82px; margin-top:0.45mm; }
+    th, td { border:0.2mm solid #d9dee5; padding:0.42mm 0.55mm; vertical-align:top; }
+    th { background:#f3f6fa; font-weight:700; }
+    .tagrow { display:flex; flex-wrap:wrap; gap:0.8mm; margin-top:0.45mm; }
+    .tag {
+      border:0.22mm solid currentColor; border-radius:2.5mm; background:#fff;
+      padding:0.24mm 0.6mm; font-size:5.7px; font-weight:700;
+    }
+    .redt { color:var(--red); }
+    .bluet { color:var(--blue); }
+    .greent { color:var(--green); }
+    .purplet { color:var(--purple); }
+    .oranget { color:var(--orange); }
+    .goldt { color:#946c07; }
+    .footer {
+      border-top:0.28mm solid #cfd7df; padding-top:0.65mm; font-size:5.7px; color:#334155;
+      display:flex; justify-content:space-between; gap:2mm; margin-top:auto;
+    }
+    .mono { font-family:"DejaVu Sans Mono","Courier New",monospace; }
+    .center { text-align:center; }
+    .tight p:last-child, .box > :last-child { margin-bottom:0; }
+    .ann { color:var(--red); font-weight:700; font-size:5.5px; }
+  </style>
+</head>
+<body>
+
+<section class="page">
+  <div class="banner">
+    <div class="title">MH1803 Midterm 2 CHEATSHEET MODE — Strict Scope Only</div>
+    <p class="subtitle"><span><strong>Boundary:</strong> Chapter 2 §2.4 → Chapter 4 §4.4 only.</span><span><strong>Double-sided landscape A4:</strong> operator-heavy, symbolic, past-paper weighted, no later Chapter 4 theorems.</span></p>
+  </div>
+
+  <div class="grid3">
+    <div class="stack">
+      <div class="box blue tight">
+        <h2>SCOPE · PRIORITY · EXAM ORDER</h2>
+        <p><strong>In scope only:</strong> triple integrals, cylindrical/spherical setup, curves, helix/Frenet–Serret, surface area, gradient/divergence/curl/Laplacian, line integrals, circulation.</p>
+        <p><strong>Out of scope here:</strong> conservative fields, potentials, exact differentials, flux, Stokes, divergence theorem.</p>
+        <div class="tagrow">
+          <span class="tag redt">1. Operators</span>
+          <span class="tag purplet">2. Helix / FS</span>
+          <span class="tag greent">3. Surface area</span>
+          <span class="tag oranget">4. Line integrals</span>
+          <span class="tag bluet">5. Triple integrals</span>
+        </div>
+        <div class="warn tiny"><strong>Weak-student rule:</strong> do not spread effort evenly. First make the operator identities, helix template, Monge area formula, and direct line-integral workflow nearly automatic.</div>
+      </div>
+
+      <div class="box red tight">
+        <h2>CORE OPERATORS · CARTESIAN</h2>
+        <p>$\nabla=\mathbf i\,\partial_x+\mathbf j\,\partial_y+\mathbf k\,\partial_z$</p>
+        <p>$\nabla f=(f_x,f_y,f_z)$ <span class="ann">→ vector output</span></p>
+        <p>$\nabla\cdot\mathbf F=\partial_xF_1+\partial_yF_2+\partial_zF_3$ <span class="ann">→ scalar output</span></p>
+        <p>$\nabla\times\mathbf F=\begin{vmatrix}\mathbf i&\mathbf j&\mathbf k\\ \partial_x&\partial_y&\partial_z\\ F_1&F_2&F_3\end{vmatrix}$ <span class="ann">→ middle term sign flips</span></p>
+        <p>$\nabla^2f=f_{xx}+f_{yy}+f_{zz}$ <span class="ann">→ sum all pure 2nd derivs</span></p>
+        <p class="tiny"><strong>Always:</strong> $\nabla\times(\nabla f)=\mathbf0$, $\nabla\cdot(\nabla\times\mathbf F)=0$.</p>
+        <div class="rule"></div>
+        <p class="tiny"><strong>Product rules:</strong> $\nabla(uv)=u\nabla v+v\nabla u$</p>
+        <p class="tiny">$\nabla\cdot(u\mathbf F)=u\nabla\cdot\mathbf F+\mathbf F\cdot\nabla u$</p>
+        <p class="tiny">$\nabla\times(u\mathbf F)=\nabla u\times\mathbf F+u\,\nabla\times\mathbf F$</p>
+        <div class="trigger micro"><strong>If you see →</strong> scalar input: use $\nabla$ or $\nabla^2$. Vector input: use $\nabla\cdot$ or $\nabla\times$. Check output type matches.</div>
+      </div>
+
+      <div class="box red tight">
+        <h2>RADIAL IDENTITIES · MUST MEMORIZE</h2>
+        <p>$\mathbf r=x\mathbf i+y\mathbf j+z\mathbf k$, $r=|\mathbf r|=\sqrt{x^2+y^2+z^2}$</p>
+        <p>$\nabla\cdot\mathbf r=3$ <span class="ann">→ instant fact</span></p>
+        <p>$\nabla\times\mathbf r=\mathbf0$ <span class="ann">→ instant fact</span></p>
+        <p>$\nabla(r^2)=2\mathbf r$ <span class="ann">→ instant fact</span></p>
+        <p>$\nabla(r^n)=nr^{n-2}\mathbf r=nr^{n-1}\hat{\mathbf r}$</p>
+        <p>$\nabla(1/r)=-\mathbf r/r^3=-\hat{\mathbf r}/r^2$</p>
+        <div class="trigger micro"><strong>If you see</strong> $(x^2+y^2+z^2)^n$ or $h(r)$ <strong>→</strong> convert to radial form $r^k\hat{\mathbf r}$ FIRST, then apply radial formula.</div>
+        <div class="good micro"><strong>2024 auto-marks:</strong> $\nabla\cdot\mathbf r=3$, $\nabla\times\mathbf r=\mathbf0$, $\nabla r^2=2\mathbf r$. Write these instantly.</div>
+        <div class="warn micro"><strong>Common trap:</strong> mixing $r$ and $r^2$, or writing scalar when vector is needed <strong>→ fix:</strong> check output type after every computation.</div>
+      </div>
+
+      <div class="box purple tight">
+        <h2>CURVES · ARCLENGTH · HELIX</h2>
+        <p>$\mathbf r(t)=(x(t),y(t),z(t))$, $\mathbf v=\mathbf r'(t)$, $\mathbf a=\mathbf r''(t)$</p>
+        <p>$|\mathbf v|=\sqrt{\mathbf v\cdot\mathbf v}$, $\ ds=|\mathbf r'(t)|dt$</p>
+        <p>$s(t)=\int_{t_0}^{t}|\mathbf r'(u)|\,du$</p>
+        <div class="rule"></div>
+        <p><strong>Helix:</strong> $\mathbf r(t)=(a\cos t,a\sin t,bt)$</p>
+        <p>$\mathbf r'(t)=(-a\sin t,a\cos t,b)$</p>
+        <p>$|\mathbf r'(t)|=\sqrt{a^2+b^2}$ <span class="ann">→ constant speed; simplifies all FS</span></p>
+        <p>$s=\sqrt{a^2+b^2}\,t$</p>
+        <div class="trigger micro"><strong>If you see</strong> $\mathbf r(t)=(a\cos t,a\sin t,bt)$ <strong>→</strong> it is a helix. Execute the FS chain below.</div>
+        <div class="tip micro"><strong>Exam sequence:</strong> differentiate $\to$ speed $\to$ arclength $\to$ unit tangent $\to$ unit normal $\to$ binormal $\to$ curvature/torsion.</div>
+      </div>
+
+      <div class="box purple tight">
+        <h2>FRENET–SERRET CORE</h2>
+        <p>$\hat{\mathbf t}=\dfrac{d\mathbf r}{ds}=\dfrac{\mathbf r'}{|\mathbf r'|}$ <span class="ann">→ normalize first</span></p>
+        <p>$\kappa=\left|\dfrac{d\hat{\mathbf t}}{ds}\right|$</p>
+        <p>$\dfrac{d\hat{\mathbf t}}{ds}=\kappa\hat{\mathbf n}$ <span class="ann">→ then $\hat{\mathbf n}=\frac{1}{\kappa}\frac{d\hat{\mathbf t}}{ds}$</span></p>
+        <p>$\hat{\mathbf b}=\hat{\mathbf t}\times\hat{\mathbf n}$ <span class="ann">→ cross product order matters</span></p>
+        <p>$\dfrac{d\hat{\mathbf b}}{ds}=-\tau\hat{\mathbf n}$</p>
+        <p>$\mathbf a=\dot v\,\hat{\mathbf t}+v^2\kappa\,\hat{\mathbf n}=\dot v\,\hat{\mathbf t}+\dfrac{v^2}{\rho}\hat{\mathbf n}$</p>
+        <p class="tiny"><strong>Helix results:</strong> $\kappa=\dfrac{a}{a^2+b^2}$, $\tau=\dfrac{b}{a^2+b^2}$, $\boldsymbol\Omega=\kappa\hat{\mathbf b}+\tau\hat{\mathbf t}$.</p>
+        <div class="warn micro"><strong>Common trap:</strong> computing $d\hat{\mathbf t}/dt$ and calling it $\kappa$ <strong>→ fix:</strong> ALWAYS divide by $|\mathbf r'|$ to convert $dt \to ds$.</div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="box red tight">
+        <h2>CYLINDRICAL / SPHERICAL OPERATORS</h2>
+        <p><strong>Cyl:</strong> $\nabla f=f_r\hat{\mathbf r}+\dfrac1r f_\theta\hat{\boldsymbol\theta}+f_z\hat{\mathbf z}$</p>
+        <p class="tiny">$\nabla\cdot\mathbf F=\dfrac1r\partial_r(rF_r)+\dfrac1r\partial_\theta F_\theta+\partial_zF_z$ <span class="ann">→ note $\frac{1}{r}\partial_r(rF_r)$ structure</span></p>
+        <p class="tiny">$\nabla^2f=\dfrac1r\partial_r(rf_r)+\dfrac1{r^2}f_{\theta\theta}+f_{zz}$</p>
+        <div class="rule"></div>
+        <p><strong>Sph:</strong> $\nabla f=f_r\hat{\mathbf r}+\dfrac1r f_\phi\hat{\boldsymbol\phi}+\dfrac1{r\sin\phi}f_\theta\hat{\boldsymbol\theta}$</p>
+        <p class="tiny">$\nabla\cdot\mathbf F=\dfrac1{r^2}\partial_r(r^2F_r)+\dfrac1{r\sin\phi}\partial_\phi(\sin\phi\,F_\phi)+\dfrac1{r\sin\phi}\partial_\theta F_\theta$</p>
+        <p class="tiny"><strong>Purely radial</strong> $\mathbf F=F_r(r)\hat{\mathbf r}$: $\nabla\cdot\mathbf F=\dfrac1{r^2}\dfrac{d}{dr}(r^2F_r)$; $\nabla\times\mathbf F=\mathbf0$ away from singularities.</p>
+        <div class="trigger micro"><strong>If you see</strong> $(x^2+y^2+z^2)^n(x,y,z)$ <strong>→</strong> rewrite as $r^{2n+1}\hat{\mathbf r}$, identify $F_r$, use spherical div formula.</div>
+        <div class="warn micro"><strong>Common trap:</strong> forgetting $\hat{\mathbf r}=\mathbf r/r$ introduces extra $r$ <strong>→ fix:</strong> write $F_r$ explicitly before applying formula.</div>
+      </div>
+
+      <div class="box blue tight">
+        <h2>COORDINATES · JACOBIANS · BOUNDS</h2>
+        <p><strong>Polar / Cyl:</strong> $x=r\cos\theta$, $y=r\sin\theta$, $dA=r\,dr\,d\theta$, $dV=r\,dr\,d\theta\,dz$</p>
+        <p><strong>Spherical:</strong> $x=r\sin\phi\cos\theta$, $y=r\sin\phi\sin\theta$, $z=r\cos\phi$</p>
+        <p>$dV=r^2\sin\phi\,dr\,d\phi\,d\theta$ <span class="ann">→ never drop $\sin\phi$</span></p>
+        <p class="tiny">First octant $\Rightarrow 0\le\theta\le\pi/2$, $0\le\phi\le\pi/2$.</p>
+        <p class="tiny">Cone $z=r \Rightarrow \phi=\pi/4$.</p>
+        <p class="tiny">Sphere radius $a \Rightarrow r=a$.</p>
+        <p class="tiny">Offset cylinder $x^2+(y-1)^2=1 \Rightarrow r=2\sin\theta$.</p>
+        <div class="warn micro"><strong>Setup rule:</strong> sketch the shadow region first, then choose coordinates by the geometry trigger table.</div>
+      </div>
+
+      <div class="box blue tight">
+        <h2>TRIPLE-INTEGRAL MICRO-TEMPLATES</h2>
+        <p><strong>Volume:</strong> $V(D)=\iiint_D 1\,dV$ <span class="ann">→ integrand is 1, not the surface</span></p>
+        <p><strong>Centroid:</strong> $\bar z=\dfrac1V\iiint_D z\,dV$ <span class="ann">→ divide by $V$ at the end</span></p>
+        <div class="rule"></div>
+        <p class="tiny"><strong>Cartesian:</strong> inner variable runs from lower surface to upper surface. <span class="ann">→ sketch region first</span></p>
+        <p class="tiny"><strong>Cylindrical:</strong> translate curved sidewall to $r=$ function of $\theta$, attach Jacobian $r$.</p>
+        <p class="tiny"><strong>Spherical:</strong> choose $0\le r\le$ sphere/cap bound; angle cuts from cone/octant/plane.</p>
+        <div class="trigger micro"><strong>If you see</strong> $\iiint$ <strong>→</strong> sketch solid, pick coordinates by geometry, write bounds, attach Jacobian.</div>
+        <div class="tip micro"><strong>EP2 Q11 pattern:</strong> sidewall $r=2\sin\theta$, floor $z=0$, roof $z=r$, $dV=r\,dz\,dr\,d\theta$.</div>
+        <div class="warn micro"><strong>Common trap:</strong> writing $dV=dr\,d\theta\,dz$ without Jacobian <strong>→ fix:</strong> cyl $\to r$, sph $\to r^2\sin\phi$.</div>
+      </div>
+
+      <div class="box green tight">
+        <h2>SURFACE PARAMETRIZATION · AREA</h2>
+        <p><strong>Parametric surface:</strong> $\mathbf X(u,v)$</p>
+        <p>$dS=|\mathbf X_u\times\mathbf X_v|\,du\,dv$</p>
+        <p><strong>Graph surface:</strong> $z=f(x,y)$</p>
+        <p>$\mathbf X(x,y)=\langle x,y,f(x,y)\rangle$</p>
+        <p>$dS=\sqrt{1+f_x^2+f_y^2}\,dx\,dy$ <span class="ann">→ do not forget the $\sqrt{\ }$</span></p>
+        <p class="tiny">Always find the projection region in the $xy$-plane before integrating. <span class="ann">→ sketch region</span></p>
+        <div class="rule"></div>
+        <p class="tiny"><strong>Paraboloid cap template:</strong> solve intersection first; if $z=2-r^2$ and cone $z=r$, then $2-r^2=r \Rightarrow r=1$.</p>
+        <p class="tiny">Then $A=\int_0^{2\pi}\int_0^1 \sqrt{1+4r^2}\,r\,dr\,d\theta$.</p>
+        <div class="trigger micro"><strong>If you see</strong> "find the area of $z=f(x,y)$" <strong>→</strong> Monge formula: $\sqrt{1+f_x^2+f_y^2}$, project onto $xy$-plane.</div>
+        <div class="warn micro"><strong>Common trap:</strong> using the bounding surface's derivatives instead of the named surface <strong>→ fix:</strong> check which surface the question asks for.</div>
+      </div>
+
+      <div class="box green tight">
+        <h2>COMMON SURFACE-AREA PATTERNS</h2>
+        <table>
+          <tr><th>Problem type</th><th>Minimal skeleton</th></tr>
+          <tr><td>Graph $z=f(x,y)$</td><td>$f_x,f_y \to \sqrt{1+f_x^2+f_y^2} \to$ project region → polar if circular</td></tr>
+          <tr><td>Sphere</td><td>parameterize by angles $\to \mathbf X_u\times\mathbf X_v$</td></tr>
+          <tr><td>Cone strip</td><td>angle + height parameter $\to$ translate cuts into bounds</td></tr>
+          <tr><td>Tilted plane in cylinder</td><td>surface is plane patch; cylinder only supplies boundary disk</td></tr>
+          <tr><td>Paraboloid above cone</td><td>solve intersection in $r$ first; Monge formula on paraboloid</td></tr>
+        </table>
+      </div>
+
+      <div class="box orange tight">
+        <h2>LINE INTEGRALS · DIRECT METHOD</h2>
+        <p>$\int_C \mathbf F\cdot d\mathbf r=\int_a^b \mathbf F(\mathbf r(t))\cdot \mathbf r'(t)\,dt$ <span class="ann">→ substitute path into $\mathbf F$ first</span></p>
+        <p>In 2D: $\int_C P\,dx+Q\,dy$</p>
+        <p class="tiny"><strong>Workflow:</strong> parameterize $C$ $\to$ compute $d\mathbf r$ $\to$ write $\mathbf F(\mathbf r(t))$ explicitly $\to$ dot $\to$ integrate.</p>
+        <p class="tiny"><strong>Piecewise path:</strong> split into segments and add.</p>
+        <p class="tiny"><strong>Closed path (circulation):</strong> same formula, but orientation matters. <span class="ann">→ CCW = positive</span></p>
+        <div class="trigger micro"><strong>If you see</strong> $\int_C\mathbf F\cdot d\mathbf r$ or $\oint$ <strong>→</strong> parameterize $C$, compute $\mathbf r'(t)$, substitute $\mathbf F(\mathbf r(t))$, dot, integrate.</div>
+        <div class="warn micro"><strong>Common trap:</strong> dotting $\mathbf F$ with $\mathbf r'$ without substituting the path into $\mathbf F$ first <strong>→ fix:</strong> write $\mathbf F(\mathbf r(t))$ explicitly before dotting.</div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="box orange tight">
+        <h2>LINE-INTEGRAL PATTERNS TO DRILL</h2>
+        <table>
+          <tr><th>Type</th><th>Minimal symbolic template</th></tr>
+          <tr><td>Straight segment</td><td>$\mathbf r(t)=\mathbf A+t(\mathbf B-\mathbf A),\ 0\le t\le1$</td></tr>
+          <tr><td>Circle</td><td>$\mathbf r(t)=(a\cos t,a\sin t)$ or 3D variant</td></tr>
+          <tr><td>Helix</td><td>$\mathbf r(t)=(\cos t,\sin t,t)$; $\mathbf r'=(-\sin t,\cos t,1)$</td></tr>
+          <tr><td>Broken path</td><td>split $C=C_1\cup C_2\cup\cdots$; integrate each, sum</td></tr>
+          <tr><td>Path in 2D</td><td>substitute $y=y(x)$, $dy=y'(x)dx$; single-variable integral</td></tr>
+        </table>
+        <div class="tip micro"><strong>2023 MT2 pattern:</strong> compute work on a helix, then on a straight segment between the same endpoints, and compare. <span class="ann">→ values may differ</span></div>
+      </div>
+
+      <div class="box orange tight">
+        <h2>CIRCULATION REMINDER · §4.4</h2>
+        <p class="tiny"><strong>Circulation</strong> $=\oint_C \mathbf F\cdot d\mathbf r$: net tangential component of $\mathbf F$ around a closed curve.</p>
+        <p class="tiny"><strong>Orientation:</strong> counterclockwise = positive by convention. Reversing direction flips the sign.</p>
+        <p class="tiny"><strong>Execution:</strong> parameterize the closed curve (usually a circle), compute $\mathbf r'(t)$, substitute, integrate over one complete period.</p>
+        <div class="warn micro"><strong>Common trap:</strong> wrong orientation reverses the sign of the answer <strong>→ fix:</strong> confirm CCW before integrating.</div>
+      </div>
+
+      <div class="box gold tight">
+        <h2>TOP 10 EXAM-READY DRILLS</h2>
+        <table>
+          <tr><th>#</th><th>Source</th><th>Why it matters</th></tr>
+          <tr><td>1</td><td>2025 MT2 Q2(a)–(b)</td><td>Best complete radial-field divergence/curl drill</td></tr>
+          <tr><td>2</td><td>2024 MT2 Q1(a)–(c)</td><td>Fast operator identities; nearly automatic marks</td></tr>
+          <tr><td>3</td><td>Tutorial 7 Q1(a)–(c)</td><td>Derive radial-gradient identities, not just memorize</td></tr>
+          <tr><td>4</td><td>2022 MT2 Q1(b)</td><td>Best Frenet–Serret frame drill</td></tr>
+          <tr><td>5</td><td>2025 MT2 Q1</td><td>Best graph-surface area exam problem</td></tr>
+          <tr><td>6</td><td>2023 MT2 Q2(a)</td><td>Best 3D direct line-integral drill</td></tr>
+          <tr><td>7</td><td>2023 MT2 Q1(c)</td><td>Radial divergence with parameter condition</td></tr>
+          <tr><td>8</td><td>Tutorial 7 Q2</td><td>Training version of paraboloid-area setup</td></tr>
+          <tr><td>9</td><td>2022 MT2 Q1(c)</td><td>Curvature and torsion follow-up after frame mastery</td></tr>
+          <tr><td>10</td><td>Extra Problems 2 Q11(a)</td><td>Best cylindrical triple-integral setup drill</td></tr>
+        </table>
+      </div>
+
+      <div class="box gold tight">
+        <h2>EMERGENCY 5-DRILL VERSION</h2>
+        <p class="tiny">1. 2025 MT2 Q2(a)–(b) — radial field divergence/curl</p>
+        <p class="tiny">2. 2024 MT2 Q1(a)–(c) — instant operator marks</p>
+        <p class="tiny">3. 2022 MT2 Q1(b) — Frenet–Serret frame</p>
+        <p class="tiny">4. 2025 MT2 Q1 — parabolic-cap area</p>
+        <p class="tiny">5. 2023 MT2 Q2(a) — helix line integral</p>
+        <div class="good micro"><strong>Reason:</strong> these five drills jointly cover the most reusable in-scope methods.</div>
+      </div>
+
+      <div class="box blue tight">
+        <h2>COMMON BOUND / GEOMETRY TRIGGERS</h2>
+        <table>
+          <tr><th>Given geometry</th><th>Immediate move</th></tr>
+          <tr><td>$x^2+y^2$ everywhere</td><td>Switch to polar/cylindrical</td></tr>
+          <tr><td>$x^2+y^2+z^2$ or sphere/cone</td><td>Test spherical first</td></tr>
+          <tr><td>Graph $z=f(x,y)$</td><td>Project onto $xy$-plane; use Monge</td></tr>
+          <tr><td>Patch inside cylinder</td><td>Cylinder defines boundary disk only</td></tr>
+          <tr><td>Offset circle/cylinder</td><td>Rewrite in polar: $r=$ function of $\theta$</td></tr>
+          <tr><td>First octant</td><td>All coords $\ge0$; angle bounds shrink</td></tr>
+          <tr><td>Helix</td><td>Use parametric $t$; speed is constant</td></tr>
+        </table>
+      </div>
+
+      <div class="box red tight">
+        <h2>COMMON MISTAKES TO ELIMINATE</h2>
+        <p class="tiny"><strong>Operators:</strong> writing scalar where vector is required, or vice versa. <span class="ann">→ check output type</span></p>
+        <p class="tiny"><strong>Radial questions:</strong> failing to rewrite field in radial form before differentiating. <span class="ann">→ convert first</span></p>
+        <p class="tiny"><strong>Frenet–Serret:</strong> using $d/dt$ as if it were $d/ds$. <span class="ann">→ divide by $|\mathbf r'|$</span></p>
+        <p class="tiny"><strong>Surface area:</strong> forgetting projection region or using wrong surface's derivatives. <span class="ann">→ name the surface</span></p>
+        <p class="tiny"><strong>Triple integrals:</strong> missing Jacobian $r$ or $r^2\sin\phi$. <span class="ann">→ write Jacobian immediately</span></p>
+        <p class="tiny"><strong>Line integrals:</strong> not substituting both path and differential. <span class="ann">→ write $\mathbf F(\mathbf r(t))$ first</span></p>
+        <p class="tiny"><strong>Circulation:</strong> wrong orientation reverses sign. <span class="ann">→ confirm CCW</span></p>
+        <div class="warn micro"><strong>Exam habit:</strong> before integrating, say silently: formula, bounds, Jacobian, orientation, variable order.</div>
+      </div>
+
+      <div class="box green tight">
+        <h2>ONE-LINE METHOD CHECKLISTS</h2>
+        <p class="tiny"><strong>Operator problem:</strong> <span class="ann">Write formula first →</span> identify operator $\to$ differentiate componentwise $\to$ simplify.</p>
+        <p class="tiny"><strong>Helix problem:</strong> <span class="ann">Write $\mathbf r'$ first →</span> $|\mathbf r'| \to s \to \hat{\mathbf t} \to \hat{\mathbf n} \to \hat{\mathbf b} \to \kappa,\tau$.</p>
+        <p class="tiny"><strong>Surface-area problem:</strong> <span class="ann">Write $dS$ first →</span> choose graph/parametrization $\to$ project region $\to$ integrate.</p>
+        <p class="tiny"><strong>Triple-integral problem:</strong> <span class="ann">Sketch solid first →</span> choose coordinates $\to$ write bounds $\to$ attach Jacobian.</p>
+        <p class="tiny"><strong>Line integral:</strong> <span class="ann">Parameterize $C$ first →</span> compute $d\mathbf r$ $\to$ substitute $\mathbf F(\mathbf r(t))\cdot\mathbf r'(t)$ $\to$ integrate.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span><strong>Page 1 of 2.</strong> Strict scope only: Ch. 2 §2.4 → Ch. 4 §4.4.</span>
+    <span><strong>Goal:</strong> automatic operator marks + helix workflow + area setup + direct line-integral workflow.</span>
+  </div>
+</section>
+
+<section class="page">
+  <div class="banner">
+    <div class="title">MH1803 Midterm 2 CHEATSHEET MODE — Worked Micro-Templates</div>
+    <p class="subtitle"><span><strong>Use this side for method execution.</strong></span><span><strong>Keep the algebra linear:</strong> write formula first, substitute second, simplify last.</span></p>
+  </div>
+
+  <div class="grid3">
+    <div class="stack">
+      <div class="box red tight">
+        <h2>OPERATOR TEMPLATE A · INSTANT IDENTITIES</h2>
+        <p><strong>1.</strong> $\nabla\cdot\mathbf r=\partial_xx+\partial_yy+\partial_zz=1+1+1=3$ <span class="ann">→ instant</span></p>
+        <p><strong>2.</strong> $\nabla\times\mathbf r=\begin{vmatrix}\mathbf i&\mathbf j&\mathbf k\\ \partial_x&\partial_y&\partial_z\\ x&y&z\end{vmatrix}=\mathbf0$ <span class="ann">→ instant</span></p>
+        <p><strong>3.</strong> $\nabla r^2=\nabla(x^2+y^2+z^2)=2x\mathbf i+2y\mathbf j+2z\mathbf k=2\mathbf r$ <span class="ann">→ instant</span></p>
+        <div class="good micro"><strong>Use on:</strong> 2024 MT2 Q1(a)–(c), Tutorial 7 Q1(a), Lecture 3A operator warm-ups.</div>
+      </div>
+
+      <div class="box red tight">
+        <h2>OPERATOR TEMPLATE B · RADIAL FIELD</h2>
+        <p><strong>If</strong> $\mathbf F=(x^2+y^2+z^2)^n(x,y,z)$, then</p>
+        <p>$\mathbf F=r^{2n}\mathbf r=r^{2n+1}\hat{\mathbf r}$ <span class="ann">→ identify $F_r=r^{2n+1}$</span></p>
+        <p class="tiny"><strong>Divergence route:</strong></p>
+        <p>$\nabla\cdot\mathbf F=\dfrac1{r^2}\dfrac{d}{dr}(r^2F_r)=\dfrac1{r^2}\dfrac{d}{dr}(r^{2n+3})=(2n+3)r^{2n}$</p>
+        <p class="tiny"><strong>Solenoidal condition:</strong> $(2n+3)r^{2n}=0 \Rightarrow n=-\dfrac32$ (away from singularities).</p>
+        <p class="tiny"><strong>Curl route:</strong> pure radial field $\Rightarrow \nabla\times\mathbf F=\mathbf0$ away from singularities. <span class="ann">→ state this directly</span></p>
+        <div class="warn micro"><strong>Common trap:</strong> losing the extra $r$ when converting $\mathbf r$ to $\hat{\mathbf r}$ <strong>→ fix:</strong> $\mathbf r = r\hat{\mathbf r}$, so $r^{2n}\mathbf r = r^{2n+1}\hat{\mathbf r}$.</div>
+      </div>
+
+      <div class="box red tight">
+        <h2>OPERATOR TEMPLATE C · $\nabla(r^n)$ AND $\nabla(1/r)$</h2>
+        <p>$r^n=(x^2+y^2+z^2)^{n/2}$</p>
+        <p>$\partial_x(r^n)=\dfrac n2(x^2+y^2+z^2)^{n/2-1}(2x)=nxr^{n-2}$</p>
+        <p>Similarly, $\partial_y(r^n)=nyr^{n-2}$, $\partial_z(r^n)=nzr^{n-2}$ <span class="ann">→ same pattern for all</span></p>
+        <p>So $\nabla(r^n)=nr^{n-2}(x,y,z)=nr^{n-2}\mathbf r$</p>
+        <p>Set $n=-1$: $\nabla(1/r)=-r^{-3}\mathbf r=-\hat{\mathbf r}/r^2$</p>
+        <div class="tip micro"><strong>Use on:</strong> Tutorial 7 Q1(b)–(c), Lecture 3A Example 3.17, radial simplifications in past papers.</div>
+      </div>
+
+      <div class="box purple tight">
+        <h2>HELIX TEMPLATE A · FRAME</h2>
+        <p><strong>Step 1.</strong> $\mathbf r(t)=(a\cos t,a\sin t,bt)$; $\mathbf r'(t)=(-a\sin t,a\cos t,b)$</p>
+        <p><strong>Step 2.</strong> $|\mathbf r'|=c=\sqrt{a^2+b^2}$ <span class="ann">→ constant</span></p>
+        <p><strong>Step 3.</strong> $\hat{\mathbf t}=\dfrac1c(-a\sin t,a\cos t,b)$ <span class="ann">→ normalize</span></p>
+        <p><strong>Step 4.</strong> $\dfrac{d\hat{\mathbf t}}{dt}=\dfrac1c(-a\cos t,-a\sin t,0)$</p>
+        <p><strong>Step 5.</strong> $\dfrac{d\hat{\mathbf t}}{ds}=\dfrac1{c^2}(-a\cos t,-a\sin t,0)$ <span class="ann">→ divide by $c$</span></p>
+        <p><strong>Step 6.</strong> $\kappa=\dfrac a{c^2}$; $\hat{\mathbf n}=(-\cos t,-\sin t,0)$</p>
+        <p><strong>Step 7.</strong> $\hat{\mathbf b}=\hat{\mathbf t}\times\hat{\mathbf n}=\dfrac1c(b\sin t,-b\cos t,a)$</p>
+        <div class="good micro"><strong>Memorize:</strong> $\kappa=a/c^2$, $\tau=b/c^2$ where $c=\sqrt{a^2+b^2}$.</div>
+      </div>
+
+      <div class="box purple tight">
+        <h2>HELIX TEMPLATE B · TORSION + DARBOUX</h2>
+        <p><strong>Step 1.</strong> $\hat{\mathbf b}=\dfrac1c(b\sin t,-b\cos t,a)$</p>
+        <p><strong>Step 2.</strong> $\dfrac{d\hat{\mathbf b}}{dt}=\dfrac1c(b\cos t,b\sin t,0)$</p>
+        <p><strong>Step 3.</strong> $\dfrac{d\hat{\mathbf b}}{ds}=\dfrac1{c^2}(b\cos t,b\sin t,0)$ <span class="ann">→ divide by $c$</span></p>
+        <p>Since $\dfrac{d\hat{\mathbf b}}{ds}=-\tau\hat{\mathbf n}$ and $\hat{\mathbf n}=(-\cos t,-\sin t,0)$,</p>
+        <p>$\tau=\dfrac b{c^2}=\dfrac b{a^2+b^2}$</p>
+        <p><strong>Darboux vector:</strong> $\boldsymbol\Omega=\kappa\hat{\mathbf b}+\tau\hat{\mathbf t}$ <span class="ann">→ substitute $\kappa,\tau,\hat{\mathbf b},\hat{\mathbf t}$ from above</span></p>
+        <div class="warn micro"><strong>Common trap:</strong> skipping $dt \to ds$ conversion makes both $\kappa$ and $\tau$ wrong <strong>→ fix:</strong> always divide by $|\mathbf r'|=c$.</div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="box green tight">
+        <h2>SURFACE-AREA TEMPLATE A · GRAPH SURFACE</h2>
+        <p>If $z=f(x,y)$, then $A=\iint_R\sqrt{1+f_x^2+f_y^2}\,dA$ <span class="ann">→ Monge formula</span></p>
+        <p class="tiny"><strong>Paraboloid:</strong> $f(x,y)=x^2+y^2$</p>
+        <p><strong>Step 1.</strong> $f_x=2x$, $f_y=2y$</p>
+        <p><strong>Step 2.</strong> $\sqrt{1+4x^2+4y^2}=\sqrt{1+4r^2}$ <span class="ann">→ convert to polar</span></p>
+        <p><strong>Step 3.</strong> If $0\le z\le2$, then $x^2+y^2\le2$, so $r\le\sqrt2$ <span class="ann">→ projection region</span></p>
+        <p><strong>Step 4.</strong> $A=\int_0^{2\pi}\int_0^{\sqrt2}\sqrt{1+4r^2}\,r\,dr\,d\theta$</p>
+        <div class="tip micro"><strong>Use on:</strong> Tutorial 7 Q2 and as training for 2025 MT2 Q1.</div>
+      </div>
+
+      <div class="box green tight">
+        <h2>SURFACE-AREA TEMPLATE B · 2025 CAP</h2>
+        <p><strong>Step 1.</strong> Paraboloid: $z=2-r^2$. Cone: $z=r$.</p>
+        <p><strong>Step 2.</strong> Intersection: $2-r^2=r \Rightarrow r^2+r-2=0 \Rightarrow r=1$ <span class="ann">→ find intersection first</span></p>
+        <p><strong>Step 3.</strong> $f_x=-2x$, $f_y=-2y$ <span class="ann">→ derivatives of the paraboloid</span></p>
+        <p><strong>Step 4.</strong> $\sqrt{1+4x^2+4y^2}=\sqrt{1+4r^2}$</p>
+        <p><strong>Step 5.</strong> $A=\int_0^{2\pi}\int_0^1\sqrt{1+4r^2}\,r\,dr\,d\theta$</p>
+        <div class="warn micro"><strong>Common trap:</strong> using cone derivatives instead of paraboloid derivatives <strong>→ fix:</strong> the area is of the paraboloid cap, not the cone.</div>
+      </div>
+
+      <div class="box green tight">
+        <h2>SURFACE-AREA TEMPLATE C · PARAMETRIC</h2>
+        <p>If $\mathbf X(u,v)$ is given, then $A=\iint |\mathbf X_u\times\mathbf X_v|\,du\,dv$</p>
+        <p class="tiny"><strong>Workflow:</strong> choose parameters $\to$ compute tangent vectors $\to$ cross product $\to$ translate cuts into parameter bounds.</p>
+        <p class="tiny"><strong>Use on:</strong> sphere area, cone strip, tilted plane patch inside cylinder.</p>
+      </div>
+
+      <div class="box orange tight">
+        <h2>LINE-INTEGRAL TEMPLATE A · HELIX</h2>
+        <p><strong>Step 1.</strong> $\mathbf r(t)=(\cos t,\sin t,t)$; $\mathbf r'(t)=(-\sin t,\cos t,1)$</p>
+        <p><strong>Step 2.</strong> For $\mathbf F=(-y,x,z)$: $\mathbf F(\mathbf r(t))=(-\sin t,\cos t,t)$ <span class="ann">→ substitute path into $\mathbf F$</span></p>
+        <p><strong>Step 3.</strong> $\mathbf F\cdot\mathbf r' = \sin^2 t+\cos^2 t+t=1+t$ <span class="ann">→ simplifies!</span></p>
+        <p><strong>Step 4.</strong> $W=\int_a^b (1+t)\,dt$</p>
+        <div class="good micro"><strong>Lesson:</strong> after substitution, ugly 3D integrals often collapse to simple scalar integrands.</div>
+      </div>
+
+      <div class="box orange tight">
+        <h2>LINE-INTEGRAL TEMPLATE B · STRAIGHT SEGMENT</h2>
+        <p><strong>Step 1.</strong> From $A$ to $B$: $\mathbf r(t)=A+t(B-A)$, $0\le t\le1$</p>
+        <p><strong>Step 2.</strong> $d\mathbf r=(B-A)\,dt$ <span class="ann">→ constant direction</span></p>
+        <p><strong>Step 3.</strong> $\int_C\mathbf F\cdot d\mathbf r=\int_0^1 \mathbf F(\mathbf r(t))\cdot(B-A)\,dt$</p>
+        <div class="warn micro"><strong>Common trap:</strong> assuming same endpoints $\Rightarrow$ same value <strong>→ fix:</strong> without conservative-field theorem (out of scope), different paths give different values.</div>
+      </div>
+
+      <div class="box orange tight">
+        <h2>LINE-INTEGRAL TEMPLATE C · 2D DIFFERENTIAL FORM</h2>
+        <p>$\int_C P\,dx+Q\,dy$</p>
+        <p class="tiny"><strong>If</strong> $y=y(x)$ on a single path piece, then $dy=y'(x)dx$ and</p>
+        <p>$\int_C=\int_{x=a}^{x=b}\big(P(x,y(x))+Q(x,y(x))y'(x)\big)dx$ <span class="ann">→ single variable</span></p>
+        <p class="tiny"><strong>Broken path:</strong> integrate each segment separately and add.</p>
+        <p class="tiny"><strong>Circle:</strong> $x=a\cos t$, $y=a\sin t$, $0\le t\le2\pi$. <span class="ann">→ check orientation</span></p>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="box blue tight">
+        <h2>TRIPLE-INTEGRAL TEMPLATE A · NESTED CARTESIAN</h2>
+        <p>$\int\!\int\!\int f(x,y,z)\,dz\,dx\,dy$</p>
+        <p class="tiny"><strong>Rule:</strong> integrate inside first, substitute its bounds completely, then move outward. <span class="ann">→ inside out</span></p>
+        <p class="tiny"><strong>Never:</strong> carry the wrong variable into the next stage after evaluating bounds.</p>
+      </div>
+
+      <div class="box blue tight">
+        <h2>TRIPLE-INTEGRAL TEMPLATE B · CYLINDRICAL REGION</h2>
+        <p><strong>Step 1.</strong> Region: inside $x^2+(y-1)^2=1$, above $z=0$, below $z=\sqrt{x^2+y^2}$</p>
+        <p><strong>Step 2.</strong> $x^2+y^2-2y=0 \Rightarrow r=2\sin\theta$ <span class="ann">→ offset cylinder in polar</span></p>
+        <p><strong>Step 3.</strong> $0\le\theta\le\pi$, $0\le r\le2\sin\theta$, $0\le z\le r$</p>
+        <p><strong>Step 4.</strong> $V=\int_0^{\pi}\int_0^{2\sin\theta}\int_0^r 1\cdot r\,dz\,dr\,d\theta$ <span class="ann">→ the $r$ is the Jacobian</span></p>
+        <p>$\bar z=\dfrac1V\int_0^{\pi}\int_0^{2\sin\theta}\int_0^r z\,r\,dz\,dr\,d\theta$ <span class="ann">→ divide by $V$ at end</span></p>
+        <div class="warn micro"><strong>Common trap:</strong> the extra $r$ in the integrand is the Jacobian, not from the roof $z=r$ <strong>→ fix:</strong> write Jacobian separately.</div>
+      </div>
+
+      <div class="box blue tight">
+        <h2>TRIPLE-INTEGRAL TEMPLATE C · SPHERICAL BOUNDS</h2>
+        <p><strong>Sphere:</strong> $r=a$</p>
+        <p><strong>Cone:</strong> $z=r \Rightarrow \phi=\pi/4$</p>
+        <p><strong>First octant:</strong> $0\le\theta\le\pi/2$, $0\le\phi\le\pi/2$</p>
+        <p>$dV=r^2\sin\phi\,dr\,d\phi\,d\theta$ <span class="ann">→ never drop $r^2\sin\phi$</span></p>
+        <div class="tip micro"><strong>Use on:</strong> Extra Problems 2 Q8 and any sphere/cone bound-construction question.</div>
+      </div>
+
+      <div class="box gold tight">
+        <h2>LAST-48-HOUR PRACTICE ORDER</h2>
+        <table>
+          <tr><th>Block</th><th>Problems</th><th>Purpose</th></tr>
+          <tr><td>1</td><td>2024 MT2 Q1(a)–(c), Tut 7 Q1(a)–(c)</td><td>Automatic operator marks</td></tr>
+          <tr><td>2</td><td>2025 MT2 Q2(a)–(b), 2023 MT2 Q1(c)</td><td>Radial-field recognition</td></tr>
+          <tr><td>3</td><td>2022 MT2 Q1(a)–(c)</td><td>Helix + FS chain</td></tr>
+          <tr><td>4</td><td>Tut 7 Q2, 2025 MT2 Q1</td><td>Graph-surface area</td></tr>
+          <tr><td>5</td><td>2023 MT2 Q2(a)–(b), Tut 8 Q1</td><td>Line integrals / path comparison</td></tr>
+          <tr><td>6</td><td>EP2 Q8, Q11(a)</td><td>3D bounds and Jacobians</td></tr>
+        </table>
+      </div>
+
+      <div class="box gold tight">
+        <h2>30-SECOND PRE-SUBMISSION CHECK</h2>
+        <p class="tiny">1. Did I choose the correct formula/operator first?</p>
+        <p class="tiny">2. Are my bounds matched to the picture and coordinate system?</p>
+        <p class="tiny">3. Did I include the Jacobian $r$ or $r^2\sin\phi$?</p>
+        <p class="tiny">4. For FS, did I convert $d/dt$ to $d/ds$?</p>
+        <p class="tiny">5. For line integrals, did I substitute both the path and $d\mathbf r$?</p>
+        <p class="tiny">6. For circulation, is my orientation correct (CCW = positive)?</p>
+        <p class="tiny">7. Did I accidentally use any out-of-scope theorem shortcut?</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span><strong>Page 2 of 2.</strong> Use these micro-templates to reproduce the top drills rapidly.</span>
+    <span><strong>Out of scope reminder:</strong> no potentials, no flux, no Stokes, no divergence theorem on this sheet.</span>
+  </div>
+</section>
+
+</body>
+</html>
