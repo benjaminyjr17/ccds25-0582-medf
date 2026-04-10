@@ -59,6 +59,33 @@ node_modules/
 *.log
 logs/
 
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.out
+*.nav
+*.snm
+*.vrb
+*.lot
+*.lof
+*.idx
+*.ilg
+*.ind
+*.nlo
+*.nls
+*.run.xml
+*.bcf
+*-blx.bib
+*.dvi
+*.ps
+*.fmt
+thesis/main.pdf
+
 # Environment variables
 *.env
 
