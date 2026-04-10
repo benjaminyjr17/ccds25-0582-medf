@@ -2207,7 +2207,7 @@ def main() -> None:
 
         frameworks: list[dict[str, Any]] = []
         stakeholders: list[dict[str, Any]] = []
-        with st.spinner("Loading frameworks and stakeholders..."):
+        with st.spinner("Loading Frameworks and Stakeholders..."):
             try:
                 frameworks = load_frameworks(backend_url)
                 stakeholders = load_stakeholders(backend_url)
@@ -2928,7 +2928,7 @@ def main() -> None:
                 "stakeholder_ids": conflict_stakeholder_ids,
             }
 
-            with st.spinner("Detecting conflicts..."):
+            with st.spinner("Detecting Conflicts..."):
                 ok, result, error_text = api_call(
                     "POST",
                     f"{backend_url}/api/conflicts",
@@ -3154,7 +3154,7 @@ def main() -> None:
                 "n_gen": pareto_n_gen_effective,
             }
 
-            with st.spinner("Generating Pareto solutions..."):
+            with st.spinner("Generating Pareto Solutions..."):
                 ok, result, error_text = api_call(
                     "POST",
                     f"{backend_url}/api/pareto",
@@ -3170,7 +3170,7 @@ def main() -> None:
                 st.caption("Note: n_gen=0 is not supported by the backend, so it was adjusted to 1.")
                 payload = dict(payload)
                 payload["n_gen"] = 1
-                with st.spinner("Retrying Pareto generation with n_gen=1..."):
+                with st.spinner("Retrying Pareto Generation with n_gen=1..."):
                     ok, result, error_text = api_call(
                         "POST",
                         f"{backend_url}/api/pareto",
@@ -3334,10 +3334,10 @@ def main() -> None:
                 [
                     "**Resolution Summary**",
                     f"- Rank: {selected_rank}.",
-                    f"- Total distance: {fmt_score(selected_total_distance)}.",
-                    f"- Utility (WSM ablation): {utility_text}.",
-                    f"- Top-1 consensus dimension: {top_dimension_label}.",
-                    f"- Highest stakeholder distance: {highest_distance_stakeholder}.",
+                    f"- Total Distance: {fmt_score(selected_total_distance)}.",
+                    f"- Utility (WSM Ablation): {utility_text}.",
+                    f"- Top-1 Consensus Dimension: {top_dimension_label}.",
+                    f"- Highest Stakeholder Distance: {highest_distance_stakeholder}.",
                 ]
             )
         )
@@ -3454,8 +3454,8 @@ def main() -> None:
                 )
                 scatter_figure.update_layout(
                     title=f"Tradeoff: {stakeholder_a} vs. {stakeholder_b}",
-                    xaxis_title=f"{stakeholder_a} distance",
-                    yaxis_title=f"{stakeholder_b} distance",
+                    xaxis_title=f"{stakeholder_a} Distance",
+                    yaxis_title=f"{stakeholder_b} Distance",
                     margin={"l": 48, "r": 48, "t": 56, "b": 48},
                 )
                 styled_scatter_figure = style_plotly(scatter_figure, tokens)
@@ -4193,7 +4193,7 @@ def main() -> None:
                 "deterministic_mode": True,
             }
 
-            with st.spinner("Running demo scenario (Evaluation → Conflict Detection → Pareto Resolution)..."):
+            with st.spinner("Running Demo Scenario (Evaluation → Conflict Detection → Pareto Resolution)..."):
                 ok_eval, evaluate_data, evaluate_error = api_call(
                     "POST",
                     f"{backend_url}/api/evaluate",
@@ -4355,14 +4355,14 @@ def main() -> None:
                 top_conflict_level = top_conflict["level"]
                 top_conflict_rho = float(top_conflict["rho"])
 
-        render_if_present("Top conflicting pair", top_conflict_pair)
-        render_if_present("Conflict level", top_conflict_level)
-        render_if_present("Spearman rho", fmt_score(top_conflict_rho))
+        render_if_present("Top Conflicting Pair", top_conflict_pair)
+        render_if_present("Conflict Level", top_conflict_level)
+        render_if_present("Spearman Rho", fmt_score(top_conflict_rho))
 
         st.markdown("### Pareto Frontier")
         pareto_solutions = demo_pareto_result.get("pareto_solutions", []) if isinstance(demo_pareto_result, dict) else []
         pareto_count = len(pareto_solutions) if isinstance(pareto_solutions, list) else 0
-        render_if_present("Pareto points", pareto_count)
+        render_if_present("Pareto Points", pareto_count)
 
         sample_rows: list[dict[str, Any]] = []
         if isinstance(pareto_solutions, list):
