@@ -1,4 +1,4 @@
-# Chapter Risk Map — CCDS25-0582 FYP Report Audit
+# Chapter Risk Map: CCDS25-0582 FYP Report Audit
 
 ## Chapter 11 Numerical Discrepancies
 
@@ -6,7 +6,7 @@ The current report presents per-stakeholder scores in the evaluation tables (e.g
 
 ### Key Findings
 
-**Evaluation Results — Facial Recognition (Case 1)**
+**Evaluation Results: Facial Recognition (Case 1)**
 
 | Metric | Report Claims | Verified API |
 |--------|--------------|-------------|
@@ -15,7 +15,7 @@ The current report presents per-stakeholder scores in the evaluation tables (e.g
 | Singapore MGAF overall | ~0.36 (avg of 0.43, 0.35, 0.29) | 0.3582 |
 | Risk Level | High | Critical (eu_altai, sg_mgaf), High (nist_ai_rmf) |
 
-**Evaluation Results — Hiring Algorithm (Case 2)**
+**Evaluation Results: Hiring Algorithm (Case 2)**
 
 | Metric | Report Claims | Verified API |
 |--------|--------------|-------------|
@@ -24,7 +24,7 @@ The current report presents per-stakeholder scores in the evaluation tables (e.g
 | Singapore MGAF overall | ~0.33 (avg of 0.33, 0.37, 0.28) | 0.3254 |
 | Risk Level | High | Critical (eu_altai, sg_mgaf), High (nist_ai_rmf) |
 
-**Evaluation Results — Healthcare Diagnostic (Case 3)**
+**Evaluation Results: Healthcare Diagnostic (Case 3)**
 
 | Metric | Report Claims | Verified API |
 |--------|--------------|-------------|
@@ -33,7 +33,7 @@ The current report presents per-stakeholder scores in the evaluation tables (e.g
 | Singapore MGAF overall | ~0.59 (avg of 0.65, 0.55, 0.58) | 0.5910 |
 | Risk Level | Medium | High (eu_altai, sg_mgaf), Medium (nist_ai_rmf) |
 
-**Conflict Matrices — All cases match API output closely:**
+**Conflict Matrices: All cases match API output closely:**
 
 | Case | Pair | Report ρ | API ρ | Match? |
 |------|------|----------|-------|--------|
@@ -47,7 +47,7 @@ The current report presents per-stakeholder scores in the evaluation tables (e.g
 | Healthcare | Dev-AC | 0.49 | 0.4857 | YES (rounded) |
 | Healthcare | Reg-AC | 0.03 | 0.0286 | YES (rounded) |
 
-**Baseline Dimension Scores — All match JSON files exactly.**
+**Baseline Dimension Scores: All match JSON files exactly.**
 
 **Cross-Case Table (Table 11.11):**
 
@@ -72,7 +72,7 @@ The current report presents per-stakeholder scores in the evaluation tables (e.g
 6. **Conflict matrix values**: All match API output when rounded to 2 decimal places. Acceptable.
 7. **Baseline dimension scores**: All match JSON files exactly. No issues.
 
-## Other Chapters — Risk Assessment
+## Other Chapters: Risk Assessment
 
 Chapters 1-10 and 12-14 need review for:
 - Architecture descriptions matching the actual codebase

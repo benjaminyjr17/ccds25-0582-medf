@@ -157,7 +157,7 @@ The test suite covers unit, integration, property-based, and end-to-end scenario
 pytest --tb=short -q
 ```
 
-Key test modules include:
+Critical test modules include:
 
 - `test_api_contract_lock.py` locks down the API schema to prevent regressions.
 - `test_topsis_hand_verification.py` verifies TOPSIS scores against hand-calculated examples.

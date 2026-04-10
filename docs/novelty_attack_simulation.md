@@ -1,4 +1,4 @@
-# MEDF — Novelty Attack Simulation (Viva Defense Stress Test)
+# MEDF: Novelty Attack Simulation (Viva Defense Stress Test)
 Date: 2026-02-28
 Version: 1.0.0
 Scope: FYP defense rehearsal (frozen build)

@@ -1,4 +1,4 @@
-# MEDF — Design Decisions Document
+# MEDF: Design Decisions Document
 Date: 2026-02-24
 Version: 1.0.0
 Scope: Aligned to Stage 1 prompts

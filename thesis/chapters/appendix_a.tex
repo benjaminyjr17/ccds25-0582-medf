@@ -26,7 +26,7 @@ This appendix provides a summary of the MEDF REST API endpoints. The complete, i
 
 \section{Request Schema}
 
-The primary request schemas are defined as Pydantic models in \texttt{app/models.py}. The key fields are:
+The primary request schemas are defined as Pydantic models in \texttt{app/models.py}. The critical fields are:
 
 \begin{itemize}[leftmargin=2em]
   \item \texttt{ai\_system}: A nested object containing \texttt{id} (string), \texttt{name} (string), \texttt{description} (optional string), and \texttt{context} (object with \texttt{dimension\_scores}).
