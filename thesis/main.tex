@@ -10,6 +10,9 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
+\tolerance=1000
+\emergencystretch=1em
+\hbadness=10000
 \usepackage{microtype}
 
 % ---- Page geometry ----
@@ -61,16 +64,17 @@
 % ---- Code listings ----
 \usepackage{listings}
 \lstset{
-  basicstyle=\small\ttfamily,
+  basicstyle=\small\ttfamily\color{black},
   breaklines=true,
   breakatwhitespace=false,
   columns=flexible,
   frame=single,
   numbers=left,
   numberstyle=\tiny\color{gray},
-  keywordstyle=\color{blue},
-  commentstyle=\color{OliveGreen},
-  stringstyle=\color{BrickRed},
+  keywordstyle=\color{black},
+  commentstyle=\color{black},
+  stringstyle=\color{black},
+  identifierstyle=\color{black},
   showstringspaces=false,
   tabsize=4,
   xleftmargin=1em,
@@ -167,10 +171,10 @@
 
 \vspace{1.5cm}
 
-Submitted in Partial Fulfilment of the Requirements\\
-for the Degree of Bachelor of Computing\\
+Submitted in Partial Fulfillment of the Requirements\\
+for the Degree of Bachelor of Computing (Hons)\\
 in Data Science and Artificial Intelligence\\
-at Nanyang Technological University
+at Nanyang Technological University, Singapore
 
 \vspace{0.5cm}
 
@@ -233,6 +237,6 @@ Academic Year 2025/2026
 \appendix
 \input{chapters/appendix_a}
 \input{chapters/appendix_b}
-\input{chapters/appendix_c}
+%\input{chapters/appendix_c}  % Removed: Verification Memo moved to VERIFICATION_MEMO.md
 
 \end{document}
