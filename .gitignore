@@ -85,6 +85,7 @@ logs/
 *.ps
 *.fmt
 thesis/main.pdf
+!thesis/main.pdf
 
 # Environment variables
 *.env
