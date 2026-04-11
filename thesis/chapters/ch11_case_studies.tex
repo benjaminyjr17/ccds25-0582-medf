@@ -119,7 +119,7 @@ Affected Community  & 0.94 &  0.94 &  1.00 \\
 \end{tabular}
 \end{table}
 
-The high positive correlations ($\rho = 0.89$ to $0.94$) indicate \textbf{low conflict} across all stakeholder pairs for this case. This result may appear counterintuitive given the divergent evaluation scores, but it reflects the fact that the contribution-based analysis measures agreement on the \emph{ranking} of dimension contributions, not on the absolute scores. The system's extreme ethical profile, with very low Fairness and Privacy scores and a high Safety score, creates a clear ranking that all stakeholders tend to agree on, even though they weight the dimensions differently. The primary conflicting dimensions are Accountability vs. Safety (Developer--Regulator) and Accountability vs. Safety (Developer--Affected Community). The Pareto optimization engine proposed consensus weight vectors that typically involved increasing the weight on Fairness and Privacy at the expense of Safety, suggesting that any acceptable path forward would require significant improvements in these areas.
+The high positive correlations ($\rho = 0.89$ to $0.94$) indicate \textbf{low conflict} across all stakeholder pairs for this case. This result may appear counterintuitive given the divergent evaluation scores, but it reflects that the contribution-based analysis measures agreement on the \emph{ranking} of dimension contributions, not on the absolute scores. The system's extreme ethical profile, with very low Fairness and Privacy scores and a high Safety score, creates a clear ranking that all stakeholders tend to agree on, even though they weight the dimensions differently. The primary conflicting dimensions are Accountability vs. Safety (Developer-Regulator) and Accountability vs. Safety (Developer-Affected Community). The Pareto optimization engine proposed consensus weight vectors that typically involved increasing the weight on Fairness and Privacy at the expense of Safety, suggesting that any acceptable path forward would require significant improvements in these areas.
 
 %% ================================================================
 %% CASE STUDY 2
@@ -182,7 +182,7 @@ All Frameworks  & 0.3477 & 0.3421 & 0.4004 & 0.3005 \\
 \end{tabular}
 \end{table}
 
-The overall aggregated score was approximately 0.35, corresponding to a \textbf{Critical Risk} classification. This case study demonstrates MEDF's ability to correctly identify and penalize systems with a single, catastrophic ethical flaw. Even though the system had a moderate Accountability score (reflecting the fact that the company was eventually held accountable), the failure on Fairness was so severe that it rendered the complete system unacceptable from every stakeholder's perspective.
+The overall aggregated score was approximately 0.35, corresponding to a \textbf{Critical Risk} classification. This case study demonstrates MEDF's ability to correctly identify and penalize systems with a single, catastrophic ethical flaw. Even though the system had a moderate Accountability score (reflecting that the company was eventually held accountable), the failure on Fairness was so severe that it rendered the complete system unacceptable from every stakeholder's perspective.
 
 \subsection{Conflict Analysis}
 
@@ -203,7 +203,7 @@ Affected Community  & 0.77 &  0.54 &  1.00 \\
 \end{tabular}
 \end{table}
 
-The Developer--Regulator and Regulator--Affected Community pairs show \textbf{moderate} conflict ($\rho = 0.54$), while the Developer--Affected Community pair shows \textbf{low} conflict ($\rho = 0.77$). The primary conflicting dimensions for the Developer--Regulator pair are Safety and Transparency, reflecting their different priorities when the system's ethical profile includes moderate Safety but low Transparency scores. This case demonstrates how the contribution-based conflict metric captures case-specific dynamics: unlike the facial recognition case (where all pairs showed low conflict), the hiring algorithm's more ambiguous ethical profile produces more differentiated conflict levels.
+The Developer-Regulator and Regulator-Affected Community pairs show \textbf{moderate} conflict ($\rho = 0.54$), while the Developer-Affected Community pair shows \textbf{low} conflict ($\rho = 0.77$). The primary conflicting dimensions for the Developer-Regulator pair are Safety and Transparency, reflecting their different priorities when the system's ethical profile includes moderate Safety but low Transparency scores. This case demonstrates how the contribution-based conflict metric captures case-specific dynamics: unlike the facial recognition case (where all pairs showed low conflict), the hiring algorithm's more ambiguous ethical profile produces more differentiated conflict levels.
 
 %% ================================================================
 %% CASE STUDY 3
@@ -287,7 +287,7 @@ Affected Community  & 0.49 &  0.03 &  1.00 \\
 \end{tabular}
 \end{table}
 
-The Developer--Regulator pair shows \textbf{high conflict} ($\rho = -0.14$), and the Regulator--Affected Community pair also shows \textbf{high conflict} ($\rho = 0.03$). The Developer--Affected Community pair shows \textbf{moderate conflict} ($\rho = 0.49$). The primary conflicting dimensions are Transparency and Human Oversight, reflecting the core tension in this case: the Developer values the system's clinical utility (Safety) while the Regulator prioritizes the data governance failure (Privacy, Transparency). This case study demonstrates the full power of the contribution-based conflict metric. Unlike the facial recognition case where the extreme ethical profile led to broad agreement, the healthcare case's more balanced profile exposes genuine disagreements about which dimensions matter most.
+The Developer-Regulator pair shows \textbf{high conflict} ($\rho = -0.14$), and the Regulator-Affected Community pair also shows \textbf{high conflict} ($\rho = 0.03$). The Developer-Affected Community pair shows \textbf{moderate conflict} ($\rho = 0.49$). The primary conflicting dimensions are Transparency and Human Oversight, reflecting the core tension in this case: the Developer values the system's clinical utility (Safety) while the Regulator prioritizes the data governance failure (Privacy, Transparency). This case study demonstrates the full power of the contribution-based conflict metric. Unlike the facial recognition case where the extreme ethical profile led to broad agreement, the healthcare case's more balanced profile exposes genuine disagreements about which dimensions matter most.
 
 The Pareto optimization engine generated a set of consensus solutions that explored the trade-off between Safety/Human Oversight and Privacy/Transparency, providing a quantitative basis for the kind of nuanced policy discussion that this case demands.
 
