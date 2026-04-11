@@ -6,19 +6,7 @@ The MEDF platform is equipped with an interactive web-based dashboard built usin
 \section{Main Evaluation View}
 \label{sec:main_view}
 
-The primary view of the dashboard allows the user to configure and run a new evaluation. The main panel is divided into several configurable sections:
-
-\begin{itemize}[leftmargin=2em]
-  \item \textbf{AI System Selection.} A dropdown menu to select the AI system to be evaluated, populated from the case studies available in the repository.
-
-  \item \textbf{Baseline Dimension Scores.} A set of six sliders, one for each Unified Dimension, allows the user to input the baseline ethical performance scores of the selected AI system on a 1--7 Likert scale.
-
-  \item \textbf{Framework and Stakeholder Selection.} Checkboxes to select the governance frameworks (ALTAI, NIST RMF, MGAF) and stakeholder profiles (Developer, Regulator, Affected Community) to include in the analysis.
-
-  \item \textbf{Stakeholder Weight Customization.} An expandable section where the user can view and override the default priority weights for each selected stakeholder, providing complete control over the evaluation context.
-\end{itemize}
-
-Once the configuration is set, the user can click the \enquote{Run Evaluation} button. The dashboard then sends a request to the backend API and displays the results in real-time. The interface also provides a \enquote{Run Demo Scenario} button that populates the form with pre-configured case study data for quick demonstration and testing. Figure~\ref{fig:evaluate_tab} shows the evaluation configuration interface.
+The primary view lets the user configure and run a new evaluation by selecting an AI system, setting baseline dimension scores on the 1--7 Likert scale and choosing the frameworks and stakeholder profiles to include in the analysis. A \enquote{Run Demo Scenario} button populates the form with pre-configured case study data to support quick demonstration and testing. Figure~\ref{fig:evaluate_tab} shows the evaluation configuration interface.
 
 \begin{figure}[H]
 \centering
@@ -30,17 +18,7 @@ Once the configuration is set, the user can click the \enquote{Run Evaluation} b
 \section{Results Visualization}
 \label{sec:results_viz}
 
-After an evaluation is complete, the results are presented in a series of clear and informative visualizations:
-
-\begin{itemize}[leftmargin=2em]
-  \item \textbf{Overall Score Gauge.} A prominent gauge visual displays the final, aggregated ethical score of the AI system, with color-coding to indicate the corresponding risk level (e.g., green for Low, red for Critical).
-
-  \item \textbf{Framework Score Breakdown.} A bar chart compares the system's performance under each selected governance framework, allowing the user to see if the system performs better against certain standards than others.
-
-  \item \textbf{Dimensional Contribution Radar Chart.} A radar chart visualizes the contribution of each of the six Unified Dimensions to the final score. This helps the user quickly identify the ethical strengths and weaknesses of the system.
-\end{itemize}
-
-Figure~\ref{fig:evaluate_results} shows the evaluation results after running the demo scenario.
+Once an evaluation completes, the dashboard presents the outcome as an overall score gauge (color-coded by risk level), a framework score breakdown bar chart and a dimensional contribution radar chart that surfaces the ethical strengths and weaknesses of the system. Figure~\ref{fig:evaluate_results} shows the evaluation results after running the demo scenario.
 
 \begin{figure}[H]
 \centering
@@ -52,13 +30,7 @@ Figure~\ref{fig:evaluate_results} shows the evaluation results after running the
 \section{Conflict and Consensus Analysis}
 \label{sec:conflict_viz}
 
-The dashboard includes dedicated views for analyzing stakeholder disagreement:
-
-\begin{itemize}[leftmargin=2em]
-  \item \textbf{Conflict Matrix.} A heatmap displays the Spearman's rank correlation coefficient for each pair of stakeholders, providing an at-a-glance overview of where the most significant conflicts in priorities lie. Figure~\ref{fig:conflict_tab} shows the conflict detection interface.
-
-  \item \textbf{Pareto Frontier Visualization.} When the Pareto optimization is run, the interface displays a plot of the resulting non-dominated consensus solutions. This allows the user to visually explore the trade-offs between different compromise solutions. Figure~\ref{fig:pareto_tab} shows the Pareto resolution interface.
-\end{itemize}
+The conflict analysis view displays a heatmap of Spearman's rank correlation coefficients between stakeholder pairs and, when Pareto optimization is run, a plot of non-dominated consensus solutions that lets the user visually explore trade-offs between compromise options. Figure~\ref{fig:conflict_tab} shows the conflict detection interface and Figure~\ref{fig:pareto_tab} shows the Pareto resolution interface.
 
 \begin{figure}[H]
 \centering
@@ -77,7 +49,7 @@ The dashboard includes dedicated views for analyzing stakeholder disagreement:
 \section{Case Study Browser}
 \label{sec:case_browser}
 
-The dashboard includes a dedicated \enquote{Case Studies} tab that allows the user to browse and run the three pre-configured case studies (Facial Recognition, Hiring Algorithm, Healthcare Diagnostic). Each case study entry displays a summary of the AI system, its deployment context, known risks, and the evidence sources used to derive the baseline scores. The user can select a case study and run a complete evaluation with a single click, making it easy to reproduce the results presented in Chapter~\ref{ch:case_studies}. Figure~\ref{fig:casestudies_tab} shows the case study browser, and Figure~\ref{fig:casestudy_results} shows the results after running Case Study~1.
+The Case Studies tab lets the user browse and run the three pre-configured case studies (Facial Recognition, Hiring Algorithm, Healthcare Diagnostic), each displayed with a system summary, deployment context, known risks and evidence sources, with a single click triggering a complete evaluation to reproduce the results in Chapter~\ref{ch:case_studies}. Figure~\ref{fig:casestudies_tab} shows the case study browser, and Figure~\ref{fig:casestudy_results} shows the results after running Case Study~1.
 
 \begin{figure}[H]
 \centering

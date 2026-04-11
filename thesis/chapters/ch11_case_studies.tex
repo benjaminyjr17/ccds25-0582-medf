@@ -119,7 +119,7 @@ Affected Community  & 0.94 &  0.94 &  1.00 \\
 \end{tabular}
 \end{table}
 
-The high positive correlations ($\rho = 0.89$ to $0.94$) indicate \textbf{low conflict} across all stakeholder pairs for this case. This result may appear counterintuitive given the divergent evaluation scores, but it reflects the fact that the contribution-based analysis measures agreement on the \emph{ranking} of dimension contributions, not on the absolute scores. The system's extreme ethical profile, with very low Fairness and Privacy scores and a high Safety score, creates a clear ranking that all stakeholders tend to agree on, even though they weight the dimensions differently. The primary conflicting dimensions are Accountability versus Safety (Developer--Regulator) and Accountability versus Safety (Developer--Affected Community). The Pareto optimization engine proposed consensus weight vectors that typically involved increasing the weight on Fairness and Privacy at the expense of Safety, suggesting that any acceptable path forward would require significant improvements in these areas.
+The high positive correlations ($\rho = 0.89$ to $0.94$) indicate \textbf{low conflict} across all stakeholder pairs for this case. This result may appear counterintuitive given the divergent evaluation scores, but it reflects the fact that the contribution-based analysis measures agreement on the \emph{ranking} of dimension contributions, not on the absolute scores. The system's extreme ethical profile, with very low Fairness and Privacy scores and a high Safety score, creates a clear ranking that all stakeholders tend to agree on, even though they weight the dimensions differently. The primary conflicting dimensions are Accountability vs. Safety (Developer--Regulator) and Accountability vs. Safety (Developer--Affected Community). The Pareto optimization engine proposed consensus weight vectors that typically involved increasing the weight on Fairness and Privacy at the expense of Safety, suggesting that any acceptable path forward would require significant improvements in these areas.
 
 %% ================================================================
 %% CASE STUDY 2
@@ -306,7 +306,7 @@ A summary comparison of the three case studies is presented in Table~\ref{tab:cr
 \small
 \begin{tabular}{@{}lccl>{\centering\arraybackslash}p{2cm}c@{}}
 \toprule
-\textbf{Case Study} & \textbf{Overall} & \textbf{Risk} & \textbf{Weakness} & \textbf{Max Conflict ($\rho$)} & \textbf{Conflict} \\
+\textbf{Case Study} & \textbf{Overall} & \textbf{Risk} & \textbf{Weakness} & \textbf{Min Pairwise $\rho$} & \textbf{Conflict} \\
 \midrule
 Facial Recognition    & 0.3866 & Critical & Fairness, Privacy & 0.89 & Low \\
 iTutorGroup Hiring    & 0.3477 & Critical & Fairness          & 0.54 & Moderate \\

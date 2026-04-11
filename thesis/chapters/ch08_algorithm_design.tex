@@ -39,6 +39,8 @@ TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution)~\cite
   \label{eq:normalize}
 \end{equation}
 
+\noindent\textbf{Note on single-alternative evaluation.} Standard TOPSIS is designed to rank multiple alternatives. When MEDF evaluates a single AI system, the implementation constructs a three-row decision matrix by augmenting the real score vector with two synthetic rows: one representing the theoretical best case (all dimensions set to the maximum Likert score) and one representing the theoretical worst case (all dimensions set to the minimum). The ideal and anti-ideal solutions are then derived from the column maxima and minima of the weighted normalized matrix in the standard manner (Step~4 below). This synthetic-anchor approach ensures that the closeness coefficient remains well-defined and interpretable as a distance-to-ideal metric, even in the absence of multiple real alternatives for comparison. The real system's score is extracted from row~0 of the resulting coefficient vector.
+
 \textbf{Step 2: Vector Normalization.} The scaled matrix is then vector-normalized:
 \begin{equation}
   r_{ij} = \frac{x'_{ij}}{\sqrt{\sum_{i} (x'_{ij})^2}}
@@ -158,7 +160,7 @@ $C < 0.40$ & Critical & Severe ethical deficiencies. \\
 \end{tabular}
 \end{table}
 
-The \textbf{harm assessment module} classifies a composite harm score $h$ (where higher values indicate greater harm) using the thresholds in Table~\ref{tab:risk_levels_harm}. The harm score is computed as $h = 0.7 \times (1 - s_{\text{norm}}) + 0.3 \times \bar{d}$, where $s_{\text{norm}}$ is the normalized dimension score and $\bar{d}$ is the mean pairwise stakeholder weight disagreement.
+The \textbf{harm assessment module} classifies a composite harm score $h$ (where higher values indicate greater harm) using the thresholds in Table~\ref{tab:risk_levels_harm}. The harm score is computed as $h = 0.7 \times (1 - s_{\text{norm}}) + 0.3 \times \bar{d}$, where $s_{\text{norm}}$ is the normalized dimension score and $\bar{d}$ is the mean pairwise stakeholder weight disagreement. The 0.7/0.3 weighting reflects a deliberate design decision: a system's own ethical performance should dominate its risk classification, with stakeholder disagreement serving as a secondary aggravating factor that elevates the harm estimate when governance consensus is lacking.
 
 \begin{table}[H]
 \centering
