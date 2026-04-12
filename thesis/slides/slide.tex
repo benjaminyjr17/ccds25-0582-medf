@@ -20,7 +20,7 @@
 
 \author{Benjamin Oliver Yick (U2120984H)}
 \title[Multi-Stakeholder Ethical Decision Framework]{%
-  {\fontsize{19}{23}\selectfont Multi-Stakeholder Ethical Decision-Making Frameworks for AI Systems}}
+  \resizebox{0.95\textwidth}{!}{Multi-Stakeholder Ethical Decision-Making Frameworks for AI Systems}}
 \subtitle{CCDS25-0582 Final-Year Project}
 \institute{College of Computing and Data Science, Nanyang Technological University (Singapore)}
 \date{Academic Year 2025/2026}
@@ -122,7 +122,7 @@
     \centering
     \begin{tikzpicture}[scale=0.78, transform shape,
         node distance=0.9cm,
-        block/.style={rectangle, draw=ntu-blue, fill=ntu-blue!10, text width=3.8cm, minimum height=0.7cm, align=center, font=\small},
+        block/.style={rectangle, draw=ntu-blue, fill=ntu-blue!10, text width=4.2cm, minimum height=0.7cm, align=center, font=\small},
         arrow/.style={-{Stealth[length=2.5mm]}, thick, ntu-blue}
     ]
         \node[block] (input1) {AI System Scores};
@@ -130,7 +130,7 @@
         \node[block, below=of $(input1)!0.5!(input2)$] (ew) {Compute Effective Weights};
         \node[block, below=of ew] (score) {TOPSIS / WSM Scoring};
         \node[block, below=of score] (agg) {Aggregate Across Frameworks};
-        \node[block, below left=0.8cm and 0.3cm of agg] (conflict) {Conflict Detection (Spearman $\rho$)};
+        \node[block, below left=0.8cm and 0.3cm of agg] (conflict) {Conflict Detection\\(Spearman $\rho$)};
         \node[block, below right=0.8cm and 0.3cm of agg] (harm) {Harm Assessment};
         \node[block, below=1.2cm of agg] (result) {Evaluation Result};
 
