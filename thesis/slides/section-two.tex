@@ -1,0 +1,183 @@
+\section{Methodology, Architecture, and Algorithms}
+
+% ============================================================
+% S8: METHODOLOGY - DSRM
+% ============================================================
+\begin{frame}{Methodology: Design Science Research}
+    MEDF follows the Design Science Research Methodology (DSRM) by Peffers et al.~\cite{peffers2007dsrm}, providing academic legitimacy beyond pure software engineering.
+
+    \vspace{8pt}
+    \begin{enumerate}
+        \item \textbf{Problem Identification:} Principles-to-practice gap in AI ethics (Chapters 2--3).
+        \item \textbf{Objective Definition:} Quantifiable, multi-stakeholder evaluation (Chapter 3).
+        \item \textbf{Design and Development:} Architecture, algorithms, and implementation (Chapters 6--9).
+        \item \textbf{Demonstration and Evaluation:} Three real-world case studies (Chapters 10--11).
+    \end{enumerate}
+\end{frame}
+% NOTES: DSRM positions the project as a research artifact, not just code. The six
+% DSRM activities map directly onto report chapters. Approximately 60 seconds.
+% Transition: "The first design decision was harmonizing three governance frameworks."
+
+% ============================================================
+% S9: FRAMEWORK HARMONIZATION
+% ============================================================
+\begin{frame}{Framework Harmonization: Six Unified Dimensions}
+    Three governance frameworks harmonized into one evaluation model.
+
+    \vspace{4pt}
+    \begin{columns}[T]
+        \begin{column}{0.35\textwidth}
+            {\small
+            \textbf{Source Frameworks:}
+            \begin{itemize}
+                \item EU ALTAI~\cite{aihleg2019ethics, aihleg2020altai}.
+                \item NIST AI RMF~\cite{nist2023rmf}.
+                \item Singapore MGAF~\cite{pdpc2020mgaf}.
+            \end{itemize}
+            }
+        \end{column}
+        \begin{column}{0.60\textwidth}
+            {\small
+            \textbf{Six Unified Dimensions:}
+            \begin{enumerate}
+                \item Transparency and Explainability.
+                \item Fairness and Non-discrimination.
+                \item Safety and Robustness.
+                \item Privacy and Data Governance.
+                \item Human Agency and Oversight.
+                \item Accountability.
+            \end{enumerate}
+            }
+        \end{column}
+    \end{columns}
+
+    \vspace{6pt}
+    {\small Derived from overlapping themes across all three frameworks, informed by Jobin et al.~\cite{jobin2019global}, Floridi et al.~\cite{floridi2018ai4people}, and Zhang et al.~\cite{zhang2023fairness}. Stored as version-controlled YAML files.}
+\end{frame}
+% NOTES: Explain that the harmonization is a central contribution. Each framework
+% assigns different intrinsic weights to each dimension. Approximately 60 seconds.
+% Transition: "The system architecture implements this model as a three-tier platform."
+
+% ============================================================
+% S10: SYSTEM ARCHITECTURE
+% ============================================================
+\begin{frame}{System Architecture: Three-Tier Design}
+    \begin{columns}[T]
+        \begin{column}{0.40\textwidth}
+            \begin{itemize}
+                \item \textbf{Presentation:} Streamlit dashboard with interactive sliders and radar charts.
+                \item \textbf{API/Orchestration Layer:} FastAPI with Pydantic validation, routing, and workflow coordination.
+                \item \textbf{Data Layer:} SQLite, YAML registry, and JSON case studies.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.56\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.78, transform shape,
+                node distance=0.55cm,
+                layer/.style={rectangle, draw=ntu-blue, fill=ntu-blue!10, text width=5.8cm, minimum height=0.65cm, align=center, font=\small},
+                sublayer/.style={rectangle, draw=ntu-blue!50, fill=white, text width=2.6cm, minimum height=0.5cm, align=center, font=\scriptsize},
+                arrow/.style={-{Stealth[length=2mm]}, thick, ntu-blue}
+            ]
+                \node[layer] (pres) {Streamlit Dashboard};
+                \node[layer, below=0.4cm of pres] (api) {FastAPI (REST API)};
+
+                \node[sublayer, below left=0.5cm and -0.3cm of api] (eval) {/api/evaluate};
+                \node[sublayer, right=0.15cm of eval] (conf) {/api/conflicts};
+                \node[sublayer, below right=0.5cm and -0.3cm of api] (par) {/api/pareto};
+
+                \node[layer, below=1.6cm of api] (engine) {Scoring Engine + Harm Assessment};
+
+                \node[layer, below=0.4cm of engine] (data) {YAML Registry | SQLite | Case Study JSON};
+
+                \draw[arrow] (pres) -- node[right, font=\scriptsize]{REST} (api);
+                \draw[arrow] (api) -- (eval);
+                \draw[arrow] (api) -- (conf);
+                \draw[arrow] (api) -- (par);
+                \draw[arrow] (engine) -- (data);
+                \draw[arrow, dashed] (eval.south) -- ++(0,-0.25) -| (engine.north west);
+                \draw[arrow, dashed] (par.south) -- ++(0,-0.25) -| (engine.north east);
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+% NOTES: Emphasize clean separation of concerns. The Streamlit frontend communicates
+% exclusively through the REST API. The routers (evaluate.py, conflicts.py, pareto.py)
+% belong to the API/orchestration layer, handling routing, request validation, and
+% workflow coordination. The scoring engine and harm assessment module form the engine
+% layer, containing the analysis, scoring, and optimization logic. Note the acknowledged
+% technical debt: conflict analysis logic currently resides in the API router layer,
+% not in a standalone engine module. Approximately 60 seconds.
+% Transition: "The scoring engine at the core uses TOPSIS with a product pooling mechanism."
+
+% ============================================================
+% S11: ALGORITHM - TOPSIS SCORING ENGINE
+% ============================================================
+\begin{frame}{Algorithm: TOPSIS Scoring Engine}
+    \textbf{Product Pooling} combines stakeholder and framework weights~\cite{hwang1981multiple, behzadian2012topsis}:
+    \[
+        w_{\text{eff}} \propto w_s \odot w_f
+    \]
+
+    \textbf{TOPSIS Closeness Coefficient} (distance to ideal vs.\ anti-ideal):
+    \[
+        C = \frac{d^-}{d^+ + d^-} \quad \in [0, 1]
+    \]
+
+    \vspace{6pt}
+    \begin{itemize}
+        \item Single-alternative evaluation uses synthetic best/worst anchors to keep $C$ well-defined.
+        \item Risk classification: $C \geq 0.80$ Low, $0.60$--$0.80$ Medium, $0.40$--$0.60$ High, $< 0.40$ Critical.
+    \end{itemize}
+\end{frame}
+% NOTES: Product pooling ensures a dimension scores high only if BOTH the stakeholder
+% and the framework consider it important. The synthetic anchor trick is a critical
+% adaptation for single-system evaluation. Approximately 90 seconds.
+% Anticipated question: "Why TOPSIS over AHP or VIKOR?"
+% Response: "TOPSIS is computationally efficient, produces a clear scalar score, and
+% performs favorably against VIKOR in comparative analyses. AHP requires pairwise
+% comparisons that would burden the user interface."
+% Transition: "The conflict detection module uses Spearman rank correlation."
+
+% ============================================================
+% S12: ALGORITHM - CONFLICT DETECTION
+% ============================================================
+\begin{frame}{Algorithm: Conflict Detection (Spearman $\rho$)}
+    MEDF computes two types of stakeholder correlation.
+
+    \vspace{6pt}
+    \begin{enumerate}
+        \item \textbf{Priority Conflict (Weights-Only):} Spearman $\rho$ between raw stakeholder weight vectors. Measures general agreement on dimension importance.
+        \item \textbf{System-Salience Conflict (Contribution-Based):} Spearman $\rho$ between contribution vectors (effective weights $\times$ dimension scores). Measures agreement for a specific AI system.
+    \end{enumerate}
+
+    \vspace{6pt}
+    \textbf{Critical Insight:} The contribution-based metric produces different conflict levels across case studies, even with identical stakeholder weights. This captures case-specific dynamics.
+\end{frame}
+% NOTES: The distinction between these two metrics is a differentiating feature.
+% Contribution-based conflict is what makes the analysis system-aware.
+% Approximately 60 seconds.
+% Transition: "When conflict is high, MEDF generates Pareto-optimal consensus solutions."
+
+% ============================================================
+% S13: ALGORITHM - PARETO AND HARM
+% ============================================================
+\begin{frame}{Algorithm: Pareto Consensus and Harm Assessment}
+    \textbf{NSGA-II} objective function with salience weighting~\cite{deb2002nsga}:
+    \[
+        f_k(w_c) = \sum_i s_i \cdot |w_{c,i} - w_{k,i}|
+    \]
+
+    \textbf{Harm Score} combines system performance and governance disagreement:
+    \[
+        h = 0.7 \times (1 - s_{\text{norm}}) + 0.3 \times \bar{d}
+    \]
+
+    \vspace{4pt}
+    \begin{itemize}
+        \item The 0.7/0.3 split reflects a design decision: system performance dominates risk classification, with stakeholder disagreement as an aggravating factor.
+    \end{itemize}
+\end{frame}
+% NOTES: The salience factor s_i ensures the optimizer prioritizes dimensions that
+% matter most for the system under evaluation. The harm score is a composite metric.
+% Approximately 45 seconds.
+% Transition: "Let me now present the three case studies used to validate the platform."

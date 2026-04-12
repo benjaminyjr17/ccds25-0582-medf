@@ -1,0 +1,53 @@
+\section{Limitations, Future Work, and Contributions}
+
+% ============================================================
+% S18: LIMITATIONS
+% ============================================================
+\begin{frame}{Limitations}
+    \begin{enumerate}
+        \item \textbf{Input Subjectivity.} Baseline dimension scores and stakeholder weights are user-provided. No built-in mechanism verifies their accuracy against ground truth.
+        \item \textbf{Linearity and Independence Assumptions.} TOPSIS and WSM assume dimensions are independent. In reality, improving transparency can affect accountability.
+        \item \textbf{No Primary User Research.} The project scope excluded user surveys, interviews, and statistical user studies.
+        \item \textbf{Router-Level Technical Debt.} Conflict analysis logic remains in the API router layer rather than an extracted standalone engine module.
+    \end{enumerate}
+\end{frame}
+% NOTES: State limitations early and honestly (per Dr. Zhang's alignment rules).
+% These do not invalidate the approach but define its boundaries.
+% Approximately 45 seconds.
+% Transition: "These limitations define clear directions for future work."
+
+% ============================================================
+% S19: FUTURE WORK
+% ============================================================
+\begin{frame}{Future Work}
+    \begin{enumerate}
+        \item \textbf{NLP-Based Automated Scoring.} Generate baseline dimension scores from system documentation and audit reports, reducing reliance on subjective manual input.
+        \item \textbf{CI/CD Pipeline Integration.} Embed MEDF evaluations as automated ethical checks in the software development workflow.
+        \item \textbf{Empirical User Studies.} Validate usability and perceived value with AI practitioners, ethicists, and policymakers.
+        \item \textbf{Expanded Framework Library.} Add IEEE Ethically Aligned Design, OECD AI Principles, and sector-specific regulations.
+    \end{enumerate}
+\end{frame}
+% NOTES: Each future work item addresses a specific limitation. NLP scoring addresses
+% input subjectivity. CI/CD integration addresses the post-hoc evaluation limitation.
+% Approximately 30 seconds.
+% Transition: "To summarize, this project makes five concrete contributions."
+
+% ============================================================
+% S20: CONTRIBUTIONS (FINAL SLIDE)
+% ============================================================
+\begin{frame}{Contributions}
+    \begin{enumerate}
+        \item \textbf{Unified Six-Dimension Model} harmonizing EU ALTAI, NIST AI RMF, and Singapore MGAF into a single coherent evaluation framework.
+        \item \textbf{TOPSIS/WSM Scoring Engine} with product pooling for integrated stakeholder-framework weight computation.
+        \item \textbf{Contribution-Based Conflict Detection} via Spearman rank correlation, producing case-sensitive stakeholder disagreement analysis.
+        \item \textbf{NSGA-II Pareto Consensus Generation} for multi-stakeholder mediation with salience-weighted objective functions.
+        \item \textbf{Open-Source, Reproducible Platform} with 50+ automated tests, public deployment, and complete documentation.
+    \end{enumerate}
+\end{frame}
+% NOTES: End on this slide. Do not advance to a "Thank You" slide. Let the
+% contributions remain visible as the examiners formulate their questions.
+% Approximately 45 seconds. Total presentation time: approximately 18.5 minutes.
+% Anticipated question: "What is your single most important contribution?"
+% Response: "The contribution-based conflict detection metric. It is the mechanism
+% that differentiates genuinely contentious cases from clear violations, which no
+% existing tool provides."

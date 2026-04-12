@@ -1,0 +1,188 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{NTU}
+
+% Disable auto-generated TOC interstitials to stay within slide budget
+\makeatletter
+\AtBeginSection[]{}
+\AtBeginSubsection[]{}
+\makeatother
+
+% Packages
+\usepackage{latexsym,amsmath,xcolor,multicol,booktabs}
+\usepackage{graphicx,listings}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning,calc}
+
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{references.bib}
+
+\author{Benjamin Oliver Yick (U2120984H)}
+\title[Multi-Stakeholder Ethical Decision Framework]{%
+  {\fontsize{19}{23}\selectfont Multi-Stakeholder Ethical Decision-Making Frameworks for AI Systems}}
+\subtitle{CCDS25-0582 Final-Year Project}
+\institute{College of Computing and Data Science, Nanyang Technological University (Singapore)}
+\date{Academic Year 2025/2026}
+
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \vspace{-10pt}
+    \begin{columns}[c]
+        \begin{column}{0.5\textwidth}
+            \centering
+            {\small Supervisor: Dr.\ Zhang Jiehuang}\\
+            {\small Examiner: A/P A S Madhukumar}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \includegraphics[width=0.45\linewidth]{images/ntu-logo.png}
+        \end{column}
+    \end{columns}
+\end{frame}
+% NOTES: Welcome the examiner and supervisor. State your name and Final-Year Project title.
+% Approximately 30 seconds. Transition: "Let me begin by showing you the working platform."
+
+
+\input{section-one}
+
+\input{section-two}
+
+\input{section-three}
+
+\input{section-four}
+
+
+\begin{frame}[allowframebreaks]{References}
+    \setbeamertemplate{frametitle continuation}[from second]
+    \footnotesize
+    \printbibliography[heading=none]
+\end{frame}
+
+
+% ============================================================
+% BACKUP SLIDES (for Q&A)
+% ============================================================
+\appendix
+\section{Backup Slides}
+
+\begin{frame}{Backup: Stakeholder Weight Profiles}
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c c}
+        \toprule
+        \textbf{Dimension} & \textbf{Developer} & \textbf{Regulator} & \textbf{Affected Community} \\
+        \midrule
+        Transparency        & 0.10 & 0.20 & 0.10 \\
+        Fairness            & 0.15 & 0.20 & 0.30 \\
+        Safety              & 0.30 & 0.10 & 0.10 \\
+        Privacy             & 0.15 & 0.15 & 0.15 \\
+        Human Oversight     & 0.15 & 0.10 & 0.20 \\
+        Accountability      & 0.15 & 0.25 & 0.15 \\
+        \midrule
+        \textbf{Total}      & 1.00 & 1.00 & 1.00 \\
+        \bottomrule
+    \end{tabular}
+\end{frame}
+% NOTES: Reference Table 11.1 in the report. Developers emphasize Safety (0.30).
+% Regulators emphasize Accountability (0.25). Affected Communities emphasize Fairness (0.30).
+
+\begin{frame}{Backup: Framework Weight Vectors}
+    \centering
+    \resizebox{0.85\linewidth}{!}{%
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l c c c}
+        \toprule
+        \textbf{Dimension} & \textbf{EU ALTAI} & \textbf{NIST RMF} & \textbf{SG MGAF} \\
+        \midrule
+        Transparency        & 0.12 & 0.20 & 0.22 \\
+        Fairness            & 0.14 & 0.20 & 0.12 \\
+        Safety              & 0.22 & 0.24 & 0.16 \\
+        Privacy             & 0.20 & 0.12 & 0.12 \\
+        Human Oversight     & 0.18 & 0.12 & 0.18 \\
+        Accountability      & 0.14 & 0.12 & 0.20 \\
+        \midrule
+        \textbf{Total}      & 1.00 & 1.00 & 1.00 \\
+        \bottomrule
+    \end{tabular}%
+    }
+
+    \vspace{6pt}
+    {\small Weights derived from the structural emphasis of each framework (requirement and principle counts).}
+\end{frame}
+% NOTES: These intrinsic weights come from Appendix B of the report.
+% Each framework emphasizes different dimensions based on its regulatory philosophy.
+
+\begin{frame}{Backup: End-to-End Evaluation Pipeline}
+    \centering
+    \begin{tikzpicture}[scale=0.78, transform shape,
+        node distance=0.9cm,
+        block/.style={rectangle, draw=ntu-blue, fill=ntu-blue!10, text width=3.8cm, minimum height=0.7cm, align=center, font=\small},
+        arrow/.style={-{Stealth[length=2.5mm]}, thick, ntu-blue}
+    ]
+        \node[block] (input1) {AI System Scores};
+        \node[block, right=1.5cm of input1] (input2) {Stakeholder Weights};
+        \node[block, below=of $(input1)!0.5!(input2)$] (ew) {Compute Effective Weights};
+        \node[block, below=of ew] (score) {TOPSIS / WSM Scoring};
+        \node[block, below=of score] (agg) {Aggregate Across Frameworks};
+        \node[block, below left=0.8cm and 0.3cm of agg] (conflict) {Conflict Detection (Spearman $\rho$)};
+        \node[block, below right=0.8cm and 0.3cm of agg] (harm) {Harm Assessment};
+        \node[block, below=1.2cm of agg] (result) {Evaluation Result};
+
+        \draw[arrow] (input1) -- (ew);
+        \draw[arrow] (input2) -- (ew);
+        \draw[arrow] (ew) -- (score);
+        \draw[arrow] (score) -- (agg);
+        \draw[arrow] (agg) -- (conflict);
+        \draw[arrow] (agg) -- (harm);
+        \draw[arrow] (conflict) -- (result);
+        \draw[arrow] (harm) -- (result);
+    \end{tikzpicture}
+\end{frame}
+% NOTES: This corresponds to Figure 8.2 in the report. The pipeline is deterministic
+% and sequential, ensuring reproducibility.
+
+\begin{frame}{Backup: Module Dependency Diagram}
+    \centering
+    \begin{tikzpicture}[scale=0.68, transform shape,
+        node distance=0.8cm,
+        mod/.style={rectangle, draw=ntu-blue, fill=ntu-blue!10, text width=3.0cm, minimum height=0.6cm, align=center, font=\footnotesize\ttfamily},
+        arrow/.style={-{Stealth[length=2mm]}, thick, ntu-blue!70}
+    ]
+        % Row 1: Entry point
+        \node[mod] (main) {main.py};
+
+        % Row 2: API/Router layer (evenly spaced)
+        \node[mod, below left=0.8cm and 1.5cm of main] (eval) {routers/evaluate.py};
+        \node[mod, below=0.8cm of main] (conf) {routers/conflicts.py};
+        \node[mod, below right=0.8cm and 1.5cm of main] (par) {routers/pareto.py};
+
+        % Row 3: Engine layer
+        \node[mod, below=0.8cm of $(eval)!0.5!(conf)$] (scoring) {scoring\_engine.py};
+        \node[mod, below=0.8cm of $(conf)!0.5!(par)$] (harm) {harm\_assessment.py};
+
+        % Row 4: Data layer
+        \node[mod, below=0.8cm of scoring] (models) {models.py};
+        \node[mod, below=0.8cm of harm] (registry) {framework\_registry.py};
+
+        % All arrows point strictly downward
+        \draw[arrow] (main) -- (eval);
+        \draw[arrow] (main) -- (conf);
+        \draw[arrow] (main) -- (par);
+        \draw[arrow] (eval) -- (scoring);
+        \draw[arrow] (conf) -- (scoring);
+        \draw[arrow] (par) -- (harm);
+        \draw[arrow] (scoring) -- (models);
+        \draw[arrow] (harm) -- (registry);
+    \end{tikzpicture}
+\end{frame}
+% NOTES: This corresponds to Figure 7.2 in the report. Note the acknowledged
+% technical debt: conflict analysis logic currently resides in the API router layer,
+% not in a standalone engine module.
+
+\end{document}
