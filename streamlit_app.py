@@ -4398,7 +4398,7 @@ def main() -> None:
             ]
             st.dataframe(sample_table, width="stretch", hide_index=True)
 
-    st.caption("MEDF v1.1.0-Freeze: Feature-Frozen Build • Reproducible Artifact.")
+    st.caption("MEDF v1.1.1: Feature-Frozen Build. Reproducible Artifact.")
 
 
 if __name__ == "__main__":

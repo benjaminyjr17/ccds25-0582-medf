@@ -85,7 +85,11 @@ logs/
 *.ps
 *.fmt
 thesis/main.pdf
-!thesis/main.pdf
+thesis/slides/slide.pdf
+
+# Root-level deliverable duplicates (removed in Prompt C Fix 3/4)
+/CCDS25-0582_FYP_Final_Slides_Yick_Benjamin_Oliver.pdf
+/CCDS25-0582_FYP_Final_Report_Yick_Benjamin_Oliver.pdf
 
 # Environment variables
 *.env
@@ -109,3 +113,6 @@ data/audit_logs/*.jsonl
 !data/audit_logs/.gitkeep
 
 .hypothesis/
+
+# Pipeline state (not part of deliverable)
+.pipeline/

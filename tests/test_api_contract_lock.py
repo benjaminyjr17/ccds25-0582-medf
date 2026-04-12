@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 # Generated from current frozen OpenAPI schema using canonical JSON serialization.
-EXPECTED_OPENAPI_SHA256 = "54631dca5d38c4b14afa197e50691a4734848917d3898ac4d2d39a4ecef1d3bc"
+EXPECTED_OPENAPI_SHA256 = "f39cc727b6e5e611bc814347212acd99b4ef1694348a6d02ec5e09c577405eb7"
 
 EXPECTED_POST_ENDPOINTS = {
     "/api/evaluate",
@@ -66,9 +66,9 @@ def test_api_surface_is_frozen() -> None:
         if "get" in methods
     }
 
-    assert actual_post_endpoints == EXPECTED_POST_ENDPOINTS, "API surface changed — feature freeze violated."
-    assert actual_get_endpoints == EXPECTED_GET_ENDPOINTS, "API surface changed — feature freeze violated."
-    assert api_surface == EXPECTED_API_SURFACE, "API surface changed — feature freeze violated."
+    assert actual_post_endpoints == EXPECTED_POST_ENDPOINTS, "API surface changed , feature freeze violated."
+    assert actual_get_endpoints == EXPECTED_GET_ENDPOINTS, "API surface changed , feature freeze violated."
+    assert api_surface == EXPECTED_API_SURFACE, "API surface changed , feature freeze violated."
 
 
 def test_openapi_schema_fingerprint_is_frozen() -> None:
@@ -76,4 +76,4 @@ def test_openapi_schema_fingerprint_is_frozen() -> None:
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     current_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
-    assert current_hash == EXPECTED_OPENAPI_SHA256, "OpenAPI schema changed — feature freeze violated."
+    assert current_hash == EXPECTED_OPENAPI_SHA256, "OpenAPI schema changed , feature freeze violated."

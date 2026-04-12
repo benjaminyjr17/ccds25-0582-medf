@@ -329,32 +329,3 @@ def compute_scores(
         "overall_score": overall_score,
         "dimension_scores": per_dimension,
     }
-
-
-if __name__ == "__main__":
-    facial_recognition = np.array([[2.0, 1.0, 4.0, 1.0, 2.0, 3.0]], dtype=float)
-    developer_weights = np.array([0.10, 0.15, 0.30, 0.15, 0.15, 0.15], dtype=float)
-    criteria = ["benefit"] * len(UNIFIED_DIMENSIONS)
-
-    decision = np.vstack(
-        [
-            facial_recognition[0],
-            np.full(len(UNIFIED_DIMENSIONS), LIKERT_MAX, dtype=float),
-            np.full(len(UNIFIED_DIMENSIONS), LIKERT_MIN, dtype=float),
-        ]
-    )
-
-    scores, debug_info = topsis_score(
-        decision_matrix=decision,
-        weights=developer_weights,
-        criteria_types=criteria,
-        scale_min=LIKERT_MIN,
-        scale_max=LIKERT_MAX,
-        return_debug=True,
-    )
-
-    print("Dimensions:", list(UNIFIED_DIMENSIONS))
-    print("TOPSIS score (facial recognition):", round(float(scores[0]), 4))
-    print("Norms:", np.array2string(np.asarray(debug_info["norms"]), precision=4))
-    print("Ideal best:", np.array2string(np.asarray(debug_info["ideal_best"]), precision=4))
-    print("Ideal worst:", np.array2string(np.asarray(debug_info["ideal_worst"]), precision=4))

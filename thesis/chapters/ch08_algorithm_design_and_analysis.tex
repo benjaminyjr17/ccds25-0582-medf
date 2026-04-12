@@ -93,7 +93,7 @@ A score of $C = 1.0$ indicates a perfect match with the ideal solution, while $C
   \draw[arrow] (ideal) -- (dist);
   \draw[arrow] (dist) -- (score);
 \end{tikzpicture}
-\caption{Ethical scoring aggregation process.}
+\caption{Scoring Aggregation: multi-framework evaluation pipeline.}
 \label{fig:scoring_flow}
 \end{figure}
 
@@ -110,7 +110,7 @@ The conflict detection module computes two types of correlation matrices:
 \begin{enumerate}[leftmargin=2em]
   \item \textbf{Priority Conflict (Weights-Only).} This matrix computes Spearman's $\rho$ directly between the raw stakeholder weight vectors. It measures whether stakeholders agree on which dimensions are most important, independent of the AI system being evaluated.
 
-  \item \textbf{System-Salience Conflict (Contribution-Based).} This matrix computes Spearman's $\rho$ between the \enquote{contribution vectors}, which are the element-wise products of the effective weights and the system's dimension scores. This measures whether stakeholders agree on which dimensions contribute most to the final score for a specific AI system. Two stakeholders might disagree on general priorities but agree on the critical issues for a particular system.
+  \item \textbf{System-Salience Conflict (Contribution-Based).} This matrix computes Spearman's $\rho$ between the \enquote{contribution vectors,} which are the element-wise products of the effective weights and the system's dimension scores. This measures whether stakeholders agree on which dimensions contribute most to the final score for a specific AI system. Two stakeholders might disagree on general priorities but agree on the critical issues for a particular system.
 \end{enumerate}
 
 \subsection{Pareto Optimization with NSGA-II}
@@ -146,7 +146,7 @@ The \textbf{evaluation router} classifies the TOPSIS closeness coefficient $C$ (
 
 \begin{table}[H]
 \centering
-\caption{Evaluation risk classification (closeness coefficient $C$).}
+\caption{Risk Classification: evaluation thresholds based on closeness coefficient $C$.}
 \label{tab:risk_levels_eval}
 \begin{tabular}{@{}lll@{}}
 \toprule
@@ -164,7 +164,7 @@ The \textbf{harm assessment module} classifies a composite harm score $h$ (where
 
 \begin{table}[H]
 \centering
-\caption{Harm severity classification (harm score $h$).}
+\caption{Harm Severity Classification: thresholds based on harm score $h$.}
 \label{tab:risk_levels_harm}
 \begin{tabular}{@{}lll@{}}
 \toprule
@@ -210,6 +210,6 @@ The complete MEDF evaluation pipeline integrates all the components described ab
   \draw[arrow] (conflict) -- (harm);
   \draw[arrow] (harm) -- (out);
 \end{tikzpicture}
-\caption{End-to-end MEDF evaluation pipeline.}
+\caption{End-to-End Evaluation Pipeline: scoring, aggregation, and harm assessment stages.}
 \label{fig:pipeline}
 \end{figure}

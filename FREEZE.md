@@ -29,7 +29,7 @@ This release includes all functionality developed for the MEDF platform:
 
 ## Test Results
 
-- All tests passing (54+ tests)
+- All tests passing (105 tests across 33 files)
 - Categories: unit, integration, property-based, stress, end-to-end
 - CI: GitHub Actions workflow at `.github/workflows/test.yml`
 

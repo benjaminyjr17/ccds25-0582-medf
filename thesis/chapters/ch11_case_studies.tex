@@ -10,7 +10,7 @@ Before presenting the individual case studies, it is important to define the sta
 
 \begin{table}[H]
 \centering
-\caption{Default stakeholder weight profiles.}
+\caption{Default Stakeholder Weight Profiles: developer, regulator, and affected community priorities.}
 \label{tab:weights}
 \begin{tabular}{@{}lccc@{}}
 \toprule
@@ -61,7 +61,7 @@ The baseline dimension scores for the LFR system were set to reflect its known e
 
 \begin{table}[H]
 \centering
-\caption{Baseline dimension scores for live facial recognition.}
+\caption{Baseline Dimension Scores: live facial recognition system inputs.}
 \label{tab:cs1_baseline}
 \begin{tabular}{@{}lcc@{}}
 \toprule
@@ -83,7 +83,7 @@ The MEDF scoring engine was run using the TOPSIS method with all three governanc
 
 \begin{table}[H]
 \centering
-\caption{MEDF evaluation results for live facial recognition.}
+\caption{Evaluation Results: live facial recognition per-stakeholder scores.}
 \label{tab:cs1_results}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
@@ -106,7 +106,7 @@ The contribution-based Spearman rank correlation analysis between stakeholder pa
 
 \begin{table}[H]
 \centering
-\caption{Stakeholder conflict matrix for live facial recognition (contribution-based Spearman $\rho$).}
+\caption{Stakeholder Conflict Matrix: live facial recognition contribution-based Spearman $\rho$.}
 \label{tab:cs1_conflict}
 \begin{tabular}{@{}lccc@{}}
 \toprule
@@ -145,7 +145,7 @@ The baseline scores for this case were set to reflect the system's primary ethic
 
 \begin{table}[H]
 \centering
-\caption{Baseline dimension scores for iTutorGroup hiring algorithm.}
+\caption{Baseline Dimension Scores: iTutorGroup hiring algorithm system inputs.}
 \label{tab:cs2_baseline}
 \begin{tabular}{@{}lcc@{}}
 \toprule
@@ -167,7 +167,7 @@ The evaluation results, presented in Table~\ref{tab:cs2_results}, show universal
 
 \begin{table}[H]
 \centering
-\caption{MEDF evaluation results for iTutorGroup hiring algorithm.}
+\caption{Evaluation Results: iTutorGroup hiring algorithm per-stakeholder scores.}
 \label{tab:cs2_results}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
@@ -190,7 +190,7 @@ The contribution-based conflict analysis for this case revealed moderate levels 
 
 \begin{table}[H]
 \centering
-\caption{Stakeholder conflict matrix for iTutorGroup (contribution-based Spearman $\rho$).}
+\caption{Stakeholder Conflict Matrix: iTutorGroup contribution-based Spearman $\rho$.}
 \label{tab:cs2_conflict}
 \begin{tabular}{@{}lccc@{}}
 \toprule
@@ -229,7 +229,7 @@ The baseline scores for the Streams app reflect a different ethical profile from
 
 \begin{table}[H]
 \centering
-\caption{Baseline dimension scores for NHS-DeepMind Streams app.}
+\caption{Baseline Dimension Scores: NHS-DeepMind Streams system inputs.}
 \label{tab:cs3_baseline}
 \begin{tabular}{@{}lcc@{}}
 \toprule
@@ -251,7 +251,7 @@ The MEDF evaluation for the Streams app produced a more nuanced result than the 
 
 \begin{table}[H]
 \centering
-\caption{MEDF evaluation results for NHS-DeepMind Streams app.}
+\caption{Evaluation Results: NHS-DeepMind Streams per-stakeholder scores.}
 \label{tab:cs3_results}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
@@ -274,7 +274,7 @@ The contribution-based conflict analysis for this case revealed the highest leve
 
 \begin{table}[H]
 \centering
-\caption{Stakeholder conflict matrix for NHS-DeepMind Streams (contribution-based Spearman $\rho$).}
+\caption{Stakeholder Conflict Matrix: NHS-DeepMind Streams contribution-based Spearman $\rho$.}
 \label{tab:cs3_conflict}
 \begin{tabular}{@{}lccc@{}}
 \toprule
@@ -301,7 +301,7 @@ A summary comparison of the three case studies is presented in Table~\ref{tab:cr
 
 \begin{table}[H]
 \centering
-\caption{Cross-case comparison of MEDF evaluation results.}
+\caption{Cross-Case Comparison: evaluation results across all three case studies.}
 \label{tab:cross_case}
 \small
 \begin{tabular}{@{}lccl>{\centering\arraybackslash}p{2cm}c@{}}
@@ -317,7 +317,7 @@ NHS-DeepMind Streams  & 0.6003 & Medium   & Privacy           & $-0.14$ & High \
 
 The cross-case analysis reveals several important patterns. First, the LFR and iTutorGroup cases, which involve clear and severe ethical violations, both received low scores and critical risk classifications. This validates the framework's ability to correctly flag problematic systems. Second, the NHS-DeepMind case, which involves a more complex trade-off between benefit and harm, received a higher score but still fell within the Medium risk range, demonstrating the framework's sensitivity to nuance.
 
-Third, and most importantly, the contribution-based conflict analysis produces \emph{different} results across cases, even though the same default stakeholder weights are used. The facial recognition case shows low conflict (all stakeholders agree on the ranking of dimension contributions because the ethical profile is extreme), the hiring case shows moderate conflict, and the healthcare case shows high conflict (the more balanced ethical profile exposes genuine disagreements about priorities). This validates MEDF's ability to distinguish between genuinely contentious cases and cases with clear ethical violations through the contribution-based conflict analysis approach.
+Thirdly, and most importantly, the contribution-based conflict analysis produces \emph{different} results across cases, even though the same default stakeholder weights are used. The facial recognition case shows low conflict (all stakeholders agree on the ranking of dimension contributions because the ethical profile is extreme), the hiring case shows moderate conflict, and the healthcare case shows high conflict (the more balanced ethical profile exposes genuine disagreements about priorities). This validates MEDF's ability to distinguish between genuinely contentious cases and cases with clear ethical violations through the contribution-based conflict analysis approach.
 
 Note that the \enquote{Overall} column in each evaluation table represents the aggregated TOPSIS closeness coefficient across all three stakeholders for a given framework, while the \enquote{All Frameworks} row represents the aggregated score when all three frameworks are evaluated simultaneously. The cross-case comparison table uses the all-frameworks overall score for each case study.
 

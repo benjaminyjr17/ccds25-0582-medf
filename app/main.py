@@ -28,7 +28,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title="MEDF API",
-    version="1.1.0",
+    version="1.1.1",
     lifespan=lifespan,
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
@@ -49,7 +49,7 @@ def health() -> HealthResponse:
 
     return HealthResponse(
         status="healthy",
-        version="1.1.0",
+        version="1.1.1",
         frameworks_loaded=frameworks_loaded,
         stakeholder_profiles_loaded=stakeholder_profiles_loaded,
     )

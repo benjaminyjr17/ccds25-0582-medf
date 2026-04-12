@@ -8,7 +8,7 @@ The MEDF platform is implemented as a modern web application with a clear separa
 \begin{tikzpicture}[
   node distance=0.6cm,
   layer/.style={rectangle, draw, thick, minimum width=14cm, minimum height=2.8cm, rounded corners=3pt},
-  comp/.style={rectangle, draw, fill=white, text width=5.5em, text centered, minimum height=2em, font=\small, rounded corners=2pt},
+  comp/.style={rectangle, draw, fill=white, text width=7em, text centered, minimum height=2em, font=\small, rounded corners=2pt},
   arrow/.style={-{Stealth[length=2.5mm]}, thick},
 ]
   % Presentation Layer
@@ -43,7 +43,7 @@ The MEDF platform is implemented as a modern web application with a clear separa
   \draw[arrow] (api.south) -- (eng.north);
   \draw[arrow] (eng.south) -- (data.north);
 \end{tikzpicture}
-\caption{MEDF system architecture diagram.}
+\caption{System Architecture: three-tier platform design.}
 \label{fig:architecture}
 \end{figure}
 
@@ -118,7 +118,7 @@ This layered architecture, summarized in the module diagram in Figure~\ref{fig:m
 \centering
 \begin{tikzpicture}[
   node distance=0.5cm and 0.8cm,
-  mod/.style={rectangle, draw, fill=blue!8, text width=9em, text centered, minimum height=2em, font=\small, rounded corners=2pt},
+  mod/.style={rectangle, draw, fill=blue!8, text width=10.5em, text centered, minimum height=2em, font=\small, rounded corners=2pt},
   arrow/.style={-{Stealth[length=2mm]}, thick},
 ]
   \node[mod] (main) {\texttt{main.py}};
@@ -142,6 +142,6 @@ This layered architecture, summarized in the module diagram in Figure~\ref{fig:m
   \draw[arrow] (eval_r) -- (registry);
   \draw[arrow] (par_r) -- (scoring);
 \end{tikzpicture}
-\caption{MEDF software module diagram.}
+\caption{Software Module Diagram: component dependencies and data flow.}
 \label{fig:modules}
 \end{figure}
