@@ -95,6 +95,7 @@ payload = {
     "scoring_method": "topsis"
 }
 
+# Local development; use deployed API base URL in production.
 response = requests.post(
     "http://localhost:8000/api/evaluate",
     json=payload
